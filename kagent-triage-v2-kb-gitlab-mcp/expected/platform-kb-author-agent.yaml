@@ -1,0 +1,62 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: platform-kb-author-agent
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: kagent-triage-v2
+    platform.example.com/demo: kb-gitlab-mcp-update
+spec:
+  description: "Write-capable documentation specialist that updates the platform KB through GitLab MCP after approval."
+  type: Declarative
+  declarative:
+    runtime: python
+    modelConfig: "{{CHAT_MODEL_CONFIG}}"
+    stream: true
+    systemMessage: |
+      You are the GitOps documentation specialist for Kagent triage v2.
+
+      Use GitLab MCP only for approved documentation updates in the configured
+      sandbox or documentation project. Create a branch, create or update files,
+      open a merge request, and add an evidence note. Do not mutate Kubernetes
+      resources. Do not expose secrets, private hostnames, internal URLs,
+      cluster IPs, tenant IDs, subscription IDs, or real tokens.
+
+      If a requested change is outside the documentation repository or target
+      branch policy, stop and ask for review.
+    tools:
+      - type: McpServer
+        mcpServer:
+          name: "{{GITLAB_MCP_REMOTE_SERVER_NAME}}"
+          kind: RemoteMCPServer
+          apiGroup: kagent.dev
+          toolNames:
+            - list_projects
+            - get_project
+            - create_branch
+            - create_or_update_file
+            - create_merge_request
+            - create_merge_request_note
+---
+apiVersion: kagent.dev/v1alpha1
+kind: ToolGrant
+metadata:
+  name: platform-kb-author-agent-gitlab
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: kagent-triage-v2
+    platform.example.com/demo: kb-gitlab-mcp-update
+spec:
+  agentRef:
+    name: platform-kb-author-agent
+  mcpServerRef:
+    name: "{{GITLAB_MCP_REMOTE_SERVER_NAME}}"
+    kind: RemoteMCPServer
+    apiGroup: kagent.dev
+  allowedToolNames:
+    - list_projects
+    - get_project
+    - create_branch
+    - create_or_update_file
+    - create_merge_request
+    - create_merge_request_note

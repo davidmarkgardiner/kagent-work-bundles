@@ -1,0 +1,24 @@
+apiVersion: platform.example.com/v1alpha1
+kind: KnowledgeQueryContract
+metadata:
+  name: platform-knowledge-agent-query-contract
+spec:
+  agent: platform-knowledge-agent
+  mcpTool: query_documentation
+  queryArguments:
+    productName: platform-kb
+    version: current
+    dbName: platform-kb.db
+  citedHitQueries:
+    - question: "How does Kagent triage v2 use GitLab MCP to update the knowledge base?"
+      expectedSource: docs/platform-kb/agents/gitlab-mcp-kb-update-loop.md
+    - question: "When should a triage agent call the platform knowledge agent?"
+      expectedSource: docs/platform-kb/agents/triage-agent-kb-lookup.md
+  fallbackQuery:
+    question: "How does the platform operate a fictional service not present in the corpus?"
+    expectedMarker: "NO_RELEVANT_DOCS"
+  requiredResponseRules:
+    - "Use query_documentation before answering platform documentation questions."
+    - "Cite source paths and headings."
+    - "Say when retrieved docs do not answer the question."
+    - "Route stale or missing docs to the GitLab MCP documentation update workflow."

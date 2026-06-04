@@ -1,0 +1,30 @@
+apiVersion: platform.example.com/v1alpha1
+kind: EvidenceContract
+metadata:
+  name: kb-gitlab-mcp-update-evidence
+spec:
+  requiredMarkers:
+    - "KAGENT_MCP: called"
+    - "GITLAB_BRANCH: created"
+    - "GITLAB_FILE: created_or_updated"
+    - "KB_INDEX_UPDATED: yes"
+    - "GITLAB_MR: created"
+    - "GITLAB_MR_NOTE: created"
+    - "QUERYDOC_REINDEXED: yes"
+    - "KB_CITED_HIT: yes"
+    - "NO_RELEVANT_DOCS: yes"
+    - "TRIAGE_KB_LOOKUP: called"
+    - "KB_CITATION_USED_IN_TRIAGE: yes"
+  hardFailures:
+    - id: local_edit_claimed_as_mcp
+      description: "Agent claims GitLab MCP proof but only edited local files."
+    - id: missing_index_update
+      description: "New KB documents exist but docs/platform-kb/INDEX.md was not updated."
+    - id: missing_querydoc_rebuild
+      description: "GitLab update succeeded but doc2vec/querydoc was not rebuilt or queried."
+    - id: invented_citation
+      description: "Knowledge agent cites a document not returned by querydoc."
+    - id: write_tools_on_general_triage_agent
+      description: "Front-door or general triage agent has write-capable GitLab tools."
+    - id: secret_or_private_endpoint_leak
+      description: "Evidence or KB content includes non-public values."

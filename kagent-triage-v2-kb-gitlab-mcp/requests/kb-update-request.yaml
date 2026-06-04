@@ -1,0 +1,36 @@
+apiVersion: platform.example.com/v1alpha1
+kind: KnowledgeBaseUpdateRequest
+metadata:
+  name: kagent-triage-v2-kb-update-loop
+spec:
+  requester: sre-platform-demo
+  repository:
+    provider: gitlab
+    project: "{{GITLAB_PROJECT}}"
+    targetBranch: "{{TARGET_BRANCH}}"
+    sourceBranch: "kb/kagent-triage-v2-{{RUN_ID}}"
+  objective: "Create or update Kagent triage v2 knowledge-base documents and prove querydoc can retrieve them."
+  files:
+    - path: docs/platform-kb/agents/kagent-triage-v2-overview.md
+      purpose: "Explain the v2 operating model, agent roles, safety rules, and evidence requirements."
+    - path: docs/platform-kb/agents/gitlab-mcp-kb-update-loop.md
+      purpose: "Explain how GitLab MCP updates KB docs and opens reviewable MRs."
+    - path: docs/platform-kb/agents/querydoc-knowledge-agent.md
+      purpose: "Explain the doc2vec/querydoc runtime path and query contract."
+    - path: docs/platform-kb/agents/triage-agent-kb-lookup.md
+      purpose: "Explain when triage agents call the knowledge agent and how citations appear in synthesis."
+    - path: docs/platform-kb/INDEX.md
+      purpose: "Route KB questions to the new agent guidance documents."
+  approval:
+    requiredBeforeMerge: true
+    requiredBeforeRuntimeMutation: true
+  requiredEvidence:
+    - "KAGENT_MCP: called"
+    - "GITLAB_BRANCH: created"
+    - "GITLAB_FILE: created_or_updated"
+    - "KB_INDEX_UPDATED: yes"
+    - "GITLAB_MR: created"
+    - "GITLAB_MR_NOTE: created"
+    - "QUERYDOC_REINDEXED: yes"
+    - "KB_CITED_HIT: yes"
+    - "NO_RELEVANT_DOCS: yes"
