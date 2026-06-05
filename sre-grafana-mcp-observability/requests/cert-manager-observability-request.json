@@ -1,0 +1,20 @@
+{
+  "component": "cert-manager",
+  "namespace": "cert-manager",
+  "cluster": "{{CLUSTER_NAME}}",
+  "environment": "{{ENVIRONMENT}}",
+  "mode": "durable-gitops",
+  "request": "Add or update cert-manager observability. Use installed Grafana MCP tools to validate live metrics and logs first. Open a GitLab MR for durable Alloy, dashboard, alert, and triage-route changes if GitLab MCP is available.",
+  "requiredEvidence": [
+    "GRAFANA_MCP_TOOLS",
+    "GRAFANA_DATASOURCES",
+    "CERT_MANAGER_METRICS",
+    "CERT_MANAGER_LOGS",
+    "DASHBOARD_DECISION",
+    "ALLOY_DECISION",
+    "ALERT_RULES",
+    "TRIAGE_ROUTE",
+    "GITLAB_MR",
+    "VALIDATION_QUERIES"
+  ]
+}

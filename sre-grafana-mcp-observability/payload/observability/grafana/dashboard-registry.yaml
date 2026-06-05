@@ -1,0 +1,242 @@
+apiVersion: platform.example.com/v1alpha1
+kind: AgentDashboardRegistry
+metadata:
+  name: agent-dashboard-registry
+  labels:
+    app.kubernetes.io/name: agent-dashboard-registry
+    app.kubernetes.io/part-of: kagent-observability
+spec:
+  version: 1
+  description: >
+    Public-safe registry that maps kagent agents to stable operating dashboards
+    and incident-specific evidence dashboards. Agents use home dashboards for
+    domain health and evidence dashboards for SRE ticket handoff.
+  requiredCorrelationLabels:
+    - cluster
+    - environment
+    - namespace
+    - pod
+    - container
+    - service
+    - workload
+    - node
+    - agent
+    - workflow
+  evidencePackContract:
+    requiredSections:
+      - incident
+      - scope
+      - fleetImpact
+      - metrics
+      - logs
+      - kubernetesEvents
+      - dashboardLinks
+      - verdict
+      - decision
+      - verification
+    requiredLinks:
+      - focusedEvidenceDashboard
+      - metricsExplore
+      - logsExplore
+    dashboardSelectionRules:
+      - Prefer incident evidence dashboards when alert labels identify a pod, workload, service, cluster, or namespace.
+      - Use agent home dashboards for domain-wide context and fleet blast-radius checks.
+      - Do not link a generic dashboard to an SRE ticket unless the variables are set to the affected labels.
+      - If required variables are missing, state which labels are missing and fall back to exact PromQL and LogQL Explore links.
+  evidenceDashboards:
+    - id: k8s-pod-crash-evidence
+      title: Kubernetes Pod Crash Evidence
+      path: observability/grafana/dashboards/k8s-pod-crash-evidence.json
+      purpose: Focused SRE view for CrashLoopBackOff, OOMKilled, failed probes, and repeated pod restarts.
+      requiredVariables:
+        - cluster
+        - namespace
+        - pod
+        - container
+      answers:
+        - Which pod and container are crashing?
+        - What is the restart rate and last termination reason?
+        - Are readiness, CPU, memory, or node pressure correlated?
+        - What logs and Kubernetes events explain the crash window?
+        - Did the remediation return the pod to healthy uptime?
+      verificationSignals:
+        - restart increase is flat after remediation
+        - pod readiness remains true during the verification window
+        - last terminated reason no longer changes
+        - error log pattern disappears or returns to baseline
+    - id: fleet-scope-evidence
+      title: Fleet Scope Evidence
+      path: "{{GRAFANA_FOLDER}}/fleet-scope-evidence"
+      purpose: Determine whether an alert affects one cluster, a subset of clusters, or the full fleet.
+      requiredVariables:
+        - alertname
+        - environment
+        - namespace
+      answers:
+        - How many clusters are affected?
+        - Is the symptom tied to one region, node pool, namespace, or release?
+        - Are related alerts firing at the same time?
+    - id: service-latency-evidence
+      title: Service Latency Evidence
+      path: "{{GRAFANA_FOLDER}}/service-latency-evidence"
+      purpose: Focused SRE view for route, service, ingress, or gateway latency incidents.
+      requiredVariables:
+        - cluster
+        - namespace
+        - service
+        - route
+      answers:
+        - Which route or service is slow?
+        - Is latency caused by app errors, gateway errors, saturation, or model backend delay?
+        - Did p95/p99 recover after remediation?
+  agents:
+    - name: grafana-evidence-agent
+      domain: Shared Grafana MCP evidence, dashboard selection, fleet scope, and remediation verification.
+      role: shared-evidence-specialist
+      homeDashboards:
+        - title: Kubernetes Pod Crash Evidence
+          uid: k8s-pod-crash-evidence
+          path: observability/grafana/dashboards/k8s-pod-crash-evidence.json
+          purpose: Focused SRE evidence for pod crash and restart incidents.
+        - title: Prometheus Alert Triage
+          uid: prometheus-alert-triage
+          purpose: Alert and Argo triage pipeline health.
+      evidenceDashboards:
+        - k8s-pod-crash-evidence
+        - fleet-scope-evidence
+        - service-latency-evidence
+      requiredTools:
+        grafanaMcp:
+          - list_datasources
+          - query_prometheus
+          - query_loki_logs
+          - search_dashboards
+          - get_dashboard_summary
+          - get_dashboard_panel_queries
+          - generate_deeplink
+        callerSuppliedKubernetesEvidence:
+          - pod status
+          - pod events
+          - container logs
+          - AKS or Kubernetes events
+      handoffContract:
+        callerProvides:
+          - alertname
+          - cluster
+          - environment
+          - namespace
+          - pod
+          - container
+          - workload
+          - service
+          - node
+          - startsAt
+          - endsAt
+          - suspectedFailureMode
+          - kubernetesEvidence
+        returns:
+          - focusedDashboardLink
+          - homeDashboardLink
+          - metricsExploreLink
+          - logsExploreLink
+          - promql
+          - logql
+          - fleetImpact
+          - verificationQueries
+          - dashboardFollowUp
+      learningQueue:
+        issueLabels:
+          - dashboard-follow-up
+          - grafana-evidence
+    - name: chaos-triage-agent
+      domain: Controlled chaos experiments and resilience drills.
+      delegatesTo:
+        - grafana-evidence-agent
+      homeDashboards:
+        - title: Prometheus Alert Triage
+          uid: prometheus-alert-triage
+          purpose: Alert and Argo triage pipeline health.
+        - title: Chaos Agent Iteration Review
+          path: docs/ai-grafana/iteration-review-chaos-agent-demo.html
+          purpose: Presenter view for chaos alert, analysis, HITL, remediation, and verification.
+      evidenceDashboards:
+        - k8s-pod-crash-evidence
+        - fleet-scope-evidence
+      requiredTools:
+        grafanaMcp:
+          - list_datasources
+          - query_prometheus
+          - query_loki_logs
+          - search_dashboards
+          - get_dashboard_panel_queries
+          - generate_deeplink
+        kubernetesRead:
+          - get pods
+          - get events
+          - get deployment
+          - get chaosresult
+      learningQueue:
+        issueLabels:
+          - dashboard-follow-up
+          - chaos-triage
+    - name: cert-manager-agent
+      domain: Certificate issuance, renewal, ACME challenge, and webhook health.
+      homeDashboards:
+        - title: cert-manager Operating Health
+          path: "{{GRAFANA_FOLDER}}/cert-manager-operating-health"
+          purpose: Certificate expiry, failed renewals, challenge state, issuer readiness, and webhook errors.
+      evidenceDashboards:
+        - fleet-scope-evidence
+      requiredVariables:
+        - cluster
+        - namespace
+        - certificate
+        - issuer
+      recommendedSignals:
+        - certmanager_certificate_expiration_timestamp_seconds
+        - certmanager_certificate_ready_status
+        - certmanager_http_acme_client_request_count
+        - certmanager_controller_sync_call_count
+      learningQueue:
+        issueLabels:
+          - dashboard-follow-up
+          - cert-manager
+    - name: external-dns-agent
+      domain: DNS record synchronization and provider API health.
+      homeDashboards:
+        - title: external-dns Operating Health
+          path: "{{GRAFANA_FOLDER}}/external-dns-operating-health"
+          purpose: Registry sync duration, provider request failures, desired vs actual records, stale records, and zone errors.
+      evidenceDashboards:
+        - fleet-scope-evidence
+      requiredVariables:
+        - cluster
+        - namespace
+        - zone
+        - hostname
+      recommendedSignals:
+        - external_dns_registry_errors_total
+        - external_dns_source_errors_total
+        - external_dns_provider_requests_total
+        - external_dns_sync_duration_seconds
+      learningQueue:
+        issueLabels:
+          - dashboard-follow-up
+          - external-dns
+    - name: platform-sre-agent
+      domain: Cross-cluster AKS, workload, and observability platform triage.
+      homeDashboards:
+        - title: K-Agent Metrics
+          path: observability/grafana/dashboards/k-agent-metrics.json
+          purpose: Agent request rate, latency, errors, and token usage.
+        - title: Agent Gateway Traffic Quality
+          path: observability/grafana/dashboards/agentgateway-traffic-quality.json
+          purpose: Model route health, gateway errors, and backend quality.
+      evidenceDashboards:
+        - k8s-pod-crash-evidence
+        - fleet-scope-evidence
+        - service-latency-evidence
+      learningQueue:
+        issueLabels:
+          - dashboard-follow-up
+          - platform-sre

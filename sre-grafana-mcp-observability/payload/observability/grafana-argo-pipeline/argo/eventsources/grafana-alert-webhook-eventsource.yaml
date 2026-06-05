@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: grafana-alert-webhook
+  namespace: argo
+spec:
+  service:
+    ports:
+      - name: grafana-direct
+        port: 12000
+        targetPort: 12000
+  webhook:
+    grafana-direct:
+      endpoint: /grafana/direct
+      method: POST
+      port: "12000"

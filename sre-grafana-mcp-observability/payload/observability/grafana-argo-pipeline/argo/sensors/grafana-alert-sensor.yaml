@@ -1,0 +1,280 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: grafana-alert-router
+  namespace: argo
+spec:
+  template:
+    serviceAccountName: argo-alert-sensor
+  dependencies:
+    - name: direct-grafana-alert
+      eventSourceName: grafana-alert-webhook
+      eventName: grafana-direct
+    - name: redpanda-grafana-alert
+      eventSourceName: grafana-alert-redpanda
+      eventName: grafana-alerts
+  triggers:
+    - template:
+        name: direct-alert-workflow
+        conditions: direct-grafana-alert
+        argoWorkflow:
+          operation: submit
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: grafana-alert-direct-
+                namespace: argo
+                labels:
+                  app.kubernetes.io/name: grafana-alert-router
+                  alerting.symphony.dev/path: direct
+              spec:
+                serviceAccountName: argo-alert-sensor
+                entrypoint: triage-alert
+                arguments:
+                  parameters:
+                    - name: delivery_path
+                      value: direct
+                    - name: alert_payload
+                      value: "{}"
+                templates:
+                  - name: triage-alert
+                    inputs:
+                      parameters:
+                        - name: delivery_path
+                        - name: alert_payload
+                    container:
+                      image: bitnami/kubectl:latest
+                      command:
+                        - sh
+                        - -c
+                      args:
+                        - |
+                          PAYLOAD='{{inputs.parameters.alert_payload}}'
+                          DELIVERY='{{inputs.parameters.delivery_path}}'
+                          TS=$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date +%Y-%m-%dT%H:%M:%SZ)
+                          xf() { echo "$PAYLOAD" | grep -o "\"$1\":\"[^\"]*\"" | head -1 | cut -d'"' -f4; }
+                          NAMESPACE=$(xf namespace)
+                          POD=$(xf pod)
+                          CONTAINER=$(xf container)
+                          RULENAME=$(xf rulename)
+                          SEVERITY=$(xf severity)
+                          REASON=$(xf reason)
+                          SOURCE=$(xf source)
+                          OBJECT_KIND=$(xf involved_object_kind)
+                          OBJECT_NAME=$(xf involved_object_name)
+                          echo "════════════════════════════════════════════════════════════════"
+                          echo "  TRIAGE CONTEXT"
+                          echo "════════════════════════════════════════════════════════════════"
+                          printf "  timestamp   : %s\n" "$TS"
+                          printf "  delivery    : %s\n" "$DELIVERY"
+                          printf "  rule        : %s\n" "${RULENAME}"
+                          printf "  severity    : %s\n" "${SEVERITY}"
+                          printf "  namespace   : %s\n" "${NAMESPACE:-(not specified)}"
+                          printf "  pod         : %s\n" "${POD:-(not a pod alert)}"
+                          printf "  container   : %s\n" "${CONTAINER:-(n/a)}"
+                          printf "  term_reason : %s\n" "${REASON:-(n/a)}"
+                          printf "  source      : %s\n" "${SOURCE:-(unknown)}"
+                          printf "  object_kind : %s\n" "${OBJECT_KIND:-(n/a)}"
+                          printf "  object_name : %s\n" "${OBJECT_NAME:-(n/a)}"
+                          echo ""
+                          echo "── ALERT PAYLOAD ────────────────────────────────────────────────"
+                          echo "$PAYLOAD"
+                          echo ""
+                          if [ -n "$POD" ] && [ -n "$NAMESPACE" ]; then
+                            echo "── KUBECTL DESCRIBE POD ─────────────────────────────────────────"
+                            kubectl describe pod "$POD" -n "$NAMESPACE" 2>&1 || echo "(describe failed)"
+                            echo ""
+                            echo "── PREVIOUS CONTAINER LOGS (150 lines) ──────────────────────────"
+                            if [ -n "$CONTAINER" ]; then
+                              kubectl logs "$POD" -n "$NAMESPACE" -c "$CONTAINER" --previous --tail=150 2>&1 || \
+                              kubectl logs "$POD" -n "$NAMESPACE" --previous --tail=150 2>&1 || echo "(no previous logs)"
+                            else
+                              kubectl logs "$POD" -n "$NAMESPACE" --previous --tail=150 2>&1 || echo "(no previous logs)"
+                            fi
+                            echo ""
+                            echo "── CURRENT CONTAINER LOGS (50 lines) ────────────────────────────"
+                            kubectl logs "$POD" -n "$NAMESPACE" --tail=50 2>&1 || echo "(no current logs)"
+                            echo ""
+                            echo "── KUBERNETES EVENTS FOR POD ────────────────────────────────────"
+                            kubectl get events -n "$NAMESPACE" \
+                              --field-selector "involvedObject.name=$POD" \
+                              --sort-by=.lastTimestamp -o wide 2>&1 | tail -30
+                            echo ""
+                            if [ -n "$OBJECT_KIND" ] && [ -n "$OBJECT_NAME" ] && [ "$OBJECT_KIND" != "Pod" ]; then
+                              KIND_LOWER=$(echo "$OBJECT_KIND" | tr '[:upper:]' '[:lower:]')
+                              echo "── KUBECTL DESCRIBE ${OBJECT_KIND} (event source object) ────────"
+                              kubectl describe "$KIND_LOWER" "$OBJECT_NAME" -n "$NAMESPACE" 2>&1 || echo "(describe failed)"
+                              echo ""
+                            fi
+                            echo "── ALL PODS IN NAMESPACE ────────────────────────────────────────"
+                            kubectl get pods -n "$NAMESPACE" -o wide 2>&1
+                          elif [ -n "$OBJECT_KIND" ] && [ -n "$OBJECT_NAME" ] && [ -n "$NAMESPACE" ]; then
+                            KIND_LOWER=$(echo "$OBJECT_KIND" | tr '[:upper:]' '[:lower:]')
+                            echo "── KUBECTL DESCRIBE ${OBJECT_KIND}/${OBJECT_NAME} ───────────────"
+                            kubectl describe "$KIND_LOWER" "$OBJECT_NAME" -n "$NAMESPACE" 2>&1 || echo "(describe failed)"
+                            echo ""
+                            echo "── K8S EVENTS FOR ${OBJECT_KIND}/${OBJECT_NAME} ─────────────────"
+                            kubectl get events -n "$NAMESPACE" \
+                              --field-selector "involvedObject.name=$OBJECT_NAME" \
+                              --sort-by=.lastTimestamp -o wide 2>&1 | tail -30
+                            echo ""
+                            echo "── ALL PODS IN NAMESPACE ────────────────────────────────────────"
+                            kubectl get pods -n "$NAMESPACE" -o wide 2>&1
+                          else
+                            echo "── NAMESPACE HEALTH SWEEP ───────────────────────────────────────"
+                            for NS in argo argo-events kagent; do
+                              echo "=== $NS pods ==="
+                              kubectl get pods -n "$NS" -o wide 2>&1 | head -25
+                              echo "=== $NS recent events ==="
+                              kubectl get events -n "$NS" --sort-by=.lastTimestamp -o wide 2>&1 | tail -15
+                              echo ""
+                            done
+                          fi
+                          echo "── RECENTLY RESTARTED PODS (all namespaces) ─────────────────────"
+                          kubectl get pods --all-namespaces -o wide 2>&1 | awk 'NR==1 || $5+0 > 0' | head -20
+                          echo ""
+                          echo "── CLUSTER NODES ────────────────────────────────────────────────"
+                          kubectl get nodes -o wide 2>&1
+                          echo ""
+                          echo "════════════════════════════════════════════════════════════════"
+                          echo "  END TRIAGE CONTEXT"
+                          echo "════════════════════════════════════════════════════════════════"
+          parameters:
+            - src:
+                dependencyName: direct-grafana-alert
+                dataTemplate: "{{ .Input.body | toJson }}"
+              dest: spec.arguments.parameters.1.value
+    - template:
+        name: redpanda-alert-workflow
+        conditions: redpanda-grafana-alert
+        argoWorkflow:
+          operation: submit
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: grafana-alert-redpanda-
+                namespace: argo
+                labels:
+                  app.kubernetes.io/name: grafana-alert-router
+                  alerting.symphony.dev/path: redpanda
+              spec:
+                serviceAccountName: argo-alert-sensor
+                entrypoint: triage-alert
+                arguments:
+                  parameters:
+                    - name: delivery_path
+                      value: redpanda
+                    - name: alert_payload
+                      value: "{}"
+                templates:
+                  - name: triage-alert
+                    inputs:
+                      parameters:
+                        - name: delivery_path
+                        - name: alert_payload
+                    container:
+                      image: bitnami/kubectl:latest
+                      command:
+                        - sh
+                        - -c
+                      args:
+                        - |
+                          PAYLOAD='{{inputs.parameters.alert_payload}}'
+                          DELIVERY='{{inputs.parameters.delivery_path}}'
+                          TS=$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date +%Y-%m-%dT%H:%M:%SZ)
+                          xf() { echo "$PAYLOAD" | grep -o "\"$1\":\"[^\"]*\"" | head -1 | cut -d'"' -f4; }
+                          NAMESPACE=$(xf namespace)
+                          POD=$(xf pod)
+                          CONTAINER=$(xf container)
+                          RULENAME=$(xf rulename)
+                          SEVERITY=$(xf severity)
+                          REASON=$(xf reason)
+                          SOURCE=$(xf source)
+                          OBJECT_KIND=$(xf involved_object_kind)
+                          OBJECT_NAME=$(xf involved_object_name)
+                          echo "════════════════════════════════════════════════════════════════"
+                          echo "  TRIAGE CONTEXT"
+                          echo "════════════════════════════════════════════════════════════════"
+                          printf "  timestamp   : %s\n" "$TS"
+                          printf "  delivery    : %s\n" "$DELIVERY"
+                          printf "  rule        : %s\n" "${RULENAME}"
+                          printf "  severity    : %s\n" "${SEVERITY}"
+                          printf "  namespace   : %s\n" "${NAMESPACE:-(not specified)}"
+                          printf "  pod         : %s\n" "${POD:-(not a pod alert)}"
+                          printf "  container   : %s\n" "${CONTAINER:-(n/a)}"
+                          printf "  term_reason : %s\n" "${REASON:-(n/a)}"
+                          printf "  source      : %s\n" "${SOURCE:-(unknown)}"
+                          printf "  object_kind : %s\n" "${OBJECT_KIND:-(n/a)}"
+                          printf "  object_name : %s\n" "${OBJECT_NAME:-(n/a)}"
+                          echo ""
+                          echo "── ALERT PAYLOAD ────────────────────────────────────────────────"
+                          echo "$PAYLOAD"
+                          echo ""
+                          if [ -n "$POD" ] && [ -n "$NAMESPACE" ]; then
+                            echo "── KUBECTL DESCRIBE POD ─────────────────────────────────────────"
+                            kubectl describe pod "$POD" -n "$NAMESPACE" 2>&1 || echo "(describe failed)"
+                            echo ""
+                            echo "── PREVIOUS CONTAINER LOGS (150 lines) ──────────────────────────"
+                            if [ -n "$CONTAINER" ]; then
+                              kubectl logs "$POD" -n "$NAMESPACE" -c "$CONTAINER" --previous --tail=150 2>&1 || \
+                              kubectl logs "$POD" -n "$NAMESPACE" --previous --tail=150 2>&1 || echo "(no previous logs)"
+                            else
+                              kubectl logs "$POD" -n "$NAMESPACE" --previous --tail=150 2>&1 || echo "(no previous logs)"
+                            fi
+                            echo ""
+                            echo "── CURRENT CONTAINER LOGS (50 lines) ────────────────────────────"
+                            kubectl logs "$POD" -n "$NAMESPACE" --tail=50 2>&1 || echo "(no current logs)"
+                            echo ""
+                            echo "── KUBERNETES EVENTS FOR POD ────────────────────────────────────"
+                            kubectl get events -n "$NAMESPACE" \
+                              --field-selector "involvedObject.name=$POD" \
+                              --sort-by=.lastTimestamp -o wide 2>&1 | tail -30
+                            echo ""
+                            if [ -n "$OBJECT_KIND" ] && [ -n "$OBJECT_NAME" ] && [ "$OBJECT_KIND" != "Pod" ]; then
+                              KIND_LOWER=$(echo "$OBJECT_KIND" | tr '[:upper:]' '[:lower:]')
+                              echo "── KUBECTL DESCRIBE ${OBJECT_KIND} (event source object) ────────"
+                              kubectl describe "$KIND_LOWER" "$OBJECT_NAME" -n "$NAMESPACE" 2>&1 || echo "(describe failed)"
+                              echo ""
+                            fi
+                            echo "── ALL PODS IN NAMESPACE ────────────────────────────────────────"
+                            kubectl get pods -n "$NAMESPACE" -o wide 2>&1
+                          elif [ -n "$OBJECT_KIND" ] && [ -n "$OBJECT_NAME" ] && [ -n "$NAMESPACE" ]; then
+                            KIND_LOWER=$(echo "$OBJECT_KIND" | tr '[:upper:]' '[:lower:]')
+                            echo "── KUBECTL DESCRIBE ${OBJECT_KIND}/${OBJECT_NAME} ───────────────"
+                            kubectl describe "$KIND_LOWER" "$OBJECT_NAME" -n "$NAMESPACE" 2>&1 || echo "(describe failed)"
+                            echo ""
+                            echo "── K8S EVENTS FOR ${OBJECT_KIND}/${OBJECT_NAME} ─────────────────"
+                            kubectl get events -n "$NAMESPACE" \
+                              --field-selector "involvedObject.name=$OBJECT_NAME" \
+                              --sort-by=.lastTimestamp -o wide 2>&1 | tail -30
+                            echo ""
+                            echo "── ALL PODS IN NAMESPACE ────────────────────────────────────────"
+                            kubectl get pods -n "$NAMESPACE" -o wide 2>&1
+                          else
+                            echo "── NAMESPACE HEALTH SWEEP ───────────────────────────────────────"
+                            for NS in argo argo-events kagent; do
+                              echo "=== $NS pods ==="
+                              kubectl get pods -n "$NS" -o wide 2>&1 | head -25
+                              echo "=== $NS recent events ==="
+                              kubectl get events -n "$NS" --sort-by=.lastTimestamp -o wide 2>&1 | tail -15
+                              echo ""
+                            done
+                          fi
+                          echo "── RECENTLY RESTARTED PODS (all namespaces) ─────────────────────"
+                          kubectl get pods --all-namespaces -o wide 2>&1 | awk 'NR==1 || $5+0 > 0' | head -20
+                          echo ""
+                          echo "── CLUSTER NODES ────────────────────────────────────────────────"
+                          kubectl get nodes -o wide 2>&1
+                          echo ""
+                          echo "════════════════════════════════════════════════════════════════"
+                          echo "  END TRIAGE CONTEXT"
+                          echo "════════════════════════════════════════════════════════════════"
+          parameters:
+            - src:
+                dependencyName: redpanda-grafana-alert
+                dataTemplate: "{{ .Input.body | toJson }}"
+              dest: spec.arguments.parameters.1.value

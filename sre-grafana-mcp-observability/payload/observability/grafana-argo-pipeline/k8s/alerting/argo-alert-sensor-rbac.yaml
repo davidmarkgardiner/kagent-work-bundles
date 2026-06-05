@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argo-alert-sensor
+  namespace: argo
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argo-alert-sensor-workflow-submit
+  namespace: argo
+rules:
+  - apiGroups: [argoproj.io]
+    resources: [workflows, workflowtaskresults]
+    verbs: [create, get, list, watch, patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argo-alert-sensor-workflow-submit
+  namespace: argo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: argo-alert-sensor-workflow-submit
+subjects:
+  - kind: ServiceAccount
+    name: argo-alert-sensor
+    namespace: argo
+---
+# ClusterRole: grants triage workflows read access to pods, logs, events, nodes
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argo-alert-enrichment
+rules:
+  - apiGroups: [""]
+    resources: [pods, pods/log, events, nodes]
+    verbs: [get, list]
+  - apiGroups: [metrics.k8s.io]
+    resources: [pods]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argo-alert-enrichment
+subjects:
+  - kind: ServiceAccount
+    name: argo-alert-sensor
+    namespace: argo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: argo-alert-enrichment

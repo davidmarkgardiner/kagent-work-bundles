@@ -1,0 +1,71 @@
+apiVersion: platform.example.com/v1alpha1
+kind: ObservabilityWorkRequest
+metadata:
+  name: cert-manager-grafana-mcp-observability
+spec:
+  component:
+    name: cert-manager
+    namespace: cert-manager
+    cluster: "{{CLUSTER_NAME}}"
+    environment: "{{ENVIRONMENT}}"
+  objective: >
+    Expose a kagent SRE front door for cert-manager observability, then build
+    or update cert-manager observability using Grafana MCP live evidence, Alloy
+    collection, Grafana dashboards, alert rules, and kagent triage routing.
+  sreFrontDoor:
+    agentName: observability-work-agent
+    access:
+      - kagent-ui
+      - a2a
+      - curl-via-approved-gateway
+    localMcpInstallRequired: false
+  requiredCapabilities:
+    grafanaMcp:
+      mode: read-first
+      requiredTools:
+        - list_datasources
+        - search_dashboards
+        - get_dashboard_summary
+        - get_dashboard_panel_queries
+        - query_prometheus
+        - query_loki_logs
+        - generate_deeplink
+    gitlabMcp:
+      mode: optional-reviewable-write
+      requiredActions:
+        - create_branch
+        - create_or_update_file
+        - create_merge_request
+        - create_merge_request_note
+  desiredOutputs:
+    kagent:
+      - observability-work-agent instructions or manifest
+      - UI or A2A request path
+      - curl example with placeholder endpoint
+    alloy:
+      - metrics collection decision
+      - logs collection decision
+    dashboards:
+      - cert-manager operating health
+      - incident evidence links
+    alerts:
+      - certificate expiry
+      - renewal failure
+      - acme order or challenge failure
+      - controller or webhook unavailable
+      - missing metrics
+      - log errors if Loki ruler is available
+    triage:
+      - route labels
+      - target cert-manager expert agent
+      - shared Grafana evidence agent delegation
+  safety:
+    requireReadFirstGrafanaMcp: true
+    requireMergeRequestForDurableWrites: true
+    disallowSecretsInGit: true
+    placeholderValues:
+      - "{{CLUSTER_NAME}}"
+      - "{{ENVIRONMENT}}"
+      - "{{GRAFANA_URL}}"
+      - "{{GITLAB_PROJECT}}"
+      - "{{KUBE_CONTEXT}}"
