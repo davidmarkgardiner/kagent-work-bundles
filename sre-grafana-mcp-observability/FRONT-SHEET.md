@@ -28,14 +28,15 @@ Read these files in order:
 4. `requests/cert-manager-observability-request.yaml`
 5. `requests/cert-manager-observability-request.json`
 6. `prompts/01-cert-manager-observability.md`
-7. `evidence/EVIDENCE-TEMPLATE.md`
-8. `payload/docs/observability/sre-grafana-mcp-observability/README.md`
-9. `payload/agents/skills/grafana-incident-evidence-pack/SKILL.md`
-10. `payload/docs/ai-grafana/shared-grafana-evidence-agent.md`
-11. `payload/agents/grafana-evidence-agent/agent.yaml`
-12. `payload/agents/kagent-triage/cert-manager-agent.yaml`
-13. `payload/observability/grafana/dashboard-registry.yaml`
-14. `payload/observability/managed-lgtm-integration/rule-sync/README.md`
+7. `prompts/02-process-not-dashboard-correction.md`
+8. `evidence/EVIDENCE-TEMPLATE.md`
+9. `payload/docs/observability/sre-grafana-mcp-observability/README.md`
+10. `payload/agents/skills/grafana-incident-evidence-pack/SKILL.md`
+11. `payload/docs/ai-grafana/shared-grafana-evidence-agent.md`
+12. `payload/agents/grafana-evidence-agent/agent.yaml`
+13. `payload/agents/kagent-triage/cert-manager-agent.yaml`
+14. `payload/observability/grafana/dashboard-registry.yaml`
+15. `payload/observability/managed-lgtm-integration/rule-sync/README.md`
 
 ## Local Bundle Check
 

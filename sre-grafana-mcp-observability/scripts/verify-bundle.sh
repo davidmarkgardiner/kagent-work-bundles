@@ -15,6 +15,7 @@ required=(
   "requests/cert-manager-observability-request.yaml"
   "requests/cert-manager-observability-request.json"
   "prompts/01-cert-manager-observability.md"
+  "prompts/02-process-not-dashboard-correction.md"
   "evidence/EVIDENCE-TEMPLATE.md"
   "payload/docs/observability/sre-grafana-mcp-observability/README.md"
   "payload/docs/observability/sre-grafana-mcp-observability/cert-manager-observability-request.json"
@@ -83,6 +84,10 @@ grep -q '"mode": "durable-gitops"' \
   "requests/cert-manager-observability-request.json"
 grep -q "observability-work-agent" \
   "prompts/01-cert-manager-observability.md"
+grep -q "Your deliverable is the process and agent integration" \
+  "prompts/02-process-not-dashboard-correction.md"
+grep -q "Do not stop after building dashboard JSON" \
+  "prompts/02-process-not-dashboard-correction.md"
 echo "KAGENT_FRONT_DOOR_CONTRACT_OK: yes"
 
 if grep -RInE \
