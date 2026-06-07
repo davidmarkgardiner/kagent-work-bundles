@@ -29,14 +29,15 @@ Read these files in order:
 5. `requests/cert-manager-observability-request.json`
 6. `prompts/01-cert-manager-observability.md`
 7. `prompts/02-process-not-dashboard-correction.md`
-8. `evidence/EVIDENCE-TEMPLATE.md`
-9. `payload/docs/observability/sre-grafana-mcp-observability/README.md`
-10. `payload/agents/skills/grafana-incident-evidence-pack/SKILL.md`
-11. `payload/docs/ai-grafana/shared-grafana-evidence-agent.md`
-12. `payload/agents/grafana-evidence-agent/agent.yaml`
-13. `payload/agents/kagent-triage/cert-manager-agent.yaml`
-14. `payload/observability/grafana/dashboard-registry.yaml`
-15. `payload/observability/managed-lgtm-integration/rule-sync/README.md`
+8. `prompts/03-live-agent-payload-and-grafana-mcp-proof.md`
+9. `evidence/EVIDENCE-TEMPLATE.md`
+10. `payload/docs/observability/sre-grafana-mcp-observability/README.md`
+11. `payload/agents/skills/grafana-incident-evidence-pack/SKILL.md`
+12. `payload/docs/ai-grafana/shared-grafana-evidence-agent.md`
+13. `payload/agents/grafana-evidence-agent/agent.yaml`
+14. `payload/agents/kagent-triage/cert-manager-agent.yaml`
+15. `payload/observability/grafana/dashboard-registry.yaml`
+16. `payload/observability/managed-lgtm-integration/rule-sync/README.md`
 
 ## Local Bundle Check
 
@@ -54,6 +55,11 @@ SRE_GRAFANA_MCP_OBSERVABILITY_BUNDLE_VERIFY: passed
 
 This is a static bundle check only. It does not prove live Grafana MCP, GitLab
 MCP, Flux, Alloy, Prometheus/Mimir, Loki, or kagent access.
+
+If a work-side agent reports completion after only running the bundle verifier,
+use `prompts/03-live-agent-payload-and-grafana-mcp-proof.md`. That prompt
+requires the exact payload sent into the kagent front door, live Grafana MCP
+tool discovery, datasource proof, PromQL/LogQL proof, and explicit blockers.
 
 ## Work-Lab Definition Of Done
 

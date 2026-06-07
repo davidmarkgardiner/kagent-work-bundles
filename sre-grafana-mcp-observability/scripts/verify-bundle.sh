@@ -16,6 +16,7 @@ required=(
   "requests/cert-manager-observability-request.json"
   "prompts/01-cert-manager-observability.md"
   "prompts/02-process-not-dashboard-correction.md"
+  "prompts/03-live-agent-payload-and-grafana-mcp-proof.md"
   "evidence/EVIDENCE-TEMPLATE.md"
   "payload/docs/observability/sre-grafana-mcp-observability/README.md"
   "payload/docs/observability/sre-grafana-mcp-observability/cert-manager-observability-request.json"
@@ -88,6 +89,12 @@ grep -q "Your deliverable is the process and agent integration" \
   "prompts/02-process-not-dashboard-correction.md"
 grep -q "Do not stop after building dashboard JSON" \
   "prompts/02-process-not-dashboard-correction.md"
+grep -q "Do not claim PASS if you only ran" \
+  "prompts/03-live-agent-payload-and-grafana-mcp-proof.md"
+grep -q "AGENT_PAYLOAD_RECORDED: yes" \
+  "prompts/03-live-agent-payload-and-grafana-mcp-proof.md"
+grep -q "PROMETHEUS_QUERY_EXECUTED: yes_or_blocked" \
+  "prompts/03-live-agent-payload-and-grafana-mcp-proof.md"
 echo "KAGENT_FRONT_DOOR_CONTRACT_OK: yes"
 
 if grep -RInE \
