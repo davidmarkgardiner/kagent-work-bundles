@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AKS Fleet Reporting Day-2</title>
+  <style>
+    body{font-family:Arial,sans-serif;margin:0;background:#f6f8fb;color:#172033}
+    main{max-width:1100px;margin:auto;padding:32px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .card{background:#fff;border:1px solid #d9e0ea;border-radius:8px;padding:16px}
+    h1{margin:0 0 8px}.sub{color:#526070;margin-bottom:24px}
+    b{color:#0b4f8a}
+    @media(max-width:800px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>AKS Fleet Reporting Day-2</h1>
+  <p class="sub">A repeatable operating report for fleet health, agent readiness, incidents, evals, and reliability work.</p>
+  <section class="grid">
+    <div class="card"><b>Inventory</b><p>Clusters, namespaces, applications, ownership, and reporting scope.</p></div>
+    <div class="card"><b>Runtime Health</b><p>Readiness, incidents, alerts, and degraded areas.</p></div>
+    <div class="card"><b>Agent Posture</b><p>kagent readiness, MCP availability, and workflow health.</p></div>
+    <div class="card"><b>Evaluation</b><p>Lifecycle scores, hard failures, and review-manager routes.</p></div>
+    <div class="card"><b>Reliability</b><p>Chaos/game-day runs and open recovery actions.</p></div>
+    <div class="card"><b>Report</b><p>Sanitized summary with owners, gaps, and next actions.</p></div>
+  </section>
+</main>
+</body>
+</html>

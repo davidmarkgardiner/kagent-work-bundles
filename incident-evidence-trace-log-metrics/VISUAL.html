@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Incident Evidence Pack</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#f8fafc;color:#172033;margin:0}
+    main{max-width:1050px;margin:auto;padding:32px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .card{background:#fff;border:1px solid #d8dee9;border-radius:8px;padding:16px}
+    b{color:#0b4f8a}.sub{color:#526070}
+    @media(max-width:850px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Incident Evidence Pack</h1>
+  <p class="sub">Metrics, logs, traces or fallback, and dashboard links in one triage summary.</p>
+  <section class="grid">
+    <div class="card"><b>Metrics</b><p>PromQL query with result summary.</p></div>
+    <div class="card"><b>Logs</b><p>LogQL query with short window and limit.</p></div>
+    <div class="card"><b>Traces</b><p>Trace lookup or explicit fallback.</p></div>
+    <div class="card"><b>Dashboard</b><p>Panel link scoped to incident labels.</p></div>
+  </section>
+</main>
+</body>
+</html>

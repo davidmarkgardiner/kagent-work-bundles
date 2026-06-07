@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GitLab MCP GitOps PR</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#f7f9fc;color:#172033;margin:0}
+    main{max-width:1050px;margin:auto;padding:32px}
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+    .box{background:#fff;border:1px solid #d8dee9;border-radius:8px;padding:16px}
+    b{color:#7b3f00}.sub{color:#526070}
+    @media(max-width:850px){.flow{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>GitLab MCP GitOps PR</h1>
+  <p class="sub">Agents propose reviewable changes through GitLab instead of mutating production.</p>
+  <section class="flow">
+    <div class="box"><b>Tool Discovery</b><p>Confirm branch, file, MR, and note tools.</p></div>
+    <div class="box"><b>Branch</b><p>Create a sandbox source branch.</p></div>
+    <div class="box"><b>Change</b><p>Create or update one safe file.</p></div>
+    <div class="box"><b>Merge Request</b><p>Open reviewable MR with evidence.</p></div>
+    <div class="box"><b>Human Review</b><p>Human accepts, rejects, or asks for changes.</p></div>
+  </section>
+</main>
+</body>
+</html>

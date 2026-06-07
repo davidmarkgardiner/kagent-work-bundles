@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lifecycle Evaluation Review Manager</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#f7f9fc;color:#172033;margin:0}
+    main{max-width:1050px;margin:auto;padding:32px}
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+    .box{background:#fff;border:1px solid #d8dee9;border-radius:8px;padding:16px}
+    b{color:#0b4f8a}.sub{color:#526070}
+    @media(max-width:850px){.flow{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Lifecycle Evaluation Review Manager</h1>
+  <p class="sub">Score every run and route weak evidence to review.</p>
+  <section class="flow">
+    <div class="box"><b>Run</b><p>Triage or remediation workflow completes.</p></div>
+    <div class="box"><b>Score</b><p>Eval compares evidence to lifecycle criteria.</p></div>
+    <div class="box"><b>Gate</b><p>Hard failures block completion.</p></div>
+    <div class="box"><b>Route</b><p>Weak runs go to review-manager.</p></div>
+    <div class="box"><b>Report</b><p>Metrics and actions are published.</p></div>
+  </section>
+</main>
+</body>
+</html>

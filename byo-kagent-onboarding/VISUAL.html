@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bring Your Own kagent</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#f7f9fc;color:#172033;margin:0}
+    main{max-width:1050px;margin:auto;padding:32px}
+    .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .step{background:#fff;border:1px solid #d8dee9;border-radius:8px;padding:16px}
+    b{color:#0b4f8a}.sub{color:#526070}
+    @media(max-width:800px){.steps{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Bring Your Own kagent</h1>
+  <p class="sub">A governed onboarding path for team-owned agents.</p>
+  <section class="steps">
+    <div class="step"><b>Request</b><p>Team, app, namespace, intent, and risk class.</p></div>
+    <div class="step"><b>Render</b><p>Agent instructions, model config, tools, and ToolGrant.</p></div>
+    <div class="step"><b>Prove</b><p>Allowed read-only tools work and forbidden tools fail.</p></div>
+    <div class="step"><b>Operate</b><p>Run through kagent UI/A2A with evidence and governance.</p></div>
+  </section>
+</main>
+</body>
+</html>

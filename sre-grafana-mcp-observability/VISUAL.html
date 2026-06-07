@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SRE Grafana MCP Observability</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#f8fafc;color:#172033;margin:0}
+    main{max-width:1100px;margin:auto;padding:32px}
+    .flow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+    .box{background:#fff;border:1px solid #d8dee9;border-radius:8px;padding:14px}
+    b{color:#0b4f8a}.sub{color:#526070}
+    @media(max-width:900px){.flow{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>SRE Grafana MCP Observability</h1>
+  <p class="sub">SRE payload enters kagent, live Grafana MCP evidence comes back with GitOps decisions.</p>
+  <section class="flow">
+    <div class="box"><b>Payload</b><p>SRE asks for component observability.</p></div>
+    <div class="box"><b>Agent</b><p>observability-work-agent receives request.</p></div>
+    <div class="box"><b>Grafana MCP</b><p>Datasources and tools are discovered.</p></div>
+    <div class="box"><b>Evidence</b><p>PromQL, LogQL, dashboards, alerts.</p></div>
+    <div class="box"><b>Decisions</b><p>Alloy, dashboard, alert, triage route.</p></div>
+    <div class="box"><b>MR</b><p>Durable changes go to review.</p></div>
+  </section>
+</main>
+</body>
+</html>

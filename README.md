@@ -16,6 +16,14 @@ GitLab project values, approval routes, and demo targets needed across bundles.
 
 ## Bundle Map
 
+Each bundle now has the same human handover layer:
+
+```text
+README.md        - TL;DR, what the feature does, evidence, run path
+GITLAB-TICKET.md - copyable GitLab issue for the work team
+VISUAL.html      - lightweight stakeholder/SRE workflow visual
+```
+
 | Bundle | Capability | Primary outcome |
 |---|---|---|
 | `team-handover-pack/` | Human handover, tickets, Teams messages, game-day planning | Provides GitLab ticket templates, Teams messages, game-day plan, and an HTML presentation for SRE/stakeholder handover |

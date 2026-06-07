@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chaos Reliability Remediation</title>
+  <style>
+    body{font-family:Arial,sans-serif;margin:0;background:#f8fafc;color:#172033}
+    main{max-width:1100px;margin:auto;padding:32px}
+    .flow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+    .box{background:white;border:1px solid #d8dee9;border-radius:8px;padding:14px}
+    b{color:#8a3b0b}.sub{color:#526070}
+    @media(max-width:900px){.flow{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Chaos Reliability Remediation</h1>
+  <p class="sub">Controlled failure -> triage -> gated remediation -> recovery -> report.</p>
+  <section class="flow">
+    <div class="box"><b>Approve Target</b><p>Lower-env opt-in workload.</p></div>
+    <div class="box"><b>Inject</b><p>Run bounded chaos scenario.</p></div>
+    <div class="box"><b>Triage</b><p>Kagent gathers evidence.</p></div>
+    <div class="box"><b>Gate</b><p>HITL or GitOps review.</p></div>
+    <div class="box"><b>Recover</b><p>Verify service health.</p></div>
+    <div class="box"><b>Score</b><p>Eval and report outcome.</p></div>
+  </section>
+</main>
+</body>
+</html>

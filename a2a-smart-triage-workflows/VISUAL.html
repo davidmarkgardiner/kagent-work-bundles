@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A2A Smart Triage Workflows</title>
+  <style>
+    body{font-family:Arial,sans-serif;margin:0;color:#172033;background:#f7f9fc}
+    main{max-width:1100px;margin:auto;padding:32px}
+    h1{font-size:30px;margin:0 0 8px}
+    .sub{color:#526070;margin-bottom:24px}
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+    .box{background:#fff;border:1px solid #d8dee9;border-radius:8px;padding:16px;min-height:110px}
+    .box b{display:block;margin-bottom:8px;color:#0b4f8a}
+    .evidence{margin-top:24px;background:#fff;border:1px solid #d8dee9;border-radius:8px;padding:18px}
+    code{background:#eef3f8;padding:2px 5px;border-radius:4px}
+    @media(max-width:800px){.flow{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>A2A Smart Triage Workflows</h1>
+  <p class="sub">One incident enters the commander, specialists investigate in parallel, one synthesized answer returns.</p>
+  <section class="flow">
+    <div class="box"><b>SRE Payload</b>Incident request with app, namespace, symptoms, and evidence requirements.</div>
+    <div class="box"><b>Commander</b>Creates shared context and chooses specialist agents.</div>
+    <div class="box"><b>Specialists</b>Kubernetes, Grafana, knowledge, and GitOps agents investigate.</div>
+    <div class="box"><b>Synthesis</b>Findings are merged with citations and confidence.</div>
+    <div class="box"><b>Closeout</b>Returns status, remediation boundary, and next action.</div>
+  </section>
+  <section class="evidence">
+    <h2>Proof Checklist</h2>
+    <p><code>A2A_BASELINE_COMPLETED</code>, <code>SPECIALIST_FANOUT_STARTED</code>, specialist markers, context ID, final synthesis, sanitized output.</p>
+  </section>
+</main>
+</body>
+</html>
