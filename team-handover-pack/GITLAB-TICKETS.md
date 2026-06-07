@@ -44,6 +44,8 @@ needed by the handover bundles.
 **Definition of done**
 
 - Shared variables are filled in private context.
+- Runtime/model/Agent Gateway/A2A/MCP preflight has been run using
+  `runtime-model-gateway-readiness/`.
 - Missing tools are listed as blockers with owners.
 - No secrets are committed to public or reusable docs.
 

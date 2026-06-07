@@ -38,6 +38,9 @@ proof run:
 | `{{CHAT_MODEL_CONFIG}}` | Default model config used by newly created agents. |
 | `{{KAGENT_A2A_ENDPOINT}}` | Agent-to-agent endpoint used for direct A2A proof, if exposed. |
 | `{{AGENTGATEWAY_HOST}}` | Agent Gateway host or route, if runtime/model readiness proof is added. |
+| `{{MODEL_BACKEND_NAMESPACE}}` | Namespace where the model backend pod/service runs. |
+| `{{MODEL_BACKEND_SELECTOR}}` | Label selector for the model backend readiness check. |
+| `{{A2A_SMOKE_TIMEOUT_SECONDS}}` | Timeout for minimal A2A message/send smoke. |
 
 Canonical names: use `{{CHAT_MODEL_CONFIG}}`, `{{CLUSTER_NAME}}`, and
 `{{KAGENT_NAMESPACE}}` rather than bundle-local synonyms.
@@ -50,6 +53,7 @@ Canonical names: use `{{CHAT_MODEL_CONFIG}}`, `{{CLUSTER_NAME}}`, and
 | `{{TARGET_BRANCH}}` | Base branch for agent-created branches and merge requests. |
 | `{{RUN_ID}}` | Unique suffix for demo branches, KB docs, and evidence files. |
 | `{{GITLAB_MCP_REMOTE_SERVER_NAME}}` | GitLab MCP server name configured in kagent. |
+| `{{GITLAB_LITE_MCP_REMOTE_SERVER_NAME}}` | Optional sandbox/lite GitLab MCP fallback for demo-only MR proof. |
 | `{{GITLAB_MR_URL}}` | Evidence placeholder for the merge request URL created during proof. |
 
 Do not give general triage agents broad GitLab write tools. GitLab write access
@@ -184,7 +188,15 @@ writing final evidence:
 `{{MISSING_OR_WEAK_AREAS}}`, `{{IMPROVEMENT_ITEM_LINK_OR_PATH}}`,
 `{{IMPROVEMENT_OWNER}}`, `{{ADOPTION_REPORT_LOCATION}}`,
 `{{DASHBOARD_OR_METRICS_LOCATION_OR_NOT_AVAILABLE}}`,
-`{{OPEN_BLOCKERS_OR_NONE}}`.
+`{{OPEN_BLOCKERS_OR_NONE}}`, `{{KAGENT_AGENT_READINESS_RESULT}}`,
+`{{KAGENT_AGENT_READINESS_EVIDENCE}}`, `{{MODEL_CONFIG_RESULT}}`,
+`{{MODEL_CONFIG_EVIDENCE}}`, `{{MODEL_BACKEND_RESULT}}`,
+`{{MODEL_BACKEND_EVIDENCE}}`, `{{AGENTGATEWAY_RESULT}}`,
+`{{AGENTGATEWAY_EVIDENCE}}`, `{{A2A_SMOKE_RESULT}}`,
+`{{A2A_SMOKE_EVIDENCE}}`, `{{GRAFANA_MCP_RESULT}}`,
+`{{GRAFANA_MCP_EVIDENCE}}`, `{{GITLAB_MCP_RESULT}}`,
+`{{GITLAB_MCP_EVIDENCE}}`, `{{MEMORY_MCP_RESULT}}`,
+`{{MEMORY_MCP_EVIDENCE}}`, `{{READINESS_BLOCKERS}}`.
 
 ## Work-Agent Instruction
 

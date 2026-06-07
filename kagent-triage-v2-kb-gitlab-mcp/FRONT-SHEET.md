@@ -53,7 +53,10 @@ or kagent UI access.
 
 The work agent must return evidence for:
 
-- GitLab MCP or approved wrapper tool list.
+- Official GitLab MCP RemoteMCPServer accepted state and tool list.
+- If only an approved wrapper or lite GitLab MCP is available, evidence is
+  marked `DEMO_ONLY` and full KB GitOps capability remains blocked until the
+  official branch/file/MR/note tools are available.
 - Source branch created from the target branch.
 - KB files created or updated under `docs/platform-kb/agents/`.
 - `docs/platform-kb/INDEX.md` updated.

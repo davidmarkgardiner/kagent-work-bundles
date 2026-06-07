@@ -40,6 +40,8 @@ OUTPUT_SANITIZED: yes
 This bundle is not a replacement for the technical bundles. It is the wrapper
 that proves SRE can use them in a real operating loop.
 
+- Run `runtime-model-gateway-readiness/` before scheduling a live SRE exercise,
+  so the session does not stall on model, Agent Gateway, A2A, or MCP readiness.
 - Use `chaos-reliability-remediation/` for controlled failure injection.
 - Use `incident-evidence-trace-log-metrics/` for Grafana evidence packs.
 - Use `gitlab-mcp-gitops-pr/` for reviewable code, docs, or runbook changes.

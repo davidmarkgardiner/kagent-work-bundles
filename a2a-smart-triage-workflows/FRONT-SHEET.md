@@ -23,6 +23,13 @@ Static verification proves this bundle is internally consistent. It does not
 prove live kagent, A2A, specialist-agent, Grafana, GitLab, KB, or cluster
 behavior.
 
+## Live Prerequisite
+
+Run `../runtime-model-gateway-readiness/` first. Do not start fanout proof until
+the selected model backend is ready, Agent Gateway or direct A2A routing is
+reachable, and a minimal A2A call completes. If the preflight blocks, return the
+runtime-readiness evidence instead of burning tokens on specialist fanout.
+
 ## Required Markers
 
 ```text

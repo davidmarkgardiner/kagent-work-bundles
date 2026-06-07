@@ -19,7 +19,8 @@ If the bundle verifier fails, stop and report the exact missing or invalid file.
 
 Then complete the work in this order:
 
-1. Inspect available GitLab MCP tools and record the tool names.
+1. Check {{GITLAB_MCP_REMOTE_SERVER_NAME}} is Accepted=True, inspect available
+   GitLab MCP tools, and record the tool names.
 2. Confirm the approved GitLab project, target branch, and scoped identity.
 3. Use GitLab MCP to create a branch.
 4. Use GitLab MCP to create or update the files in payload/docs/platform-kb/.
@@ -32,6 +33,11 @@ Then complete the work in this order:
 11. Prove one NO_RELEVANT_DOCS fallback.
 12. Ask the triage coordinator to use the cited KB answer in a KNOWLEDGE_LOOKUP
     block.
+
+If only {{GITLAB_LITE_MCP_REMOTE_SERVER_NAME}} or an approved wrapper is
+available, label the run DEMO_ONLY and do not claim full KB GitOps capability
+unless branch, file update, merge request, note, reindex, and cited retrieval
+are all proven.
 
 Required evidence markers:
 

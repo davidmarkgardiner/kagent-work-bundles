@@ -37,6 +37,9 @@ OUTPUT_SANITIZED: yes
 ## Definition Of Done
 
 - kagent Agents and ToolGrants are inventoried.
+- Actual agent `toolNames` and discovered MCP tool descriptions are audited; do
+  not trust "readonly" names or RemoteMCPServer labels without checking the
+  granted tools.
 - General triage/front-door agents do not have delete, exec, broad apply, or
   broad GitLab write tools.
 - Remediation agents are bounded by namespace, approval route, and workflow or

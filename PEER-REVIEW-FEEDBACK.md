@@ -5,6 +5,11 @@ findings are retained below as an audit trail.
 
 Applied fixes:
 
+- Follow-up live audit added `runtime-model-gateway-readiness/` and promoted it
+  from a missing P0 concept to the required preflight before downstream demos.
+- Follow-up live audit tightened GitLab official-vs-lite MCP wording, A2A/chaos
+  runtime dependencies, lifecycle historical-failure review, and governance
+  audits of actual agent tool lists.
 - Converted the copied cert-manager diagnostic agent payload to read-only
   posture by removing Kubernetes mutation tools and removing "act if safe"
   wording.
@@ -17,6 +22,8 @@ Applied fixes:
 
 Reviewer pass against `PEER-REVIEW-PROMPT.md`. Scope: `work-agent-bundles/` only.
 Original static verifier run: `WORK_AGENT_BUNDLES_VERIFY: passed` (all 12 bundles green).
+Follow-up static verifier after the runtime-readiness bundle was added:
+`WORK_AGENT_BUNDLES_VERIFY: passed` across 15 bundles.
 Static pass proves internal consistency only — not live GitLab/Grafana/kagent/Argo/chaos behavior.
 
 ---
@@ -197,9 +204,10 @@ MISSING_CONCEPTS:
 built. Priorities below mark which should precede broad live use.)
 
 - concept: Runtime / model / agentgateway readiness
-  priority: P0
-  why_it_matters: every other bundle assumes kagent + a working ModelConfig + gateway routing. Without a readiness proof, a failed model/route looks like a bundle failure. Should run before the rest.
+  priority: DONE
+  why_it_matters: every other bundle assumes kagent + a working ModelConfig + gateway routing. Without a readiness proof, a failed model/route looks like a bundle failure.
   suggested_bundle_name: runtime-model-gateway-readiness
+  status: implemented as a dedicated bundle and placed second in the recommended work order.
 
 - concept: Alert ingestion and dedup
   priority: P1

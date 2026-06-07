@@ -22,6 +22,13 @@ Static verification proves this bundle is internally consistent. It does not
 prove live eval cases, scorer, metrics export, review-manager, or kagent
 behavior.
 
+## Live Audit Rule
+
+Do not infer evaluation health from a single metric or one successful workflow.
+Inspect recent eval and chaos/eval-related workflow runs, report failed
+historical cases, and distinguish "metric exists" from "latest lifecycle eval
+completed and enforced gates".
+
 ## Required Markers
 
 ```text

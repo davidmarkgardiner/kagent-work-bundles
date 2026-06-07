@@ -3,6 +3,8 @@ kind: GitLabMcpGitOpsPrRequest
 metadata:
   name: kagent-triage-v2-gitlab-mcp-pr-proof
 spec:
+  gitlabMcpServer: "{{GITLAB_MCP_REMOTE_SERVER_NAME}}"
+  gitlabLiteFallbackMcpServer: "{{GITLAB_LITE_MCP_REMOTE_SERVER_NAME}}"
   project: "{{GITLAB_PROJECT}}"
   targetBranch: "{{TARGET_BRANCH}}"
   sourceBranch: "gitlab-mcp/gitops-pr-{{RUN_ID}}"

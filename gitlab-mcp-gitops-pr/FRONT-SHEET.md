@@ -22,7 +22,10 @@ mutating production.
 
 ## Definition Of Done
 
-- GitLab MCP tools discovered.
+- Official GitLab MCP RemoteMCPServer is Accepted=True and its tool list is
+  discovered.
+- Required file/branch/MR/note tools are present on the official GitLab MCP, or
+  the run is marked BLOCKED.
 - Scoped project and identity confirmed without exposing token values.
 - Branch created from the target branch.
 - File created or updated.
@@ -30,6 +33,14 @@ mutating production.
 - Merge request note added with proof markers.
 - Human review boundary is explicit.
 - No cluster mutation is claimed from GitLab write proof alone.
+
+## Official Vs Lite MCP
+
+Use `{{GITLAB_MCP_REMOTE_SERVER_NAME}}` for the real GitOps PR proof. A
+`{{GITLAB_LITE_MCP_REMOTE_SERVER_NAME}}` or demo wrapper can be used only to
+prove a limited sandbox MR path, and the evidence must label that result
+`DEMO_ONLY`. Do not claim full GitOps write capability from a lite wrapper that
+cannot create branches, update arbitrary files, or add review notes.
 
 ## Required Markers
 

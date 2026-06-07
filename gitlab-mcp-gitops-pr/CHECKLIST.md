@@ -3,7 +3,8 @@
 | Check | Evidence | Status |
 |---|---|---|
 | Bundle verifier passes | verifier output | TODO |
-| GitLab MCP tools discovered | tool names | TODO |
+| Official GitLab MCP accepted | RemoteMCPServer status | TODO |
+| GitLab MCP tools discovered | tool names; lite wrapper labelled demo-only if used | TODO |
 | Scoped auth confirmed | project boundary, no token value | TODO |
 | Branch created | branch name | TODO |
 | File updated | path and commit ID | TODO |

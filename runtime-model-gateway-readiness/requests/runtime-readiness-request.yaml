@@ -1,0 +1,32 @@
+apiVersion: platform.example.io/v1alpha1
+kind: RuntimeReadinessRequest
+metadata:
+  name: kagent-triage-v2-runtime-readiness-{{RUN_ID}}
+spec:
+  kubeContext: "{{KUBE_CONTEXT}}"
+  kagentNamespace: "{{KAGENT_NAMESPACE}}"
+  chatModelConfig: "{{CHAT_MODEL_CONFIG}}"
+  agentGatewayHost: "{{AGENTGATEWAY_HOST}}"
+  modelBackendNamespace: "{{MODEL_BACKEND_NAMESPACE}}"
+  modelBackendSelector: "{{MODEL_BACKEND_SELECTOR}}"
+  a2aEndpoint: "{{KAGENT_A2A_ENDPOINT}}"
+  a2aSmokeTimeoutSeconds: "{{A2A_SMOKE_TIMEOUT_SECONDS}}"
+  grafanaMcpServer: "{{GRAFANA_MCP_REMOTE_SERVER_NAME}}"
+  gitlabMcpServer: "{{GITLAB_MCP_REMOTE_SERVER_NAME}}"
+  gitlabLiteMcpServer: "{{GITLAB_LITE_MCP_REMOTE_SERVER_NAME}}"
+  memoryMcpServer: "{{MEMORY_MCP_REMOTE_SERVER_NAME}}"
+  requiredTools:
+    grafana:
+      - list_datasources
+      - query_prometheus
+      - query_loki_logs
+    gitlab:
+      - create_or_update_file
+      - create_merge_request
+      - create_issue
+    gitlabLiteFallback:
+      - gitlab_create_mr_demo
+    memory:
+      - search_nodes
+      - open_nodes
+      - read_graph

@@ -36,6 +36,8 @@ OUTPUT_SANITIZED: yes
 
 ## Definition Of Done
 
+- `../runtime-model-gateway-readiness/` has passed for the chosen kagent/model
+  path, or this run is marked BLOCKED before chaos is injected.
 - Chaos is limited to an approved non-production namespace and workload.
 - Any remediation path is bound to `{{APPROVAL_CHANNEL}}` and requires HITL or
   GitOps review before non-read-only action.

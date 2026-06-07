@@ -19,6 +19,7 @@ GitLab project values, approval routes, and demo targets needed across bundles.
 | Bundle | Capability | Primary outcome |
 |---|---|---|
 | `team-handover-pack/` | Human handover, tickets, Teams messages, game-day planning | Provides GitLab ticket templates, Teams messages, game-day plan, and an HTML presentation for SRE/stakeholder handover |
+| `runtime-model-gateway-readiness/` | Runtime, model, Agent Gateway, A2A, and MCP preflight | Proves model backend, Agent Gateway, A2A, and required MCP servers are live before downstream demos |
 | `sre-grafana-mcp-observability/` | Grafana MCP observability | SRE asks a kagent front door to build/verify dashboards, alerts, logs, metrics, and GitOps observability changes |
 | `sre-adoption-feedback-loop/` | SRE adoption and feedback loop | SRE onboards one app, uses/reviews the workflow, captures feedback, routes improvements, and reports adoption |
 | `kagent-triage-v2-kb-gitlab-mcp/` | KB + doc2vec/querydoc + GitLab MCP | Agent updates KB docs through GitLab MCP, reindexes querydoc, and proves cited retrieval |
@@ -36,19 +37,20 @@ GitLab project values, approval routes, and demo targets needed across bundles.
 ## Recommended Work Order
 
 1. `team-handover-pack/`
-2. `sre-grafana-mcp-observability/`
-3. `sre-adoption-feedback-loop/`
-4. `kagent-triage-v2-kb-gitlab-mcp/`
-5. `gitlab-mcp-gitops-pr/`
-6. `a2a-smart-triage-workflows/`
-7. `chaos-reliability-remediation/`
-8. `lifecycle-evaluation-review-manager/`
-9. `hitl-remediation-approval/`
-10. `policy-governance-safety/`
-11. `incident-evidence-trace-log-metrics/`
-12. `memory-mcp-shared-context/`
-13. `byo-kagent-onboarding/`
-14. `aks-fleet-reporting-day2/`
+2. `runtime-model-gateway-readiness/` - stop here and fix blockers before live fanout, chaos, GitOps PR, or SRE demo sessions
+3. `sre-grafana-mcp-observability/`
+4. `sre-adoption-feedback-loop/`
+5. `kagent-triage-v2-kb-gitlab-mcp/`
+6. `gitlab-mcp-gitops-pr/`
+7. `a2a-smart-triage-workflows/`
+8. `chaos-reliability-remediation/`
+9. `lifecycle-evaluation-review-manager/`
+10. `hitl-remediation-approval/`
+11. `policy-governance-safety/`
+12. `incident-evidence-trace-log-metrics/`
+13. `memory-mcp-shared-context/`
+14. `byo-kagent-onboarding/`
+15. `aks-fleet-reporting-day2/`
 
 ## Future Bundle Ideas
 
@@ -58,7 +60,6 @@ handoff packages.
 
 | Idea | Why it matters | Likely source material |
 |---|---|---|
-| Runtime, model, and agentgateway readiness | Proves kagent, agentgateway, ModelConfigs, Qwen/GPT routes, latency, rate limits, and model capacity before relying on any demo result. | `platform/agentgateway/work-qwen-primary-gpt4-failover-handoff/` |
 | Alert ingestion and dedup | Proves Alertmanager or Grafana alert ingestion through Argo Events into smart triage, including duplicate suppression and replay safety. | `a2a/smart-triage-fanout-demo/sensors/`, `SMART-TRIAGE-FANOUT-LIVE-EVIDENCE.md` |
 | AKS-MCP and Kubernetes day-to-day operations | Separates normal cluster/workload debugging through AKS-MCP or Kubernetes tools from fleet reporting and chaos workflows. | `platform/aks-mcp/`, `agents/kagent-triage/` |
 | Deployment-state and GitOps context | Maps workload to Helm/Flux/GitLab release context, recent MRs, rollout history, and safe rollback or config PR proposals. | `a2a/smart-triage-fanout-demo/mapping/`, GitLab MCP bundles |
