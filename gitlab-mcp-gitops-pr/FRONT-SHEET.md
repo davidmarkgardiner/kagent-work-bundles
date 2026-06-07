@@ -19,6 +19,7 @@ mutating production.
 5. `prompts/01-create-reviewable-gitops-pr.md`
 6. `payload/REFERENCE.md`
 7. `evidence/EVIDENCE-TEMPLATE.md`
+8. `OFFICIAL-GITLAB-MCP-SPIKE-2026-06-07.md`
 
 ## Definition Of Done
 
@@ -41,6 +42,13 @@ Use `{{GITLAB_MCP_REMOTE_SERVER_NAME}}` for the real GitOps PR proof. A
 prove a limited sandbox MR path, and the evidence must label that result
 `DEMO_ONLY`. Do not claim full GitOps write capability from a lite wrapper that
 cannot create branches, update arbitrary files, or add review notes.
+
+The home-lab official GitLab MCP spike is captured in
+`OFFICIAL-GITLAB-MCP-SPIKE-2026-06-07.md`. Short version: GitLab OAuth discovery
+worked and an OAuth token was issued through `mcp-remote`, but GitLab.com still
+returned `404 Not Found` for `/api/v4/mcp` after authentication. Treat official
+GitLab MCP as a work-side enablement/auth spike until `tools/list` and kagent
+`RemoteMCPServer Accepted=True` are proven.
 
 ## Required Markers
 
