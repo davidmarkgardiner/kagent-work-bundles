@@ -1,0 +1,12 @@
+apiVersion: platform.example.com/v1alpha1
+kind: ChaosReliabilityRequest
+metadata:
+  name: kagent-triage-v2-pod-delete-demo
+spec:
+  targetNamespace: "{{DEMO_TARGET_NAMESPACE}}"
+  targetWorkload: "{{DEMO_TARGET_WORKLOAD}}"
+  environment: non-production
+  failureMode: pod-delete
+  maxDuration: 10m
+  remediationMode: hitl-gated-gitops-or-workflow
+  reportRequired: true

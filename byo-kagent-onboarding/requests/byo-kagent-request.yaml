@@ -1,0 +1,16 @@
+apiVersion: platform.example.com/v1alpha1
+kind: BYOKagentOnboardingRequest
+metadata:
+  name: payments-triage-agent
+spec:
+  team: "{{TEAM_NAME}}"
+  namespace: "{{TEAM_NAMESPACE}}"
+  agentType: read-only-triage
+  allowedCapabilities:
+    - kubernetes-read
+    - grafana-read
+    - knowledge-read
+  forbiddenCapabilities:
+    - delete
+    - exec
+    - broad-gitlab-write

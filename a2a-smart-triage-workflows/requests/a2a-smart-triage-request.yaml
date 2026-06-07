@@ -1,0 +1,14 @@
+apiVersion: platform.example.com/v1alpha1
+kind: A2ASmartTriageRequest
+metadata:
+  name: kagent-triage-v2-a2a-fanout
+spec:
+  incidentId: "{{INCIDENT_ID}}"
+  alertSource: "{{ALERT_SOURCE}}"
+  requiredSpecialists:
+    - kubernetes
+    - grafana
+    - knowledge
+    - gitops
+    - policy
+  requireSynthesis: true

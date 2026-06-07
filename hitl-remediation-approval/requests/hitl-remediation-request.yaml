@@ -1,0 +1,10 @@
+apiVersion: platform.example.com/v1alpha1
+kind: HitlRemediationRequest
+metadata:
+  name: kagent-triage-v2-hitl-remediation-proof
+spec:
+  incidentId: "{{INCIDENT_ID}}"
+  remediationAction: "{{BOUNDED_REMEDIATION_ACTION}}"
+  approvalChannel: "{{APPROVAL_CHANNEL}}"
+  requireApproverIdentity: true
+  requirePostVerification: true

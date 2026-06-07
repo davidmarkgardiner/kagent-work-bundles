@@ -1,0 +1,14 @@
+apiVersion: platform.example.com/v1alpha1
+kind: AksFleetReportRequest
+metadata:
+  name: kagent-triage-v2-day2-fleet-report
+spec:
+  scope: "{{FLEET_SCOPE}}"
+  include:
+    - agent-readiness
+    - incident-funnel
+    - lifecycle-eval-scores
+    - chaos-run-status
+    - gitlab-mr-summary
+    - grafana-dashboard-links
+  output: markdown-and-dashboard-links

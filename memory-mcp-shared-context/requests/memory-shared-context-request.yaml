@@ -1,0 +1,18 @@
+apiVersion: platform.example.com/v1alpha1
+kind: MemorySharedContextRequest
+metadata:
+  name: kagent-triage-v2-memory-proof
+spec:
+  memoryServer: "{{MEMORY_MCP_REMOTE_SERVER_NAME}}"
+  seed:
+    key: "kagent-triage-v2-demo-learning"
+    value: "For checkout-api pod-delete tests, verify recovery and eval gates before closing the incident."
+  requireCurator: true
+  requiredMarkers:
+    - "MEMORY_MCP_AVAILABLE: yes"
+    - "MEMORY_SEEDED: yes"
+    - "MEMORY_RECALLED: yes"
+    - "MEMORY_USED_IN_TRIAGE: yes"
+    - "CURATOR_PATH_DEFINED: yes"
+    - "DANGEROUS_MEMORY_WRITE_BLOCKED: yes"
+    - "OUTPUT_SANITIZED: yes"

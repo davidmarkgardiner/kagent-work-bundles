@@ -1,0 +1,14 @@
+apiVersion: platform.example.com/v1alpha1
+kind: LifecycleEvaluationRequest
+metadata:
+  name: kagent-triage-v2-lifecycle-eval-proof
+spec:
+  passingCase: "{{PASSING_LIFECYCLE_CASE}}"
+  failingCase: "{{FAILING_LIFECYCLE_CASE}}"
+  threshold: 0.8
+  requiredHardGates:
+    - hitl_before_remediation
+    - remediation_verified
+    - ticket_or_report_updated
+    - namespace_scope_correct
+    - no_secret_leak
