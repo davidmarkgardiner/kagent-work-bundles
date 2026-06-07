@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kagent Triage V2 SRE Handover</title>
+  <style>
+    :root {
+      --bg: #f7f5ef;
+      --paper: #ffffff;
+      --ink: #161616;
+      --muted: #63635d;
+      --line: #d9d3c5;
+      --accent: #b75c3f;
+      --accent-2: #2f6f73;
+      --green: #4f7a55;
+      --amber: #a56a22;
+      --red: #9c3d3d;
+      --shade: #ebe6d8;
+      --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      --sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --serif: ui-serif, Georgia, "Times New Roman", serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.45;
+    }
+
+    main {
+      scroll-snap-type: y mandatory;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    section {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      padding: 56px 32px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      align-items: center;
+    }
+
+    .wrap {
+      width: min(1160px, 100%);
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 3px;
+      background: var(--accent);
+      display: inline-block;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.05;
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(42px, 6vw, 76px);
+      max-width: 930px;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(34px, 4.2vw, 56px);
+      max-width: 840px;
+      margin-bottom: 22px;
+    }
+
+    h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 42px;
+      align-items: center;
+    }
+
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 18px 45px rgba(43, 36, 22, 0.08);
+    }
+
+    .metric-grid,
+    .card-grid,
+    .three-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .metric-grid {
+      grid-template-columns: repeat(4, 1fr);
+      margin-top: 28px;
+    }
+
+    .card-grid {
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 28px;
+    }
+
+    .three-grid {
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 28px;
+    }
+
+    .card,
+    .metric,
+    .step {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .metric strong {
+      display: block;
+      font-family: var(--serif);
+      font-size: 38px;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .metric span,
+    .card p,
+    .step p {
+      font-size: 14px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      background: var(--shade);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      margin: 4px 6px 4px 0;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .step {
+      min-height: 138px;
+      position: relative;
+    }
+
+    .step b {
+      font-family: var(--mono);
+      color: var(--accent);
+      font-size: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 14px 16px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      background: var(--shade);
+      font-family: var(--mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .status {
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      display: inline-block;
+      border: 1px solid var(--line);
+    }
+
+    .p0 { color: var(--red); background: #f5e2df; }
+    .p1 { color: var(--amber); background: #f7ead8; }
+    .p2 { color: var(--green); background: #e4eddf; }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    label.check {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-2);
+      flex: 0 0 auto;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: white;
+      border-radius: 6px;
+      padding: 11px 14px;
+      font: 700 14px var(--sans);
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      font: 14px var(--sans);
+      background: var(--paper);
+      color: var(--ink);
+      margin-top: 14px;
+    }
+
+    .note {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 12px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        scroll-snap-type: none;
+        height: auto;
+        overflow: visible;
+      }
+
+      section {
+        min-height: auto;
+        padding: 40px 18px;
+      }
+
+      .hero,
+      .metric-grid,
+      .card-grid,
+      .three-grid,
+      .flow,
+      .checklist {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section>
+      <div class="wrap hero">
+        <div>
+          <div class="eyebrow">Kagent triage v2 handover</div>
+          <h1>Move from engineering proof to SRE operating habit.</h1>
+          <p>
+            The platform exists. The next milestone is adoption: SRE brings an
+            application, runs the workflow, challenges the answer, and feeds
+            improvements back into KB, skills, dashboards, evals, and policy.
+          </p>
+          <div>
+            <span class="badge">Grafana MCP</span>
+            <span class="badge">GitLab MCP</span>
+            <span class="badge">Doc2Vec KB</span>
+            <span class="badge">Memory</span>
+            <span class="badge">A2A</span>
+            <span class="badge">Chaos</span>
+            <span class="badge">Eval</span>
+            <span class="badge">HITL</span>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Tomorrow's goal</h3>
+          <p>
+            Create the first tickets, brief SRE, agree the first app, and set up
+            a recurring game-day loop where usage and feedback are measurable.
+          </p>
+          <div class="metric-grid" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="metric"><strong>1</strong><span>first SRE app</span></div>
+            <div class="metric"><strong>1</strong><span>safe game-day</span></div>
+            <div class="metric"><strong>1+</strong><span>feedback item</span></div>
+            <div class="metric"><strong>1</strong><span>adoption report</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="eyebrow">Problem</div>
+        <h2>Engineering has proved features. SRE needs an operating loop.</h2>
+        <div class="card-grid">
+          <div class="card">
+            <h3>Current risk</h3>
+            <p>Specialist agents, MCPs, KB, memory, eval, and chaos remain engineering artifacts unless SRE uses them against real work.</p>
+          </div>
+          <div class="card">
+            <h3>What changes</h3>
+            <p>Every SRE session produces evidence: app onboarded, workflow used, feedback captured, and an improvement routed.</p>
+          </div>
+          <div class="card">
+            <h3>What SRE gets</h3>
+            <p>A safer front door for triage, Grafana evidence, GitLab reporting, and gated remediation practice.</p>
+          </div>
+          <div class="card">
+            <h3>What engineering gets</h3>
+            <p>A measurable feedback loop to improve skills, docs, dashboards, policies, and eval cases.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="eyebrow">Operating loop</div>
+        <h2>The six-step adoption cycle.</h2>
+        <div class="flow">
+          <div class="step"><b>01</b><h3>Pick app</h3><p>One SRE-owned namespace or workload.</p></div>
+          <div class="step"><b>02</b><h3>First contact</h3><p>Map alerts, dashboards, KB, failure modes, and owners.</p></div>
+          <div class="step"><b>03</b><h3>Game-day</h3><p>Run or simulate one lower-env scenario.</p></div>
+          <div class="step"><b>04</b><h3>Use Kagent</h3><p>SRE uses or reviews the workflow directly.</p></div>
+          <div class="step"><b>05</b><h3>Capture feedback</h3><p>What was missed, weak, unsafe, or useful?</p></div>
+          <div class="step"><b>06</b><h3>Improve</h3><p>Route KB, skill, eval, dashboard, policy, or workflow change.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="eyebrow">Work order</div>
+        <h2>Recommended ticket sequence.</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Priority</th>
+              <th>Ticket</th>
+              <th>Why it matters</th>
+              <th>Done when</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="status p0">P0</span></td>
+              <td>Prepare variables and access</td>
+              <td>Every bundle depends on MCP names, namespaces, datasource UIDs, approval route, and GitLab scope.</td>
+              <td>Shared variables filled privately and blockers owned.</td>
+            </tr>
+            <tr>
+              <td><span class="status p0">P0</span></td>
+              <td>SRE first-contact app onboarding</td>
+              <td>Turns the platform into a concrete workflow around one app SRE cares about.</td>
+              <td>First-contact output reviewed by SRE.</td>
+            </tr>
+            <tr>
+              <td><span class="status p1">P1</span></td>
+              <td>First controlled game-day</td>
+              <td>Forces the real question: did SRE use it, trust it, and improve it?</td>
+              <td>Exercise completed or blocked with evidence.</td>
+            </tr>
+            <tr>
+              <td><span class="status p1">P1</span></td>
+              <td>Feedback and improvement loop</td>
+              <td>Prevents adoption feedback becoming meeting notes.</td>
+              <td>At least one feedback item routed and owned.</td>
+            </tr>
+            <tr>
+              <td><span class="status p2">P2</span></td>
+              <td>Adoption reporting</td>
+              <td>Shows whether SRE is actually using the system.</td>
+              <td>Dashboard, report, or fleet summary exists.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="eyebrow">Game-day model</div>
+        <h2>Start small, make it repeatable.</h2>
+        <div class="three-grid">
+          <div class="card">
+            <h3>Cadence</h3>
+            <p>Weekly for four weeks, 60-90 minutes, one SRE owner or pair, one app, one lower-env scenario.</p>
+          </div>
+          <div class="card">
+            <h3>Guardrails</h3>
+            <p>Lower-env only, no production chaos by default, read-only triage agents, HITL or GitOps for remediation.</p>
+          </div>
+          <div class="card">
+            <h3>Evidence</h3>
+            <p>Grafana metrics/logs/traces, GitLab ticket/MR, KB lookup, eval score, feedback item, adoption report.</p>
+          </div>
+        </div>
+        <table style="margin-top: 24px;">
+          <thead>
+            <tr><th>Starter scenario</th><th>Expected evidence</th><th>Boundary</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Pod delete</td><td>Events, restart, logs, metrics</td><td>Observe/recover unless failure persists</td></tr>
+            <tr><td>Crashloop</td><td>CrashLoopBackOff, logs, restart count</td><td>Fix through MR or approved workflow</td></tr>
+            <tr><td>Missing dependency</td><td>Readiness failure, logs, connection metrics</td><td>HITL before config changes</td></tr>
+            <tr><td>Alert replay</td><td>Alert route, dedup, A2A fanout</td><td>No cluster mutation</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="eyebrow">Discussion prompts</div>
+        <h2>Questions to ask SRE in the room.</h2>
+        <div class="checklist" id="discussion">
+          <label class="check"><input type="checkbox" data-item="Choose first app or namespace">Choose the first app or namespace.</label>
+          <label class="check"><input type="checkbox" data-item="Name SRE owner or rota">Name the SRE owner or rotating pair.</label>
+          <label class="check"><input type="checkbox" data-item="Agree first safe game-day scenario">Agree the first safe lower-env scenario.</label>
+          <label class="check"><input type="checkbox" data-item="Confirm approval route">Confirm HITL/GitOps approval route.</label>
+          <label class="check"><input type="checkbox" data-item="Confirm feedback location">Confirm feedback issue/project location.</label>
+          <label class="check"><input type="checkbox" data-item="Confirm adoption metrics">Confirm reporting/dashboard approach.</label>
+          <label class="check"><input type="checkbox" data-item="Identify blockers">Identify missing access, MCPs, dashboards, or data.</label>
+          <label class="check"><input type="checkbox" data-item="Book next session">Book the next game-day session.</label>
+        </div>
+        <textarea id="notes" placeholder="Meeting notes, decisions, owners, blockers..."></textarea>
+        <div class="actions">
+          <button id="copyBtn">Copy as markdown</button>
+          <button class="secondary" id="resetBtn">Reset checks</button>
+        </div>
+        <div class="note" id="copyState">Export creates a short meeting follow-up you can paste into Teams or GitLab.</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="eyebrow">Close</div>
+        <h2>Definition of success.</h2>
+        <p>
+          This is successful when SRE has used or reviewed Kagent triage v2
+          against an application they own, feedback is captured, and at least
+          one improvement item is routed into the platform backlog.
+        </p>
+        <div class="metric-grid">
+          <div class="metric"><strong>SRE</strong><span>uses or reviews workflow</span></div>
+          <div class="metric"><strong>Agent</strong><span>produces evidence</span></div>
+          <div class="metric"><strong>Feedback</strong><span>becomes improvement</span></div>
+          <div class="metric"><strong>Report</strong><span>shows adoption state</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const copyBtn = document.getElementById('copyBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const copyState = document.getElementById('copyState');
+    const notes = document.getElementById('notes');
+
+    function buildExport() {
+      const checks = Array.from(document.querySelectorAll('#discussion input[type="checkbox"]'));
+      const done = checks.filter(c => c.checked).map(c => `- [x] ${c.dataset.item}`);
+      const todo = checks.filter(c => !c.checked).map(c => `- [ ] ${c.dataset.item}`);
+      return [
+        '# Kagent triage v2 SRE handover follow-up',
+        '',
+        '## Decisions/checks completed',
+        done.length ? done.join('\n') : '- None recorded yet',
+        '',
+        '## Still open',
+        todo.length ? todo.join('\n') : '- None',
+        '',
+        '## Notes',
+        notes.value.trim() || 'No notes recorded.',
+        '',
+        '## Next action',
+        'Create/update GitLab tickets from work-agent-bundles/team-handover-pack/GITLAB-TICKETS.md and schedule the next game-day slot.'
+      ].join('\n');
+    }
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(buildExport()).then(() => {
+        copyBtn.textContent = 'Copied';
+        copyState.textContent = 'Markdown copied to clipboard.';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy as markdown';
+          copyState.textContent = 'Export creates a short meeting follow-up you can paste into Teams or GitLab.';
+        }, 1800);
+      });
+    });
+
+    resetBtn.addEventListener('click', () => {
+      document.querySelectorAll('#discussion input[type="checkbox"]').forEach(c => {
+        c.checked = false;
+      });
+      notes.value = '';
+    });
+  </script>
+</body>
+</html>

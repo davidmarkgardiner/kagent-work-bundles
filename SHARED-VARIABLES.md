@@ -120,6 +120,15 @@ through GitLab MCP and a human-reviewed branch or merge request.
 | `{{FEEDBACK_ISSUE_PROJECT}}` | GitLab/Jira/project location for feedback issues. |
 | `{{FEEDBACK_LABEL_TRIAGE_V2}}` | Label used for Kagent triage v2 feedback. |
 | `{{FEEDBACK_LABEL_SRE_ADOPTION}}` | Label used for SRE adoption feedback. |
+| `{{SESSION_DATE_TIME}}` | Proposed Teams/meeting date and time. |
+| `{{APPLICATION_NAME_OR_TBD}}` | Proposed first application name or explicit TBD. |
+| `{{FEEDBACK_LOCATION_OR_TBD}}` | Feedback project/channel location or explicit TBD. |
+| `{{CADENCE}}` | Proposed game-day cadence such as weekly or fortnightly. |
+| `{{DURATION}}` | Proposed session duration such as 60 minutes or 90 minutes. |
+| `{{SCENARIO}}` | Selected game-day scenario. |
+| `{{IMPROVEMENT_LINK_OR_TBD}}` | GitLab issue/MR/backlog link or explicit TBD. |
+| `{{NEXT_SESSION_OR_TBD}}` | Next game-day/adoption session date or explicit TBD. |
+| `{{FEEDBACK_LOCATION}}` | Final feedback issue/project/channel location. |
 | `{{TEAM_NAME}}` | Team onboarding through BYO kagent. |
 | `{{TEAM_NAMESPACE}}` | Team namespace for BYO kagent. |
 | `{{PASSING_LIFECYCLE_CASE}}` | Known-good eval case. |

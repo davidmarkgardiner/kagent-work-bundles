@@ -18,6 +18,7 @@ GitLab project values, approval routes, and demo targets needed across bundles.
 
 | Bundle | Capability | Primary outcome |
 |---|---|---|
+| `team-handover-pack/` | Human handover, tickets, Teams messages, game-day planning | Provides GitLab ticket templates, Teams messages, game-day plan, and an HTML presentation for SRE/stakeholder handover |
 | `sre-grafana-mcp-observability/` | Grafana MCP observability | SRE asks a kagent front door to build/verify dashboards, alerts, logs, metrics, and GitOps observability changes |
 | `sre-adoption-feedback-loop/` | SRE adoption and feedback loop | SRE onboards one app, uses/reviews the workflow, captures feedback, routes improvements, and reports adoption |
 | `kagent-triage-v2-kb-gitlab-mcp/` | KB + doc2vec/querydoc + GitLab MCP | Agent updates KB docs through GitLab MCP, reindexes querydoc, and proves cited retrieval |
@@ -34,19 +35,20 @@ GitLab project values, approval routes, and demo targets needed across bundles.
 
 ## Recommended Work Order
 
-1. `sre-grafana-mcp-observability/`
-2. `sre-adoption-feedback-loop/`
-3. `kagent-triage-v2-kb-gitlab-mcp/`
-4. `gitlab-mcp-gitops-pr/`
-5. `a2a-smart-triage-workflows/`
-6. `chaos-reliability-remediation/`
-7. `lifecycle-evaluation-review-manager/`
-8. `hitl-remediation-approval/`
-9. `policy-governance-safety/`
-10. `incident-evidence-trace-log-metrics/`
-11. `memory-mcp-shared-context/`
-12. `byo-kagent-onboarding/`
-13. `aks-fleet-reporting-day2/`
+1. `team-handover-pack/`
+2. `sre-grafana-mcp-observability/`
+3. `sre-adoption-feedback-loop/`
+4. `kagent-triage-v2-kb-gitlab-mcp/`
+5. `gitlab-mcp-gitops-pr/`
+6. `a2a-smart-triage-workflows/`
+7. `chaos-reliability-remediation/`
+8. `lifecycle-evaluation-review-manager/`
+9. `hitl-remediation-approval/`
+10. `policy-governance-safety/`
+11. `incident-evidence-trace-log-metrics/`
+12. `memory-mcp-shared-context/`
+13. `byo-kagent-onboarding/`
+14. `aks-fleet-reporting-day2/`
 
 ## Future Bundle Ideas
 
