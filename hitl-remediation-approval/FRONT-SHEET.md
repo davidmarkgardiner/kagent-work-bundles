@@ -8,6 +8,19 @@ step records identity, decision, and scope.
 Trigger a remediation proposal, suspend before action, record approval or denial,
 resume only after approval, and verify the final action and report.
 
+## Start Here
+
+1. `FRONT-SHEET.md`
+2. `WORK-AGENT-START-PROMPT.md`
+3. `CHECKLIST.md`
+4. `requests/hitl-remediation-request.yaml`
+5. `prompts/01-prove-hitl-remediation.md`
+6. `payload/REFERENCE.md`
+7. `evidence/EVIDENCE-TEMPLATE.md`
+
+Static verification proves this bundle is internally consistent. It does not
+prove live Argo, kagent, approval-channel, remediation, or cluster behavior.
+
 ## Required Markers
 
 ```text

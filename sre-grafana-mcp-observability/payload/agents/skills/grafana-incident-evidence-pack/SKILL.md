@@ -82,7 +82,7 @@ For a crashing pod, gather at least:
 ```promql
 sum by (cluster, namespace, pod, container) (
   increase(kube_pod_container_status_restarts_total{
-    cluster=~"{{CLUSTER}}",
+    cluster=~"{{CLUSTER_NAME}}",
     namespace="{{NAMESPACE}}",
     pod=~"{{POD}}",
     container=~"{{CONTAINER}}"
@@ -91,7 +91,7 @@ sum by (cluster, namespace, pod, container) (
 
 max by (cluster, namespace, pod) (
   kube_pod_status_ready{
-    cluster=~"{{CLUSTER}}",
+    cluster=~"{{CLUSTER_NAME}}",
     namespace="{{NAMESPACE}}",
     pod=~"{{POD}}",
     condition="true"
@@ -99,7 +99,7 @@ max by (cluster, namespace, pod) (
 )
 
 kube_pod_container_status_last_terminated_reason{
-  cluster=~"{{CLUSTER}}",
+  cluster=~"{{CLUSTER_NAME}}",
   namespace="{{NAMESPACE}}",
   pod=~"{{POD}}",
   container=~"{{CONTAINER}}"
@@ -111,14 +111,14 @@ kube_pod_container_status_last_terminated_reason{
 Use narrow LogQL first:
 
 ```logql
-{cluster=~"{{CLUSTER}}", namespace="{{NAMESPACE}}", pod=~"{{POD}}", container=~"{{CONTAINER}}"}
+{cluster=~"{{CLUSTER_NAME}}", namespace="{{NAMESPACE}}", pod=~"{{POD}}", container=~"{{CONTAINER}}"}
   |~ "panic|fatal|error|exception|oom|killed|back-off|timeout|denied"
 ```
 
 Then add Kubernetes event logs if collected:
 
 ```logql
-{cluster=~"{{CLUSTER}}", namespace="{{NAMESPACE}}"}
+{cluster=~"{{CLUSTER_NAME}}", namespace="{{NAMESPACE}}"}
   |~ "{{POD}}|BackOff|Killing|Unhealthy|Failed|Started|Pulled|Created"
 ```
 

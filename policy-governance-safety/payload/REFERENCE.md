@@ -17,6 +17,11 @@ Local source patterns:
 Governance position:
 
 - Front-door and general triage agents stay read-only.
+- Diagnostic agent manifests, including copied bundle payloads such as
+  `sre-grafana-mcp-observability/payload/agents/kagent-triage/cert-manager-agent.yaml`,
+  must not contain delete, exec, apply, patch, create, label, or annotation
+  tools unless they are explicitly relabelled as HITL-gated remediation
+  specialists.
 - Write-capable tools belong to specialists and require approval or GitOps
   review.
 - Workflow service accounts execute bounded changes; chat agents should not be

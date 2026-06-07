@@ -35,7 +35,7 @@ Prerequisites to confirm first:
 - kagent CRDs and controller are installed.
 - The kagent controller A2A API is reachable inside the cluster on port 8083.
 - A ModelConfig exists for the approved model endpoint:
-  {{KAGENT_MODEL_CONFIG}}.
+  {{CHAT_MODEL_CONFIG}}.
 - Grafana MCP is deployed as a kagent RemoteMCPServer:
   {{GRAFANA_MCP_REMOTE_SERVER_NAME}}.
 - The Grafana service account used by MCP is read-only for dashboards, metrics,
@@ -89,7 +89,7 @@ Implementation steps:
 
 4. Deploy grafana-evidence-agent:
    - Port agents/grafana-evidence-agent/agent.yaml.
-   - Set spec.declarative.modelConfig to {{KAGENT_MODEL_CONFIG}}.
+   - Set spec.declarative.modelConfig to {{CHAT_MODEL_CONFIG}}.
    - Set the MCP server name to {{GRAFANA_MCP_REMOTE_SERVER_NAME}}.
    - Keep toolNames limited to read-only Grafana MCP tools:
      list_datasources, search_dashboards, get_dashboard_summary,

@@ -8,10 +8,12 @@ Run:
 bash scripts/verify-bundle.sh
 
 Then onboard or verify one team agent:
-1. Read the team request.
-2. Render Agent and ToolGrant manifests.
-3. Confirm read-only tools for triage.
-4. Confirm remediation tools are bounded and HITL-gated if present.
-5. Prove dangerous delete/exec/broad-write tools are absent or denied.
-6. Return manifests, policy report, and demo transcript.
+1. Read FRONT-SHEET.md, CHECKLIST.md, requests/*, prompts/*, payload/REFERENCE.md,
+   and evidence/EVIDENCE-TEMPLATE.md.
+2. Read the team request.
+3. Render Agent and ToolGrant manifests.
+4. Confirm read-only tools for triage.
+5. Confirm remediation tools are bounded and HITL-gated if present.
+6. Prove dangerous delete/exec/broad-write tools are absent or denied.
+7. Return manifests, policy report, and demo transcript.
 ```

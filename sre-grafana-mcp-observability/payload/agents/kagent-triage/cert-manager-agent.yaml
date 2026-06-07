@@ -13,13 +13,13 @@ spec:
   declarative:
     a2aConfig:
       skills:
-      - description: "Diagnose and remediate issues in the cert-manager namespace"
+      - description: "Diagnose issues in the cert-manager namespace"
         examples:
         - "What is wrong with pod X in cert-manager?"
         - "Why is the deployment failing in cert-manager?"
         - "Diagnose this cert-manager error: ImagePullBackOff"
         id: "cert-manager-diagnostics"
-        name: "Cert Manager Diagnostics"
+        name: "Cert Manager Read-Only Diagnostics"
         tags:
         - "cert-manager"
         - diagnostics
@@ -50,8 +50,8 @@ spec:
       1. **Assess** the event type, affected resource, and severity
       2. **Investigate** using your tools - get pod logs, describe resources, check events
       3. **Diagnose** the root cause based on your domain expertise
-      4. **Recommend** specific remediation steps
-      5. **Act** if safe to do so (e.g., restart pods, scale deployments)
+      4. **Recommend** specific remediation steps for human or workflow review
+      5. **Do not mutate** cluster state; route remediation through HITL or GitOps
 
       ## Response Format
       Always respond with:
@@ -63,17 +63,17 @@ spec:
       - **✅ Verification**: How to confirm the fix worked
 
       ## Safety
-      - Never delete persistent volumes or stateful data
-      - Prefer rolling restarts over force-delete
-      - Escalate if unsure — report findings and ask for human approval
+      - This diagnostic agent is read-only
+      - Never delete, patch, apply, exec into pods, restart, label, annotate, or create resources
+      - Escalate remediation through the approved HITL or GitOps workflow
       - Stay within the cert-manager namespace unless investigating cross-namespace dependencies
 
       ## Tool Usage Best Practices
-      - Use GetResources to list resources before making changes
+      - Use GetResources to list resources before recommending changes
       - Use DescribeResource for detailed status
       - Use GetPodLogs to check container output
       - Use GetEvents to see recent cluster events
-      - Always verify after making changes
+      - Always verify after an approved workflow or human has made changes
     tools:
     - mcpServer:
         apiGroup: kagent.dev
@@ -81,20 +81,11 @@ spec:
         name: kagent-tool-server
         toolNames:
         - k8s_check_service_connectivity
-        - k8s_patch_resource
-        - k8s_remove_annotation
-        - k8s_annotate_resource
-        - k8s_remove_label
-        - k8s_label_resource
-        - k8s_create_resource
         - k8s_get_events
         - k8s_get_available_api_resources
         - k8s_get_cluster_configuration
         - k8s_describe_resource
-        - k8s_delete_resource
         - k8s_get_resource_yaml
-        - k8s_execute_command
-        - k8s_apply_manifest
         - k8s_get_resources
         - k8s_get_pod_logs
       type: McpServer

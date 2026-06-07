@@ -34,12 +34,13 @@ proof run:
 |---|---|
 | `{{KUBE_CONTEXT}}` | Kubernetes context for approved lower-env testing. |
 | `{{KAGENT_NAMESPACE}}` | kagent runtime namespace. |
-| `{{KAGENT_NAMESPACE_OR_PLATFORM_SCOPE}}` | Namespace or scope used by governance audits. |
 | `{{ARGO_NAMESPACE}}` | Argo namespace for workflow/event proof. |
 | `{{CHAT_MODEL_CONFIG}}` | Default model config used by newly created agents. |
-| `{{KAGENT_MODEL_CONFIG}}` | Existing Grafana bundle synonym for `{{CHAT_MODEL_CONFIG}}`; prefer one name in work docs. |
 | `{{KAGENT_A2A_ENDPOINT}}` | Agent-to-agent endpoint used for direct A2A proof, if exposed. |
 | `{{AGENTGATEWAY_HOST}}` | Agent Gateway host or route, if runtime/model readiness proof is added. |
+
+Canonical names: use `{{CHAT_MODEL_CONFIG}}`, `{{CLUSTER_NAME}}`, and
+`{{KAGENT_NAMESPACE}}` rather than bundle-local synonyms.
 
 ## GitLab And GitOps
 
@@ -131,7 +132,6 @@ than once globally:
 
 | Variable | Purpose |
 |---|---|
-| `{{CLUSTER}}` | Cluster label used by Grafana evidence skills. |
 | `{{NAMESPACE}}` | Namespace used by PromQL, LogQL, or workflow proof. |
 | `{{WORKLOAD}}` | Workload name used by dashboards, chaos, or triage. |
 | `{{POD}}` | Pod name used by logs, metrics, or trace lookup. |

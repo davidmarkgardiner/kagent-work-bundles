@@ -33,3 +33,11 @@ LIFECYCLE_EVAL_RECORDED: yes
 REPORT_CREATED: yes
 OUTPUT_SANITIZED: yes
 ```
+
+## Definition Of Done
+
+- Chaos is limited to an approved non-production namespace and workload.
+- Any remediation path is bound to `{{APPROVAL_CHANNEL}}` and requires HITL or
+  GitOps review before non-read-only action.
+- Recovery, Grafana evidence, lifecycle eval, and a sanitized report are
+  returned before the exercise is considered complete.

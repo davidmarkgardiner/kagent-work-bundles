@@ -9,4 +9,5 @@ spec:
   failureMode: pod-delete
   maxDuration: 10m
   remediationMode: hitl-gated-gitops-or-workflow
+  approvalChannel: "{{APPROVAL_CHANNEL}}"
   reportRequired: true
