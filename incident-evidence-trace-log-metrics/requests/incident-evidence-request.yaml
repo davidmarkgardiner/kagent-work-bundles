@@ -1,0 +1,24 @@
+apiVersion: platform.example.com/v1alpha1
+kind: IncidentEvidencePackRequest
+metadata:
+  name: kagent-triage-v2-incident-evidence-pack
+spec:
+  incidentId: "{{INCIDENT_ID}}"
+  namespace: "{{APPLICATION_NAMESPACE}}"
+  workload: "{{APPLICATION_WORKLOAD}}"
+  timeWindow: "{{INCIDENT_TIME_WINDOW}}"
+  datasourceHints:
+    metrics: "{{MIMIR_OR_PROMETHEUS_DATASOURCE_UID}}"
+    logs: "{{LOKI_DATASOURCE_UID}}"
+    traces: "{{TEMPO_OR_TRACE_DATASOURCE_UID_OR_NONE}}"
+  requireNoMutationTools: true
+  requiredMarkers:
+    - "GRAFANA_MCP_TOOLS_DISCOVERED: yes"
+    - "METRICS_QUERY_EXECUTED: yes"
+    - "LOG_QUERY_EXECUTED: yes"
+    - "TRACE_LOOKUP_EXECUTED_OR_FALLBACK: yes"
+    - "DASHBOARD_LINK_ATTACHED: yes"
+    - "EVIDENCE_PACK_CREATED: yes"
+    - "TRIAGE_SYNTHESIS_UPDATED: yes"
+    - "NO_MUTATION_TOOLS_GRANTED: yes"
+    - "OUTPUT_SANITIZED: yes"

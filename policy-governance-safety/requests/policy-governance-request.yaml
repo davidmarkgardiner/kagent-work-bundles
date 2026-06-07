@@ -1,0 +1,31 @@
+apiVersion: platform.example.com/v1alpha1
+kind: PolicyGovernanceSafetyRequest
+metadata:
+  name: kagent-triage-v2-policy-governance-audit
+spec:
+  scope: "{{KAGENT_NAMESPACE_OR_PLATFORM_SCOPE}}"
+  audit:
+    agents: true
+    toolGrants: true
+    remoteMcpServers: true
+    chaosSafety: true
+    gitlabWriteBoundary: true
+    memoryWriteBoundary: true
+    publicSafetyScan: true
+  forbiddenTools:
+    - k8s_delete_resource
+    - k8s_exec
+    - k8s_execute_command
+    - delete_resource
+    - exec
+    - broad_gitlab_write
+  requiredMarkers:
+    - "POLICY_BASELINE_COLLECTED: yes"
+    - "TOOLGRANTS_AUDITED: yes"
+    - "FORBIDDEN_TOOLS_BLOCKED: yes"
+    - "PROD_CHAOS_BLOCKED: yes"
+    - "GITLAB_WRITE_BOUNDARY_VERIFIED: yes"
+    - "MEMORY_WRITE_BOUNDARY_VERIFIED: yes"
+    - "SECRET_LEAK_SCAN_PASSED: yes"
+    - "POLICY_REPORT_CREATED: yes"
+    - "OUTPUT_SANITIZED: yes"
