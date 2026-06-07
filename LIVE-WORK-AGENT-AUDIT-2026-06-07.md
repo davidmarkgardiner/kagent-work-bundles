@@ -43,14 +43,19 @@ cluster state allowed it:
   read-only as documented.
 - Re-ran the front-door/specialist governance audit and found no dangerous
   tools on the checked triage agents.
-- Confirmed the official GitLab MCP remains blocked by invalid token material:
-  both configured GitLab token secrets returned HTTP 401 against GitLab. The
-  Kubernetes `RemoteMCPServer` wiring is correct; it needs a fresh scoped PAT or
-  approved OAuth token.
-
-Known output-polish issue: Qwen3 still emits an empty `<think></think>` wrapper
-even with `/no_think`. This does not block runtime proof, but demo prompts or
-post-processing should strip it before stakeholder-facing evidence.
+- Checked GCloud Secret Manager and found a valid GitLab API token in
+  `radiant-pen-425209-e5/gitlab-token-holmes`. Refreshed the home-lab
+  Kubernetes GitLab secrets from that value without printing it.
+- Proved the GitLab-lite MCP pod can call GitLab `/api/v4/user` with HTTP 200,
+  and its MCP `tools/list` exposes `gitlab_create_mr_demo`.
+- Confirmed the official hosted GitLab MCP remains blocked after token refresh:
+  `smart-triage-gitlab-mcp` is still `Accepted=False`. The error moved away
+  from invalid local token material and now points at the hosted MCP
+  endpoint/session/auth model. Treat the lite/API wrapper as the proven demo
+  path unless the work environment has an approved GitLab MCP OAuth path.
+- Fixed the Qwen3 stakeholder-output issue by adding an OpenAI-compatible
+  no-think proxy in front of the native KubeAI/Ollama API. Agent Gateway and A2A
+  smoke tests now return the expected markers with no `<think>` wrapper.
 
 ## Live Evidence Collected
 
@@ -62,11 +67,11 @@ post-processing should strip it before stakeholder-facing evidence.
 | Prometheus direct query | ready | `count(up)` returned live data; kagent agent/eval metrics were also present. |
 | Loki direct query | ready | Recent kagent namespace log series were queryable. |
 | Memory MCP | accepted | Memory server exposed read/search tools plus write/delete tools; bundle governance still needs curator-only enforcement. |
-| GitLab lite MCP | accepted | Demo fallback exposed `gitlab_create_mr_demo`. |
-| Official GitLab MCP | blocked | RemoteMCPServer was `Accepted=False`; controller logs showed initialization failed with Unauthorized. |
+| GitLab lite MCP | accepted after token refresh | Demo fallback exposed `gitlab_create_mr_demo`; pod token verified against GitLab API with HTTP 200. |
+| Official GitLab MCP | blocked | RemoteMCPServer remained `Accepted=False` after valid API token refresh; use lite/API wrapper unless approved OAuth/hosted MCP path is available. |
 | A2A endpoint | ready after fix | Agent-card and health endpoints worked; after model repair, direct `message/send` returned HTTP 200 and completed. |
 | Model backend | ready after fix | Stale failed KubeAI model pod was deleted; replacement pod reached `1/1 Running` and KubeAI status reported `ready:1`. |
-| Agent Gateway Qwen route | ready after fix | `/qwen/v1/chat/completions` returned HTTP 200 through `agent-gw`. |
+| Agent Gateway Qwen route | ready after fix | `/qwen/v1/chat/completions` returned HTTP 200 through `agent-gw`; clean proxy suppressed `<think>` wrappers. |
 | Chaos target | ready for controlled lower-env use | `chaos-demo/chaos-target` exists, is labelled opt-in, and has two ready replicas. |
 | Chaos lifecycle | mixed historical state | Recent lifecycle workflows include successful runs and one earlier failure due to a missing runtime volume. |
 
@@ -100,10 +105,15 @@ The official GitLab RemoteMCPServer exists but is not accepted. Controller logs
 show Unauthorized during MCP initialization. The GitLab-lite MCP is accepted,
 but it is a sandbox/demo fallback with a narrower tool set.
 
-Validated blocker: the configured GitLab auth secret has the right header shape
-but GitLab returns HTTP 401. A second GitLab token secret also returned HTTP
-401. Required work-side action: replace the token material with a fresh scoped
-PAT or approved OAuth token, then re-run RemoteMCPServer acceptance.
+Validated update: GCloud Secret Manager contains a valid GitLab API token, and
+the home-lab Kubernetes GitLab secrets were refreshed from it. The GitLab-lite
+MCP/API wrapper can call GitLab successfully and exposes the expected demo tool.
+
+Remaining blocker: the official hosted GitLab MCP remains `Accepted=False` after
+valid token refresh. Required work-side action: either use the proven lite/API
+wrapper for branch/file/MR demos, or implement the approved GitLab hosted MCP
+auth/session flow for the work environment and re-run RemoteMCPServer
+acceptance.
 
 ### P1 - Read-Only Names Do Not Guarantee Read-Only Tools
 
@@ -138,8 +148,8 @@ failed workflows and not only the latest successful run.
 | `runtime-model-gateway-readiness/` | Added by this audit | Run before all live demos; home-lab model/A2A/Agent Gateway path now passes after fix. |
 | `sre-grafana-mcp-observability/` | Mostly ready | Grafana read/query path works; live demo still depends on runtime preflight. |
 | `sre-adoption-feedback-loop/` | Ready with dependency | Start once runtime preflight has a go/no-go decision. |
-| `kagent-triage-v2-kb-gitlab-mcp/` | Needs live querydoc/GitLab proof | GitLab official MCP auth must be fixed or fallback clearly labelled. |
-| `gitlab-mcp-gitops-pr/` | Blocked for official MCP | Lite demo fallback is available but narrower than full GitLab MCP; official token currently returns HTTP 401. |
+| `kagent-triage-v2-kb-gitlab-mcp/` | Needs live querydoc/GitLab proof | GitLab-lite/API wrapper is proven; official hosted MCP still needs approved auth/session path. |
+| `gitlab-mcp-gitops-pr/` | Ready for lite/API proof, blocked for official hosted MCP | Lite demo fallback has a valid API token and exposes `gitlab_create_mr_demo`; official hosted MCP remains `Accepted=False`. |
 | `a2a-smart-triage-workflows/` | Runtime smoke fixed | Direct A2A `message/send` returns HTTP 200 after model repair. |
 | `chaos-reliability-remediation/` | Safe target exists | Do not run new chaos until runtime preflight and explicit lower-env scenario are agreed. |
 | `lifecycle-evaluation-review-manager/` | Metrics exist | Include recent failed workflow cases in evidence. |
@@ -153,7 +163,9 @@ failed workflows and not only the latest successful run.
 ## Immediate Work-Side Priorities
 
 1. Run `runtime-model-gateway-readiness/` in work.
-2. Fix official GitLab MCP auth or explicitly use the lite fallback for demo only.
-3. Strip or suppress Qwen3 `<think>` wrappers for stakeholder-facing evidence.
+2. Decide whether work will use the proven GitLab-lite/API wrapper or implement
+   the official hosted GitLab MCP OAuth/session path.
+3. Deploy the Qwen3 no-think proxy before stakeholder demos and confirm
+   `/qwen/v1/chat/completions` responses contain no `<think>` wrappers.
 4. Run governance audit against actual agent tool lists.
 5. Start SRE adoption/game-day only after the preflight returns go or go-with-known-blockers.
