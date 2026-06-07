@@ -37,6 +37,25 @@ subscription IDs, or real tokens.
 9. `byo-kagent-onboarding/`
 10. `aks-fleet-reporting-day2/`
 
+## Future Bundle Ideas
+
+These are useful concepts to preserve, but they are not yet dedicated
+`work-agent-bundles/` folders. Treat them as backlog candidates, not verified
+handoff packages.
+
+| Idea | Why it matters | Likely source material |
+|---|---|---|
+| SRE first-contact app onboarding | Cold-start path where an SRE brings an application, the platform generates agent profiles, failure modes, chaos checks, eval criteria, and reporting, then demos the end-to-end flow. | `demos/sre-first-contact/`, `WORK-KAGENT-TRIAGE-V2-ASTHERI-SRE-WALKTHROUGH.md` |
+| Runtime, model, and agentgateway readiness | Proves kagent, agentgateway, ModelConfigs, Qwen/GPT routes, latency, rate limits, and model capacity before relying on any demo result. | `platform/agentgateway/work-qwen-primary-gpt4-failover-handoff/` |
+| Alert ingestion and dedup | Proves Alertmanager or Grafana alert ingestion through Argo Events into smart triage, including duplicate suppression and replay safety. | `a2a/smart-triage-fanout-demo/sensors/`, `SMART-TRIAGE-FANOUT-LIVE-EVIDENCE.md` |
+| AKS-MCP and Kubernetes day-to-day operations | Separates normal cluster/workload debugging through AKS-MCP or Kubernetes tools from fleet reporting and chaos workflows. | `platform/aks-mcp/`, `agents/kagent-triage/` |
+| Policy and governance safety | Gives one explicit bundle for Kyverno, ToolGrants, forbidden tools, production-chaos blocking, and public-safety leak checks across every agent path. | `infra/byo-kagent/kyverno-policies/`, `chaos/reliability/schemas/` |
+| Deployment-state and GitOps context | Maps workload to Helm/Flux/GitLab release context, recent MRs, rollout history, and safe rollback or config PR proposals. | `a2a/smart-triage-fanout-demo/mapping/`, GitLab MCP bundles |
+| Trace, log, and metric correlation evidence packs | Produces reusable incident evidence packs that join traces, logs, metrics, dashboards, and fallback behaviour. | `docs/ai-grafana/`, `agents/skills/grafana-incident-evidence-pack/` |
+| Agentgateway/model capacity and failover | Covers Qwen capacity sweeps, workflow-level rate limiting, retry/failover policy, and model saturation alerting. | `platform/agentgateway/work-qwen-primary-gpt4-failover-handoff/` |
+| Ticket/report closure workflow | Updates GitLab/Jira/issues with evidence, attaches eval output, and blocks closure when lifecycle score or hard gates fail. | GitLab MCP bundle, lifecycle evaluation bundle |
+| Fleet scheduling and randomized game-day selection | Chooses a bounded set of clusters/apps under policy and runs controlled reliability checks with auditable selection. | `agents/skills/fleet-selector/`, `chaos/reliability/` |
+
 ## Local Verification
 
 Run all bundle verifiers:
