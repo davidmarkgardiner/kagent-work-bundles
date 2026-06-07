@@ -9,6 +9,11 @@ These bundles are public-safe. They use placeholders for environment-specific
 values and must not contain secrets, private hostnames, private IPs, tenant IDs,
 subscription IDs, or real tokens.
 
+Before live implementation, fill in
+[`SHARED-VARIABLES.md`](SHARED-VARIABLES.md) inside the approved work context.
+That sheet lists the common namespaces, MCP server names, datasource UIDs,
+GitLab project values, approval routes, and demo targets needed across bundles.
+
 ## Bundle Map
 
 | Bundle | Capability | Primary outcome |
@@ -75,3 +80,10 @@ bash scripts/verify-bundle.sh
 Static verification proves the handoff package is internally consistent. It
 does not prove live work-lab GitLab, Grafana, querydoc, kagent, Argo, chaos,
 memory, or cluster behavior.
+
+## Peer Review
+
+Before giving the bundle set to a work-side implementation agent, hand
+[`PEER-REVIEW-PROMPT.md`](PEER-REVIEW-PROMPT.md) to a separate review agent.
+That reviewer should check handover clarity, required variables, token
+efficiency, safety boundaries, and missing concepts without claiming live proof.
