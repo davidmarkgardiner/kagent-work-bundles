@@ -1,0 +1,32 @@
+apiVersion: platform.example.io/v1alpha1
+kind: SREAdoptionRequest
+metadata:
+  name: kagent-triage-v2-sre-adoption-{{RUN_ID}}
+spec:
+  sreOwner: "{{SRE_OWNER}}"
+  sreTeam: "{{SRE_TEAM}}"
+  applicationName: "{{APPLICATION_NAME}}"
+  applicationNamespace: "{{APPLICATION_NAMESPACE}}"
+  applicationWorkload: "{{APPLICATION_WORKLOAD}}"
+  gitlabProject: "{{GITLAB_PROJECT}}"
+  targetBranch: "{{TARGET_BRANCH}}"
+  adoptionWindow: "{{ADOPTION_WINDOW}}"
+  gameDayId: "{{GAME_DAY_ID}}"
+  approvalChannel: "{{APPROVAL_CHANNEL}}"
+  grafanaMcpServer: "{{GRAFANA_MCP_REMOTE_SERVER_NAME}}"
+  gitlabMcpServer: "{{GITLAB_MCP_REMOTE_SERVER_NAME}}"
+  memoryMcpServer: "{{MEMORY_MCP_REMOTE_SERVER_NAME}}"
+  metricsDatasourceUid: "{{MIMIR_OR_PROMETHEUS_DATASOURCE_UID}}"
+  logsDatasourceUid: "{{LOKI_DATASOURCE_UID}}"
+  traceDatasourceUid: "{{TEMPO_OR_TRACE_DATASOURCE_UID_OR_NONE}}"
+  feedbackIssueProject: "{{FEEDBACK_ISSUE_PROJECT}}"
+  feedbackLabels:
+    - "{{FEEDBACK_LABEL_TRIAGE_V2}}"
+    - "{{FEEDBACK_LABEL_SRE_ADOPTION}}"
+  requiredOutcomes:
+    - sre_first_contact_completed
+    - controlled_exercise_completed_or_blocked
+    - workflow_used_or_reviewed_by_sre
+    - feedback_captured
+    - improvement_routed
+    - adoption_report_created

@@ -110,7 +110,15 @@ through GitLab MCP and a human-reviewed branch or merge request.
 | `{{APPLICATION_NAMESPACE}}` | Application namespace for incident evidence. |
 | `{{APPLICATION_WORKLOAD}}` | Application workload for incident evidence. |
 | `{{INCIDENT_TIME_WINDOW}}` | Time window for metrics, logs, and traces. |
+| `{{APPLICATION_NAME}}` | Application name used by SRE adoption and first-contact onboarding. |
 | `{{FLEET_SCOPE}}` | Fleet, cluster group, or namespace set for day-2 reporting. |
+| `{{SRE_OWNER}}` | SRE owner or delegate for an adoption run. |
+| `{{SRE_TEAM}}` | SRE team or rota associated with the app. |
+| `{{ADOPTION_WINDOW}}` | Time window for trial, game day, or adoption review. |
+| `{{GAME_DAY_ID}}` | Controlled exercise, game-day, or incident identifier. |
+| `{{FEEDBACK_ISSUE_PROJECT}}` | GitLab/Jira/project location for feedback issues. |
+| `{{FEEDBACK_LABEL_TRIAGE_V2}}` | Label used for Kagent triage v2 feedback. |
+| `{{FEEDBACK_LABEL_SRE_ADOPTION}}` | Label used for SRE adoption feedback. |
 | `{{TEAM_NAME}}` | Team onboarding through BYO kagent. |
 | `{{TEAM_NAMESPACE}}` | Team namespace for BYO kagent. |
 | `{{PASSING_LIFECYCLE_CASE}}` | Known-good eval case. |
@@ -131,6 +139,10 @@ than once globally:
 | `{{WINDOW}}` | Query time window such as `30m`, `2h`, or an incident interval. |
 | `{{WORKFLOW_NAME}}` | Argo Workflow name used in chaos or triage proof. |
 | `{{DOMAIN_AGENT_NAME}}` | Domain triage agent being connected to shared evidence workflows. |
+| `{{EXISTING_DASHBOARDS_OR_NONE}}` | Existing dashboard links or explicit `none`. |
+| `{{EXISTING_ALERTS_OR_NONE}}` | Existing alert names/routes or explicit `none`. |
+| `{{EXISTING_RUNBOOKS_OR_NONE}}` | Existing runbook links or explicit `none`. |
+| `{{KNOWN_FAILURE_MODES_OR_NONE}}` | Known risks/failure modes or explicit `none`. |
 
 ## Evidence Template Placeholders
 
@@ -153,7 +165,17 @@ writing final evidence:
 `{{CALLER_OBSERVED_EVENTS_OR_UNKNOWN}}`,
 `{{CALLER_OBSERVED_LOG_EXCERPT_OR_UNKNOWN}}`, `{{FILES}}`,
 `{{FILES_OR_NOT_REQUIRED}}`, `{{GRAFANA_DASHBOARD_URL_OR_UID}}`,
-`{{ROUTING_LABELS_OR_WORKFLOW}}`.
+`{{ROUTING_LABELS_OR_WORKFLOW}}`, `{{FIRST_CONTACT_PROMPT_OR_TRANSCRIPT}}`,
+`{{FAILURE_MODES}}`, `{{EXISTING_CONTEXT_SUMMARY}}`,
+`{{TOOLING_SUMMARY}}`, `{{EXERCISE_TYPE}}`, `{{RUN_OR_WORKFLOW_ID}}`,
+`{{BLOCKER_OR_NONE}}`, `{{EVIDENCE_PACK_LINK_OR_PATH}}`,
+`{{EVAL_RESULT_OR_NOT_AVAILABLE}}`, `{{SRE_ACTION_SUMMARY}}`,
+`{{SRE_REVIEW_LINK_OR_NOT_AVAILABLE}}`, `{{FEEDBACK_CAPTURE_LOCATION}}`,
+`{{FEEDBACK_CATEGORIES}}`, `{{TOP_FEEDBACK_ITEM}}`,
+`{{MISSING_OR_WEAK_AREAS}}`, `{{IMPROVEMENT_ITEM_LINK_OR_PATH}}`,
+`{{IMPROVEMENT_OWNER}}`, `{{ADOPTION_REPORT_LOCATION}}`,
+`{{DASHBOARD_OR_METRICS_LOCATION_OR_NOT_AVAILABLE}}`,
+`{{OPEN_BLOCKERS_OR_NONE}}`.
 
 ## Work-Agent Instruction
 

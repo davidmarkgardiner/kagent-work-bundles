@@ -19,6 +19,7 @@ GitLab project values, approval routes, and demo targets needed across bundles.
 | Bundle | Capability | Primary outcome |
 |---|---|---|
 | `sre-grafana-mcp-observability/` | Grafana MCP observability | SRE asks a kagent front door to build/verify dashboards, alerts, logs, metrics, and GitOps observability changes |
+| `sre-adoption-feedback-loop/` | SRE adoption and feedback loop | SRE onboards one app, uses/reviews the workflow, captures feedback, routes improvements, and reports adoption |
 | `kagent-triage-v2-kb-gitlab-mcp/` | KB + doc2vec/querydoc + GitLab MCP | Agent updates KB docs through GitLab MCP, reindexes querydoc, and proves cited retrieval |
 | `gitlab-mcp-gitops-pr/` | GitLab MCP GitOps PRs | Agent creates a branch, updates code/YAML/docs, opens an MR, and leaves it for human review |
 | `chaos-reliability-remediation/` | Chaos and remediation proof | SRE requests controlled lower-env chaos, triage, gated remediation, recovery proof, and report |
@@ -34,17 +35,18 @@ GitLab project values, approval routes, and demo targets needed across bundles.
 ## Recommended Work Order
 
 1. `sre-grafana-mcp-observability/`
-2. `kagent-triage-v2-kb-gitlab-mcp/`
-3. `gitlab-mcp-gitops-pr/`
-4. `a2a-smart-triage-workflows/`
-5. `chaos-reliability-remediation/`
-6. `lifecycle-evaluation-review-manager/`
-7. `hitl-remediation-approval/`
-8. `policy-governance-safety/`
-9. `incident-evidence-trace-log-metrics/`
-10. `memory-mcp-shared-context/`
-11. `byo-kagent-onboarding/`
-12. `aks-fleet-reporting-day2/`
+2. `sre-adoption-feedback-loop/`
+3. `kagent-triage-v2-kb-gitlab-mcp/`
+4. `gitlab-mcp-gitops-pr/`
+5. `a2a-smart-triage-workflows/`
+6. `chaos-reliability-remediation/`
+7. `lifecycle-evaluation-review-manager/`
+8. `hitl-remediation-approval/`
+9. `policy-governance-safety/`
+10. `incident-evidence-trace-log-metrics/`
+11. `memory-mcp-shared-context/`
+12. `byo-kagent-onboarding/`
+13. `aks-fleet-reporting-day2/`
 
 ## Future Bundle Ideas
 
@@ -54,7 +56,6 @@ handoff packages.
 
 | Idea | Why it matters | Likely source material |
 |---|---|---|
-| SRE first-contact app onboarding | Cold-start path where an SRE brings an application, the platform generates agent profiles, failure modes, chaos checks, eval criteria, and reporting, then demos the end-to-end flow. | `demos/sre-first-contact/`, `WORK-KAGENT-TRIAGE-V2-ASTHERI-SRE-WALKTHROUGH.md` |
 | Runtime, model, and agentgateway readiness | Proves kagent, agentgateway, ModelConfigs, Qwen/GPT routes, latency, rate limits, and model capacity before relying on any demo result. | `platform/agentgateway/work-qwen-primary-gpt4-failover-handoff/` |
 | Alert ingestion and dedup | Proves Alertmanager or Grafana alert ingestion through Argo Events into smart triage, including duplicate suppression and replay safety. | `a2a/smart-triage-fanout-demo/sensors/`, `SMART-TRIAGE-FANOUT-LIVE-EVIDENCE.md` |
 | AKS-MCP and Kubernetes day-to-day operations | Separates normal cluster/workload debugging through AKS-MCP or Kubernetes tools from fleet reporting and chaos workflows. | `platform/aks-mcp/`, `agents/kagent-triage/` |

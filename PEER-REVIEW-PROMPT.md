@@ -70,6 +70,7 @@ Primary review questions:
      triage/remediation platform.
    - Pay particular attention to:
      - SRE first-contact app onboarding
+     - SRE adoption feedback loop and usage reporting
      - runtime/model/agentgateway readiness
      - alert ingestion and dedup
      - AKS-MCP day-to-day Kubernetes operations
