@@ -7,6 +7,11 @@ Run:
 
 bash scripts/verify-bundle.sh
 
+This verifier uses the bundle-local `payload/agent-evals` copy of the scorer,
+metrics library, route script, lifecycle cases, and sample runs. If you only
+received this bundle directory, do not rely on `observability/agent-evals`
+paths existing.
+
 Then prove the work eval path:
 1. Read FRONT-SHEET.md, CHECKLIST.md, MEETING-ACTION-COVERAGE.md,
    ARCHITECTURE-DECISION.md, DATA-STORAGE-ACCESS-TRACEABILITY.md,

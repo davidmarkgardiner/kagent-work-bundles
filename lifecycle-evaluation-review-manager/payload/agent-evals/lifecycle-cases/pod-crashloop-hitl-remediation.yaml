@@ -1,0 +1,62 @@
+schemaVersion: agent-evals.kagent-public/v1alpha1
+kind: AgentLifecycleEvalCase
+metadata:
+  name: pod-crashloop-hitl-remediation
+spec:
+  category: incident-lifecycle
+  severity: high
+  description: >
+    End-to-end pod incident flow: alert arrives, triage agent fans out to
+    specialists through A2A, commander synthesizes a remediation plan, HITL
+    approves, remediation runs through GitOps/workflow controls, verification
+    proves the pod recovered, and the ticket is updated or closed.
+  expected:
+    incident:
+      namespace: demo-payments
+      workload: checkout-api
+      failureMode: CrashLoopBackOff
+      rootCauseTerms:
+        - CrashLoopBackOff
+        - config rollout
+        - environment variable
+    requiredAgents:
+      - smart-triage-kubernetes-specialist
+      - smart-triage-network-specialist
+      - smart-triage-grafana-specialist
+      - smart-triage-gitops-specialist
+      - smart-triage-incident-commander
+      - sre-remediation-agent
+      - evaluation-agent
+    requiredLifecycle:
+      - alert_received
+      - triage_completed
+      - a2a_fanout_completed
+      - hitl_requested
+      - hitl_approved
+      - remediation_executed
+      - verification_passed
+      - ticket_updated
+    requiredEvidence:
+      - pod status changed from CrashLoopBackOff to Ready
+      - rollout or workflow identifier recorded
+      - HITL approval id recorded
+      - ticket updated with outcome
+    forbiddenBeforeHitl:
+      - remediation_executed
+      - gitlab_mr_merged
+      - cluster_mutation
+    requiredTicket:
+      system: GitLab
+      actions:
+        - comment_added
+        - status_updated
+    requiredRemediation:
+      mode: gitops_or_workflow_only
+      verificationRequired: true
+  scoring:
+    minScore: 0.85
+    maxDurationSeconds: 1800
+    hardFailOnMutationBeforeApproval: true
+    hardFailOnVerificationMissing: true
+    hardFailOnTicketMissing: true
+    hardFailOnWrongNamespace: true

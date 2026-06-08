@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 bundle_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-repo_root="$(cd "${bundle_root}/../.." && pwd)"
+eval_root="${bundle_root}/payload/agent-evals"
 cd "${bundle_root}"
 for rel in \
   FRONT-SHEET.md \
@@ -15,6 +15,16 @@ for rel in \
   requests/lifecycle-evaluation-request.yaml \
   prompts/01-run-lifecycle-eval.md \
   payload/REFERENCE.md \
+  payload/agent-evals/scripts/reporting.py \
+  payload/agent-evals/scripts/metrics.py \
+  payload/agent-evals/scripts/collect-lifecycle-evidence.py \
+  payload/agent-evals/scripts/score-lifecycle-run.py \
+  payload/agent-evals/scripts/summarize-agent-scores.py \
+  payload/agent-evals/scripts/route-lifecycle-review.py \
+  payload/agent-evals/lifecycle-cases/pod-crashloop-hitl-remediation.yaml \
+  payload/agent-evals/lifecycle-cases/chaos-pod-delete.yaml \
+  payload/agent-evals/results/sample/lifecycle/pod-crashloop-hitl-remediation.lifecycle-run.json \
+  payload/agent-evals/results/sample/lifecycle/chaos-pod-delete-below-threshold.lifecycle-run.json \
   evidence/EVIDENCE-TEMPLATE.md; do
   [[ -f "${rel}" ]] || { echo "MISSING ${rel}" >&2; exit 1; }
   echo "FOUND ${rel}"
@@ -40,15 +50,15 @@ done
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "${tmp_dir}"' EXIT
 
-python3 "${repo_root}/observability/agent-evals/scripts/score-lifecycle-run.py" \
-  --case "${repo_root}/observability/agent-evals/lifecycle-cases/pod-crashloop-hitl-remediation.yaml" \
-  --run "${repo_root}/observability/agent-evals/results/sample/lifecycle/pod-crashloop-hitl-remediation.lifecycle-run.json" \
+PYTHONPATH="${eval_root}/scripts" python3 "${eval_root}/scripts/score-lifecycle-run.py" \
+  --case "${eval_root}/lifecycle-cases/pod-crashloop-hitl-remediation.yaml" \
+  --run "${eval_root}/results/sample/lifecycle/pod-crashloop-hitl-remediation.lifecycle-run.json" \
   --output-dir "${tmp_dir}/pass"
 echo "PASSING_RUN_SCORED: yes"
 
-if python3 "${repo_root}/observability/agent-evals/scripts/score-lifecycle-run.py" \
-  --case "${repo_root}/observability/agent-evals/lifecycle-cases/chaos-pod-delete.yaml" \
-  --run "${repo_root}/observability/agent-evals/results/sample/lifecycle/chaos-pod-delete-below-threshold.lifecycle-run.json" \
+if PYTHONPATH="${eval_root}/scripts" python3 "${eval_root}/scripts/score-lifecycle-run.py" \
+  --case "${eval_root}/lifecycle-cases/chaos-pod-delete.yaml" \
+  --run "${eval_root}/results/sample/lifecycle/chaos-pod-delete-below-threshold.lifecycle-run.json" \
   --output-dir "${tmp_dir}/fail"; then
   echo "BELOW_THRESHOLD_RUN_UNEXPECTEDLY_PASSED" >&2
   exit 1
@@ -57,14 +67,14 @@ else
   echo "HARD_FAILURES_ENFORCED: yes"
 fi
 
-python3 "${repo_root}/observability/agent-evals/scripts/route-lifecycle-review.py" \
+PYTHONPATH="${eval_root}/scripts" python3 "${eval_root}/scripts/route-lifecycle-review.py" \
   --results-dir "${tmp_dir}/fail" \
   --output "${tmp_dir}/review-route.json"
 rg -q '"review_manager_route": "review-manager"' "${tmp_dir}/review-route.json"
 echo "REVIEW_MANAGER_ROUTED: yes"
 
-python3 "${repo_root}/observability/agent-evals/scripts/summarize-agent-scores.py" \
-  --results-dir "${repo_root}/observability/agent-evals/results/sample" \
+PYTHONPATH="${eval_root}/scripts" python3 "${eval_root}/scripts/summarize-agent-scores.py" \
+  --results-dir "${tmp_dir}" \
   --summary-md "${tmp_dir}/summary.md" \
   --metrics "${tmp_dir}/agent-eval.prom"
 rg -q "agent_lifecycle_eval_score|agent_lifecycle_eval_hard_failures|agent_lifecycle_eval_subscore" "${tmp_dir}/agent-eval.prom"

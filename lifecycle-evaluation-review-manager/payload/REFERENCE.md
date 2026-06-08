@@ -1,6 +1,16 @@
 # Reference
 
-Local source patterns:
+Bundle-local runnable payload:
+
+- `payload/agent-evals/scripts/score-lifecycle-run.py`
+- `payload/agent-evals/scripts/route-lifecycle-review.py`
+- `payload/agent-evals/scripts/summarize-agent-scores.py`
+- `payload/agent-evals/scripts/metrics.py`
+- `payload/agent-evals/lifecycle-cases/pod-crashloop-hitl-remediation.yaml`
+- `payload/agent-evals/lifecycle-cases/chaos-pod-delete.yaml`
+- `payload/agent-evals/results/sample/lifecycle/`
+
+Full-repo source patterns:
 
 - `observability/agent-evals/README.md`
 - `observability/agent-evals/OFFLINE-ONLINE-EVALUATION-DESIGN.md`

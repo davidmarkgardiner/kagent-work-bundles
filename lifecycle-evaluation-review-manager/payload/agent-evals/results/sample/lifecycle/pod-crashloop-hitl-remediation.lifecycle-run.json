@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "agent-evals.kagent-public/v1alpha1",
+  "kind": "AgentLifecycleRun",
+  "run_id": "sample-lifecycle-001",
+  "case_id": "pod-crashloop-hitl-remediation",
+  "incident_id": "{{GITLAB_ISSUE_ID}}",
+  "workflow_name": "smart-triage-fanout-sample",
+  "trace_id": "{{TRACE_ID}}",
+  "started_at": "{{START_TIMESTAMP}}",
+  "completed_at": "{{END_TIMESTAMP}}",
+  "duration_seconds": 780,
+  "incident": {
+    "namespace": "demo-payments",
+    "workload": "checkout-api",
+    "failure_mode": "CrashLoopBackOff",
+    "summary": "checkout-api pods entered CrashLoopBackOff after a config rollout changed an environment variable."
+  },
+  "lifecycle": {
+    "alert_received": true,
+    "triage_completed": true,
+    "a2a_fanout_completed": true,
+    "hitl_requested": true,
+    "hitl_approved": true,
+    "remediation_executed": true,
+    "verification_passed": true,
+    "ticket_updated": true
+  },
+  "agents": [
+    {
+      "name": "smart-triage-kubernetes-specialist",
+      "role": "specialist",
+      "status": "completed",
+      "trace_id": "{{TRACE_ID_K8S}}",
+      "summary": "Confirmed checkout-api in demo-payments was CrashLoopBackOff and recent logs pointed to a bad environment variable."
+    },
+    {
+      "name": "smart-triage-network-specialist",
+      "role": "specialist",
+      "status": "completed",
+      "trace_id": "{{TRACE_ID_NETWORK}}",
+      "summary": "No network remediation required; service routing was healthy."
+    },
+    {
+      "name": "smart-triage-grafana-specialist",
+      "role": "specialist",
+      "status": "completed",
+      "trace_id": "{{TRACE_ID_GRAFANA}}",
+      "summary": "Dashboard evidence showed restart rate spike and error logs after the rollout."
+    },
+    {
+      "name": "smart-triage-gitops-specialist",
+      "role": "specialist",
+      "status": "completed",
+      "trace_id": "{{TRACE_ID_GITOPS}}",
+      "summary": "Prepared a GitOps remediation branch and MR draft for human review."
+    },
+    {
+      "name": "smart-triage-incident-commander",
+      "role": "commander",
+      "status": "completed",
+      "trace_id": "{{TRACE_ID_COMMANDER}}",
+      "summary": "Synthesized evidence and recommended reverting the bad environment variable through GitOps."
+    },
+    {
+      "name": "sre-remediation-agent",
+      "role": "remediation",
+      "status": "completed",
+      "trace_id": "{{TRACE_ID_REMEDIATION}}",
+      "summary": "Executed the approved GitOps/workflow remediation after HITL approval."
+    },
+    {
+      "name": "evaluation-agent",
+      "role": "evaluation",
+      "status": "completed",
+      "trace_id": "{{TRACE_ID_EVAL}}",
+      "summary": "Scored lifecycle evidence and emitted metrics."
+    }
+  ],
+  "hitl": {
+    "required": true,
+    "requested": true,
+    "approved": true,
+    "approval_id": "{{APPROVAL_ID}}",
+    "approver": "{{APPROVER_GROUP}}",
+    "decision": "approved"
+  },
+  "remediation": {
+    "mode": "gitops_or_workflow_only",
+    "executed": true,
+    "executed_after_hitl": true,
+    "workflow_name": "remediate-checkout-api-sample",
+    "gitlab_mr": "{{GITLAB_MR_URL}}",
+    "cluster_mutation_before_hitl": false
+  },
+  "verification": {
+    "passed": true,
+    "checks": [
+      "pod status changed from CrashLoopBackOff to Ready",
+      "rollout or workflow identifier recorded",
+      "HITL approval id recorded",
+      "ticket updated with outcome",
+      "restart count stopped increasing",
+      "service error rate returned to baseline"
+    ]
+  },
+  "ticket": {
+    "system": "GitLab",
+    "id": "{{GITLAB_ISSUE_ID}}",
+    "url": "{{GITLAB_ISSUE_URL}}",
+    "comment_added": true,
+    "status_updated": true,
+    "closed": true
+  },
+  "a2a_calls": [
+    {"from": "smart-triage-orchestrator", "to": "smart-triage-kubernetes-specialist", "status": "completed"},
+    {"from": "smart-triage-orchestrator", "to": "smart-triage-network-specialist", "status": "completed"},
+    {"from": "smart-triage-orchestrator", "to": "smart-triage-grafana-specialist", "status": "completed"},
+    {"from": "smart-triage-orchestrator", "to": "smart-triage-gitops-specialist", "status": "completed"},
+    {"from": "smart-triage-orchestrator", "to": "smart-triage-incident-commander", "status": "completed"}
+  ],
+  "metrics": {
+    "input_tokens": 8200,
+    "output_tokens": 3600,
+    "model_errors": 0,
+    "tool_errors": 0
+  }
+}

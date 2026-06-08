@@ -21,7 +21,7 @@ Before running evidence commands, confirm the design coverage:
 6. Data storage/access model is documented.
 7. Audit retention and traceability fields are documented.
 
-Minimum commands to adapt:
+Minimum commands to adapt when you have the full repo:
 
 ```bash
 kubectl kustomize observability/agent-evals
@@ -43,4 +43,13 @@ python3 observability/agent-evals/scripts/summarize-agent-scores.py \
 ```
 
 Return the evidence using `evidence/EVIDENCE-TEMPLATE.md`.
+
+If you only have this bundle directory, run:
+
+```bash
+bash scripts/verify-bundle.sh
+```
+
+That verifier uses `payload/agent-evals` and does not require the full
+`observability/agent-evals` source tree.
 ```

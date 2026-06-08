@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "agent-evals.kagent-public/v1alpha1",
+  "kind": "AgentLifecycleRun",
+  "run_id": "sample-chaos-pod-delete-below-threshold",
+  "case_id": "chaos-pod-delete",
+  "incident_id": "{{GITLAB_ISSUE_ID}}",
+  "workflow_name": "chaos-test-lifecycle-below-threshold-sample",
+  "trace_id": "{{TRACE_ID}}",
+  "started_at": "{{START_TIMESTAMP}}",
+  "completed_at": "{{END_TIMESTAMP}}",
+  "duration_seconds": 1240,
+  "incident": {
+    "namespace": "chaos-demo",
+    "workload": "chaos-target",
+    "failure_mode": "pod-delete",
+    "summary": "Lower-env pod-delete chaos test reached a ChaosResult terminal verdict for chaos-target, but recovery verification and report hygiene were incomplete."
+  },
+  "lifecycle": {
+    "alert_received": true,
+    "triage_completed": true,
+    "a2a_fanout_completed": false,
+    "hitl_requested": true,
+    "hitl_approved": true,
+    "remediation_executed": true,
+    "verification_passed": false,
+    "ticket_updated": false
+  },
+  "agents": [
+    {
+      "name": "smart-triage-kubernetes-specialist",
+      "role": "specialist",
+      "status": "completed",
+      "trace_id": "{{TRACE_ID_K8S}}",
+      "summary": "Observed the pod-delete failure mode and referenced the ChaosResult terminal verdict for chaos-target."
+    },
+    {
+      "name": "smart-triage-network-specialist",
+      "role": "specialist",
+      "status": "completed",
+      "trace_id": "{{TRACE_ID_NETWORK}}",
+      "summary": "No network-specific blocker was identified."
+    },
+    {
+      "name": "smart-triage-grafana-specialist",
+      "role": "specialist",
+      "status": "failed",
+      "trace_id": "{{TRACE_ID_GRAFANA}}",
+      "summary": "Grafana dashboard k8s-pod-crash-evidence linked evidence was not captured before the lifecycle eval."
+    },
+    {
+      "name": "smart-triage-gitops-specialist",
+      "role": "specialist",
+      "status": "completed",
+      "trace_id": "{{TRACE_ID_GITOPS}}",
+      "summary": "Confirmed the remediation mode should remain gitops_or_workflow_only."
+    },
+    {
+      "name": "smart-triage-incident-commander",
+      "role": "commander",
+      "status": "completed",
+      "trace_id": "{{TRACE_ID_COMMANDER}}",
+      "summary": "Synthesized the incomplete recovery evidence and recommended review-manager follow-up."
+    },
+    {
+      "name": "evaluation-agent",
+      "role": "evaluation",
+      "status": "completed",
+      "trace_id": "{{TRACE_ID_EVAL}}",
+      "summary": "Scored the below-threshold lifecycle evidence."
+    }
+  ],
+  "hitl": {
+    "required": true,
+    "requested": true,
+    "approved": true,
+    "approval_id": "{{APPROVAL_ID}}",
+    "approver": "{{APPROVER_GROUP}}",
+    "decision": "approved"
+  },
+  "remediation": {
+    "mode": "gitops_or_workflow_only",
+    "executed": true,
+    "executed_after_hitl": true,
+    "workflow_name": "chaos-test-lifecycle-below-threshold-sample",
+    "gitlab_mr": "{{GITLAB_MR_URL}}",
+    "cluster_mutation_before_hitl": false
+  },
+  "verification": {
+    "passed": false,
+    "checks": [
+      "ChaosResult reached a terminal verdict",
+      "deployment/chaos-target reports two Ready replicas evidence missing from final report"
+    ]
+  },
+  "ticket": {
+    "system": "GitLab",
+    "id": "{{GITLAB_ISSUE_ID}}",
+    "url": "{{GITLAB_ISSUE_URL}}",
+    "comment_added": true,
+    "status_updated": false,
+    "closed": false
+  },
+  "a2a_calls": [
+    {"from": "chaos-test-manager-agent", "to": "smart-triage-kubernetes-specialist", "status": "completed"},
+    {"from": "chaos-test-manager-agent", "to": "smart-triage-network-specialist", "status": "completed"},
+    {"from": "chaos-test-manager-agent", "to": "smart-triage-gitops-specialist", "status": "completed"},
+    {"from": "chaos-test-manager-agent", "to": "smart-triage-incident-commander", "status": "completed"}
+  ],
+  "metrics": {
+    "input_tokens": 5200,
+    "output_tokens": 1700,
+    "model_errors": 0,
+    "tool_errors": 1
+  }
+}
