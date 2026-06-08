@@ -1,0 +1,98 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: kagent-chaos-test-lifecycle-
+  namespace: "{{ARGO_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/name: chaos-test-lifecycle
+    app.kubernetes.io/part-of: kagent
+    reliability.platform/suite: kagent-triage-v2-sandbox
+    reliability.platform/test: kagent-triage-v2-pod-delete
+    reliability.platform/env-tier: dev
+spec:
+  workflowTemplateRef:
+    name: chaos-test-lifecycle
+  arguments:
+    parameters:
+      - name: chaos_test_spec
+        value: |
+          apiVersion: reliability.platform.example/v1alpha1
+          kind: ChaosTest
+          metadata:
+            name: kagent-triage-v2-pod-delete
+            labels:
+              reliability.platform/suite: kagent-triage-v2-sandbox
+              reliability.platform/owner: platform
+              reliability.platform/env-tier: dev
+          spec:
+            owner: platform
+            description: Dry-run lifecycle submission for the reviewed pod-delete chaos test.
+            target:
+              environment: dev
+              clusters:
+                selectionMode: explicit
+                count: 1
+                selector: environment=dev,reliability.platform/chaos-optin=true
+                resolved:
+                  - "{{CLUSTER_NAME}}"
+              namespace: "{{DEMO_TARGET_NAMESPACE}}"
+              selector:
+                matchLabels:
+                  app.kubernetes.io/name: "{{DEMO_TARGET_WORKLOAD}}"
+                  reliability.platform/chaos-optin: "true"
+              serviceOwnership: "{{SERVICE_OWNERSHIP_REF}}"
+            experiment:
+              provider: litmus
+              type: pod-delete
+              parameters:
+                totalChaosDuration: "20"
+                chaosInterval: "5"
+                podsAffectedPerc: "50"
+                force: "true"
+            schedule:
+              mode: manual
+              cron: ""
+              window: next-business-hours-lower-env
+            safety:
+              blastRadius: single-workload
+              maxDurationSeconds: 600
+              abortConditions:
+                - target workload unavailable for more than 120 seconds
+              rollback: Stop workflow, remove active ChaosEngine, and wait for target Ready replicas.
+              requiresHITL: true
+            observability:
+              expectedSignals:
+                - ChaosResult reaches Pass or Fail
+                - smart triage fan-out starts
+              recoverySignals:
+                - target deployment reports expected ready replicas
+              grafanaDashboard: "{{GRAFANA_DASHBOARD_UID}}"
+            triage:
+              workflowTemplate: smart-triage-fanout
+            eval:
+              rubricRef: chaos-pod-delete
+              benchmark: 8
+            reporting:
+              destination:
+                - GitLab
+                - GrafanaAnnotation
+                - Teams
+            learning:
+              memoryUpdatePolicy: curator-only
+              kbUpdatePolicy: hitl-gated-mr
+      - name: run_id
+        value: "{{RUN_ID}}"
+      - name: dry_run
+        value: "true"
+      - name: gitlab_project
+        value: "{{GITLAB_SANDBOX_PROJECT}}"
+      - name: gitlab_target_branch
+        value: main
+      - name: gitlab_mr_url
+        value: "{{GITLAB_MR_URL}}"
+      - name: approval_id
+        value: "{{APPROVAL_ID}}"
+      - name: chaos_result_name
+        value: ""
+      - name: marker_evidence_extra
+        value: ""

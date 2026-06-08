@@ -1,0 +1,72 @@
+apiVersion: reliability.platform.example/v1alpha1
+kind: ChaosTest
+metadata:
+  name: kagent-triage-v2-pod-delete
+  labels:
+    reliability.platform/suite: kagent-triage-v2-sandbox
+    reliability.platform/owner: platform
+    reliability.platform/env-tier: dev
+spec:
+  owner: platform
+  description: >
+    Delete one pod from an opt-in lower-environment workload and verify Kagent
+    triage, Grafana evidence, HITL/GitOps boundary, recovery, lifecycle eval,
+    and reporting.
+  target:
+    environment: dev
+    clusters:
+      selectionMode: explicit
+      count: 1
+      selector: environment=dev,reliability.platform/chaos-optin=true
+      resolved:
+        - "{{CLUSTER_NAME}}"
+    namespace: "{{DEMO_TARGET_NAMESPACE}}"
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: "{{DEMO_TARGET_WORKLOAD}}"
+        reliability.platform/chaos-optin: "true"
+    serviceOwnership: "{{SERVICE_OWNERSHIP_REF}}"
+  experiment:
+    provider: litmus
+    type: pod-delete
+    parameters:
+      totalChaosDuration: "20"
+      chaosInterval: "5"
+      podsAffectedPerc: "50"
+      force: "true"
+  schedule:
+    mode: manual
+    cron: ""
+    window: next-business-hours-lower-env
+  safety:
+    blastRadius: single-workload
+    maxDurationSeconds: 600
+    abortConditions:
+      - target workload unavailable for more than 120 seconds
+      - namespace-level error rate exceeds {{ERROR_RATE_THRESHOLD}}
+    rollback: >
+      Stop the workflow, remove the active ChaosEngine if present, and wait for
+      the target deployment to return to the expected ready replica count.
+    requiresHITL: true
+  observability:
+    expectedSignals:
+      - ChaosResult reaches Pass or Fail
+      - pod deletion event appears for the target workload
+      - smart triage fan-out starts
+    recoverySignals:
+      - target deployment reports expected ready replicas
+      - Grafana pod availability panel returns to baseline
+    grafanaDashboard: "{{GRAFANA_DASHBOARD_UID}}"
+  triage:
+    workflowTemplate: smart-triage-fanout
+  eval:
+    rubricRef: chaos-pod-delete
+    benchmark: 8
+  reporting:
+    destination:
+      - GitLab
+      - GrafanaAnnotation
+      - Teams
+  learning:
+    memoryUpdatePolicy: curator-only
+    kbUpdatePolicy: hitl-gated-mr

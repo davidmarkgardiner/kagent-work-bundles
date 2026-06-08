@@ -18,6 +18,11 @@ remediation through HITL/GitOps, and return a scored report.
 5. `prompts/01-run-controlled-chaos-demo.md`
 6. `payload/REFERENCE.md`
 7. `evidence/EVIDENCE-TEMPLATE.md`
+8. `examples/README.md`
+9. `examples/chaos-test-pod-delete.yaml`
+10. `examples/litmus-chaosengine-pod-delete.yaml`
+11. `examples/argo-workflow-dry-run.yaml`
+12. `examples/a2a-chaos-request-payload.json`
 
 ## Required Markers
 
@@ -43,3 +48,6 @@ OUTPUT_SANITIZED: yes
   GitOps review before non-read-only action.
 - Recovery, Grafana evidence, lifecycle eval, and a sanitized report are
   returned before the exercise is considered complete.
+- Use the `examples/` folder for the work-side starting YAML. Keep the Argo
+  workflow in `dry_run: "true"` until readiness, target opt-in, and HITL are
+  proven.

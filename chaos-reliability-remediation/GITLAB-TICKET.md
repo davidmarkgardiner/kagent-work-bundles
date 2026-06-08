@@ -15,6 +15,8 @@ outcome.
 
 - Runtime readiness result.
 - Approved target and blast-radius note.
+- Adapted example YAML and validation result.
+- Dry-run workflow result.
 - Chaos injection record.
 - Grafana/cluster evidence.
 - HITL or GitOps approval boundary.

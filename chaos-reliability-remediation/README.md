@@ -30,6 +30,18 @@ and produce a scored report.
 3. Use `WORK-AGENT-START-PROMPT.md`.
 4. Capture evidence with `evidence/EVIDENCE-TEMPLATE.md`.
 
+## YAML Examples
+
+Use `examples/` for concrete work-side starting points:
+
+- `examples/chaos-test-pod-delete.yaml`
+- `examples/litmus-chaosengine-pod-delete.yaml`
+- `examples/argo-workflow-dry-run.yaml`
+- `examples/a2a-chaos-request-payload.json`
+
+Keep `dry_run: "true"` until runtime readiness, target opt-in, and HITL are
+proven in the work environment.
+
 ## Definition Of Done
 
 The controlled failure is injected, detected, triaged, gated, recovered, scored,
