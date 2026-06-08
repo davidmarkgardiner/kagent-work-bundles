@@ -45,6 +45,7 @@ Verify:
 - runtime uses public image and ConfigMap-mounted scripts
 - workflow passes `workflow_json` and `marker_evidence`
 - ticket close or review route happens after evaluation, not before
+- `templateRef` callers receive the evaluator ConfigMap volume from the reusable template
 
 Evidence:
 
@@ -52,6 +53,7 @@ Evidence:
 ONLINE_EVALUATOR_RENDERED:
 RUNTIME_IMAGE:
 CONFIGMAP_RUNTIME:
+ONLINE_HOOK_SUCCEEDED:
 TICKET_CLOSE_GATED:
 ```
 
@@ -113,4 +115,5 @@ REVIEW_MANAGER_ROUTED: yes
 - The failing case cannot be silently treated as success.
 - Metrics are generated through the independent library.
 - Access control and retention are documented.
+- The safe online hook runs in Argo or the blocker is captured with logs.
 - Output is sanitized.

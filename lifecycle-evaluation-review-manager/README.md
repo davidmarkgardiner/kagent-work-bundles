@@ -48,6 +48,7 @@ traceability.
 | `DATA-STORAGE-ACCESS-TRACEABILITY.md` | Defines storage classes, RBAC boundaries, retention, and traceability fields. |
 | `IMPLEMENTATION-VERIFY-PLAN.md` | Step-by-step build and verification plan for a work environment. |
 | `WORK-AGENT-START-PROMPT.md` | Prompt to hand to another agent. |
+| `HOMELAB-VERIFICATION-EVIDENCE.md` | Local offline, server-dry-run, and online Argo proof collected before handoff. |
 | `evidence/EVIDENCE-TEMPLATE.md` | Output format for proof/evidence. |
 
 ## Definition Of Done

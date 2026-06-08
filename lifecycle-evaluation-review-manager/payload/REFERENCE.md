@@ -9,6 +9,7 @@ Local source patterns:
 - `observability/agent-evals/ARGO-RUNTIME.md`
 - `observability/agent-evals/EVAL-METRICS-ACCESS-CONTROL-DESIGN.md`
 - `observability/agent-evals/FLEET-DASHBOARD.md`
+- `observability/agent-evals/HOMELAB-VERIFICATION-EVIDENCE.md`
 - `observability/agent-evals/offline-online-eval-design.html`
 - `observability/agent-evals/scripts/score-lifecycle-run.py`
 - `observability/agent-evals/scripts/metrics.py`
@@ -18,6 +19,7 @@ Local source patterns:
 - `observability/agent-evals/alerting/agent-eval-rules.yaml`
 - `KAGENT-EVAL-LIFT-AND-SHIFT-HANDOFF.md`
 - `KAGENT-EVAL-PR-REVIEW.md`
+- `work-agent-bundles/lifecycle-evaluation-review-manager/HOMELAB-VERIFICATION-EVIDENCE.md`
 
 Keep deterministic hard gates authoritative. LLM-as-judge or semantic scoring
 can be layered later, but it must not replace HITL, namespace, verification,
