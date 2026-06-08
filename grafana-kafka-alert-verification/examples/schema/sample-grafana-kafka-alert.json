@@ -1,0 +1,8 @@
+{
+  "client": "Grafana",
+  "description": "[FIRING:1] ConfluentKafkaFiringSmoke",
+  "details": "**Firing**\n\nValue: B=1, C=1\nLabels:\n - alertname = ConfluentKafkaFiringSmoke\n - route_to = confluent-kafka-rest\n - severity = warning\nAnnotations:\n - summary = Grafana to Confluent Kafka firing smoke\n",
+  "alert_state": "alerting",
+  "client_url": "https://{{GRAFANA_HOST}}/alerting/list",
+  "incident_key": "{{GROUP_KEY_HASH}}"
+}

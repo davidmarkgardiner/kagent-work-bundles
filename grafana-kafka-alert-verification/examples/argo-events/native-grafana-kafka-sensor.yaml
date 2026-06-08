@@ -1,0 +1,61 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: native-grafana-kafka-alert-triage
+  namespace: "{{ARGO_EVENTS_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/part-of: grafana-kafka-alert-verification
+    event-type: grafana-alert
+spec:
+  eventBusName: "{{ARGO_EVENTS_EVENTBUS_NAME}}"
+  template:
+    serviceAccountName: "{{ARGO_EVENTS_SERVICE_ACCOUNT}}"
+  dependencies:
+    - name: grafana-alert
+      eventSourceName: grafana-kafka-alerts
+      eventName: grafana-alerts
+      filters:
+        data:
+          - path: body.client
+            type: string
+            value:
+              - "Grafana"
+          - path: body.alert_state
+            type: string
+            value:
+              - "alerting"
+  triggers:
+    - template:
+        name: native-grafana-alert-triage
+        conditions: "grafana-alert"
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: grafana-alert-triage-
+                namespace: "{{ARGO_WORKFLOWS_NAMESPACE}}"
+                labels:
+                  app.kubernetes.io/part-of: grafana-kafka-alert-verification
+                  event-type: grafana-alert
+              spec:
+                workflowTemplateRef:
+                  name: native-grafana-alert-triage
+                arguments:
+                  parameters:
+                    - name: grafana-alert-payload
+                      value: "{}"
+          parameters:
+            - src:
+                dependencyName: grafana-alert
+                dataKey: body
+              dest: spec.arguments.parameters.0.value
+      rateLimit:
+        requestsPerUnit: 5
+        unit: Minute
+      retryStrategy:
+        steps: 3
+        duration: 10s

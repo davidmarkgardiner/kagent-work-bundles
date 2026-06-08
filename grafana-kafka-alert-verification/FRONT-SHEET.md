@@ -29,7 +29,11 @@ Grafana alert rule fires
 7. `prompts/03-consume-capture-schema.md`
 8. `prompts/04-cluster-consumer-and-schema-decision.md`
 9. `payload/grafana-kafka-alert.schema.json`
-10. `evidence/EVIDENCE-TEMPLATE.md`
+10. `examples/argo-events/native-grafana-kafka-eventsource.yaml`
+11. `examples/argo-events/native-grafana-kafka-sensor.yaml`
+12. `examples/argo-events/native-grafana-alert-workflowtemplate.yaml`
+13. `examples/schema/sample-grafana-kafka-alert.json`
+14. `evidence/EVIDENCE-TEMPLATE.md`
 
 ## Definition Of Done
 
@@ -42,6 +46,8 @@ Grafana alert rule fires
 - Raw payload is captured without secrets.
 - Payload validates against the draft schema, or schema changes are proposed.
 - Cluster-side consumer path is proven or blocked with the exact blocker.
+- Copyable Argo EventSource, Sensor, and WorkflowTemplate examples are adapted
+  or explicitly rejected with a reason.
 - Broker-side schema validation decision is recorded.
 - Temporary Grafana smoke rule and route are cleaned up.
 

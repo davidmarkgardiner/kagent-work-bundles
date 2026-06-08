@@ -23,6 +23,23 @@ payload shape, and decide whether schema validation can be enabled safely.
 - Records whether broker-side schema validation is safe now or requires a
   bridge/serializer.
 
+## Copyable Examples
+
+The bundle includes example files the work agent can adapt:
+
+```text
+examples/argo-events/native-grafana-kafka-eventsource.yaml
+examples/argo-events/native-grafana-kafka-sensor.yaml
+examples/argo-events/native-grafana-alert-workflowtemplate.yaml
+examples/schema/sample-grafana-kafka-alert.json
+examples/schema/validate-sample-payload.sh
+payload/grafana-kafka-alert.schema.json
+```
+
+These are examples, not production-ready manifests. The work agent must replace
+placeholders, validate the installed Argo Events API version, and dry-run/apply
+only in the approved work environment.
+
 ## Evidence To Produce
 
 - Environment variable preflight result, without values.
@@ -41,8 +58,9 @@ payload shape, and decide whether schema validation can be enabled safely.
 1. Run `bash scripts/verify-bundle.sh`.
 2. Give `WORK-AGENT-START-PROMPT.md` to the work-side agent.
 3. The agent must run `prompts/01-preflight-env-tools.md` before live changes.
-4. The agent then runs the remaining prompts in order.
-5. Capture evidence with `evidence/EVIDENCE-TEMPLATE.md`.
+4. The agent should review `examples/` before creating any Argo consumer path.
+5. The agent then runs the remaining prompts in order.
+6. Capture evidence with `evidence/EVIDENCE-TEMPLATE.md`.
 
 ## Definition Of Done
 

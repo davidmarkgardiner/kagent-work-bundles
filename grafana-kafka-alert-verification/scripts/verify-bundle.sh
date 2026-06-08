@@ -22,6 +22,11 @@ required=(
   "prompts/03-consume-capture-schema.md"
   "prompts/04-cluster-consumer-and-schema-decision.md"
   "payload/grafana-kafka-alert.schema.json"
+  "examples/argo-events/native-grafana-kafka-eventsource.yaml"
+  "examples/argo-events/native-grafana-kafka-sensor.yaml"
+  "examples/argo-events/native-grafana-alert-workflowtemplate.yaml"
+  "examples/schema/sample-grafana-kafka-alert.json"
+  "examples/schema/validate-sample-payload.sh"
   "evidence/EVIDENCE-TEMPLATE.md"
 )
 
@@ -35,6 +40,7 @@ done
 
 python3 -m json.tool "payload/grafana-kafka-alert.schema.json" >/dev/null
 python3 -m json.tool "requests/grafana-kafka-alert-verification-request.json" >/dev/null
+python3 -m json.tool "examples/schema/sample-grafana-kafka-alert.json" >/dev/null
 echo "JSON_OK: yes"
 
 for marker in \
@@ -57,6 +63,10 @@ grep -q "If any required variable is missing, stop and return BLOCKED" "prompts/
 grep -q "ConfluentKafkaFiringSmoke" "prompts/02-configure-firing-alert.md"
 grep -q "payload/grafana-kafka-alert.schema.json" "prompts/03-consume-capture-schema.md"
 grep -q "bridge/normalizer" "prompts/04-cluster-consumer-and-schema-decision.md"
+grep -q "body.client" "examples/argo-events/native-grafana-kafka-sensor.yaml"
+grep -q "body.alert_state" "examples/argo-events/native-grafana-kafka-sensor.yaml"
+grep -q "jsonBody: true" "examples/argo-events/native-grafana-kafka-eventsource.yaml"
+grep -q "WorkflowTemplate" "examples/argo-events/native-grafana-alert-workflowtemplate.yaml"
 echo "PROMPT_CONTRACT_OK: yes"
 
 if grep -RInE \

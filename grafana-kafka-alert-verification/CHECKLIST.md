@@ -13,6 +13,7 @@
 | Raw payload captured | sanitized evidence file path | TODO |
 | Draft schema validation run | pass/fail and schema delta | TODO |
 | Resolved/OK payload captured or disabled | evidence or explicit setting | TODO |
+| Argo examples reviewed | EventSource, Sensor, WorkflowTemplate adapted or rejected | TODO |
 | Cluster-side consumer path proven | CLI, `kcat`, Argo Events, service, or bridge | TODO |
 | Broker schema decision recorded | consumer-side, bridge-required, or native-proven | TODO |
 | Temporary Grafana smoke objects cleaned up | cleanup evidence | TODO |

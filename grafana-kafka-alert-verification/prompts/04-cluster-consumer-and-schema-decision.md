@@ -34,6 +34,15 @@ If Argo Events is used, propose or verify a native Grafana filter:
 body.client == Grafana
 body.alert_state == alerting
 
+Copyable starting manifests are available in:
+
+- examples/argo-events/native-grafana-kafka-eventsource.yaml
+- examples/argo-events/native-grafana-kafka-sensor.yaml
+- examples/argo-events/native-grafana-alert-workflowtemplate.yaml
+
+Adapt those examples only after replacing placeholders and validating them
+against the installed Argo Events and Argo Workflows versions.
+
 Schema decision:
 
 1. If the native Grafana contact point only emits plain JSON, keep validation

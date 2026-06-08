@@ -1,0 +1,31 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: native-grafana-alert-triage
+  namespace: "{{ARGO_WORKFLOWS_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/part-of: grafana-kafka-alert-verification
+spec:
+  entrypoint: inspect-grafana-alert
+  arguments:
+    parameters:
+      - name: grafana-alert-payload
+        value: "{}"
+  templates:
+    - name: inspect-grafana-alert
+      inputs:
+        parameters:
+          - name: grafana-alert-payload
+      container:
+        image: alpine:3.19
+        command:
+          - sh
+          - -c
+        args:
+          - |
+            set -eu
+            echo "GRAFANA_ALERT_PAYLOAD_BEGIN"
+            printf '%s\n' '{{inputs.parameters.grafana-alert-payload}}'
+            echo "GRAFANA_ALERT_PAYLOAD_END"
+            echo "TODO: replace this placeholder with the approved work triage agent or workflow."

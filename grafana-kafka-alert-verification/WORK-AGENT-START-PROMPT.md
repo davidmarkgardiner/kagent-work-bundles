@@ -30,20 +30,23 @@ Then complete the work in this order:
 1. Read FRONT-SHEET.md, README.md, CHECKLIST.md, and
    requests/grafana-kafka-alert-verification-request.yaml.
 2. Run prompts/01-preflight-env-tools.md.
-3. Use Grafana MCP or approved Grafana APIs to confirm the Kafka contact point.
-4. Run prompts/02-configure-firing-alert.md.
-5. Prove a real Grafana alert is firing and routed to the Kafka contact point.
-6. Run prompts/03-consume-capture-schema.md.
-7. Consume the produced Kafka event and capture topic, partition, offset,
+3. Review examples/argo-events/ and examples/schema/ so you have copyable
+   EventSource, Sensor, WorkflowTemplate, sample payload, and schema validation
+   starting points.
+4. Use Grafana MCP or approved Grafana APIs to confirm the Kafka contact point.
+5. Run prompts/02-configure-firing-alert.md.
+6. Prove a real Grafana alert is firing and routed to the Kafka contact point.
+7. Run prompts/03-consume-capture-schema.md.
+8. Consume the produced Kafka event and capture topic, partition, offset,
    timestamp, and raw payload.
-8. Validate the captured payload against payload/grafana-kafka-alert.schema.json.
-9. Run prompts/04-cluster-consumer-and-schema-decision.md.
-10. Prove or block the cluster-side consumer path.
-11. Record whether schema validation should remain consumer-side for now or
+9. Validate the captured payload against payload/grafana-kafka-alert.schema.json.
+10. Run prompts/04-cluster-consumer-and-schema-decision.md.
+11. Prove or block the cluster-side consumer path.
+12. Record whether schema validation should remain consumer-side for now or
     move to broker-side validation through a bridge/serializer.
-12. Clean up the temporary Grafana smoke rule and route unless the request says
+13. Clean up the temporary Grafana smoke rule and route unless the request says
     to keep them.
-13. Return the evidence template filled in.
+14. Return the evidence template filled in.
 
 Required evidence markers:
 
