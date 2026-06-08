@@ -16,6 +16,11 @@ for rel in \
   requests/lifecycle-evaluation-request.yaml \
   prompts/01-run-lifecycle-eval.md \
   prompts/02-prove-chaos-event-to-eval-gitlab.md \
+  examples/chaos/README.md \
+  examples/chaos/chaos-test-pod-delete.yaml \
+  examples/chaos/litmus-chaosengine-pod-delete.yaml \
+  examples/chaos/argo-workflow-dry-run.yaml \
+  examples/chaos/a2a-chaos-request-payload.json \
   payload/REFERENCE.md \
   payload/agent-evals/scripts/reporting.py \
   payload/agent-evals/scripts/metrics.py \
@@ -57,6 +62,19 @@ done
 
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "${tmp_dir}"' EXIT
+
+python3 - <<'PY'
+import json
+import pathlib
+import yaml
+
+base = pathlib.Path("examples/chaos")
+for path in sorted(base.glob("*.yaml")):
+    list(yaml.safe_load_all(path.read_text()))
+    print(f"YAML_OK {path}")
+json.loads((base / "a2a-chaos-request-payload.json").read_text())
+print("JSON_OK examples/chaos/a2a-chaos-request-payload.json")
+PY
 
 PYTHONPATH="${eval_root}/scripts" python3 "${eval_root}/scripts/score-lifecycle-run.py" \
   --case "${eval_root}/lifecycle-cases/pod-crashloop-hitl-remediation.yaml" \

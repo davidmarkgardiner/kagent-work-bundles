@@ -1,0 +1,37 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: kagent-triage-v2-pod-delete
+  namespace: "{{DEMO_TARGET_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/name: kagent-triage-v2-pod-delete
+    app.kubernetes.io/part-of: chaos-test-manager
+    reliability.platform/suite: kagent-triage-v2-sandbox
+    reliability.platform/test: kagent-triage-v2-pod-delete
+    reliability.platform/env-tier: dev
+    reliability.platform/owner: platform
+spec:
+  appinfo:
+    appns: "{{DEMO_TARGET_NAMESPACE}}"
+    applabel: "app.kubernetes.io/name={{DEMO_TARGET_WORKLOAD}},reliability.platform/chaos-optin=true"
+    appkind: deployment
+  chaosServiceAccount: k8s-chaos-admin
+  engineState: active
+  jobCleanUpPolicy: retain
+  experiments:
+    - name: pod-delete
+      spec:
+        components:
+          env:
+            - name: TOTAL_CHAOS_DURATION
+              value: "20"
+            - name: CHAOS_INTERVAL
+              value: "5"
+            - name: FORCE
+              value: "true"
+            - name: PODS_AFFECTED_PERC
+              value: "50"
+            - name: TARGET_PODS
+              value: ""
+            - name: SEQUENCE
+              value: parallel

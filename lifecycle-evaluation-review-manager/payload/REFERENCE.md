@@ -37,7 +37,14 @@ Full-repo source patterns:
 - `KAGENT-EVAL-PR-REVIEW.md`
 - `work-agent-bundles/lifecycle-evaluation-review-manager/HOMELAB-VERIFICATION-EVIDENCE.md`
 
-Chaos-event-to-evaluation source patterns:
+Chaos-event-to-evaluation local examples:
+
+- `examples/chaos/chaos-test-pod-delete.yaml`
+- `examples/chaos/litmus-chaosengine-pod-delete.yaml`
+- `examples/chaos/argo-workflow-dry-run.yaml`
+- `examples/chaos/a2a-chaos-request-payload.json`
+
+Related full-repo source patterns:
 
 - `work-agent-bundles/chaos-reliability-remediation/examples/chaos-test-pod-delete.yaml`
 - `work-agent-bundles/chaos-reliability-remediation/examples/argo-workflow-dry-run.yaml`

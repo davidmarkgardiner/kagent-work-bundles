@@ -27,6 +27,9 @@ triage, lifecycle evaluation, and GitLab evidence.
 - Includes `payload/agent-evals` so the scorer, route script, lifecycle cases,
   and sample runs are available even when only this bundle directory is handed
   over.
+- Includes `examples/chaos` so the phase-1 chaos request, Litmus shape,
+  dry-run Argo workflow, and A2A payload are available without the separate
+  chaos reliability bundle.
 
 ## Evidence To Produce
 
@@ -67,6 +70,7 @@ triage, lifecycle evaluation, and GitLab evidence.
 | `CHAOS-TO-EVAL-FLOW.md` | Contract for chaos event, triage, lifecycle eval, and GitLab evidence. |
 | `WORK-AGENT-START-PROMPT.md` | Prompt to hand to another agent. |
 | `HOMELAB-VERIFICATION-EVIDENCE.md` | Local offline, server-dry-run, and online Argo proof collected before handoff. |
+| `examples/chaos/` | Self-contained chaos request, Litmus, Argo dry-run, and A2A examples for the phase-1 proof. |
 | `payload/agent-evals/` | Bundle-local scorer scripts, lifecycle cases, and sample runs. |
 | `evidence/EVIDENCE-TEMPLATE.md` | Output format for proof/evidence. |
 

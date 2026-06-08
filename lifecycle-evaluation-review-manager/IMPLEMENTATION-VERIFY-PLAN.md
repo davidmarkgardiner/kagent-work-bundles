@@ -148,11 +148,14 @@ REVIEW_MANAGER_ROUTED: yes
 
 ## Phase 7: Chaos Event To Eval And GitLab Evidence
 
-Use the chaos reliability bundle as the upstream producer:
+Use the local chaos examples in this bundle as the upstream producer. If the
+separate chaos reliability bundle is also available, it can be used as broader
+background, but it is not required for this phase-1 proof.
 
-- `../chaos-reliability-remediation/examples/chaos-test-pod-delete.yaml`
-- `../chaos-reliability-remediation/examples/argo-workflow-dry-run.yaml`
-- `../chaos-reliability-remediation/examples/a2a-chaos-request-payload.json`
+- `examples/chaos/chaos-test-pod-delete.yaml`
+- `examples/chaos/litmus-chaosengine-pod-delete.yaml`
+- `examples/chaos/argo-workflow-dry-run.yaml`
+- `examples/chaos/a2a-chaos-request-payload.json`
 
 Use one approved event observation path:
 

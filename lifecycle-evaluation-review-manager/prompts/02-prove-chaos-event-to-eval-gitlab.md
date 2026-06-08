@@ -42,8 +42,8 @@ Steps:
    - evidence/EVIDENCE-TEMPLATE.md
 2. Run:
    bash scripts/verify-bundle.sh
-3. Use the chaos reliability bundle examples or the installed work equivalents
-   to create a pod-delete chaos action against the approved demo namespace and
+3. Use the local `examples/chaos` files or the installed work equivalents to
+   create a pod-delete chaos action against the approved demo namespace and
    workload. If live chaos is not approved, use the dry-run Argo workflow and
    record the approval blocker.
 4. Show the exact event observation path:

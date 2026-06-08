@@ -36,7 +36,7 @@ dry-run placeholders:
 
 ```yaml
 run_id: "{{RUN_ID}}"
-source: "chaos-reliability-remediation"
+source: "lifecycle-evaluation-review-manager/examples/chaos"
 event_type: "chaos_pod_delete"
 target_namespace: "{{DEMO_TARGET_NAMESPACE}}"
 target_workload: "{{DEMO_TARGET_WORKLOAD}}"

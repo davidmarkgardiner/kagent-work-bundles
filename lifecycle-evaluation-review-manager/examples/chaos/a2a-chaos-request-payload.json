@@ -1,0 +1,18 @@
+{
+  "jsonrpc": "2.0",
+  "id": "kagent-chaos-reliability-{{RUN_ID}}",
+  "method": "message/send",
+  "params": {
+    "message": {
+      "role": "user",
+      "parts": [
+        {
+          "kind": "text",
+          "text": "Use the Kagent triage v2 chaos reliability workflow. Do not inject chaos until runtime readiness, lower-environment target opt-in, and HITL approval route are proven. Request: {\"targetNamespace\":\"{{DEMO_TARGET_NAMESPACE}}\",\"targetWorkload\":\"{{DEMO_TARGET_WORKLOAD}}\",\"environment\":\"dev\",\"failureMode\":\"pod-delete\",\"maxDuration\":\"10m\",\"remediationMode\":\"hitl-gated-gitops-or-workflow\",\"approvalChannel\":\"{{APPROVAL_CHANNEL}}\",\"reportRequired\":true,\"requiredEvidence\":[\"CHAOS_REQUEST_ACCEPTED\",\"TARGET_NON_PROD\",\"CHAOS_SPEC_VALIDATED\",\"CHAOS_INJECTED_OR_DRY_RUN_BLOCKED\",\"TRIAGE_STARTED\",\"HITL_REQUIRED_FOR_REMEDIATION\",\"RECOVERY_VERIFIED\",\"LIFECYCLE_EVAL_RECORDED\",\"REPORT_CREATED\",\"OUTPUT_SANITIZED\"]}"
+        }
+      ],
+      "messageId": "kagent-chaos-reliability-{{RUN_ID}}",
+      "kind": "message"
+    }
+  }
+}

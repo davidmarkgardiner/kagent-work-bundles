@@ -38,7 +38,7 @@ spec:
     phase: "phase_1"
     grafanaAlertRequiredForPhase1: false
     source: "argo-events-or-workflow-watch"
-    upstreamBundle: "../chaos-reliability-remediation/"
+    upstreamBundle: "examples/chaos/"
     eventSourceOptions:
       - "Litmus ChaosResult EventSource"
       - "Kubernetes event watcher"
