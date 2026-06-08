@@ -157,6 +157,13 @@ background, but it is not required for this phase-1 proof.
 - `examples/chaos/argo-workflow-dry-run.yaml`
 - `examples/chaos/a2a-chaos-request-payload.json`
 
+Do not install a new `ChaosTest` CRD for this proof. In this bundle,
+`ChaosTest` is a structured request/config contract that is passed to the
+workflow, GitLab report, or chaos agent. Kubernetes resources can only be
+applied when their real controllers already exist: Argo Workflows for
+`Workflow`, Argo Events for `EventSource`/`Sensor`, and Litmus for
+`ChaosEngine`/`ChaosResult`.
+
 Use one approved event observation path:
 
 - Litmus `ChaosResult` event via `chaos/litmus/manifests/eventsource-litmus.yaml`

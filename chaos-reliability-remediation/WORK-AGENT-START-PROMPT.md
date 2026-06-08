@@ -14,6 +14,9 @@ Tasks:
 2. Confirm the target namespace, workload, and non-production approval.
 3. Read examples/README.md and adapt the example YAML only in the private work
    environment.
+   Do not install a new `ChaosTest` CRD. Treat `ChaosTest` as the request
+   payload/config contract unless a separately approved platform controller
+   already exists.
 4. Validate examples/chaos-test-pod-delete.yaml and
    examples/litmus-chaosengine-pod-delete.yaml before execution.
 4. Inject a low-risk failure such as pod delete or controlled crashloop only

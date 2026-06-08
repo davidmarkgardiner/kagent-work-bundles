@@ -46,6 +46,10 @@ Steps:
    create a pod-delete chaos action against the approved demo namespace and
    workload. If live chaos is not approved, use the dry-run Argo workflow and
    record the approval blocker.
+   Important: do not install a new `ChaosTest` CRD. `ChaosTest` is a request
+   payload/config contract in this handover, not a Kubernetes API to create.
+   Only apply `Workflow`, `EventSource`/`Sensor`, or Litmus resources if those
+   controllers and CRDs already exist in the work environment.
 4. Show the exact event observation path:
    - EventSource name, Sensor name, watcher workflow, or watch command
    - event UID or workflow ID

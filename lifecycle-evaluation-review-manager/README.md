@@ -59,6 +59,10 @@ triage, lifecycle evaluation, and GitLab evidence.
    proof.
 6. Capture evidence with `evidence/EVIDENCE-TEMPLATE.md`.
 
+Do not install a new `ChaosTest` CRD for this bundle. `ChaosTest` is a
+structured request/config contract for the agent/workflow. Use existing Argo,
+Argo Events, and Litmus CRDs only when those controllers are already installed.
+
 ## File Map
 
 | File | Purpose |

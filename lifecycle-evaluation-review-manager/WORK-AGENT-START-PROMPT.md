@@ -62,6 +62,8 @@ Then prove the work eval path:
     chaos injection or approved dry-run, Argo EventSource/Litmus/Kubernetes
     event observation, Kagent triage run, lifecycle eval score, GitLab evidence
     update.
+    Do not install a new `ChaosTest` CRD. Treat `ChaosTest` as a request/config
+    payload unless a separately approved platform controller already exists.
 11. If Grafana alert triggering is not part of the current proof, report
     `GRAFANA_ALERT_TRIGGER: not_required_for_phase_1` and use the Argo
     EventSource or watcher path instead.
