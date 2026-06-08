@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/grafana-kafka-alert.schema.json",
+  "title": "Grafana Kafka REST Proxy Alert Record",
+  "description": "Draft consumer-side schema for records emitted by Grafana Alerting's native Kafka REST Proxy contact point. Confirm against consumed work records before using as a production contract.",
+  "type": "object",
+  "required": [
+    "client",
+    "description",
+    "details",
+    "alert_state",
+    "client_url",
+    "incident_key"
+  ],
+  "properties": {
+    "client": {
+      "type": "string",
+      "const": "Grafana"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "details": {
+      "type": "string",
+      "minLength": 1
+    },
+    "alert_state": {
+      "type": "string",
+      "enum": [
+        "alerting",
+        "ok",
+        "pending",
+        "no_data",
+        "paused"
+      ]
+    },
+    "client_url": {
+      "type": "string"
+    },
+    "incident_key": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": true
+}

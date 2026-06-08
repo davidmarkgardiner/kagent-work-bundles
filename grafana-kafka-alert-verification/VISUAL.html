@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grafana Kafka Alert Verification</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, sans-serif; margin: 0; color: #17202a; background: #f6f8fb; }
+    main { max-width: 1080px; margin: 0 auto; padding: 32px 20px; }
+    h1 { font-size: 30px; margin: 0 0 8px; }
+    h2 { font-size: 18px; margin: 28px 0 12px; }
+    p { line-height: 1.5; }
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .step, .card { background: #fff; border: 1px solid #d8dee8; border-radius: 8px; padding: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    .step strong { display: block; margin-bottom: 6px; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    code { background: #edf2f7; padding: 2px 5px; border-radius: 4px; }
+    ul { padding-left: 20px; }
+    @media (max-width: 800px) { .flow, .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Grafana Kafka Alert Verification</h1>
+    <p>Prove real alert firing, consume the Kafka event, capture the payload, and make the schema decision from evidence.</p>
+
+    <section class="flow" aria-label="verification flow">
+      <div class="step"><strong>1. Preflight</strong>Check variables, Grafana MCP, Kafka tooling, and access.</div>
+      <div class="step"><strong>2. Fire</strong>Create or use a temporary always-firing Grafana rule.</div>
+      <div class="step"><strong>3. Consume</strong>Read the produced Kafka record with metadata.</div>
+      <div class="step"><strong>4. Validate</strong>Compare the captured payload to the draft schema.</div>
+      <div class="step"><strong>5. Decide</strong>Consumer-side schema now, bridge/serializer for broker validation.</div>
+    </section>
+
+    <h2>Evidence Markers</h2>
+    <div class="grid">
+      <div class="card">
+        <ul>
+          <li><code>ENV_PREFLIGHT</code></li>
+          <li><code>GRAFANA_CONTACT_POINT</code></li>
+          <li><code>ALERT_RULE</code></li>
+          <li><code>KAFKA_RECORD</code></li>
+        </ul>
+      </div>
+      <div class="card">
+        <ul>
+          <li><code>PAYLOAD_CAPTURED</code></li>
+          <li><code>SCHEMA_VALIDATION</code></li>
+          <li><code>CLUSTER_CONSUMER</code></li>
+          <li><code>BROKER_SCHEMA_DECISION</code></li>
+        </ul>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

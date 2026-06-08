@@ -1,0 +1,32 @@
+{
+  "apiVersion": "platform.example.invalid/v1alpha1",
+  "kind": "GrafanaKafkaAlertVerificationRequest",
+  "metadata": {
+    "name": "grafana-kafka-alert-verification"
+  },
+  "spec": {
+    "mode": "live-work-verification",
+    "requiredFirstStep": "env-and-tool-preflight",
+    "grafana": {
+      "contactPointNameEnv": "GRAFANA_CONTACT_POINT_NAME",
+      "contactPointUidEnv": "GRAFANA_CONTACT_POINT_UID",
+      "smokeAlertName": "ConfluentKafkaFiringSmoke",
+      "smokeRouteLabel": {
+        "key": "route_to",
+        "value": "confluent-kafka-rest"
+      },
+      "cleanupTemporaryObjects": true
+    },
+    "kafka": {
+      "topicEnv": "CONFLUENT_TOPIC",
+      "clusterIdEnv": "CONFLUENT_CLUSTER_ID",
+      "bootstrapEnv": "CONFLUENT_BOOTSTRAP",
+      "consumerGroupPrefixEnv": "CONSUMER_GROUP_PREFIX"
+    },
+    "schema": {
+      "draftSchema": "payload/grafana-kafka-alert.schema.json",
+      "subjectEnv": "CONFLUENT_SCHEMA_SUBJECT",
+      "defaultSubjectPattern": "{{CONFLUENT_TOPIC}}-value"
+    }
+  }
+}
