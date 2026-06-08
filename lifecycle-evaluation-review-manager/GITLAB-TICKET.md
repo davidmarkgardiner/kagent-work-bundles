@@ -2,17 +2,25 @@
 
 ## Summary
 
-Prove Kagent triage/remediation runs are scored and below-threshold or unsafe
-runs are routed to review-manager.
+Design and prove Kagent lifecycle evaluation for triage/remediation workflows,
+including offline eval, online eval, key metrics, evaluator architecture,
+storage/access, audit retention, traceability, and review-manager routing.
 
 ## Feature
 
 The lifecycle evaluation workflow should score passing and failing cases,
 enforce hard gates, publish evidence, and create a review route for weak runs.
+The design must cover the Microsoft meeting actions assigned to David.
 
 ## Evidence Required
 
 - Eval case names.
+- Evaluation framework design link.
+- Offline and online evaluation design summary.
+- Key evaluation metric names and labels.
+- Inline versus separate evaluator architecture decision.
+- Data storage and access-control model.
+- Audit retention and traceability model.
 - Passing run score.
 - Below-threshold run score.
 - Hard failure markers.
@@ -22,6 +30,12 @@ enforce hard gates, publish evidence, and create a review route for weak runs.
 ## Acceptance Criteria
 
 - `EVAL_CASES_LOADED: yes`
+- `EVALUATION_FRAMEWORK_DESIGN: covered`
+- `OFFLINE_ONLINE_DESIGN: covered`
+- `KEY_METRICS_IDENTIFIED: covered`
+- `INLINE_VS_SEPARATE_ARCHITECTURE: covered`
+- `DATA_STORAGE_ACCESS_MODEL: covered`
+- `AUDIT_RETENTION_TRACEABILITY: covered`
 - `PASSING_RUN_SCORED: yes`
 - `BELOW_THRESHOLD_RUN_SCORED: yes`
 - `HARD_FAILURES_ENFORCED: yes`

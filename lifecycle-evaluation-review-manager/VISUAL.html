@@ -3,26 +3,81 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lifecycle Evaluation Review Manager</title>
+  <title>Lifecycle Evaluation Review Manager Bundle</title>
+  <link rel="icon" href="data:,">
   <style>
-    body{font-family:Arial,sans-serif;background:#f7f9fc;color:#172033;margin:0}
-    main{max-width:1050px;margin:auto;padding:32px}
-    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-    .box{background:#fff;border:1px solid #d8dee9;border-radius:8px;padding:16px}
-    b{color:#0b4f8a}.sub{color:#526070}
-    @media(max-width:850px){.flow{grid-template-columns:1fr}}
+    :root{--bg:#faf9f5;--paper:#fff;--ink:#171716;--muted:#67635c;--line:#d8d4c8;--clay:#c96f4a;--olive:#6f8555;--blue:#527894;--amber:#d8a346}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.45}
+    main{max-width:1120px;margin:0 auto;padding:42px 24px 64px}
+    h1{font-family:Georgia,serif;font-size:clamp(34px,5vw,58px);line-height:1.06;margin:0 0 14px}
+    h2{font-family:Georgia,serif;font-size:30px;margin:0 0 16px}
+    p{color:var(--muted);font-size:17px}
+    section{padding:34px 0;border-bottom:1px solid var(--line)}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:18px;box-shadow:0 14px 34px rgba(39,36,28,.07)}
+    .card b{display:block;margin-bottom:8px}
+    .tag{display:inline-block;font:700 12px ui-monospace,Menlo,monospace;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+    .flow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;align-items:stretch}
+    .step{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px;min-height:132px}
+    .step small{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;font:700 12px ui-monospace,Menlo,monospace;margin-bottom:10px}
+    ul{margin:10px 0 0;padding-left:18px;color:var(--muted)}
+    li{margin:6px 0}
+    table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+    th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{background:#efede5;color:var(--muted);font:700 12px ui-monospace,Menlo,monospace;text-transform:uppercase}
+    tr:last-child td{border-bottom:0}
+    code{font-family:ui-monospace,Menlo,Consolas,monospace}
+    .ok{color:var(--olive);font-weight:700}.warn{color:#8a5a00;font-weight:700}.gate{color:#9a3c30;font-weight:700}
+    @media(max-width:900px){.grid,.flow{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
 <main>
-  <h1>Lifecycle Evaluation Review Manager</h1>
-  <p class="sub">Score every run and route weak evidence to review.</p>
-  <section class="flow">
-    <div class="box"><b>Run</b><p>Triage or remediation workflow completes.</p></div>
-    <div class="box"><b>Score</b><p>Eval compares evidence to lifecycle criteria.</p></div>
-    <div class="box"><b>Gate</b><p>Hard failures block completion.</p></div>
-    <div class="box"><b>Route</b><p>Weak runs go to review-manager.</p></div>
-    <div class="box"><b>Report</b><p>Metrics and actions are published.</p></div>
+  <section>
+    <span class="tag">Work-agent bundle</span>
+    <h1>Lifecycle Evaluation Review Manager</h1>
+    <p>This bundle gives another agent the design, build plan, and evidence checklist for implementing offline and online lifecycle evaluation in a work environment.</p>
+  </section>
+
+  <section>
+    <h2>Meeting actions covered</h2>
+    <div class="grid">
+      <div class="card"><b>Evaluation framework</b><p>Cases, scorers, reports, metrics, dashboards, alerts, and Argo runtime are mapped.</p></div>
+      <div class="card"><b>Offline and online eval</b><p>Offline is CI/replay. Online is Argo post-run audit and gating.</p></div>
+      <div class="card"><b>Key metrics</b><p><code>metrics.py</code> owns metric names, labels, escaping, and Prometheus output.</p></div>
+      <div class="card"><b>Architecture</b><p>Separate reusable evaluator step, inline public-image runtime, ConfigMap-mounted scripts.</p></div>
+      <div class="card"><b>Storage and access</b><p>Raw evidence, lifecycle JSON, eval JSON, Markdown, metrics, and dashboards are separated.</p></div>
+      <div class="card"><b>Retention and traceability</b><p>Run IDs, workflow names, scores, hard failures, and ticket links form the audit trail.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Build and verify flow</h2>
+    <div class="flow">
+      <div class="step"><small>1</small><b>Read bundle</b><p>Start with front sheet, meeting coverage, architecture, storage/access, and request YAML.</p></div>
+      <div class="step"><small>2</small><b>Render runtime</b><p><code>kubectl kustomize observability/agent-evals</code></p></div>
+      <div class="step"><small>3</small><b>Score pass</b><p>Run lifecycle scorer against a known good sample.</p></div>
+      <div class="step"><small>4</small><b>Score fail</b><p>Run below-threshold or hard-failure sample and capture non-success evidence.</p></div>
+      <div class="step"><small>5</small><b>Export metrics</b><p>Generate Prometheus text through the independent metrics library.</p></div>
+      <div class="step"><small>6</small><b>Route review</b><p>Keep ticket open or create review-manager route when eval fails.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Required evidence markers</h2>
+    <table>
+      <thead><tr><th>Marker</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>EVALUATION_FRAMEWORK_DESIGN: covered</code></td><td>Design docs and implementation files are identified.</td></tr>
+        <tr><td><code>OFFLINE_ONLINE_DESIGN: covered</code></td><td>Offline and online modes are defined independently from environments.</td></tr>
+        <tr><td><code>KEY_METRICS_IDENTIFIED: covered</code></td><td>Metric families, labels, and access-control rules are documented.</td></tr>
+        <tr><td><code>INLINE_VS_SEPARATE_ARCHITECTURE: covered</code></td><td>The selected evaluator runtime pattern is justified.</td></tr>
+        <tr><td><code>DATA_STORAGE_ACCESS_MODEL: covered</code></td><td>Storage classes and RBAC boundaries are defined.</td></tr>
+        <tr><td><code>AUDIT_RETENTION_TRACEABILITY: covered</code></td><td>Retention and audit identifiers are defined.</td></tr>
+        <tr><td><code>PASSING_RUN_SCORED: yes</code> / <code>BELOW_THRESHOLD_RUN_SCORED: yes</code></td><td>The agent proves both happy path and failure path.</td></tr>
+      </tbody>
+    </table>
   </section>
 </main>
 </body>

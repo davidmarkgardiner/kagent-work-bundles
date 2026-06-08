@@ -3,12 +3,42 @@ kind: LifecycleEvaluationRequest
 metadata:
   name: kagent-triage-v2-lifecycle-eval-proof
 spec:
+  objective: "Implement and verify offline plus online lifecycle evaluation for Kagent incident workflows."
+  meetingActions:
+    - prepare_evaluation_framework_design_document
+    - define_offline_and_online_evaluation_designs
+    - identify_key_evaluation_metrics
+    - propose_inline_versus_separate_evaluator_architecture
+    - define_data_storage_and_access_model
+    - add_audit_retention_and_traceability_design
   passingCase: "{{PASSING_LIFECYCLE_CASE}}"
   failingCase: "{{FAILING_LIFECYCLE_CASE}}"
   threshold: 0.8
+  evaluatorArchitecture:
+    mode: "separate_reusable_step_with_inline_public_image_runtime"
+    runtimeImage: "alpine:3.19"
+    runtimeFiles: "agent-eval-runtime-files ConfigMap"
+    customImageRequired: false
+  metrics:
+    library: "observability/agent-evals/scripts/metrics.py"
+    requiredFamilies:
+      - agent_eval_score
+      - agent_eval_passed
+      - agent_eval_hard_failures
+      - agent_lifecycle_eval_score
+      - agent_lifecycle_eval_passed
+      - agent_lifecycle_eval_hard_failures
+      - agent_lifecycle_eval_subscore
   requiredHardGates:
     - hitl_before_remediation
     - remediation_verified
     - ticket_or_report_updated
     - namespace_scope_correct
     - no_secret_leak
+  storageAndAccess:
+    rawEvidence: "restricted_short_retention"
+    normalizedLifecycleRunJson: "sanitized_replay_store_or_artifact"
+    evalResultJson: "audit_store"
+    markdownSummary: "ticket_comment_or_artifact"
+    prometheusMetrics: "metrics_backend_low_cardinality_labels"
+    evaluatorPermissions: "read_sanitized_evidence_write_own_outputs_no_mutation"
