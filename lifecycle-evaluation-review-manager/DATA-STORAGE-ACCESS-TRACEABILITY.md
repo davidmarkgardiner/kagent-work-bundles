@@ -22,10 +22,13 @@ case_id
 run_id
 workflow_name
 dimension
-environment
-team
-service
+stable environment label added by publisher
+stable team/service label added by publisher
 ```
+
+`run_id` and full `workflow_name` are acceptable for per-run textfile, CI, and
+artifact exports. For a long-lived Prometheus scrape endpoint, aggregate these
+or move per-run identifiers into logs/exemplars to avoid unbounded cardinality.
 
 Forbidden labels:
 
@@ -54,6 +57,11 @@ Evaluation should score evidence, not perform remediation.
 | Read secrets | No | Only if explicitly required | Only GitLab token if needed |
 | Write GitLab ticket | Prefer no | No | Yes |
 | Publish metrics/report outputs | Yes | No | Optional |
+
+The current Argo evaluator manifest ships a dedicated `agent-lifecycle-eval`
+ServiceAccount with only `workflowtaskresults.argoproj.io` `create`/`patch`
+permissions for Argo output reporting. It does not grant ConfigMap, Secret,
+workload, apply, delete, or ticket-system permissions.
 
 ## Retention
 
@@ -103,6 +111,10 @@ TICKET_ID:
 REVIEW_MANAGER_ROUTE:
 NEXT_ACTION:
 ```
+
+The current implementation emits this as a sanitized review-route payload from
+`scripts/route-lifecycle-review.py`. Work environments can wire that payload to
+a real review-manager agent, issue, or ticket workflow after local approval.
 
 For production gating:
 

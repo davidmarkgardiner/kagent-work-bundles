@@ -10,7 +10,7 @@ storage/access, audit retention, traceability, and review-manager routing.
 
 The lifecycle evaluation workflow should score passing and failing cases,
 enforce hard gates, publish evidence, and create a review route for weak runs.
-The design must cover the Microsoft meeting actions assigned to David.
+The design must cover the planning-meeting evaluation actions.
 
 ## Evidence Required
 

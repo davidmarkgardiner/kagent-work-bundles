@@ -1,6 +1,6 @@
 # Meeting Action Coverage
 
-This bundle covers the evaluation work items assigned after the Microsoft
+This bundle covers the evaluation work items assigned after the planning
 discussion.
 
 | Assigned action | Covered by | Evidence the work agent must produce |

@@ -11,7 +11,7 @@ Then prove the work eval path:
 1. Read FRONT-SHEET.md, CHECKLIST.md, MEETING-ACTION-COVERAGE.md,
    ARCHITECTURE-DECISION.md, DATA-STORAGE-ACCESS-TRACEABILITY.md,
    requests/*, prompts/*, payload/REFERENCE.md, and evidence/EVIDENCE-TEMPLATE.md.
-2. Confirm the six Microsoft meeting actions are covered:
+2. Confirm the six planning-meeting actions are covered:
    evaluation framework design, offline/online designs, key metrics,
    inline-vs-separate architecture, data storage/access, audit retention and
    traceability.
@@ -19,7 +19,7 @@ Then prove the work eval path:
    dashboards, and alert rules.
 4. Score one passing run.
 5. Score one below-threshold or hard-failure run.
-6. Confirm hard failures block closure or create a review route.
+6. Confirm hard failures block closure and produce a review route payload.
 7. Verify the independent metrics contract and label policy.
 8. Define where lifecycle JSON, eval result JSON, Markdown reports, raw
    evidence, metrics, and trace identifiers are stored.

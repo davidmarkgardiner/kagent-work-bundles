@@ -9,8 +9,8 @@ retention, and traceability.
 
 Implement or verify the lifecycle evaluation design in a work environment. Show
 one passing and one below-threshold lifecycle evaluation, prove hard gates,
-publish metrics or reports, define storage/access controls, and route the
-failing case to review-manager.
+publish metrics or reports, define storage/access controls, and produce a
+review-manager route payload for failing cases.
 
 ## Start Here
 
@@ -26,7 +26,7 @@ failing case to review-manager.
 10. `evidence/EVIDENCE-TEMPLATE.md`
 
 Static verification proves this bundle is internally consistent. It does not
-prove live eval cases, scorer, metrics export, review-manager, or kagent
+prove live eval cases, scorer, metrics export, review-manager payloads, or kagent
 behavior.
 
 ## Live Audit Rule

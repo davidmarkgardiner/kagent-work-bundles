@@ -14,6 +14,6 @@
 | Passing run scored | score output | TODO |
 | Failing run scored | score output and exit code | TODO |
 | Hard gates enforced | hard failure list | TODO |
-| Review-manager routed | report/finding/issue | TODO |
+| Review-manager route payload created | report/finding/issue payload | TODO |
 | Metrics exported | Prometheus text or dashboard | TODO |
 | Output sanitized | no secrets/private values in evidence | TODO |

@@ -46,6 +46,8 @@ Verify:
 - workflow passes `workflow_json` and `marker_evidence`
 - ticket close or review route happens after evaluation, not before
 - `templateRef` callers receive the evaluator ConfigMap volume from the reusable template
+- passing and negative online hooks are both server-side validated
+- the negative online hook fails evaluation and still emits a review-route stub
 
 Evidence:
 
@@ -54,6 +56,8 @@ ONLINE_EVALUATOR_RENDERED:
 RUNTIME_IMAGE:
 CONFIGMAP_RUNTIME:
 ONLINE_HOOK_SUCCEEDED:
+ONLINE_NEGATIVE_HOOK_FAILED:
+REVIEW_ROUTE_PAYLOAD_CREATED:
 TICKET_CLOSE_GATED:
 ```
 
@@ -110,7 +114,7 @@ REVIEW_MANAGER_ROUTED: yes
 
 ## Completion Criteria
 
-- The six Microsoft meeting actions are explicitly covered.
+- The six planning-meeting actions are explicitly covered.
 - A passing eval and failing eval are both demonstrated.
 - The failing case cannot be silently treated as success.
 - Metrics are generated through the independent library.

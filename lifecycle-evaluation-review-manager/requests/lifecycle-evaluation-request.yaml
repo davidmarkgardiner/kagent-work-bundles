@@ -13,7 +13,7 @@ spec:
     - add_audit_retention_and_traceability_design
   passingCase: "{{PASSING_LIFECYCLE_CASE}}"
   failingCase: "{{FAILING_LIFECYCLE_CASE}}"
-  threshold: 0.8
+  scoringThresholdSource: "case spec.scoring.minScore is authoritative"
   evaluatorArchitecture:
     mode: "separate_reusable_step_with_inline_public_image_runtime"
     runtimeImage: "alpine:3.19"

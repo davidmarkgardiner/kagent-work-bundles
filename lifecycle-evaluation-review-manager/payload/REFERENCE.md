@@ -11,7 +11,13 @@ Local source patterns:
 - `observability/agent-evals/FLEET-DASHBOARD.md`
 - `observability/agent-evals/HOMELAB-VERIFICATION-EVIDENCE.md`
 - `observability/agent-evals/offline-online-eval-design.html`
+- `observability/agent-evals/argo/evaluator-rbac.yaml`
+- `observability/agent-evals/argo/lifecycle-eval-workflow-template.yaml`
+- `observability/agent-evals/argo/lifecycle-eval-hook-example.yaml`
+- `observability/agent-evals/argo/lifecycle-eval-hook-negative-example.yaml`
 - `observability/agent-evals/scripts/score-lifecycle-run.py`
+- `observability/agent-evals/scripts/collect-lifecycle-evidence.py`
+- `observability/agent-evals/scripts/route-lifecycle-review.py`
 - `observability/agent-evals/scripts/metrics.py`
 - `observability/agent-evals/lifecycle-cases/chaos-pod-delete.yaml`
 - `observability/agent-evals/results/sample/lifecycle/`

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+bundle_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+repo_root="$(cd "${bundle_root}/../.." && pwd)"
+cd "${bundle_root}"
 for rel in \
   FRONT-SHEET.md \
   WORK-AGENT-START-PROMPT.md \
@@ -9,6 +11,7 @@ for rel in \
   ARCHITECTURE-DECISION.md \
   DATA-STORAGE-ACCESS-TRACEABILITY.md \
   IMPLEMENTATION-VERIFY-PLAN.md \
+  HOMELAB-VERIFICATION-EVIDENCE.md \
   requests/lifecycle-evaluation-request.yaml \
   prompts/01-run-lifecycle-eval.md \
   payload/REFERENCE.md \
@@ -33,4 +36,38 @@ for marker in \
   grep -Rqs "${marker}" . || { echo "MARKER_MISSING ${marker}" >&2; exit 1; }
   echo "MARKER_OK ${marker}"
 done
+
+tmp_dir="$(mktemp -d)"
+trap 'rm -rf "${tmp_dir}"' EXIT
+
+python3 "${repo_root}/observability/agent-evals/scripts/score-lifecycle-run.py" \
+  --case "${repo_root}/observability/agent-evals/lifecycle-cases/pod-crashloop-hitl-remediation.yaml" \
+  --run "${repo_root}/observability/agent-evals/results/sample/lifecycle/pod-crashloop-hitl-remediation.lifecycle-run.json" \
+  --output-dir "${tmp_dir}/pass"
+echo "PASSING_RUN_SCORED: yes"
+
+if python3 "${repo_root}/observability/agent-evals/scripts/score-lifecycle-run.py" \
+  --case "${repo_root}/observability/agent-evals/lifecycle-cases/chaos-pod-delete.yaml" \
+  --run "${repo_root}/observability/agent-evals/results/sample/lifecycle/chaos-pod-delete-below-threshold.lifecycle-run.json" \
+  --output-dir "${tmp_dir}/fail"; then
+  echo "BELOW_THRESHOLD_RUN_UNEXPECTEDLY_PASSED" >&2
+  exit 1
+else
+  echo "BELOW_THRESHOLD_RUN_SCORED: yes"
+  echo "HARD_FAILURES_ENFORCED: yes"
+fi
+
+python3 "${repo_root}/observability/agent-evals/scripts/route-lifecycle-review.py" \
+  --results-dir "${tmp_dir}/fail" \
+  --output "${tmp_dir}/review-route.json"
+rg -q '"review_manager_route": "review-manager"' "${tmp_dir}/review-route.json"
+echo "REVIEW_MANAGER_ROUTED: yes"
+
+python3 "${repo_root}/observability/agent-evals/scripts/summarize-agent-scores.py" \
+  --results-dir "${repo_root}/observability/agent-evals/results/sample" \
+  --summary-md "${tmp_dir}/summary.md" \
+  --metrics "${tmp_dir}/agent-eval.prom"
+rg -q "agent_lifecycle_eval_score|agent_lifecycle_eval_hard_failures|agent_lifecycle_eval_subscore" "${tmp_dir}/agent-eval.prom"
+echo "METRICS_EXPORTED: yes"
+
 echo "LIFECYCLE_EVALUATION_REVIEW_MANAGER_BUNDLE_VERIFY: passed"

@@ -9,14 +9,14 @@ traceability.
 
 ## What This Feature Does
 
-- Maps the Microsoft meeting actions to repo design docs.
+- Maps the planning-meeting actions to repo design docs.
 - Loads lifecycle eval cases and scorer.
 - Scores one passing and one below-threshold run.
 - Enforces hard gates such as mutation-before-HITL or missing verification.
 - Verifies the online Argo evaluator architecture.
 - Confirms the independent metrics library and label policy.
 - Defines storage, access, retention, and traceability evidence.
-- Routes failing cases to review-manager.
+- Produces a review-manager route payload for failing cases.
 
 ## Evidence To Produce
 
@@ -43,7 +43,7 @@ traceability.
 
 | File | Purpose |
 | --- | --- |
-| `MEETING-ACTION-COVERAGE.md` | Maps each Microsoft meeting action to design docs and required evidence. |
+| `MEETING-ACTION-COVERAGE.md` | Maps each planning-meeting action to design docs and required evidence. |
 | `ARCHITECTURE-DECISION.md` | Explains inline versus separate evaluator and the selected hybrid pattern. |
 | `DATA-STORAGE-ACCESS-TRACEABILITY.md` | Defines storage classes, RBAC boundaries, retention, and traceability fields. |
 | `IMPLEMENTATION-VERIFY-PLAN.md` | Step-by-step build and verification plan for a work environment. |
