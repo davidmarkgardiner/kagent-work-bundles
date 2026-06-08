@@ -6,7 +6,7 @@ omitted or redacted.
 
 ## Summary
 
-Status: **PARTIAL PASS / schema proven**
+Status: **PASS / schema proven / Grafana MCP recovered**
 
 The home lab proved:
 
@@ -21,6 +21,9 @@ Grafana managed alert rule fired
 This is enough to hand the work agent a concrete payload contract and a clear
 next action: add a native Grafana Kafka Sensor or a normalizer/bridge before
 using the existing Alertmanager triage Sensor.
+
+Follow-up verification on 2026-06-08 11:42 BST also proved that the home-lab
+Grafana MCP transport recovered and can query Grafana directly.
 
 ## Runtime Preflight
 
@@ -56,8 +59,8 @@ Argo Events:
 
 ## Grafana MCP Preflight
 
-The in-cluster `kagent-grafana-mcp` RemoteMCPServer was not healthy during this
-verification:
+The in-cluster `kagent-grafana-mcp` RemoteMCPServer was temporarily unhealthy
+during the original alert-to-Kafka verification window:
 
 ```text
 RemoteMCPServer:
@@ -70,10 +73,37 @@ Reason:
   connection refused to the Grafana MCP service endpoint
 ```
 
-The home-lab proof therefore used the Grafana HTTP API directly. The work agent
-must still perform Grafana MCP discovery first, but it should treat MCP
-unavailability as a preflight blocker or switch to the approved Grafana API path
-if that is permitted in the work environment.
+The pod restarted at approximately `2026-06-08T10:26:48Z` and the
+RemoteMCPServer reconciled to `Accepted=True` at `2026-06-08T10:27:39Z`.
+
+Current verified state:
+
+```text
+RemoteMCPServer:
+  kagent-grafana-mcp
+
+Accepted:
+  True
+
+Grafana evidence agent:
+  Accepted=True
+  Ready=True
+
+Smoke test:
+  scripts/observability/smoke-grafana-mcp.sh --context {{KUBE_CONTEXT}}
+
+Smoke result:
+  MCP initialized
+  list_datasources discovered
+  query_prometheus discovered
+  list_datasources returned Alertmanager, Loki, Mimir, and Prometheus
+  count(up) returned 48
+```
+
+The original Kafka proof used the Grafana HTTP API directly because MCP was
+transiently unavailable at that moment. For the work replay, use Grafana MCP as
+the primary path and keep the approved Grafana API path as a fallback only if MCP
+fails preflight.
 
 ## Smoke Alert Proof
 
@@ -243,4 +273,3 @@ Confluent CLI consume was not used as the final payload evidence because the
 local CLI session required re-login. The cluster-side Argo Events consumer did
 capture the payload and is the stronger evidence for this handoff because the
 work objective is cluster-side consumption.
-
