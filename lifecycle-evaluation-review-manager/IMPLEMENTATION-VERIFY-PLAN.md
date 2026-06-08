@@ -1,5 +1,39 @@
 # Implementation And Verification Plan
 
+## Phase 0: Work Environment Variables
+
+Read `../SHARED-VARIABLES.md` before running live checks. Resolve only the
+values needed for this bundle and keep private values out of committed
+artifacts.
+
+Required for phase-1 proof:
+
+- `{{KUBE_CONTEXT}}`
+- `{{KAGENT_NAMESPACE}}`
+- `{{ARGO_NAMESPACE}}`
+- `{{ARGO_EVENTS_NAMESPACE}}`
+- `{{GITLAB_PROJECT}}`
+- `{{TARGET_BRANCH}}`
+- `{{GITLAB_MCP_REMOTE_SERVER_NAME}}` or approved GitLab API wrapper
+- `{{GITLAB_MR_URL}}` or `{{GITLAB_ISSUE_URL}}`
+- `{{APPROVAL_CHANNEL}}`
+- `{{DEMO_TARGET_NAMESPACE}}`
+- `{{DEMO_TARGET_WORKLOAD}}`
+- `{{PASSING_LIFECYCLE_CASE}}`
+- `{{FAILING_LIFECYCLE_CASE}}`
+- `{{RUN_ID}}`
+
+Optional for this phase:
+
+- `{{GRAFANA_MCP_REMOTE_SERVER_NAME}}`
+- `{{GRAFANA_DASHBOARD_URL_OR_UID}}`
+
+Evidence:
+
+```text
+WORK_VARIABLES_RESOLVED: yes
+```
+
 ## Phase 1: Design Review
 
 Read and summarize:
@@ -112,11 +146,50 @@ Evidence:
 REVIEW_MANAGER_ROUTED: yes
 ```
 
+## Phase 7: Chaos Event To Eval And GitLab Evidence
+
+Use the chaos reliability bundle as the upstream producer:
+
+- `../chaos-reliability-remediation/examples/chaos-test-pod-delete.yaml`
+- `../chaos-reliability-remediation/examples/argo-workflow-dry-run.yaml`
+- `../chaos-reliability-remediation/examples/a2a-chaos-request-payload.json`
+
+Use one approved event observation path:
+
+- Litmus `ChaosResult` event via `chaos/litmus/manifests/eventsource-litmus.yaml`
+- Kubernetes event watcher in an Argo workflow
+- Argo workflow watch on the chaos lifecycle workflow
+
+Verify:
+
+- the chaos event is injected or an approved dry-run blocker is captured
+- Argo Events or the watcher observes the event
+- Kagent triage starts with the event payload
+- lifecycle eval scores the resulting run with the `chaos-pod-delete` case
+- failures or weak runs route to review-manager
+- GitLab issue, MR, comment, or report is updated with the event, triage,
+  evaluation, and next action
+
+Grafana alert triggering is not required for phase 1. If dashboards or alerts
+are available, attach them as extra evidence only.
+
+Evidence:
+
+```text
+CHAOS_EVENT_FLOW_MAPPED: yes
+ARGO_EVENTSOURCE_OR_WATCH_PROVEN: yes_or_blocked
+CHAOS_TO_TRIAGE_TO_EVAL_FLOW: proven_or_blocked
+GITLAB_EVIDENCE_UPDATED: yes_or_blocked
+GRAFANA_ALERT_TRIGGER: not_required_for_phase_1
+```
+
 ## Completion Criteria
 
 - The six planning-meeting actions are explicitly covered.
 - A passing eval and failing eval are both demonstrated.
 - The failing case cannot be silently treated as success.
+- A chaos-tested action is traced from event observation through triage,
+  evaluation, and GitLab evidence, or an exact blocker is documented.
 - Metrics are generated through the independent library.
 - Access control and retention are documented.
 - The safe online hook runs in Argo or the blocker is captured with logs.

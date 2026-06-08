@@ -3,7 +3,27 @@ kind: LifecycleEvaluationRequest
 metadata:
   name: kagent-triage-v2-lifecycle-eval-proof
 spec:
-  objective: "Implement and verify offline plus online lifecycle evaluation for Kagent incident workflows."
+  objective: "Implement and verify offline plus online lifecycle evaluation for Kagent incident workflows, including phase-1 chaos event to triage to eval to GitLab evidence."
+  environmentSetup:
+    source: "../SHARED-VARIABLES.md"
+    requiredSharedVariables:
+      - "{{KUBE_CONTEXT}}"
+      - "{{KAGENT_NAMESPACE}}"
+      - "{{ARGO_NAMESPACE}}"
+      - "{{ARGO_EVENTS_NAMESPACE}}"
+      - "{{GITLAB_PROJECT}}"
+      - "{{TARGET_BRANCH}}"
+      - "{{GITLAB_MCP_REMOTE_SERVER_NAME}}"
+      - "{{GITLAB_MR_URL}}"
+      - "{{APPROVAL_CHANNEL}}"
+      - "{{DEMO_TARGET_NAMESPACE}}"
+      - "{{DEMO_TARGET_WORKLOAD}}"
+      - "{{PASSING_LIFECYCLE_CASE}}"
+      - "{{FAILING_LIFECYCLE_CASE}}"
+      - "{{RUN_ID}}"
+    optionalSharedVariables:
+      - "{{GRAFANA_MCP_REMOTE_SERVER_NAME}}"
+      - "{{GRAFANA_DASHBOARD_URL_OR_UID}}"
   meetingActions:
     - prepare_evaluation_framework_design_document
     - define_offline_and_online_evaluation_designs
@@ -14,6 +34,32 @@ spec:
   passingCase: "{{PASSING_LIFECYCLE_CASE}}"
   failingCase: "{{FAILING_LIFECYCLE_CASE}}"
   scoringThresholdSource: "case spec.scoring.minScore is authoritative"
+  chaosEventIntegration:
+    phase: "phase_1"
+    grafanaAlertRequiredForPhase1: false
+    source: "argo-events-or-workflow-watch"
+    upstreamBundle: "../chaos-reliability-remediation/"
+    eventSourceOptions:
+      - "Litmus ChaosResult EventSource"
+      - "Kubernetes event watcher"
+      - "Argo workflow watch"
+    expectedFlow:
+      - chaos_injected_or_dry_run_blocked
+      - event_observed
+      - kagent_triage_started
+      - lifecycle_eval_recorded
+      - review_route_created_for_weak_or_failed_run
+      - gitlab_evidence_updated
+    preferredCase: "chaos-pod-delete"
+    requiredTraceFields:
+      - run_id
+      - chaos_experiment_id
+      - target_namespace
+      - target_workload
+      - event_uid
+      - triage_run_id
+      - lifecycle_eval_result_id
+      - gitlab_artifact_url
   evaluatorArchitecture:
     mode: "separate_reusable_step_with_inline_public_image_runtime"
     runtimeImage: "alpine:3.19"

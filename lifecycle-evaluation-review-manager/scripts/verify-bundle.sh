@@ -11,9 +11,11 @@ for rel in \
   ARCHITECTURE-DECISION.md \
   DATA-STORAGE-ACCESS-TRACEABILITY.md \
   IMPLEMENTATION-VERIFY-PLAN.md \
+  CHAOS-TO-EVAL-FLOW.md \
   HOMELAB-VERIFICATION-EVIDENCE.md \
   requests/lifecycle-evaluation-request.yaml \
   prompts/01-run-lifecycle-eval.md \
+  prompts/02-prove-chaos-event-to-eval-gitlab.md \
   payload/REFERENCE.md \
   payload/agent-evals/scripts/reporting.py \
   payload/agent-evals/scripts/metrics.py \
@@ -30,6 +32,7 @@ for rel in \
   echo "FOUND ${rel}"
 done
 for marker in \
+  "WORK_VARIABLES_RESOLVED: yes" \
   "EVALUATION_FRAMEWORK_DESIGN: covered" \
   "OFFLINE_ONLINE_DESIGN: covered" \
   "KEY_METRICS_IDENTIFIED: covered" \
@@ -42,6 +45,11 @@ for marker in \
   "HARD_FAILURES_ENFORCED: yes" \
   "REVIEW_MANAGER_ROUTED: yes" \
   "METRICS_EXPORTED: yes_or_blocked" \
+  "CHAOS_EVENT_FLOW_MAPPED: yes" \
+  "ARGO_EVENTSOURCE_OR_WATCH_PROVEN: yes_or_blocked" \
+  "CHAOS_TO_TRIAGE_TO_EVAL_FLOW: proven_or_blocked" \
+  "GITLAB_EVIDENCE_UPDATED: yes_or_blocked" \
+  "GRAFANA_ALERT_TRIGGER: not_required_for_phase_1" \
   "OUTPUT_SANITIZED: yes"; do
   grep -Rqs "${marker}" . || { echo "MARKER_MISSING ${marker}" >&2; exit 1; }
   echo "MARKER_OK ${marker}"

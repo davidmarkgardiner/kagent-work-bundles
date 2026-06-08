@@ -37,6 +37,15 @@ Full-repo source patterns:
 - `KAGENT-EVAL-PR-REVIEW.md`
 - `work-agent-bundles/lifecycle-evaluation-review-manager/HOMELAB-VERIFICATION-EVIDENCE.md`
 
+Chaos-event-to-evaluation source patterns:
+
+- `work-agent-bundles/chaos-reliability-remediation/examples/chaos-test-pod-delete.yaml`
+- `work-agent-bundles/chaos-reliability-remediation/examples/argo-workflow-dry-run.yaml`
+- `work-agent-bundles/chaos-reliability-remediation/examples/a2a-chaos-request-payload.json`
+- `platform/argo-workflows/templates/chaos-test-lifecycle.yaml`
+- `chaos/litmus/manifests/eventsource-litmus.yaml`
+- `chaos/litmus/manifests/sensor-litmus-triage.yaml`
+
 Keep deterministic hard gates authoritative. LLM-as-judge or semantic scoring
 can be layered later, but it must not replace HITL, namespace, verification,
 ticket/report, and leak checks.

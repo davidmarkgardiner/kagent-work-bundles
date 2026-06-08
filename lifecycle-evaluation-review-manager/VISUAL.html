@@ -37,7 +37,7 @@
   <section>
     <span class="tag">Work-agent bundle</span>
     <h1>Lifecycle Evaluation Review Manager</h1>
-    <p>This bundle gives another agent the design, build plan, and evidence checklist for implementing offline and online lifecycle evaluation in a work environment.</p>
+    <p>This bundle gives another agent the design, build plan, and evidence checklist for proving chaos-event to triage to lifecycle evaluation to GitLab documentation in a work environment.</p>
   </section>
 
   <section>
@@ -49,18 +49,21 @@
       <div class="card"><b>Architecture</b><p>Separate reusable evaluator step, inline public-image runtime, ConfigMap-mounted scripts.</p></div>
       <div class="card"><b>Storage and access</b><p>Raw evidence, lifecycle JSON, eval JSON, Markdown, metrics, and dashboards are separated.</p></div>
       <div class="card"><b>Retention and traceability</b><p>Run IDs, workflow names, scores, hard failures, and ticket links form the audit trail.</p></div>
+      <div class="card"><b>Chaos event proof</b><p>Argo Events, Litmus, Kubernetes events, or workflow watch can trigger the phase-1 proof path.</p></div>
+      <div class="card"><b>GitLab evidence</b><p>The resulting issue, MR, comment, or report captures event, triage, evaluation, and next action.</p></div>
+      <div class="card"><b>Grafana optional</b><p>Grafana alert triggering is useful later, but not required for the first end-to-end proof.</p></div>
     </div>
   </section>
 
   <section>
     <h2>Build and verify flow</h2>
     <div class="flow">
-      <div class="step"><small>1</small><b>Read bundle</b><p>Start with front sheet, meeting coverage, architecture, storage/access, and request YAML.</p></div>
-      <div class="step"><small>2</small><b>Render runtime</b><p><code>kubectl kustomize observability/agent-evals</code></p></div>
-      <div class="step"><small>3</small><b>Score pass</b><p>Run lifecycle scorer against a known good sample.</p></div>
-      <div class="step"><small>4</small><b>Score fail</b><p>Run below-threshold or hard-failure sample and capture non-success evidence.</p></div>
-      <div class="step"><small>5</small><b>Export metrics</b><p>Generate Prometheus text through the independent metrics library.</p></div>
-      <div class="step"><small>6</small><b>Route review</b><p>Keep ticket open or create review-manager route when eval fails.</p></div>
+      <div class="step"><small>1</small><b>Resolve variables</b><p>Read <code>../SHARED-VARIABLES.md</code> and confirm namespaces, GitLab targets, MCP names, and run IDs.</p></div>
+      <div class="step"><small>2</small><b>Observe chaos</b><p>Use Argo Events, Litmus, Kubernetes events, or workflow watch to capture the chaos action.</p></div>
+      <div class="step"><small>3</small><b>Start triage</b><p>Send the observed payload to the Kagent triage path and capture run or workflow IDs.</p></div>
+      <div class="step"><small>4</small><b>Score lifecycle</b><p>Evaluate the result with the <code>chaos-pod-delete</code> lifecycle case and hard gates.</p></div>
+      <div class="step"><small>5</small><b>Route review</b><p>Keep weak runs open and create a review-manager route with owner and next action.</p></div>
+      <div class="step"><small>6</small><b>Update GitLab</b><p>Attach event, triage, score, evidence links, and next action to an issue, MR, comment, or report.</p></div>
     </div>
   </section>
 
@@ -76,6 +79,9 @@
         <tr><td><code>DATA_STORAGE_ACCESS_MODEL: covered</code></td><td>Storage classes and RBAC boundaries are defined.</td></tr>
         <tr><td><code>AUDIT_RETENTION_TRACEABILITY: covered</code></td><td>Retention and audit identifiers are defined.</td></tr>
         <tr><td><code>PASSING_RUN_SCORED: yes</code> / <code>BELOW_THRESHOLD_RUN_SCORED: yes</code></td><td>The agent proves both happy path and failure path.</td></tr>
+        <tr><td><code>CHAOS_TO_TRIAGE_TO_EVAL_FLOW: proven_or_blocked</code></td><td>The operational loop is proven live or blocked with exact evidence.</td></tr>
+        <tr><td><code>GITLAB_EVIDENCE_UPDATED: yes_or_blocked</code></td><td>The result is documented where SRE and engineering can review it.</td></tr>
+        <tr><td><code>GRAFANA_ALERT_TRIGGER: not_required_for_phase_1</code></td><td>The first proof can use the Argo/Litmus/Kubernetes event path.</td></tr>
       </tbody>
     </table>
   </section>
