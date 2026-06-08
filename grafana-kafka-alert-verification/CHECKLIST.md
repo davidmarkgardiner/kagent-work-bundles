@@ -15,6 +15,7 @@
 | Resolved/OK payload captured or disabled | evidence or explicit setting | TODO |
 | Argo examples reviewed | EventSource, Sensor, WorkflowTemplate adapted or rejected | TODO |
 | Cluster-side consumer path proven | CLI, `kcat`, Argo Events, service, or bridge | TODO |
+| Agent Gateway alert candidates validated | 429, 5xx, log-error, notification-failure queries | TODO |
 | Broker schema decision recorded | consumer-side, bridge-required, or native-proven | TODO |
 | Temporary Grafana smoke objects cleaned up | cleanup evidence | TODO |
 | Output sanitized | no secrets/private endpoints | TODO |

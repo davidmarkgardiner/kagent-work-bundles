@@ -29,24 +29,30 @@ Then complete the work in this order:
 
 1. Read FRONT-SHEET.md, README.md, CHECKLIST.md, and
    requests/grafana-kafka-alert-verification-request.yaml.
-2. Run prompts/01-preflight-env-tools.md.
-3. Review examples/argo-events/ and examples/schema/ so you have copyable
+2. Read HOME-LAB-VERIFICATION-2026-06-08.md so you understand the verified
+   payload shape and the known bridge-Sensor mismatch.
+3. Run prompts/01-preflight-env-tools.md.
+4. Review examples/argo-events/ and examples/schema/ so you have copyable
    EventSource, Sensor, WorkflowTemplate, sample payload, and schema validation
    starting points.
-4. Use Grafana MCP or approved Grafana APIs to confirm the Kafka contact point.
-5. Run prompts/02-configure-firing-alert.md.
-6. Prove a real Grafana alert is firing and routed to the Kafka contact point.
-7. Run prompts/03-consume-capture-schema.md.
-8. Consume the produced Kafka event and capture topic, partition, offset,
+5. Review examples/grafana-alerts/agentgateway-alert-candidates.md for
+   candidate Agent Gateway and Grafana notification alerts.
+6. Use Grafana MCP or approved Grafana APIs to confirm the Kafka contact point.
+7. Run prompts/02-configure-firing-alert.md.
+8. Prove a real Grafana alert is firing and routed to the Kafka contact point.
+9. Run prompts/03-consume-capture-schema.md.
+10. Consume the produced Kafka event and capture topic, partition, offset,
    timestamp, and raw payload.
-9. Validate the captured payload against payload/grafana-kafka-alert.schema.json.
-10. Run prompts/04-cluster-consumer-and-schema-decision.md.
-11. Prove or block the cluster-side consumer path.
-12. Record whether schema validation should remain consumer-side for now or
+11. Validate the captured payload against payload/grafana-kafka-alert.schema.json.
+12. Run prompts/04-cluster-consumer-and-schema-decision.md.
+13. Prove or block the cluster-side consumer path.
+14. Validate candidate Agent Gateway 429/5xx/log-error queries against live
+    work labels before proposing durable alert rules.
+15. Record whether schema validation should remain consumer-side for now or
     move to broker-side validation through a bridge/serializer.
-13. Clean up the temporary Grafana smoke rule and route unless the request says
+16. Clean up the temporary Grafana smoke rule and route unless the request says
     to keep them.
-14. Return the evidence template filled in.
+17. Return the evidence template filled in.
 
 Required evidence markers:
 
@@ -61,6 +67,7 @@ Required evidence markers:
 - PAYLOAD_CAPTURED: yes
 - SCHEMA_VALIDATION: passed_or_update_required
 - CLUSTER_CONSUMER: proven_or_blocked
+- AGENTGATEWAY_ALERT_CANDIDATES: validated_or_blocked
 - BROKER_SCHEMA_DECISION: consumer_side_or_bridge_required_or_proven_native
 - CLEANUP: completed_or_not_requested
 - OUTPUT_SANITIZED: yes

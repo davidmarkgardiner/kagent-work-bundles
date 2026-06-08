@@ -33,12 +33,34 @@ examples/argo-events/native-grafana-kafka-sensor.yaml
 examples/argo-events/native-grafana-alert-workflowtemplate.yaml
 examples/schema/sample-grafana-kafka-alert.json
 examples/schema/validate-sample-payload.sh
+examples/grafana-alerts/agentgateway-alert-candidates.md
 payload/grafana-kafka-alert.schema.json
 ```
 
 These are examples, not production-ready manifests. The work agent must replace
 placeholders, validate the installed Argo Events API version, and dry-run/apply
 only in the approved work environment.
+
+## Home-Lab Verification
+
+The home-lab proof is captured in:
+
+```text
+HOME-LAB-VERIFICATION-2026-06-08.md
+```
+
+Short version:
+
+```text
+Grafana fired a temporary alert
+  -> Kafka REST Proxy contact point produced to Confluent
+  -> Argo Events consumed the record
+  -> existing bridge Sensor rejected it because body.source is absent
+  -> native Grafana payload shape was captured
+```
+
+This means the work agent should focus on adding or verifying a native Grafana
+Kafka consumer path, not debugging Kafka transport first.
 
 ## Evidence To Produce
 

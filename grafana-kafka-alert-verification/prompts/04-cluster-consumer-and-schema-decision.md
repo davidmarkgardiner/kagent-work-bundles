@@ -62,3 +62,13 @@ RATIONALE: short evidence-based explanation
 NEXT_ACTION: concrete next step
 OUTPUT_SANITIZED: yes
 ```
+
+After the native Kafka path is proven, validate the candidate alert queries in:
+
+```text
+examples/grafana-alerts/agentgateway-alert-candidates.md
+```
+
+Do not create durable 429/5xx/log-error rules until the work Grafana datasource
+returns live series or the run is explicitly marked blocked by missing metrics
+or labels.

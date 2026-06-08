@@ -66,6 +66,13 @@ CLUSTER_CONSUMER:
 - EventSource/Sensor/service: {{NAME_OR_NOT_APPLICABLE}}
 - Result: proven | blocked
 
+AGENTGATEWAY_ALERT_CANDIDATES:
+- 429 metric query validated: yes | no | blocked
+- 5xx metric query validated: yes | no | blocked
+- log 429 query validated: yes | no | blocked
+- log error query validated: yes | no | blocked
+- Grafana Kafka notification metric validated: yes | no | blocked
+
 BROKER_SCHEMA_DECISION:
 - Decision: consumer_side | bridge_required | proven_native_wire_format | blocked
 - Rationale: {{SHORT_RATIONALE}}

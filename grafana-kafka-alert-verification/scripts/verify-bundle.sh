@@ -15,6 +15,7 @@ required=(
   "CHECKLIST.md"
   "GITLAB-TICKET.md"
   "VISUAL.html"
+  "HOME-LAB-VERIFICATION-2026-06-08.md"
   "requests/grafana-kafka-alert-verification-request.yaml"
   "requests/grafana-kafka-alert-verification-request.json"
   "prompts/01-preflight-env-tools.md"
@@ -27,6 +28,7 @@ required=(
   "examples/argo-events/native-grafana-alert-workflowtemplate.yaml"
   "examples/schema/sample-grafana-kafka-alert.json"
   "examples/schema/validate-sample-payload.sh"
+  "examples/grafana-alerts/agentgateway-alert-candidates.md"
   "evidence/EVIDENCE-TEMPLATE.md"
 )
 
@@ -67,6 +69,9 @@ grep -q "body.client" "examples/argo-events/native-grafana-kafka-sensor.yaml"
 grep -q "body.alert_state" "examples/argo-events/native-grafana-kafka-sensor.yaml"
 grep -q "jsonBody: true" "examples/argo-events/native-grafana-kafka-eventsource.yaml"
 grep -q "WorkflowTemplate" "examples/argo-events/native-grafana-alert-workflowtemplate.yaml"
+grep -q "body.source" "HOME-LAB-VERIFICATION-2026-06-08.md"
+grep -q "agentgateway_requests_total" "examples/grafana-alerts/agentgateway-alert-candidates.md"
+grep -q "grafana_alerting_notification_requests_total" "examples/grafana-alerts/agentgateway-alert-candidates.md"
 echo "PROMPT_CONTRACT_OK: yes"
 
 if grep -RInE \

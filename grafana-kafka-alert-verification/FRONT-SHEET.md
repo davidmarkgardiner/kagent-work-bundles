@@ -33,7 +33,9 @@ Grafana alert rule fires
 11. `examples/argo-events/native-grafana-kafka-sensor.yaml`
 12. `examples/argo-events/native-grafana-alert-workflowtemplate.yaml`
 13. `examples/schema/sample-grafana-kafka-alert.json`
-14. `evidence/EVIDENCE-TEMPLATE.md`
+14. `examples/grafana-alerts/agentgateway-alert-candidates.md`
+15. `HOME-LAB-VERIFICATION-2026-06-08.md`
+16. `evidence/EVIDENCE-TEMPLATE.md`
 
 ## Definition Of Done
 
@@ -48,6 +50,8 @@ Grafana alert rule fires
 - Cluster-side consumer path is proven or blocked with the exact blocker.
 - Copyable Argo EventSource, Sensor, and WorkflowTemplate examples are adapted
   or explicitly rejected with a reason.
+- Candidate Agent Gateway/Grafana notification alert queries are validated
+  against live work labels before durable rules are created.
 - Broker-side schema validation decision is recorded.
 - Temporary Grafana smoke rule and route are cleaned up.
 
