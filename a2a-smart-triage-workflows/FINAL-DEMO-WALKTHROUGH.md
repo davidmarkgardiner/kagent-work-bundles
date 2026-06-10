@@ -28,6 +28,8 @@ chaos/eval evidence is scored -> GitLab contains the final report.
 5. If chaos is in scope, show the chaos event and lifecycle eval result.
 6. Produce one commander synthesis.
 7. Update GitLab with the demo evidence and next actions.
+8. Create the final handover front sheet and ticket set described in
+   `FINAL-HANDOVER-PACK.md`.
 
 ## Required Output
 
@@ -47,6 +49,10 @@ CHAOS_EVAL_LOOP_PROVEN: yes_or_blocked
 CONTEXT_PRESERVED: yes
 SYNTHESIS_CREATED: yes
 FINAL_DEMO_REPORT_CREATED: yes
+FINAL_FRONT_SHEET_CREATED: yes
+GITLAB_TICKET_SET_CREATED: yes
+EVIDENCE_INDEX_CREATED: yes
+NEXT_ACTIONS_RECORDED: yes
 OUTPUT_SANITIZED: yes
 ```
 

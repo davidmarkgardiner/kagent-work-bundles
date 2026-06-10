@@ -27,6 +27,10 @@ remediation-safety state.
 - HITL suspend/approval route, or Teams-channel blocker.
 - Chaos/eval evidence and GitLab report link.
 - Commander synthesis.
+- Final front sheet.
+- Evidence index.
+- Per-capability GitLab ticket set.
+- Next actions and owners.
 - Sanitized output check.
 
 ## Acceptance Criteria
@@ -45,6 +49,10 @@ remediation-safety state.
 - `CHAOS_EVAL_LOOP_PROVEN: yes_or_blocked`
 - `SYNTHESIS_CREATED: yes`
 - `FINAL_DEMO_REPORT_CREATED: yes`
+- `FINAL_FRONT_SHEET_CREATED: yes`
+- `GITLAB_TICKET_SET_CREATED: yes`
+- `EVIDENCE_INDEX_CREATED: yes`
+- `NEXT_ACTIONS_RECORDED: yes`
 - `OUTPUT_SANITIZED: yes`
 
 ## Notes

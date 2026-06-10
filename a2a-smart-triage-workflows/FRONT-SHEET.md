@@ -25,8 +25,9 @@ and final GitLab evidence.
 5. `prompts/01-prove-a2a-fanout.md`
 6. `prompts/02-final-demo-walkthrough.md`
 7. `FINAL-DEMO-WALKTHROUGH.md`
-8. `payload/REFERENCE.md`
-9. `evidence/EVIDENCE-TEMPLATE.md`
+8. `FINAL-HANDOVER-PACK.md`
+9. `payload/REFERENCE.md`
+10. `evidence/EVIDENCE-TEMPLATE.md`
 
 Static verification proves this bundle is internally consistent. It does not
 prove live kagent, A2A, specialist-agent, Grafana, GitLab, KB, or cluster
@@ -57,5 +58,9 @@ CHAOS_EVAL_LOOP_PROVEN: yes_or_blocked
 CONTEXT_PRESERVED: yes
 SYNTHESIS_CREATED: yes
 FINAL_DEMO_REPORT_CREATED: yes
+FINAL_FRONT_SHEET_CREATED: yes
+GITLAB_TICKET_SET_CREATED: yes
+EVIDENCE_INDEX_CREATED: yes
+NEXT_ACTIONS_RECORDED: yes
 OUTPUT_SANITIZED: yes
 ```

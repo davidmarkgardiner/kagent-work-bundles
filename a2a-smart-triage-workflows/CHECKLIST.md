@@ -16,3 +16,7 @@
 | Synthesis produced | final commander summary | TODO |
 | Safety state included | remediation allowed/blocked reason | TODO |
 | Final demo report created | GitLab issue/comment/report or markdown artifact | TODO |
+| Final front sheet created | GitLab/wiki/doc URL or copy-ready markdown | TODO |
+| GitLab ticket set created | issue URLs or copy-ready issue bodies | TODO |
+| Evidence index created | index of dashboards, MRs, run IDs, reports | TODO |
+| Next actions recorded | owners, blockers, first game-day recommendation | TODO |

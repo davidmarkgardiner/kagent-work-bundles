@@ -10,8 +10,8 @@ already works.
 Start:
 1. Run `bash scripts/verify-bundle.sh`.
 2. Read FINAL-DEMO-WALKTHROUGH.md, WORK-AGENT-START-PROMPT.md, CHECKLIST.md,
-   requests/a2a-smart-triage-request.yaml, payload/REFERENCE.md, and
-   evidence/EVIDENCE-TEMPLATE.md.
+   FINAL-HANDOVER-PACK.md, requests/a2a-smart-triage-request.yaml,
+   payload/REFERENCE.md, and evidence/EVIDENCE-TEMPLATE.md.
 3. Use the latest runtime readiness evidence or run the runtime preflight.
 
 Prove one end-to-end demo:
@@ -26,6 +26,9 @@ Prove one end-to-end demo:
 - chaos/eval loop is shown if available, or blocked with exact reason
 - commander returns one synthesis with context and safety state
 - final evidence is captured in GitLab or a report artifact
+- final front sheet is created
+- GitLab tickets are created or copy-ready ticket bodies are returned
+- evidence index links to the proof artifacts
 
 Return:
 - exact commands or UI actions
@@ -33,6 +36,9 @@ Return:
 - run IDs, workflow IDs, task IDs, GitLab URLs, dashboard URLs
 - blocker list with owner and next action
 - final demo report text
+- front sheet text or GitLab link
+- ticket list with GitLab links or copy-ready issue text
+- evidence index with links
 
 Required markers:
 
@@ -51,5 +57,9 @@ CHAOS_EVAL_LOOP_PROVEN: yes_or_blocked
 CONTEXT_PRESERVED: yes
 SYNTHESIS_CREATED: yes
 FINAL_DEMO_REPORT_CREATED: yes
+FINAL_FRONT_SHEET_CREATED: yes
+GITLAB_TICKET_SET_CREATED: yes
+EVIDENCE_INDEX_CREATED: yes
+NEXT_ACTIONS_RECORDED: yes
 OUTPUT_SANITIZED: yes
 ```

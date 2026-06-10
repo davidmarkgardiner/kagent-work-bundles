@@ -38,10 +38,14 @@ it should prove the already-built integrations rather than build new features.
 2. Run the runtime readiness bundle first.
 3. Use `WORK-AGENT-START-PROMPT.md`.
 4. Use `prompts/02-final-demo-walkthrough.md` for the last-day walkthrough.
-5. Capture evidence with `evidence/EVIDENCE-TEMPLATE.md`.
+5. Use `FINAL-HANDOVER-PACK.md` for the front sheet, evidence index, and
+   GitLab ticket set.
+6. Capture evidence with `evidence/EVIDENCE-TEMPLATE.md`.
 
 ## Definition Of Done
 
 All required A2A markers are present, the final answer is synthesized rather
 than a set of disconnected specialist replies, and no write action is claimed
-without an explicit GitOps or HITL boundary.
+without an explicit GitOps or HITL boundary. The final handover front sheet,
+ticket set, evidence index, and next actions are created or returned as
+copy-ready text if GitLab MCP is blocked.
