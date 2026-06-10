@@ -11,4 +11,17 @@ spec:
     - knowledge
     - gitops
     - policy
+    - memory
+    - chaos
+    - lifecycle-eval
+  finalDemo:
+    proveExistingCapabilitiesOnly: true
+    include:
+      - querydoc_vector_kb
+      - grafana_mcp
+      - gitlab_mcp
+      - memory_context_if_available
+      - hitl_gate
+      - chaos_to_lifecycle_eval
+      - gitlab_evidence_report
   requireSynthesis: true

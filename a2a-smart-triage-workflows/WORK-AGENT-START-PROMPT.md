@@ -17,6 +17,9 @@ Then prove one A2A workflow in the work lab:
 6. Preserve shared context and source evidence.
 7. Return commander synthesis and remediation safety state.
 8. Record any blocked specialist with exact tool/server/permission details.
+9. For the final handover demo, use prompts/02-final-demo-walkthrough.md to
+   prove the already-built integrations: querydoc/vector KB, Grafana MCP,
+   GitLab MCP, memory if available, HITL, chaos/eval, and GitLab evidence.
 
 If the model backend, Agent Gateway, or direct A2A smoke test is blocked, stop
 and report STATUS: BLOCKED with the runtime-readiness evidence.
