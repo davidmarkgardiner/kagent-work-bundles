@@ -1,0 +1,51 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: alloy-k8s-events-kafka-smoke
+  namespace: "{{ARGO_EVENTS_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/part-of: alloy-k8s-events-kafka
+    event-type: kubernetes-event
+spec:
+  eventBusName: "{{ARGO_EVENTS_EVENTBUS_NAME}}"
+  template:
+    serviceAccountName: "{{ARGO_EVENTS_SERVICE_ACCOUNT}}"
+  dependencies:
+    - name: alloy-k8s-event
+      eventSourceName: alloy-k8s-events-kafka
+      eventName: k8s-events
+  triggers:
+    - template:
+        name: alloy-k8s-event-workflow
+        conditions: "alloy-k8s-event"
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: alloy-k8s-event-smoke-
+                namespace: "{{ARGO_WORKFLOWS_NAMESPACE}}"
+                labels:
+                  app.kubernetes.io/part-of: alloy-k8s-events-kafka
+                  event-type: kubernetes-event
+              spec:
+                workflowTemplateRef:
+                  name: alloy-k8s-event-smoke
+                arguments:
+                  parameters:
+                    - name: kafka-event-payload
+                      value: "{}"
+          parameters:
+            - src:
+                dependencyName: alloy-k8s-event
+                dataKey: body
+              dest: spec.arguments.parameters.0.value
+      rateLimit:
+        requestsPerUnit: 5
+        unit: Minute
+      retryStrategy:
+        steps: 3
+        duration: 10s

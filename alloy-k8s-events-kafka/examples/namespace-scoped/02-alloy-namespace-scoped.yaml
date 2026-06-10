@@ -1,0 +1,264 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-k8s-events-env
+  namespace: "{{MONITORING_NAMESPACE}}"
+  labels:
+    app: alloy-k8s-events
+    app.kubernetes.io/part-of: alloy-k8s-events-kafka
+data:
+  CLUSTER_NAME: "{{CLUSTER_NAME}}"
+  CLUSTER_REGION: "{{CLUSTER_REGION}}"
+  CLUSTER_ENVIRONMENT: "{{CLUSTER_ENVIRONMENT}}"
+  LOG_LEVEL: "info"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-k8s-events-config
+  namespace: "{{MONITORING_NAMESPACE}}"
+  labels:
+    app: alloy-k8s-events
+    app.kubernetes.io/part-of: alloy-k8s-events-kafka
+data:
+  config.alloy: | # pragma: allowlist secret
+    logging {
+      level  = coalesce(env("LOG_LEVEL"), "info")
+      format = "logfmt"
+    }
+
+    loki.source.kubernetes_events "cluster_events" {
+      namespaces = ["{{TEST_NAMESPACE}}"]
+      job_name   = "kubernetes-events"
+      log_format = "json"
+
+      forward_to = [loki.process.enrich.receiver]
+    }
+
+    loki.process "enrich" {
+      stage.static_labels {
+        values = {
+          cluster      = coalesce(env("CLUSTER_NAME"), "{{CLUSTER_NAME}}"),
+          environment  = coalesce(env("CLUSTER_ENVIRONMENT"), "{{CLUSTER_ENVIRONMENT}}"),
+          region       = coalesce(env("CLUSTER_REGION"), "{{CLUSTER_REGION}}"),
+          source       = "alloy",
+          pipeline     = "alloy-k8s-events-kafka",
+          payload_type = "kubernetes-event-otlp",
+          test_scope   = "{{TEST_NAMESPACE}}",
+        }
+      }
+
+      stage.json {
+        expressions = {
+          event_type     = "type",
+          event_reason   = "reason",
+          event_message  = "message",
+          event_count    = "count",
+          obj_kind       = "involvedObject.kind",
+          obj_name       = "involvedObject.name",
+          obj_namespace  = "involvedObject.namespace",
+          first_time     = "firstTimestamp",
+          last_time      = "lastTimestamp",
+          source_comp    = "source.component",
+        }
+      }
+
+      stage.labels {
+        values = {
+          event_type    = "",
+          event_reason  = "",
+          obj_kind      = "",
+          obj_namespace = "",
+        }
+      }
+
+      stage.drop {
+        source              = "event_count"
+        expression          = "^[2-9]|^[1-9][0-9]+"
+        drop_counter_reason = "duplicate_event"
+      }
+
+      stage.limit {
+        rate  = 10
+        burst = 25
+        drop  = true
+      }
+
+      forward_to = [otelcol.receiver.loki.bridge.receiver]
+    }
+
+    otelcol.receiver.loki "bridge" {
+      output {
+        logs = [otelcol.processor.batch.events.input]
+      }
+    }
+
+    otelcol.processor.batch "events" {
+      timeout             = "5s"
+      send_batch_size     = 10
+      send_batch_max_size = 50
+
+      output {
+        logs = [otelcol.exporter.kafka.confluent.input]
+      }
+    }
+
+    otelcol.exporter.kafka "confluent" {
+      protocol_version = "2.5.0"
+      brokers          = [env("CONFLUENT_BOOTSTRAP")]
+
+      logs {
+        topic    = env("CONFLUENT_TOPIC")
+        encoding = "otlp_json"
+      }
+
+      authentication {
+        sasl {
+          mechanism = "PLAIN"
+          username  = env("CONFLUENT_SA_KEY")
+          password  = env("CONFLUENT_SA_SECRET")
+        }
+        tls {
+          insecure = false
+        }
+      }
+
+      sending_queue {
+        enabled    = true
+        queue_size = 1000
+      }
+
+      retry_on_failure {
+        enabled          = true
+        initial_interval = "500ms"
+        max_interval     = "30s"
+        max_elapsed_time = "5m"
+      }
+    }
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: alloy-k8s-events
+  namespace: "{{MONITORING_NAMESPACE}}"
+  labels:
+    app: alloy-k8s-events
+    app.kubernetes.io/part-of: alloy-k8s-events-kafka
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: alloy-k8s-events-read
+  namespace: "{{TEST_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/part-of: alloy-k8s-events-kafka
+rules:
+  - apiGroups: [""]
+    resources: ["events", "pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["events.k8s.io"]
+    resources: ["events"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: alloy-k8s-events-read
+  namespace: "{{TEST_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/part-of: alloy-k8s-events-kafka
+subjects:
+  - kind: ServiceAccount
+    name: alloy-k8s-events
+    namespace: "{{MONITORING_NAMESPACE}}"
+roleRef:
+  kind: Role
+  name: alloy-k8s-events-read
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alloy-k8s-events
+  namespace: "{{MONITORING_NAMESPACE}}"
+  labels:
+    app: alloy-k8s-events
+    app.kubernetes.io/part-of: alloy-k8s-events-kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alloy-k8s-events
+  template:
+    metadata:
+      labels:
+        app: alloy-k8s-events
+        app.kubernetes.io/part-of: alloy-k8s-events-kafka
+    spec:
+      serviceAccountName: alloy-k8s-events
+      containers:
+        - name: alloy
+          image: grafana/alloy:v1.12.2
+          args:
+            - run
+            - /etc/alloy/config.alloy
+            - --storage.path=/var/lib/alloy/data
+            - --server.http.listen-addr=0.0.0.0:12345
+          ports:
+            - containerPort: 12345
+              name: http
+          envFrom:
+            - configMapRef:
+                name: alloy-k8s-events-env
+          env:
+            - name: CONFLUENT_BOOTSTRAP
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ALLOY_CONFLUENT_SECRET_NAME}}"
+                  key: bootstrap
+            - name: CONFLUENT_TOPIC
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ALLOY_CONFLUENT_SECRET_NAME}}"
+                  key: topic
+            - name: CONFLUENT_SA_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ALLOY_CONFLUENT_SECRET_NAME}}"
+                  key: key
+            - name: CONFLUENT_SA_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ALLOY_CONFLUENT_SECRET_NAME}}"
+                  key: secret
+          volumeMounts:
+            - name: config
+              mountPath: /etc/alloy
+            - name: data
+              mountPath: /var/lib/alloy/data
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 12345
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 12345
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      volumes:
+        - name: config
+          configMap:
+            name: alloy-k8s-events-config
+        - name: data
+          emptyDir: {}
