@@ -13,6 +13,7 @@ required_env=(
   ARGO_EVENTS_NAMESPACE
   ARGO_WORKFLOWS_NAMESPACE
   ARGO_EVENTS_SERVICE_ACCOUNT
+  ARGO_WORKFLOWS_SERVICE_ACCOUNT
   ARGO_EVENTS_EVENTBUS_NAME
   CONFLUENT_BOOTSTRAP
   CONFLUENT_K8S_EVENTS_TOPIC
@@ -23,7 +24,12 @@ required_env=(
   CLUSTER_NAME
   CLUSTER_ENVIRONMENT
   CLUSTER_REGION
+  EXISTING_K8S_EVENTS_EVENTSOURCE_NAME
+  EXISTING_K8S_EVENTS_EVENT_NAME
 )
+
+RUN_ID="${RUN_ID:-$(date -u +%Y%m%d%H%M%S)}"
+EVENT_TIME="${EVENT_TIME:-$(date -u +%Y-%m-%dT%H:%M:%S.000000Z)}"
 
 missing=()
 for name in "${required_env[@]}"; do
@@ -63,6 +69,7 @@ replace "MONITORING_NAMESPACE" "$(escape_for_perl "$MONITORING_NAMESPACE")"
 replace "ARGO_EVENTS_NAMESPACE" "$(escape_for_perl "$ARGO_EVENTS_NAMESPACE")"
 replace "ARGO_WORKFLOWS_NAMESPACE" "$(escape_for_perl "$ARGO_WORKFLOWS_NAMESPACE")"
 replace "ARGO_EVENTS_SERVICE_ACCOUNT" "$(escape_for_perl "$ARGO_EVENTS_SERVICE_ACCOUNT")"
+replace "ARGO_WORKFLOWS_SERVICE_ACCOUNT" "$(escape_for_perl "$ARGO_WORKFLOWS_SERVICE_ACCOUNT")"
 replace "ARGO_EVENTS_EVENTBUS_NAME" "$(escape_for_perl "$ARGO_EVENTS_EVENTBUS_NAME")"
 replace "CONFLUENT_BOOTSTRAP" "$(escape_for_perl "$CONFLUENT_BOOTSTRAP")"
 replace "CONFLUENT_K8S_EVENTS_TOPIC" "$(escape_for_perl "$CONFLUENT_K8S_EVENTS_TOPIC")"
@@ -73,6 +80,10 @@ replace "CONSUMER_GROUP_PREFIX" "$(escape_for_perl "$CONSUMER_GROUP_PREFIX")"
 replace "CLUSTER_NAME" "$(escape_for_perl "$CLUSTER_NAME")"
 replace "CLUSTER_ENVIRONMENT" "$(escape_for_perl "$CLUSTER_ENVIRONMENT")"
 replace "CLUSTER_REGION" "$(escape_for_perl "$CLUSTER_REGION")"
+replace "EXISTING_K8S_EVENTS_EVENTSOURCE_NAME" "$(escape_for_perl "$EXISTING_K8S_EVENTS_EVENTSOURCE_NAME")"
+replace "EXISTING_K8S_EVENTS_EVENT_NAME" "$(escape_for_perl "$EXISTING_K8S_EVENTS_EVENT_NAME")"
+replace "RUN_ID" "$(escape_for_perl "$RUN_ID")"
+replace "EVENT_TIME" "$(escape_for_perl "$EVENT_TIME")"
 
 if grep -RIn '{{[A-Z0-9_]*}}' "$out_dir"; then
   echo "unresolved placeholders remain" >&2

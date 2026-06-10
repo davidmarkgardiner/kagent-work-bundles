@@ -19,7 +19,8 @@ required=(
   "examples/namespace-scoped/03-argo-kafka-eventsource.yaml"
   "examples/namespace-scoped/04-argo-kafka-sensor.yaml"
   "examples/namespace-scoped/05-argo-workflowtemplate.yaml"
-  "examples/namespace-scoped/06-smoke-event-job.yaml"
+  "examples/namespace-scoped/06-smoke-event.yaml"
+  "examples/namespace-scoped/07-existing-eventsource-sensor.yaml"
   "scripts/render-namespace-test.sh"
 )
 
@@ -45,7 +46,10 @@ grep -Fq 'otelcol.exporter.kafka "confluent"' examples/namespace-scoped/02-alloy
 grep -Fq 'groupName: "{{CONSUMER_GROUP_PREFIX}}-alloy-k8s-events-smoke"' examples/namespace-scoped/03-argo-kafka-eventsource.yaml
 grep -Fq 'eventSourceName: alloy-k8s-events-kafka' examples/namespace-scoped/04-argo-kafka-sensor.yaml
 grep -Fq 'ALLOY_K8S_EVENT_PAYLOAD_BEGIN' examples/namespace-scoped/05-argo-workflowtemplate.yaml
-grep -Fq 'AlloyKafkaSmoke' examples/namespace-scoped/06-smoke-event-job.yaml
+grep -Fq 'serviceAccountName: "{{ARGO_WORKFLOWS_SERVICE_ACCOUNT}}"' examples/namespace-scoped/05-argo-workflowtemplate.yaml
+grep -Fq 'AlloyKafkaSmoke' examples/namespace-scoped/06-smoke-event.yaml
+grep -Fq 'eventTime: "{{EVENT_TIME}}"' examples/namespace-scoped/06-smoke-event.yaml
+grep -Fq 'eventSourceName: "{{EXISTING_K8S_EVENTS_EVENTSOURCE_NAME}}"' examples/namespace-scoped/07-existing-eventsource-sensor.yaml
 grep -Fq 'CONFLUENT_BOOTSTRAP' scripts/render-namespace-test.sh
 grep -Fq 'ALLOY_NAMESPACE_SCOPED' WORK-AGENT-START-PROMPT.md
 grep -Fq 'ARGO_WORKFLOW_TRIGGERED' evidence/EVIDENCE-TEMPLATE.md

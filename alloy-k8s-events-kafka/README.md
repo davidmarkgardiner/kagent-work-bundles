@@ -29,7 +29,8 @@ examples/namespace-scoped/02-alloy-namespace-scoped.yaml
 examples/namespace-scoped/03-argo-kafka-eventsource.yaml
 examples/namespace-scoped/04-argo-kafka-sensor.yaml
 examples/namespace-scoped/05-argo-workflowtemplate.yaml
-examples/namespace-scoped/06-smoke-event-job.yaml
+examples/namespace-scoped/06-smoke-event.yaml
+examples/namespace-scoped/07-existing-eventsource-sensor.yaml
 scripts/render-namespace-test.sh
 scripts/verify-bundle.sh
 ```
@@ -61,7 +62,8 @@ The test pattern therefore binds Alloy's service account to a Role in
 3. Apply the namespace-scoped Alloy ConfigMap, Deployment, ServiceAccount, Role,
    and RoleBinding.
 4. Apply the Argo WorkflowTemplate, EventSource, and Sensor.
-5. Trigger a harmless Kubernetes Event in `{{TEST_NAMESPACE}}`.
+5. Trigger a harmless Kubernetes Event in `{{TEST_NAMESPACE}}` with
+   `06-smoke-event.yaml`.
 6. Confirm Alloy logs show event collection and Kafka export has no errors.
 7. Confirm the Argo EventSource consumer group consumes from Kafka.
 8. Confirm the Argo Sensor creates a Workflow.
@@ -77,6 +79,27 @@ work-agent-bundles/alloy-k8s-events-kafka/scripts/render-namespace-test.sh \
 
 The rendered output may contain environment-specific Kafka endpoints and Secret
 names. Do not commit it.
+
+## Consumer Group Fallback
+
+The preferred test uses `03-argo-kafka-eventsource.yaml` so the work agent proves
+a dedicated smoke consumer group. If Kafka ACLs reject that group with an error
+like:
+
+```text
+The client is not authorized to access this group
+```
+
+then either request consume permission for the smoke group or use
+`07-existing-eventsource-sensor.yaml` against an already-authorized Argo
+EventSource for the same topic. Record this as:
+
+```text
+KAFKA_SMOKE_CONSUMER_GROUP: blocked_by_acl
+ARGO_EVENTSOURCE_CONSUMED: yes_via_existing_authorized_eventsource
+```
+
+Do not leave broad no-filter fallback Sensors running after the smoke test.
 
 ## Expansion Rule
 

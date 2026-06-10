@@ -1,0 +1,56 @@
+---
+# Use this fallback only when the Kafka API key is not authorized to create or
+# join a new consumer group for 03-argo-kafka-eventsource.yaml.
+#
+# It reuses an already-approved Argo Events Kafka EventSource that consumes the
+# same Kubernetes events topic.
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: alloy-k8s-events-existing-consumer-smoke
+  namespace: "{{ARGO_EVENTS_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/part-of: alloy-k8s-events-kafka
+    event-type: kubernetes-event
+spec:
+  eventBusName: "{{ARGO_EVENTS_EVENTBUS_NAME}}"
+  template:
+    serviceAccountName: "{{ARGO_EVENTS_SERVICE_ACCOUNT}}"
+  dependencies:
+    - name: alloy-k8s-event
+      eventSourceName: "{{EXISTING_K8S_EVENTS_EVENTSOURCE_NAME}}"
+      eventName: "{{EXISTING_K8S_EVENTS_EVENT_NAME}}"
+  triggers:
+    - template:
+        name: alloy-k8s-event-workflow
+        conditions: "alloy-k8s-event"
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: alloy-k8s-event-smoke-
+                namespace: "{{ARGO_WORKFLOWS_NAMESPACE}}"
+                labels:
+                  app.kubernetes.io/part-of: alloy-k8s-events-kafka
+                  event-type: kubernetes-event
+              spec:
+                workflowTemplateRef:
+                  name: alloy-k8s-event-smoke
+                arguments:
+                  parameters:
+                    - name: kafka-event-payload
+                      value: "{}"
+          parameters:
+            - src:
+                dependencyName: alloy-k8s-event
+                dataKey: body
+              dest: spec.arguments.parameters.0.value
+      rateLimit:
+        requestsPerUnit: 5
+        unit: Minute
+      retryStrategy:
+        steps: 3
+        duration: 10s

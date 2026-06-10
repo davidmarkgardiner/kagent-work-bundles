@@ -118,12 +118,24 @@ first matching event.
 
 Example synthetic event approach:
 
-```bash
-kubectl --context {{WORKLOAD_KUBE_CONTEXT}} -n {{TEST_NAMESPACE}} create event \
-  alloy-k8s-event-smoke \
-  --reason=AlloyKafkaSmoke \
-  --type=Normal \
-  --message="Alloy Kubernetes Event to Kafka smoke test"
+```yaml
+apiVersion: events.k8s.io/v1
+kind: Event
+metadata:
+  name: alloy-k8s-event-manual-{{RUN_ID}}
+  namespace: {{TEST_NAMESPACE}}
+regarding:
+  apiVersion: v1
+  kind: Namespace
+  name: {{TEST_NAMESPACE}}
+  namespace: {{TEST_NAMESPACE}}
+reason: AlloyKafkaSmoke
+note: Alloy Kubernetes Event to Kafka smoke test {{RUN_ID}}
+type: Normal
+action: ManualSmoke
+reportingController: {{REPORTING_CONTROLLER}}
+reportingInstance: {{REPORTING_INSTANCE}}
+eventTime: "{{EVENT_TIME_RFC3339_MICRO}}"
 ```
 
 Consumer proof can use one of:

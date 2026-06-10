@@ -1,0 +1,20 @@
+---
+apiVersion: events.k8s.io/v1
+kind: Event
+metadata:
+  name: alloy-k8s-event-manual-{{RUN_ID}}
+  namespace: "{{TEST_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/part-of: alloy-k8s-events-kafka
+regarding:
+  apiVersion: v1
+  kind: Namespace
+  name: "{{TEST_NAMESPACE}}"
+  namespace: "{{TEST_NAMESPACE}}"
+reason: AlloyKafkaSmoke
+note: Alloy Kubernetes Event to Kafka manual smoke {{RUN_ID}}
+type: Normal
+action: ManualSmoke
+reportingController: kagent-public.local/alloy-k8s-events-kafka
+reportingInstance: codex-home-lab
+eventTime: "{{EVENT_TIME}}"
