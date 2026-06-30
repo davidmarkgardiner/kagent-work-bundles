@@ -20,6 +20,22 @@ Alertmanager / Grafana / Alloy
   -> selected agent or escalation path
 ```
 
+If the already-working work path is HTTP webhook based, assess it before
+changing it:
+
+```text
+Alertmanager / Grafana
+  -> webhook
+  -> Vector
+  -> webhook-to-Kafka proxy
+  -> Confluent REST
+  -> Argo
+```
+
+That path can be valid as a compatibility bridge, but it has more components to
+own. The cleaner target is either Kafka-first into Vector or HTTP into Vector
+with Vector publishing directly to Kafka.
+
 ## Why This Matters
 
 The value is not "more middleware." The value is:

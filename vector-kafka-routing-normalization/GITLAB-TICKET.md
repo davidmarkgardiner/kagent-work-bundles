@@ -31,6 +31,11 @@ For this work run, first reuse the existing Vector and Confluent setup:
 - confirm Grafana MCP access
 - confirm the Manager/Grafana Kafka contact point and safe test alert path
 
+If the current environment already routes alerts through a webhook, Vector, a
+webhook-to-Kafka proxy, and Confluent REST, document that path before changing
+it. The target design should remove proxy hops only when Vector can publish
+directly to Kafka or when a Kafka-first source path is verified.
+
 ## Acceptance Criteria
 
 - BUNDLE_VERIFY: passed
@@ -58,6 +63,13 @@ For this work run, first reuse the existing Vector and Confluent setup:
 - ROUTE_FALLBACK: verified
 - DEDUPE: verified
 - RESOLVED_FILTER: verified
+- CURRENT_CHAIN: documented
+- CLEAN_CHAIN: proposed_or_verified
+- AUTH_OPTIONS: verified
+- OAUTH_DECISION: supported_blocked_or_not_available
+- API_KEY_FALLBACK: documented
+- PROXY_REMOVAL_DECISION: remove_keep_or_blocked
+- ROLLBACK_PLAN: captured
 - FULL_ENVELOPE_WORKFLOW: planned_or_implemented
 - AUTOMATION_GATE: default_deny
 - METRICS_PLAN: captured
@@ -69,3 +81,5 @@ For this work run, first reuse the existing Vector and Confluent setup:
   allowlist.
 - Do not replace Kafka with Vector.
 - Do not remove raw topics until replay/audit requirements are agreed.
+- Do not remove the existing webhook/proxy path until a cleaner path is verified
+  and rollback is documented.

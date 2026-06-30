@@ -57,7 +57,10 @@ Then complete the work in this order:
    is approved.
 12. Prove duplicate suppression before Argo workflow creation.
 13. Run prompts/05-production-readiness-gap-check.md.
-14. Return the evidence template filled in.
+14. Run prompts/06-assess-existing-webhook-proxy-cleanup.md if the work
+   environment has an existing webhook/proxy/Confluent REST chain or if the
+   team wants a component-reduction recommendation.
+15. Return the evidence template filled in.
 
 Required evidence markers:
 
@@ -87,6 +90,13 @@ Required evidence markers:
 - ROUTE_FALLBACK: verified
 - DEDUPE: verified
 - RESOLVED_FILTER: verified
+- CURRENT_CHAIN: documented
+- CLEAN_CHAIN: proposed_or_verified
+- AUTH_OPTIONS: verified
+- OAUTH_DECISION: supported_blocked_or_not_available
+- API_KEY_FALLBACK: documented
+- PROXY_REMOVAL_DECISION: remove_keep_or_blocked
+- ROLLBACK_PLAN: captured
 - FULL_ENVELOPE_WORKFLOW: planned_or_implemented
 - AUTOMATION_GATE: default_deny
 - METRICS_PLAN: captured
@@ -109,6 +119,7 @@ DEDUPE:
 FILTERING:
 GRAFANA_E2E:
 GITLAB_TICKET:
+WEBHOOK_PROXY_ASSESSMENT:
 WORKFLOW_CONTRACT:
 AUTOMATION_GATE:
 METRICS:

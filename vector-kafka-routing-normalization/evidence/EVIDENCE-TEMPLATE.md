@@ -76,6 +76,23 @@ STATUS: PASS | PARTIAL | BLOCKED
 - Duplicate raw records sent:
 - Normalized workflows created:
 
+## Existing Webhook/Proxy Assessment
+
+- CURRENT_CHAIN:
+- Sanitized current-state diagram:
+- CLEAN_CHAIN:
+- AUTH_OPTIONS:
+- OAUTH_DECISION:
+- API_KEY_FALLBACK:
+- VECTOR_DIRECT_KAFKA:
+- KAFKA_FIRST_SOURCE:
+- PROXY_SERVICE_ROLE:
+- PROXY_REMOVAL_DECISION:
+- ROLLBACK_PLAN:
+- HOME_LAB_REPLICATION:
+- Components proposed for removal:
+- Components retained and why:
+
 ## Workflow Contract
 
 - FULL_ENVELOPE_WORKFLOW:

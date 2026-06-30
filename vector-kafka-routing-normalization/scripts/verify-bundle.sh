@@ -22,6 +22,7 @@ required=(
   "prompts/03-verify-routing-and-dedupe.md"
   "prompts/04-run-grafana-mcp-end-to-end.md"
   "prompts/05-production-readiness-gap-check.md"
+  "prompts/06-assess-existing-webhook-proxy-cleanup.md"
   "payload/REFERENCE.md"
   "evidence/EVIDENCE-TEMPLATE.md"
 )
@@ -74,6 +75,13 @@ for marker in \
   "ROUTE_FALLBACK: verified" \
   "DEDUPE: verified" \
   "RESOLVED_FILTER: verified" \
+  "CURRENT_CHAIN: documented" \
+  "CLEAN_CHAIN: proposed_or_verified" \
+  "AUTH_OPTIONS: verified" \
+  "OAUTH_DECISION: supported_blocked_or_not_available" \
+  "API_KEY_FALLBACK: documented" \
+  "PROXY_REMOVAL_DECISION: remove_keep_or_blocked" \
+  "ROLLBACK_PLAN: captured" \
   "AUTOMATION_GATE: default_deny" \
   "OUTPUT_SANITIZED: yes"; do
   grep -q "${marker}" "WORK-AGENT-START-PROMPT.md" "GITLAB-TICKET.md" "evidence/EVIDENCE-TEMPLATE.md"
@@ -90,6 +98,10 @@ grep -q "Grafana MCP" "WORK-AGENT-START-PROMPT.md" "prompts/01-preflight-env-too
 grep -q "GitLab ticket" "WORK-AGENT-START-PROMPT.md" "prompts/04-run-grafana-mcp-end-to-end.md"
 grep -q "production triage workflow" "WORK-AGENT-START-PROMPT.md" "prompts/04-run-grafana-mcp-end-to-end.md"
 grep -q "Manager/Grafana contact point" "WORK-AGENT-START-PROMPT.md" "prompts/01-preflight-env-tools.md"
+grep -q "webhook-to-Kafka proxy" "README.md" "FRONT-SHEET.md" "prompts/06-assess-existing-webhook-proxy-cleanup.md"
+grep -q "SASL_PLAIN" "README.md" "prompts/06-assess-existing-webhook-proxy-cleanup.md"
+grep -q "OAuth/OIDC" "README.md" "prompts/06-assess-existing-webhook-proxy-cleanup.md"
+grep -q "HOME_LAB_REPLICATION" "prompts/06-assess-existing-webhook-proxy-cleanup.md" "evidence/EVIDENCE-TEMPLATE.md"
 grep -q "VECTOR_SECRET_REFS_NAMES_ONLY" "prompts/01-preflight-env-tools.md"
 grep -q "suppress_duplicates" "${REPO_ROOT}/observability/vector/manifests/01-vector-alertmanager-normalizer.yaml"
 grep -q "accepted_events" "${REPO_ROOT}/observability/vector/manifests/01-vector-alertmanager-normalizer.yaml"

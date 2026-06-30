@@ -30,6 +30,15 @@
 | Unknown-owner fallback verified | target agent and route key | TODO |
 | Duplicate suppression verified | N raw records -> 1 normalized workflow | TODO |
 | Resolved-alert filtering verified | no normalized workflow created | TODO |
+| Existing webhook/proxy chain documented | sanitized current-state diagram and inventory | TODO |
+| Clean chain proposed or verified | Kafka-first or Vector HTTP receiver target path | TODO |
+| Auth options verified | OAuth/OIDC support and API-key fallback decision | TODO |
+| OAuth decision captured | supported, blocked, or not available | TODO |
+| API key fallback documented | SASL_SSL/SASL_PLAIN with least-privilege topic scope | TODO |
+| Proxy service role understood | translation only, extra logic, or unknown | TODO |
+| Proxy removal decision captured | remove, keep, or blocked | TODO |
+| Rollback plan captured | how to restore the known-working path | TODO |
+| Home-lab replication plan captured | compatibility demo and clean demo | TODO |
 | Production workflow full-envelope plan | proposed workflow/Sensor contract | TODO |
 | Automation allowlist defined | default-deny gate and approved cases | TODO |
 | Metrics plan defined | route, dedupe, workflow, MTTA/MTTR | TODO |

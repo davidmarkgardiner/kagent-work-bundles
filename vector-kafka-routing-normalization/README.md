@@ -14,6 +14,25 @@ connectivity is already configured, and the Manager/Grafana contact point
 already exists. The work agent must discover and confirm those prerequisites
 before creating a new Vector instance or applying manifests.
 
+If the work environment already has a working webhook/proxy path, do not break
+it. First document it, then prove a cleaner path in parallel:
+
+```text
+current possible path:
+Alertmanager/Grafana -> webhook -> Vector -> webhook-to-Kafka proxy
+  -> Confluent REST -> Kafka -> Argo
+
+clean target path:
+Alertmanager/Grafana -> Kafka raw topic -> Vector -> Kafka normalized topic
+  -> Argo
+
+clean HTTP fallback:
+Alertmanager/Grafana -> Vector HTTP receiver -> Kafka normalized topic -> Argo
+```
+
+The design decision is to remove avoidable webhook/proxy services only after the
+clean path is verified and rollback is documented.
+
 ## What This Feature Does
 
 - Keeps raw Kafka topics for audit and replay.
@@ -76,7 +95,34 @@ Also verified:
 4. Use `PREREQS-CHECKLIST.md` as the live building-block inventory before
    creating the new Vector instance/config.
 5. Follow the prompts in order.
-6. Capture evidence with `evidence/EVIDENCE-TEMPLATE.md`.
+6. If a webhook/proxy/Confluent REST chain exists, run
+   `prompts/06-assess-existing-webhook-proxy-cleanup.md`.
+7. Capture evidence with `evidence/EVIDENCE-TEMPLATE.md`.
+
+## Auth Decision
+
+Preferred: OAuth/OIDC for Confluent Cloud where the work cluster, identity
+provider, client library, Vector image, and operations model support it.
+
+Fallback: Confluent Kafka API key/secret using `SASL_SSL` plus `SASL_PLAIN`.
+The API key is the SASL username and the API secret is the SASL password. Store
+these only in approved secret stores and grant least-privilege topic access.
+
+For Grafana webhook contact points, verify whether Basic Auth, an
+`Authorization` header, HMAC signing, mTLS, or network policy is used. If Vector
+receives webhooks directly, document and test the receiver protection before
+using it outside a test environment.
+
+Reference these primary docs during the work-side check:
+
+- Confluent Cloud client auth:
+  `https://docs.confluent.io/cloud/current/client-apps/config-client.html`
+- Confluent Cloud OAuth/OIDC:
+  `https://docs.confluent.io/cloud/current/security/authenticate/workload-identities/identity-providers/oauth/overview.html`
+- Vector Kafka sink:
+  `https://vector.dev/docs/reference/configuration/sinks/kafka/`
+- Grafana webhook contact point:
+  `https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/webhook-notifier/`
 
 ## Definition Of Done
 
@@ -96,3 +142,5 @@ The bundle is complete only when the work environment has proven:
 - Kafka credentials are least-privilege
 - metrics or evidence exist for route counts, suppression, workflow outcomes,
   MTTA, MTTR, and escalation/deflection
+- existing webhook/proxy components are documented and either retained with a
+  reason or replaced by a cleaner verified path with rollback
