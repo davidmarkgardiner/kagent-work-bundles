@@ -1,0 +1,33 @@
+request:
+  name: vector-kafka-routing-normalization
+  objective: >
+    Deploy and verify Vector normalization, filtering, dedupe, and routing
+    between raw Kafka observability topics and Argo Events in a work dev
+    environment.
+  environment:
+    management_cluster_context: "{{MGMT_KUBE_CONTEXT}}"
+    argo_namespace: "{{ARGO_EVENTS_NAMESPACE}}"
+    kafka_raw_alert_topic: "{{ALERTMANAGER_RAW_TOPIC}}"
+    kafka_normalized_alert_topic: "{{ALERTMANAGER_TRIAGE_TOPIC}}"
+    kafka_k8s_raw_topic: "{{K8S_RAW_TOPIC}}"
+    existing_vector_namespace: "{{EXISTING_VECTOR_NAMESPACE}}"
+    existing_vector_deployment_or_release: "{{EXISTING_VECTOR_DEPLOYMENT_OR_RELEASE}}"
+    grafana_contact_point_name_or_uid: "{{GRAFANA_CONTACT_POINT_NAME_OR_UID}}"
+    grafana_mcp_required: true
+  required_routes:
+    - name: application
+      expected_target_agent: "{{APPLICATION_TRIAGE_AGENT}}"
+    - name: platform
+      expected_target_agent: "{{PLATFORM_OPS_AGENT}}"
+    - name: security
+      expected_target_agent: "{{SECURITY_HARDENING_AGENT}}"
+    - name: fallback
+      expected_target_agent: "{{SRE_FALLBACK_AGENT}}"
+  safety:
+    automation_default: deny
+    require_argo_allowlist_for_write_remediation: true
+    split_kafka_principals: true
+  evidence:
+    capture_topic_partition_offset: true
+    capture_workflow_parameters: true
+    redact_secrets_and_private_endpoints: true
