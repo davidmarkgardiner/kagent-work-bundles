@@ -59,10 +59,39 @@ Key files:
 ```text
 ../../observability/vector/README.md
 ../../observability/vector/manifests/
+../../observability/vector/homelab/
 ../../observability/vector/examples/
 ../../observability/vector/tests/
 ../../observability/vector/handoff/
 ```
+
+Home-lab reference YAML for the two cleanup options lives in:
+
+```text
+../../observability/vector/homelab/vector-http-receiver-to-kafka.yaml
+../../observability/vector/homelab/vector-kafka-raw-to-normalized.yaml
+```
+
+Use these as implementation references when deciding whether work can remove the
+webhook-to-Kafka proxy service.
+
+Grafana chaos alert examples for the gameday prompt live in:
+
+```text
+examples/grafana-chaos-alerts/chaos-alert-rules.yaml
+examples/grafana-chaos-alerts/create-chaos-alerts-api.sh
+examples/grafana-dashboards/lgtm-agentic-resolution-showcase.json
+examples/daily-gameday/cronworkflow.yaml
+```
+
+Use Grafana MCP first. Use the API script as the fallback and home-lab
+replication path.
+
+Use [`SHOWCASE-RUNBOOK.md`](SHOWCASE-RUNBOOK.md) as the single stakeholder demo
+path. Use [`scenarios/SCENARIO-PACK.md`](scenarios/SCENARIO-PACK.md),
+[`TICKET-QUALITY-CONTRACT.md`](TICKET-QUALITY-CONTRACT.md),
+[`FAILURE-MODE-TESTS.md`](FAILURE-MODE-TESTS.md), and
+[`PROMOTION-GATE.md`](PROMOTION-GATE.md) before rollout.
 
 ## Evidence From Public Spike
 
@@ -97,7 +126,11 @@ Also verified:
 5. Follow the prompts in order.
 6. If a webhook/proxy/Confluent REST chain exists, run
    `prompts/06-assess-existing-webhook-proxy-cleanup.md`.
-7. Capture evidence with `evidence/EVIDENCE-TEMPLATE.md`.
+7. After the flow is working, run
+   `prompts/07-chaos-gameday-end-to-end.md` to prove real alerting, routing,
+   ticket/evidence creation, rollback, and dashboard visibility under
+   controlled chaos.
+8. Capture evidence with `evidence/EVIDENCE-TEMPLATE.md`.
 
 ## Auth Decision
 
@@ -144,3 +177,10 @@ The bundle is complete only when the work environment has proven:
   MTTA, MTTR, and escalation/deflection
 - existing webhook/proxy components are documented and either retained with a
   reason or replaced by a cleaner verified path with rollback
+- at least one controlled chaos scenario has proven the full flow from
+  Grafana/LGTM alert to GitLab or ServiceNow evidence
+- Grafana MCP or the approved API fallback has created the chaos alert rules
+  from `examples/grafana-chaos-alerts/chaos-alert-rules.yaml`
+- Grafana dashboards show route counts, dedupe, workflow outcomes, ticket
+  outcomes, MTTA/MTTR, and daily gameday pass/fail history
+- a daily low-risk gameday proposal exists before any scheduled chaos is enabled

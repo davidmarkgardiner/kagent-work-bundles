@@ -97,6 +97,11 @@ Primary docs to check during the work-side run:
 - Grafana webhook contact point:
   `https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/webhook-notifier/`
 
+Home-lab reference YAML to compare against:
+
+- `../../observability/vector/homelab/vector-http-receiver-to-kafka.yaml`
+- `../../observability/vector/homelab/vector-kafka-raw-to-normalized.yaml`
+
 ## Work To Perform
 
 1. Map the currently working path from source to Argo.

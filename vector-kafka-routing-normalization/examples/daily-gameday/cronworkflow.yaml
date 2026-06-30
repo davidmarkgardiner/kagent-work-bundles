@@ -1,0 +1,70 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: kagent-daily-gameday-verification
+  namespace: argo
+  labels:
+    app.kubernetes.io/name: kagent-daily-gameday-verification
+    app.kubernetes.io/part-of: vector-kafka-routing-normalization
+spec:
+  schedule: "0 9 * * 1-5"
+  timezone: "{{TIMEZONE}}"
+  suspend: true
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  workflowSpec:
+    entrypoint: daily-gameday
+    serviceAccountName: "{{GAMEDAY_SERVICE_ACCOUNT}}"
+    arguments:
+      parameters:
+        - name: chaos-target-namespace
+          value: "{{CHAOS_TARGET_NAMESPACE}}"
+        - name: chaos-scenario
+          value: "pod-restart"
+    templates:
+      - name: daily-gameday
+        steps:
+          - - name: preflight
+              template: marker
+              arguments:
+                parameters:
+                  - name: message
+                    value: "CHAOS_PREFLIGHT: passed_or_blocked"
+          - - name: inject-safe-fault
+              template: marker
+              arguments:
+                parameters:
+                  - name: message
+                    value: "CHAOS_SCENARIO: injected_or_blocked"
+          - - name: verify-alert-flow
+              template: marker
+              arguments:
+                parameters:
+                  - name: message
+                    value: "GRAFANA_ALERT_FIRED: verified_or_blocked"
+          - - name: verify-ticket
+              template: marker
+              arguments:
+                parameters:
+                  - name: message
+                    value: "TICKET_CREATED_OR_UPDATED: verified_or_blocked"
+          - - name: cleanup
+              template: marker
+              arguments:
+                parameters:
+                  - name: message
+                    value: "CHAOS_ROLLBACK: verified_or_blocked"
+      - name: marker
+        inputs:
+          parameters:
+            - name: message
+        container:
+          image: busybox:1.36
+          command:
+            - sh
+            - -ceu
+          args:
+            - |
+              echo "{{inputs.parameters.message}}"
+              echo "OUTPUT_SANITIZED: yes"

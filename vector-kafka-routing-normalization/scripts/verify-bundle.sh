@@ -23,6 +23,17 @@ required=(
   "prompts/04-run-grafana-mcp-end-to-end.md"
   "prompts/05-production-readiness-gap-check.md"
   "prompts/06-assess-existing-webhook-proxy-cleanup.md"
+  "prompts/07-chaos-gameday-end-to-end.md"
+  "examples/grafana-chaos-alerts/README.md"
+  "examples/grafana-chaos-alerts/chaos-alert-rules.yaml"
+  "examples/grafana-chaos-alerts/create-chaos-alerts-api.sh"
+  "examples/grafana-dashboards/lgtm-agentic-resolution-showcase.json"
+  "examples/daily-gameday/cronworkflow.yaml"
+  "SHOWCASE-RUNBOOK.md"
+  "scenarios/SCENARIO-PACK.md"
+  "TICKET-QUALITY-CONTRACT.md"
+  "FAILURE-MODE-TESTS.md"
+  "PROMOTION-GATE.md"
   "payload/REFERENCE.md"
   "evidence/EVIDENCE-TEMPLATE.md"
 )
@@ -43,6 +54,9 @@ repo_required=(
   "observability/vector/tests/run-vector-example-tests.sh"
   "observability/vector/tests/vector-example-test.yaml"
   "observability/vector/handoff/FEEDBACK.md"
+  "observability/vector/homelab/README.md"
+  "observability/vector/homelab/vector-http-receiver-to-kafka.yaml"
+  "observability/vector/homelab/vector-kafka-raw-to-normalized.yaml"
 )
 
 for rel in "${repo_required[@]}"; do
@@ -82,9 +96,20 @@ for marker in \
   "API_KEY_FALLBACK: documented" \
   "PROXY_REMOVAL_DECISION: remove_keep_or_blocked" \
   "ROLLBACK_PLAN: captured" \
+  "CHAOS_PREFLIGHT: passed" \
+  "GRAFANA_MCP_ALERT_WRITE: used_or_blocked" \
+  "GRAFANA_CHAOS_ALERT_RULES: created_or_updated" \
+  "CHAOS_SCENARIO: injected" \
+  "GRAFANA_ALERT_FIRED: verified" \
+  "VECTOR_ROUTE_AGENT: verified" \
+  "SPECIALIST_AGENT_SELECTED: verified" \
+  "TICKET_CREATED_OR_UPDATED: verified" \
+  "CHAOS_ROLLBACK: verified" \
+  "GRAFANA_DASHBOARD: updated" \
+  "DAILY_GAMEDAY_PROPOSAL: captured" \
   "AUTOMATION_GATE: default_deny" \
   "OUTPUT_SANITIZED: yes"; do
-  grep -q "${marker}" "WORK-AGENT-START-PROMPT.md" "GITLAB-TICKET.md" "evidence/EVIDENCE-TEMPLATE.md"
+  grep -q "${marker}" "WORK-AGENT-START-PROMPT.md" "GITLAB-TICKET.md" "evidence/EVIDENCE-TEMPLATE.md" "prompts/07-chaos-gameday-end-to-end.md"
   echo "MARKER_OK ${marker}"
 done
 
@@ -102,6 +127,25 @@ grep -q "webhook-to-Kafka proxy" "README.md" "FRONT-SHEET.md" "prompts/06-assess
 grep -q "SASL_PLAIN" "README.md" "prompts/06-assess-existing-webhook-proxy-cleanup.md"
 grep -q "OAuth/OIDC" "README.md" "prompts/06-assess-existing-webhook-proxy-cleanup.md"
 grep -q "HOME_LAB_REPLICATION" "prompts/06-assess-existing-webhook-proxy-cleanup.md" "evidence/EVIDENCE-TEMPLATE.md"
+grep -q "vector-http-receiver-to-kafka.yaml" "README.md" "prompts/06-assess-existing-webhook-proxy-cleanup.md"
+grep -q "vector-kafka-raw-to-normalized.yaml" "README.md" "prompts/06-assess-existing-webhook-proxy-cleanup.md"
+grep -q "controlled chaos" "README.md" "prompts/07-chaos-gameday-end-to-end.md"
+grep -q "chaos-alert-rules.yaml" "README.md" "prompts/07-chaos-gameday-end-to-end.md" "examples/grafana-chaos-alerts/README.md"
+grep -q "create-chaos-alerts-api.sh" "README.md" "prompts/07-chaos-gameday-end-to-end.md" "examples/grafana-chaos-alerts/README.md"
+grep -q "Grafana MCP" "prompts/07-chaos-gameday-end-to-end.md" "examples/grafana-chaos-alerts/README.md"
+grep -q "daily low-risk verification job" "prompts/07-chaos-gameday-end-to-end.md"
+grep -q "networking-triage-agent" "prompts/07-chaos-gameday-end-to-end.md"
+grep -q "security-hardening-agent" "examples/grafana-chaos-alerts/chaos-alert-rules.yaml"
+grep -q "platform-ops-agent" "examples/grafana-chaos-alerts/chaos-alert-rules.yaml"
+grep -q "aks-sre-triage-agent" "examples/grafana-chaos-alerts/chaos-alert-rules.yaml"
+grep -q "Grafana dashboards" "README.md" "prompts/07-chaos-gameday-end-to-end.md"
+grep -q "LGTM To Agentic Resolution Showcase" "examples/grafana-dashboards/lgtm-agentic-resolution-showcase.json"
+grep -q "suspend: true" "examples/daily-gameday/cronworkflow.yaml"
+grep -q "Ticket Quality Contract" "TICKET-QUALITY-CONTRACT.md"
+grep -q "Failure-Mode Tests" "FAILURE-MODE-TESTS.md"
+grep -q "Promotion Gate" "PROMOTION-GATE.md"
+grep -q "Known-Good Scenario Pack" "scenarios/SCENARIO-PACK.md"
+grep -q "LGTM To Agentic Resolution Showcase Runbook" "SHOWCASE-RUNBOOK.md"
 grep -q "VECTOR_SECRET_REFS_NAMES_ONLY" "prompts/01-preflight-env-tools.md"
 grep -q "suppress_duplicates" "${REPO_ROOT}/observability/vector/manifests/01-vector-alertmanager-normalizer.yaml"
 grep -q "accepted_events" "${REPO_ROOT}/observability/vector/manifests/01-vector-alertmanager-normalizer.yaml"

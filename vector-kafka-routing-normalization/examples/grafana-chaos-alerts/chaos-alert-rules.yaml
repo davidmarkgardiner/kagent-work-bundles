@@ -1,0 +1,78 @@
+# Public-safe contract for the chaos alert rules the work agent should create
+# through Grafana MCP or the Grafana provisioning API fallback.
+#
+# These are not Kubernetes resources. They describe Grafana-managed alert rules
+# and the routing labels expected by the Vector/Argo pipeline.
+folder:
+  uid: kagent-chaos-gameday
+  title: Kagent Chaos Gameday
+ruleGroup:
+  name: kagent-chaos-gameday
+  intervalSeconds: 60
+contactPoint:
+  name: "{{GRAFANA_CONTACT_POINT_NAME}}"
+notificationPolicy:
+  matcher:
+    label: route_to
+    value: kagent-chaos-gameday
+rules:
+  - uid: kagent-chaos-pod-restarts
+    title: Kagent Chaos - Pod Restart Spike
+    datasourceUid: prometheus
+    expression: |
+      increase(kube_pod_container_status_restarts_total{namespace="{{CHAOS_TARGET_NAMESPACE}}"}[5m]) > 0
+    labels:
+      alertname: KagentChaosPodRestartSpike
+      severity: warning
+      route_to: kagent-chaos-gameday
+      route_domain: application
+      target_agent: aks-sre-triage-agent
+      chaos_scenario: pod-restart
+    annotations:
+      summary: Pod restart spike in {{CHAOS_TARGET_NAMESPACE}}
+      runbook: Inspect pod logs, describe output, recent events, rollout status, and resource pressure.
+  - uid: kagent-chaos-network-5xx
+    title: Kagent Chaos - Network 5xx Or Latency
+    datasourceUid: prometheus
+    expression: |
+      sum(rate(nginx_ingress_controller_requests{namespace="{{CHAOS_TARGET_NAMESPACE}}",status=~"5.."}[5m])) > 0
+    labels:
+      alertname: KagentChaosNetwork5xxOrLatency
+      severity: warning
+      route_to: kagent-chaos-gameday
+      route_domain: networking
+      target_agent: networking-triage-agent
+      chaos_scenario: network-5xx
+    annotations:
+      summary: Network or ingress failure detected for {{CHAOS_TARGET_NAMESPACE}}
+      runbook: Check ingress, service endpoints, DNS, TLS, network policy, and controller logs.
+  - uid: kagent-chaos-cert-expiry
+    title: Kagent Chaos - Certificate Expiry
+    datasourceUid: prometheus
+    expression: |
+      min(certmanager_certificate_expiration_timestamp_seconds{namespace="{{CHAOS_TARGET_NAMESPACE}}"}) - time() < 604800
+    labels:
+      alertname: KagentChaosCertificateExpiry
+      severity: warning
+      route_to: kagent-chaos-gameday
+      route_domain: platform
+      target_agent: platform-ops-agent
+      chaos_scenario: certificate-expiry
+    annotations:
+      summary: Certificate expiry window reached in {{CHAOS_TARGET_NAMESPACE}}
+      runbook: Check Certificate, CertificateRequest, Issuer, Secret, and cert-manager events.
+  - uid: kagent-chaos-policy-violation
+    title: Kagent Chaos - Policy Violation
+    datasourceUid: prometheus
+    expression: |
+      increase(policy_report_result_total{namespace="{{CHAOS_TARGET_NAMESPACE}}",result="fail"}[5m]) > 0
+    labels:
+      alertname: KagentChaosPolicyViolation
+      severity: warning
+      route_to: kagent-chaos-gameday
+      route_domain: security
+      target_agent: security-hardening-agent
+      chaos_scenario: policy-violation
+    annotations:
+      summary: Policy violation detected in {{CHAOS_TARGET_NAMESPACE}}
+      runbook: Check policy result, workload owner, image/advisory evidence, and remediation recommendation.

@@ -76,6 +76,37 @@ STATUS: PASS | PARTIAL | BLOCKED
 - Duplicate raw records sent:
 - Normalized workflows created:
 
+## Chaos Gameday Evidence
+
+- CHAOS_PREFLIGHT:
+- GRAFANA_MCP_ALERT_WRITE:
+- GRAFANA_CHAOS_ALERT_RULES:
+- Grafana chaos folder UID:
+- Grafana chaos rule group:
+- Grafana alert rule UIDs:
+- Grafana create paused:
+- CHAOS_TARGET_NAMESPACE:
+- CHAOS_TARGET_WORKLOAD:
+- CHAOS_SCENARIO:
+- GRAFANA_ALERT_FIRED:
+- EVENT_DELIVERY:
+- VECTOR_NORMALIZED_EVENT:
+- VECTOR_ROUTE_AGENT:
+- SPECIALIST_AGENT_SELECTED:
+- EVIDENCE_PACK_CREATED:
+- TICKET_CREATED_OR_UPDATED:
+- REMEDIATION_GATE:
+- CHAOS_ROLLBACK:
+- ALERT_RESOLUTION:
+- GRAFANA_DASHBOARD:
+- DAILY_GAMEDAY_PROPOSAL:
+- Dashboard URL or UID:
+- Ticket URL or ID:
+- Workflow name:
+- Selected agent:
+- Route key:
+- Rollback evidence:
+
 ## Existing Webhook/Proxy Assessment
 
 - CURRENT_CHAIN:
@@ -108,10 +139,21 @@ STATUS: PASS | PARTIAL | BLOCKED
 ## Metrics And Value
 
 - METRICS_PLAN:
+- SHOWCASE_DASHBOARD:
+- Dashboard UID:
+- Daily gameday CronWorkflow dry-run:
 - Baseline workflow count:
 - Suppressed event count plan:
 - MTTA/MTTR capture plan:
 - Deflection tracking plan:
+
+## Failure Modes And Promotion
+
+- FAILURE_MODE_TESTS:
+- PROMOTION_GATE:
+- Scenario count passed:
+- Unsafe write actions before HITL:
+- Ticket quality accepted:
 
 ## Cleanup
 
