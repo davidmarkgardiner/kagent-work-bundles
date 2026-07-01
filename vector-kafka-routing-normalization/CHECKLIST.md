@@ -20,6 +20,7 @@
 | Vector rollout healthy | deployment ready, probe status | TODO |
 | Raw event produce verified | topic, partition, offset | TODO |
 | Normalized event consumed | topic, partition, offset | TODO |
+| Actionable topic contains actionable records only | consumed sample set and rejected noise examples | TODO |
 | Route-verification workflow succeeds | workflow name and parameters | TODO |
 | Production triage workflow triggered | workflow name and phase | TODO |
 | Kit/kagent analysis completed | workflow/agent evidence | TODO |
@@ -29,7 +30,11 @@
 | Security route verified | target agent and route key | TODO |
 | Unknown-owner fallback verified | target agent and route key | TODO |
 | Duplicate suppression verified | N raw records -> 1 normalized workflow | TODO |
-| Resolved-alert filtering verified | no normalized workflow created | TODO |
+| Duplicate suppression happens before Argo | N raw records -> 1 actionable record -> 1 workflow | TODO |
+| Resolved-alert filtering verified | no actionable record and no workflow created | TODO |
+| Ignored severity/label filtering verified | dropped/quarantined, no actionable record and no workflow | TODO |
+| Malformed payload filtering verified | dropped/quarantined, no actionable record and no workflow | TODO |
+| Quarantine/drop decision captured | discard, metric-only, or quarantine topic with Argo excluded | TODO |
 | Existing webhook/proxy chain documented | sanitized current-state diagram and inventory | TODO |
 | Clean chain proposed or verified | Kafka-first or Vector HTTP receiver target path | TODO |
 | Auth options verified | OAuth/OIDC support and API-key fallback decision | TODO |

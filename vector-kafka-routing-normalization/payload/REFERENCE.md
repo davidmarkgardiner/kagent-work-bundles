@@ -3,9 +3,10 @@
 Use the implementation references in:
 
 ```text
-../../observability/vector/examples/
-../../observability/vector/manifests/
-../../observability/vector/tests/
+payload/observability-vector/manifests/
+payload/observability-vector/tests/
+payload/observability-vector/handoff/
+payload/observability-vector/homelab/
 ```
 
 Normalized records should include:

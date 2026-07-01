@@ -4,7 +4,7 @@ Verify **every** row in the live cluster **before** building or deploying the
 Vector normalizer. This is the agent's preflight inventory. Do not start
 `prompts/02-deploy-vector-normalizer.md` until all `MUST` rows are confirmed.
 
-All values below are derived from `../../observability/vector/manifests/`. The
+All values below are derived from `payload/observability-vector/manifests/`. The
 agent must prove each one exists (or create it) in the target cluster.
 
 ---

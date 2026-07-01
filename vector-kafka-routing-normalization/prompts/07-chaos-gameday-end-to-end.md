@@ -11,12 +11,16 @@ Run a safe gameday that proves:
 ```text
 controlled chaos
   -> LGTM / Grafana alert fires
+  -> Alertmanager receives or forwards the firing alert where applicable
   -> Alertmanager or Grafana contact point delivers the event
-  -> Kafka / Vector path normalizes and routes the event
+  -> Kenawa webhook receives the alert
+  -> Vector filters noise, removes duplicates, normalizes, and routes the event
+  -> only actionable records reach the actionable Kafka topic
   -> Argo EventSource and Sensor trigger the workflow
   -> the correct specialist agent is selected
   -> evidence is collected
-  -> GitLab or ServiceNow ticket is created or updated
+  -> GitLab ticket is created or updated with triage/remediation evidence
+  -> ServiceNow is used only if the work path requires formal escalation
   -> optional human approval gates remediation
   -> Grafana dashboards show the flow and outcome
 ```
@@ -34,10 +38,15 @@ Before injecting chaos, capture:
 - `CHAOS_SCENARIO_ID`
 - Grafana dashboard URL or UID for the relevant LGTM signals
 - Alert rule name and contact point name
+- Alertmanager route/receiver name if Alertmanager is in the path
+- Kenawa webhook endpoint/service name
 - Kafka raw topic and normalized topic names
+- actionable Kafka topic name
+- optional quarantine topic name
 - Vector deployment/config name
 - Argo EventSource, Sensor, WorkflowTemplate, and workflow namespace
 - Target agent route map
+- expected ignore/noise policy for this test window
 - GitLab or ServiceNow project/queue used for evidence tickets
 - Rollback command or GitOps revert path
 
@@ -106,6 +115,16 @@ rollout:
 | DNS/service discovery failure | `networking-triage-agent` | CoreDNS logs, service/endpoints, failing lookup evidence |
 | Resource pressure/OOM | `aks-sre-triage-agent` | metrics, limits/requests, OOMKilled evidence, recommendation |
 
+Also run the negative controls below. These prove the pipeline is efficient and
+does not create agent work for non-actionable input:
+
+| Negative control | Expected result |
+|---|---|
+| Duplicate firing notification for the same alert | one actionable Kafka record and one Argo workflow inside the dedupe window |
+| Resolved notification for the same alert | no new actionable Kafka record and no new Argo workflow |
+| Ignored severity or configured noisy label | dropped or quarantined, no Argo workflow |
+| Malformed or incomplete alert payload | dropped or quarantined, no Argo workflow |
+
 ## Execution Steps
 
 1. Confirm the alert rule is enabled and routed to the intended contact point.
@@ -114,26 +133,45 @@ rollout:
 4. Start a timestamped evidence log.
 5. Inject one controlled chaos scenario.
 6. Wait for the Grafana/LGTM alert to fire.
-7. Confirm delivery into the raw path:
+7. Confirm Alertmanager receives or forwards the alert where applicable.
+8. Confirm the Kenawa webhook receives the alert.
+9. Confirm delivery into the raw path:
    - Kafka-first: event appears on the raw topic.
    - Direct Vector: Vector receives the webhook.
-8. Confirm Vector emits a normalized `observability.triage.v1` record.
-9. Confirm the normalized event includes:
+10. Confirm Vector emits a normalized `observability.triage.v1` record only for
+   the actionable firing alert.
+11. Confirm the normalized event includes:
+   - `schema_version`
+   - `source_system`
+   - `alert_uid`
+   - `fingerprint`
    - `target_agent`
+   - `route_domain`
    - `route_key`
    - `routing_reason`
    - `dedupe_key`
    - `incident_candidate`
    - `automation_allowed`
-10. Confirm Argo creates the triage workflow.
-11. Confirm the selected specialist agent is correct for the scenario.
-12. Confirm the evidence pack is attached to, or linked from, GitLab or
-    ServiceNow.
-13. If remediation is enabled, confirm human approval is required before any
+   - `raw_event_ref_or_hash`
+12. Confirm duplicates, resolved notifications, ignored severities, ignored
+    labels, and malformed events do not create actionable records or workflows.
+13. Confirm Argo creates the triage workflow for the actionable record only.
+14. Confirm the selected specialist agent is correct for the scenario.
+15. Confirm the GitLab ticket is created or updated and includes:
+    - original alert name and fingerprint
+    - affected namespace/workload/service
+    - selected specialist agent
+    - triage summary
+    - evidence links or captured evidence
+    - remediation recommendation or action taken
+    - automation approval state
+    - final status: triaged, remediated, escalated, or blocked
+16. If remediation is enabled, confirm human approval is required before any
     write-capable action.
-14. Roll back the chaos condition.
-15. Confirm alert recovery/resolution is observed.
-16. Capture final dashboard screenshots or panel links showing the lifecycle.
+17. Roll back the chaos condition.
+18. Confirm alert recovery/resolution is observed and does not create a new
+    actionable agent task.
+19. Capture final dashboard screenshots or panel links showing the lifecycle.
 
 ## Daily Scheduled Gameday
 
@@ -154,6 +192,7 @@ The daily job must:
 
 - run only in an approved test namespace
 - use a unique `chaos_scenario_id`
+- include at least one negative control for duplicate or resolved alert
 - clean up after itself
 - fail closed if alerting or remediation safety gates are unavailable
 - never perform production remediation automatically
@@ -165,8 +204,10 @@ Create or update dashboards that show:
 
 - alerts received by source
 - raw events vs normalized events
+- normalized actionable events vs dropped/quarantined events
 - Vector route counts by `target_agent` and `route_domain`
 - duplicate suppression count
+- noise suppression count by reason
 - Argo workflow count and status
 - ticket created count
 - ticket avoided or deflected count
@@ -190,11 +231,16 @@ CHAOS_SCENARIO: injected
 GRAFANA_ALERT_FIRED: verified
 EVENT_DELIVERY: verified
 VECTOR_NORMALIZED_EVENT: verified
+ACTIONABLE_TOPIC_CLEAN: verified
+NEGATIVE_CONTROLS: verified
+NOISE_FILTER: verified
+DEDUPE_BEFORE_ARGO: verified
 VECTOR_ROUTE_AGENT: verified
 ARGO_WORKFLOW_CREATED: verified
 SPECIALIST_AGENT_SELECTED: verified
 EVIDENCE_PACK_CREATED: verified
 TICKET_CREATED_OR_UPDATED: verified
+GITLAB_TICKET_TRIAGE_OR_REMEDIATION: verified
 REMEDIATION_GATE: verified_or_not_enabled
 CHAOS_ROLLBACK: verified
 ALERT_RESOLUTION: verified

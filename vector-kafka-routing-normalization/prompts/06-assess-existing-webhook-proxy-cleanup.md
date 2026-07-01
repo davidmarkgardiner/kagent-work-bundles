@@ -4,19 +4,19 @@ The work environment may already have a working alert path that looks like this:
 
 ```text
 Alertmanager or Grafana contact point
-  -> HTTP webhook POST
+  -> Kenawa webhook / HTTP webhook POST
   -> Vector HTTP receiver
   -> Grafana webhook Kafka proxy service
-  -> Confluent REST endpoint
   -> Kafka topic
   -> Argo EventSource
   -> Argo Sensor
   -> Argo Workflow
 ```
 
-This prompt is not permission to remove anything. Your job is to document the
-current chain, prove whether a cleaner chain can replace it, and return a safe
-cutover recommendation.
+This is now the proven work baseline from the previous test run. This prompt is
+not permission to remove anything. Your job is to document the current chain,
+preserve it, improve Vector filtering/dedupe/routing around it, prove whether a
+cleaner chain can replace it later, and return a safe cutover recommendation.
 
 ## Target Cleaner Chains
 
@@ -45,12 +45,15 @@ Avoid this unless there is a proven blocker:
 
 ```text
 Alertmanager / Grafana
-  -> webhook
+  -> Kenawa webhook
   -> Vector
   -> webhook-to-Kafka proxy
-  -> Confluent REST
   -> Argo
 ```
+
+For the current work run, this avoided path is still the control path because it
+has already been proven end to end. Do not remove it until the cleaner path has
+passed the same test evidence.
 
 ## Authentication Decision
 
@@ -99,8 +102,8 @@ Primary docs to check during the work-side run:
 
 Home-lab reference YAML to compare against:
 
-- `../../observability/vector/homelab/vector-http-receiver-to-kafka.yaml`
-- `../../observability/vector/homelab/vector-kafka-raw-to-normalized.yaml`
+- `payload/observability-vector/homelab/vector-http-receiver-to-kafka.yaml`
+- `payload/observability-vector/homelab/vector-kafka-raw-to-normalized.yaml`
 
 ## Work To Perform
 
@@ -108,15 +111,18 @@ Home-lab reference YAML to compare against:
 2. Identify every workload, service, contact point, topic, secret reference,
    and namespace in that path.
 3. Capture a sanitized current-state diagram.
-4. Confirm which component performs normalization today.
-5. Confirm which component publishes to Confluent today.
-6. Confirm whether the proxy service is only translating HTTP to Confluent REST
+4. Confirm the Kenawa webhook endpoint/service and how it is protected.
+5. Confirm which component performs normalization today.
+6. Confirm which component publishes to Kafka today.
+7. Confirm whether the proxy service is only translating HTTP to Kafka
    or whether it has any extra required logic.
-7. Test the cleaner direct Vector-to-Kafka path in parallel using safe topics.
-8. If available, test a Kafka-first source path in parallel using safe topics.
-9. Compare both paths with the same safe test alert payload.
-10. Confirm Argo receives the normalized event from the cleaner path.
-11. Capture a rollback plan before proposing any removal.
+8. Confirm Vector performs or will perform filtering, dedupe, route enrichment,
+   and actionable-topic cleanup before Argo sees the event.
+9. Test the cleaner direct Vector-to-Kafka path in parallel using safe topics.
+10. If available, test a Kafka-first source path in parallel using safe topics.
+11. Compare both paths with the same safe test alert payload.
+12. Confirm Argo receives the normalized event from the cleaner path.
+13. Capture a rollback plan before proposing any removal.
 
 ## Home-Lab Demonstration
 
@@ -143,6 +149,7 @@ The demo should show:
 
 ```text
 CURRENT_CHAIN: documented | blocked
+KENAWA_WEBHOOK: verified | blocked
 CLEAN_CHAIN: proposed | verified | blocked
 AUTH_OPTIONS: verified | blocked
 OAUTH_DECISION: supported | blocked | not_available
@@ -150,6 +157,7 @@ API_KEY_FALLBACK: documented | blocked
 VECTOR_DIRECT_KAFKA: verified | blocked
 KAFKA_FIRST_SOURCE: verified | blocked | not_applicable
 PROXY_SERVICE_ROLE: translation_only | extra_logic | unknown
+BASELINE_PRESERVED: yes | no
 PROXY_REMOVAL_DECISION: remove | keep | blocked
 ROLLBACK_PLAN: captured | blocked
 HOME_LAB_REPLICATION: planned | implemented | not_requested

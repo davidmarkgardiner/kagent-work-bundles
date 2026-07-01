@@ -1,0 +1,115 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: vector-alertmanager-triage-kafka
+  namespace: argo-events
+  labels:
+    app.kubernetes.io/part-of: confluent-cloud-pipeline
+    app.kubernetes.io/name: vector-alertmanager-triage-kafka
+spec:
+  template:
+    serviceAccountName: argo-events-sa
+    container:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+  kafka:
+    alertmanager-events-triage:
+      url: "{{CONFLUENT_BOOTSTRAP}}"
+      topic: "alertmanager-events-triage"
+      consumerGroup:
+        groupName: "{{ALERTMANAGER_TRIAGE_CONSUMER_GROUP}}"
+      tls:
+        caCertSecret:
+          name: confluent-public-ca
+          key: ca.pem
+      sasl:
+        mechanism: "PLAIN"
+        userSecret:
+          name: confluent-credentials
+          key: key
+        passwordSecret:
+          name: confluent-credentials
+          key: secret
+      jsonBody: true
+      partition: ""
+      version: "2.5.0"
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: vector-alertmanager-triage
+  namespace: argo-events
+  labels:
+    app.kubernetes.io/part-of: confluent-cloud-pipeline
+    app.kubernetes.io/name: vector-alertmanager-triage
+    event-type: prometheus-alert
+spec:
+  eventBusName: default
+  template:
+    serviceAccountName: argo-events-sa
+    container:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+  dependencies:
+    - name: alertmanager-triage-alert
+      eventSourceName: vector-alertmanager-triage-kafka
+      eventName: alertmanager-events-triage
+      filters:
+        data:
+          - path: body.schema_version
+            type: string
+            value:
+              - "observability.triage.v1"
+          - path: body.event_type
+            type: string
+            value:
+              - "prometheus-alert"
+          - path: body.alertmanager.status
+            type: string
+            value:
+              - "firing"
+  triggers:
+    - template:
+        name: alertmanager-triage
+        conditions: "alertmanager-triage-alert"
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: alert-triage-vector-
+                namespace: argo-events
+                labels:
+                  app.kubernetes.io/part-of: confluent-cloud-pipeline
+                  event-type: prometheus-alert
+                  event-source: vector
+              spec:
+                workflowTemplateRef:
+                  name: alertmanager-triage
+                arguments:
+                  parameters:
+                    - name: alert-payload
+          parameters:
+            - src:
+                dependencyName: alertmanager-triage-alert
+                dataKey: body.alertmanager
+              dest: spec.arguments.parameters.0.value
+      rateLimit:
+        requestsPerUnit: 5
+        unit: Minute
+      retryStrategy:
+        steps: 3
+        duration: 10s

@@ -1,0 +1,143 @@
+sources:
+  example_input:
+    type: stdin
+    decoding:
+      codec: json
+
+transforms:
+  normalize:
+    type: remap
+    inputs:
+      - example_input
+    source: |
+      original = .
+      .schema_version = "observability.triage.v1"
+      .normalized_at = now()
+      .raw = original
+      .raw_topic = "example-raw"
+      .normalized_topic = "example-triage"
+
+      .source = to_string(.source) ?? "unknown"
+      .event_type = "prometheus-alert"
+      cluster_value = to_string(.cluster) ?? ""
+      .cluster = if cluster_value != "" { cluster_value } else { "unknown" }
+      .environment = "unknown"
+      .severity = "warning"
+      .namespace = "unknown"
+      .object_kind = "Unknown"
+      .pod = ""
+      .service = "unknown"
+      .alert_name = "unknown"
+      .reason = "unknown"
+      .alert_status = "firing"
+      .incident_candidate = false
+      .automation_allowed = false
+      .automation_policy = "default-deny"
+
+      if exists(.alertmanager) {
+        .source = "alertmanager"
+        .event_type = "prometheus-alert"
+        .alert_status = to_string(.alertmanager.status) ?? "firing"
+        .alert_name = to_string(.alertmanager.alerts[0].labels.alertname) ?? to_string(.alertmanager.commonLabels.alertname) ?? "AlertmanagerAlert"
+        .severity = to_string(.alertmanager.alerts[0].labels.severity) ?? to_string(.alertmanager.commonLabels.severity) ?? "warning"
+        .namespace = to_string(.alertmanager.alerts[0].labels.namespace) ?? to_string(.alertmanager.commonLabels.namespace) ?? "unknown"
+        .pod = to_string(.alertmanager.alerts[0].labels.pod) ?? ""
+        .service = to_string(.alertmanager.alerts[0].labels.service) ?? to_string(.alertmanager.commonLabels.service) ?? "unknown"
+        .environment = to_string(.alertmanager.alerts[0].labels.environment) ?? "unknown"
+        .object_kind = if .pod != "" { "Pod" } else { "Service" }
+        .reason = to_string(.alertmanager.alerts[0].labels.reason) ?? .alert_name
+      } else if exists(.client) && .client == "Grafana" {
+        .source = "grafana"
+        .event_type = "grafana-alert"
+        .alert_status = if exists(.state) && .state == "ok" { "resolved" } else { "firing" }
+        .alert_name = to_string(.ruleName) ?? to_string(.incident_key) ?? "GrafanaAlert"
+        .severity = to_string(.labels.severity) ?? "warning"
+        .namespace = to_string(.labels.namespace) ?? "unknown"
+        .service = to_string(.labels.service) ?? "unknown"
+        .environment = to_string(.labels.environment) ?? "unknown"
+        .object_kind = "Service"
+        .reason = .alert_name
+        .alertmanager = {
+          "status": .alert_status,
+          "alerts": [{
+            "status": .alert_status,
+            "labels": {
+              "alertname": .alert_name,
+              "severity": .severity,
+              "namespace": .namespace,
+              "service": .service,
+              "environment": .environment,
+              "source": "grafana"
+            },
+            "annotations": {
+              "summary": to_string(.description) ?? to_string(.title) ?? "Grafana alert",
+              "details": to_string(.details) ?? ""
+            }
+          }]
+        }
+      } else if exists(.involvedObject) {
+        .source = "alloy"
+        .event_type = "kubernetes-event"
+        .alert_status = "firing"
+        .severity = if exists(.type) && .type == "Warning" { "warning" } else { "info" }
+        .namespace = to_string(.involvedObject.namespace) ?? to_string(.metadata.namespace) ?? "unknown"
+        .object_kind = to_string(.involvedObject.kind) ?? "Unknown"
+        .pod = if .object_kind == "Pod" { to_string(.involvedObject.name) ?? "" } else { "" }
+        .service = to_string(.labels.service) ?? "unknown"
+        .environment = to_string(.labels.environment) ?? "unknown"
+        .reason = to_string(original.reason) ?? "unknown"
+        .alert_name = .reason
+      }
+
+      if .severity == "critical" || .environment == "prod" {
+        .incident_candidate = true
+      }
+
+      if .event_type == "security-advisory" || includes(["platform-security", "security"], .namespace) {
+        .target_agent = "security-hardening-agent"
+        .route_domain = "security"
+        .routing_reason = "security or compliance event"
+      } else if starts_with(.namespace, "kube-") || starts_with(.namespace, "istio-") || starts_with(.namespace, "argo-") || .namespace == "monitoring" || .namespace == "platform-tools" {
+        .target_agent = "platform-ops-agent"
+        .route_domain = "platform"
+        .routing_reason = "platform namespace or control-plane event"
+      } else if .service != "unknown" && .service != "" {
+        .target_agent = "aks-sre-triage-agent"
+        .route_domain = "application"
+        .routing_reason = "application service event"
+      } else {
+        .target_agent = "sre-triage-agent"
+        .route_domain = "fallback"
+        .routing_reason = "missing stable service ownership"
+      }
+
+      service_for_key = if .service == "" { "unknown" } else { .service }
+      .route_key = join!([.route_domain, .environment, .namespace, service_for_key, .severity, .target_agent], ".")
+      .dedupe_key = join!([.cluster, .namespace, service_for_key, .alert_name], ":")
+
+  accepted_events:
+    type: filter
+    inputs:
+      - normalize
+    condition:
+      type: vrl
+      source: '.alert_status == "firing"'
+
+  suppress_duplicates:
+    type: dedupe
+    inputs:
+      - accepted_events
+    fields:
+      match:
+        - dedupe_key
+    cache:
+      num_events: 1000
+
+sinks:
+  stdout:
+    type: console
+    inputs:
+      - suppress_duplicates
+    target: stdout
+    encoding:
+      codec: json

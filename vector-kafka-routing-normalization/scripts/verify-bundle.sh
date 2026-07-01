@@ -2,7 +2,6 @@
 set -euo pipefail
 
 BUNDLE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-REPO_ROOT="$(cd "${BUNDLE_ROOT}/../.." && pwd)"
 cd "${BUNDLE_ROOT}"
 
 echo "== Vector Kafka routing normalization work-agent bundle verifier =="
@@ -35,6 +34,16 @@ required=(
   "FAILURE-MODE-TESTS.md"
   "PROMOTION-GATE.md"
   "payload/REFERENCE.md"
+  "payload/observability-vector/README.md"
+  "payload/observability-vector/manifests/01-vector-alertmanager-normalizer.yaml"
+  "payload/observability-vector/manifests/02-argo-alertmanager-triage-topic.yaml"
+  "payload/observability-vector/manifests/03-argo-routing-verification.yaml"
+  "payload/observability-vector/tests/run-vector-example-tests.sh"
+  "payload/observability-vector/tests/vector-example-test.yaml"
+  "payload/observability-vector/handoff/FEEDBACK.md"
+  "payload/observability-vector/homelab/README.md"
+  "payload/observability-vector/homelab/vector-http-receiver-to-kafka.yaml"
+  "payload/observability-vector/homelab/vector-kafka-raw-to-normalized.yaml"
   "evidence/EVIDENCE-TEMPLATE.md"
 )
 
@@ -46,31 +55,13 @@ for rel in "${required[@]}"; do
   echo "FOUND ${rel}"
 done
 
-repo_required=(
-  "observability/vector/README.md"
-  "observability/vector/manifests/01-vector-alertmanager-normalizer.yaml"
-  "observability/vector/manifests/02-argo-alertmanager-triage-topic.yaml"
-  "observability/vector/manifests/03-argo-routing-verification.yaml"
-  "observability/vector/tests/run-vector-example-tests.sh"
-  "observability/vector/tests/vector-example-test.yaml"
-  "observability/vector/handoff/FEEDBACK.md"
-  "observability/vector/homelab/README.md"
-  "observability/vector/homelab/vector-http-receiver-to-kafka.yaml"
-  "observability/vector/homelab/vector-kafka-raw-to-normalized.yaml"
-)
-
-for rel in "${repo_required[@]}"; do
-  if [[ ! -f "${REPO_ROOT}/${rel}" ]]; then
-    echo "MISSING_REPO_REFERENCE ${rel}" >&2
-    exit 1
-  fi
-  echo "FOUND_REPO_REFERENCE ${rel}"
-done
-
 for marker in \
   "BUNDLE_VERIFY: passed" \
   "ENV_PREFLIGHT: passed_or_blocked" \
   "EXISTING_VECTOR: discovered" \
+  "WORK_BASELINE_CHAIN: documented" \
+  "KENAWA_WEBHOOK: verified" \
+  "WEBHOOK_TO_KAFKA_PROXY: verified" \
   "VECTOR_IMAGE: captured" \
   "VECTOR_NAMESPACE: captured" \
   "CONFLUENT_CONNECTION_SECRET: located" \
@@ -147,15 +138,22 @@ grep -q "Promotion Gate" "PROMOTION-GATE.md"
 grep -q "Known-Good Scenario Pack" "scenarios/SCENARIO-PACK.md"
 grep -q "LGTM To Agentic Resolution Showcase Runbook" "SHOWCASE-RUNBOOK.md"
 grep -q "VECTOR_SECRET_REFS_NAMES_ONLY" "prompts/01-preflight-env-tools.md"
-grep -q "suppress_duplicates" "${REPO_ROOT}/observability/vector/manifests/01-vector-alertmanager-normalizer.yaml"
-grep -q "accepted_events" "${REPO_ROOT}/observability/vector/manifests/01-vector-alertmanager-normalizer.yaml"
-grep -q "readinessProbe" "${REPO_ROOT}/observability/vector/manifests/01-vector-alertmanager-normalizer.yaml"
-grep -q "livenessProbe" "${REPO_ROOT}/observability/vector/manifests/01-vector-alertmanager-normalizer.yaml"
+grep -q "suppress_duplicates" "payload/observability-vector/manifests/01-vector-alertmanager-normalizer.yaml"
+grep -q "accepted_events" "payload/observability-vector/manifests/01-vector-alertmanager-normalizer.yaml"
+grep -q "readinessProbe" "payload/observability-vector/manifests/01-vector-alertmanager-normalizer.yaml"
+grep -q "livenessProbe" "payload/observability-vector/manifests/01-vector-alertmanager-normalizer.yaml"
 echo "PROMPT_CONTRACT_OK: yes"
 
-if grep -RInE \
-  '(Bearer[[:space:]]+[A-Za-z0-9._-]+|token=|password:|secret:|pkc-[A-Za-z0-9-]+|lkc-[A-Za-z0-9-]+|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|10\.[0-9]{1,3}\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)' \
-  --exclude='verify-bundle.sh' .; then
+public_safety_hits="$(
+  grep -RInE \
+    '(Bearer[[:space:]]+[A-Za-z0-9._-]+|token=|password:|secret:|pkc-[A-Za-z0-9-]+|lkc-[A-Za-z0-9-]+|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|10\.[0-9]{1,3}\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)' \
+    --exclude='verify-bundle.sh' . \
+    | grep -Ev 'sasl\.password: "\$\{CONFLUENT_SA_SECRET\}"|secret: "\{\{CONFLUENT_KAFKA_API_SECRET\}\}"' \
+    || true
+)"
+
+if [[ -n "${public_safety_hits}" ]]; then
+  echo "${public_safety_hits}"
   echo "PUBLIC_SAFETY_HITS: review output above" >&2
   exit 1
 fi

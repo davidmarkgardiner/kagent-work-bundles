@@ -14,13 +14,41 @@ connectivity is already configured, and the Manager/Grafana contact point
 already exists. The work agent must discover and confirm those prerequisites
 before creating a new Vector instance or applying manifests.
 
-If the work environment already has a working webhook/proxy path, do not break
-it. First document it, then prove a cleaner path in parallel:
+## Work Baseline To Preserve
+
+The work environment has already proven an end-to-end path. Treat this as the
+baseline, not as theory:
 
 ```text
-current possible path:
-Alertmanager/Grafana -> webhook -> Vector -> webhook-to-Kafka proxy
-  -> Confluent REST -> Kafka -> Argo
+Alertmanager / Grafana alert
+  -> Kenawa webhook
+  -> Vector
+  -> webhook-to-Kafka proxy
+  -> Kafka
+  -> Argo EventSource / Sensor
+  -> Argo Workflow
+```
+
+The next work-side agent should iterate over this working path. Do not replace,
+delete, or bypass the Kenawa webhook, Vector deployment, proxy, Kafka topic, or
+Argo trigger until the current chain is documented, rollback is captured, and a
+cleaner path has been proven in parallel.
+
+The immediate improvement is signal quality:
+
+- Vector should filter resolved/non-actionable/noisy alerts.
+- Vector should suppress duplicates before the actionable Kafka topic.
+- Only actionable alerts should reach the Kafka topic consumed by Argo.
+- Argo should trust the normalized/actionable topic and avoid carrying the main
+  cleanup logic.
+
+If the work environment later wants to simplify the chain, compare the existing
+baseline with cleaner candidate paths in parallel:
+
+```text
+verified current path:
+Alertmanager/Grafana -> Kenawa webhook -> Vector -> webhook-to-Kafka proxy
+  -> Kafka -> Argo
 
 clean target path:
 Alertmanager/Grafana -> Kafka raw topic -> Vector -> Kafka normalized topic
@@ -31,7 +59,8 @@ Alertmanager/Grafana -> Vector HTTP receiver -> Kafka normalized topic -> Argo
 ```
 
 The design decision is to remove avoidable webhook/proxy services only after the
-clean path is verified and rollback is documented.
+clean path is verified and rollback is documented. Until then, the working path
+is the control path.
 
 ## What This Feature Does
 
@@ -46,30 +75,47 @@ clean path is verified and rollback is documented.
 - Provides a synthetic route-verification workflow that does not call GitLab,
   Teams, Mattermost, ServiceNow, or a real agent.
 
-## Source Artifacts
+## Copy / Upload Folder
 
-The implementation reference lives in:
+Copy this single folder to the work agent:
 
 ```text
-../../observability/vector/
+work-agent-bundles/vector-kafka-routing-normalization/
+```
+
+It now includes the prompt, checklists, chaos examples, dashboard example, and
+the relevant Vector reference manifests under `payload/observability-vector/`.
+You should not need to copy the wider repo for this handoff.
+
+Start the other agent with:
+
+```text
+WORK-AGENT-START-PROMPT.md
+```
+
+## Source Artifacts
+
+The implementation reference is bundled locally in:
+
+```text
+payload/observability-vector/
 ```
 
 Key files:
 
 ```text
-../../observability/vector/README.md
-../../observability/vector/manifests/
-../../observability/vector/homelab/
-../../observability/vector/examples/
-../../observability/vector/tests/
-../../observability/vector/handoff/
+payload/observability-vector/README.md
+payload/observability-vector/manifests/
+payload/observability-vector/homelab/
+payload/observability-vector/tests/
+payload/observability-vector/handoff/
 ```
 
 Home-lab reference YAML for the two cleanup options lives in:
 
 ```text
-../../observability/vector/homelab/vector-http-receiver-to-kafka.yaml
-../../observability/vector/homelab/vector-kafka-raw-to-normalized.yaml
+payload/observability-vector/homelab/vector-http-receiver-to-kafka.yaml
+payload/observability-vector/homelab/vector-kafka-raw-to-normalized.yaml
 ```
 
 Use these as implementation references when deciding whether work can remove the
@@ -161,6 +207,8 @@ Reference these primary docs during the work-side check:
 
 The bundle is complete only when the work environment has proven:
 
+- the existing Kenawa webhook -> Vector -> proxy -> Kafka -> Argo path is
+  documented and preserved until a replacement is proven
 - raw events are retained in raw Kafka topics
 - Vector emits normalized `observability.triage.v1` records
 - Grafana MCP can fire a safe test alert through the existing Manager/Grafana

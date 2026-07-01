@@ -3,7 +3,7 @@
 Adapt the public-safe manifests from:
 
 ```text
-../../observability/vector/manifests/
+payload/observability-vector/manifests/
 ```
 
 Use approved work values for:
@@ -23,6 +23,25 @@ kubectl apply --dry-run=server -f <adapted-manifests>
 
 Deploy only after dry run passes.
 
+Vector must own the cleanup boundary. The config should make these stages clear
+and testable:
+
+```text
+raw input
+  -> schema/shape normalization
+  -> status filter
+  -> severity / namespace / service noise filter
+  -> owner and route enrichment
+  -> dedupe key generation
+  -> duplicate suppression
+  -> actionable Kafka sink
+  -> optional metrics/quarantine sink for dropped events
+```
+
+The actionable Kafka sink must receive only records that should be reviewed by
+an agent. Argo must not be used as the primary place to filter resolved alerts,
+noise, malformed events, or duplicates.
+
 Required checks:
 
 ```bash
@@ -40,6 +59,10 @@ VECTOR_ROLLOUT: healthy
 IMAGE:
 PROBES:
 FILTER_STAGE: present
+NOISE_FILTER_STAGE: present
+ROUTE_ENRICHMENT_STAGE: present
 DEDUPE_STAGE: present
+ACTIONABLE_SINK: present
+QUARANTINE_OR_DROP_DECISION: captured
 NEXT_ACTION:
 ```

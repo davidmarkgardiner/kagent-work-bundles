@@ -1,0 +1,176 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: vector-routing-verification
+  namespace: argo-events
+  labels:
+    app.kubernetes.io/part-of: confluent-cloud-pipeline
+    app.kubernetes.io/name: vector-routing-verification
+spec:
+  serviceAccountName: argo-events-sa
+  entrypoint: verify-route
+  podGC:
+    strategy: OnPodCompletion
+  ttlStrategy:
+    secondsAfterCompletion: 300
+    secondsAfterSuccess: 300
+    secondsAfterFailure: 600
+  arguments:
+    parameters:
+      - name: target-agent
+      - name: route-key
+      - name: routing-reason
+      - name: event-type
+      - name: namespace
+      - name: service
+      - name: pod
+      - name: severity
+      - name: dedupe-key
+  templates:
+    - name: verify-route
+      script:
+        image: badouralix/curl-jq:alpine
+        command:
+          - sh
+        resources:
+          requests:
+            cpu: 25m
+            memory: 32Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        source: |
+          #!/bin/sh
+          set -eu
+
+          jq -n \
+            --arg target_agent "{{workflow.parameters.target-agent}}" \
+            --arg route_key "{{workflow.parameters.route-key}}" \
+            --arg routing_reason "{{workflow.parameters.routing-reason}}" \
+            --arg event_type "{{workflow.parameters.event-type}}" \
+            --arg namespace "{{workflow.parameters.namespace}}" \
+            --arg service "{{workflow.parameters.service}}" \
+            --arg pod "{{workflow.parameters.pod}}" \
+            --arg severity "{{workflow.parameters.severity}}" \
+            --arg dedupe_key "{{workflow.parameters.dedupe-key}}" \
+            '{
+              target_agent: $target_agent,
+              route_key: $route_key,
+              routing_reason: $routing_reason,
+              event_type: $event_type,
+              namespace: $namespace,
+              service: $service,
+              pod: $pod,
+              severity: $severity,
+              dedupe_key: $dedupe_key
+            }'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: vector-routing-verification
+  namespace: argo-events
+  labels:
+    app.kubernetes.io/part-of: confluent-cloud-pipeline
+    app.kubernetes.io/name: vector-routing-verification
+spec:
+  eventBusName: default
+  template:
+    serviceAccountName: argo-events-sa
+    container:
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+  dependencies:
+    - name: route-test-event
+      eventSourceName: vector-alertmanager-triage-kafka
+      eventName: alertmanager-events-triage
+      filters:
+        data:
+          - path: body.schema_version
+            type: string
+            value:
+              - "observability.triage.v1"
+          - path: body.routing_test
+            type: string
+            value:
+              - "true"
+  triggers:
+    - template:
+        name: create-route-verification-workflow
+        conditions: "route-test-event"
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: vector-route-verify-
+                namespace: argo-events
+                labels:
+                  app.kubernetes.io/part-of: confluent-cloud-pipeline
+                  event-source: vector
+                  event-type: route-verification
+              spec:
+                workflowTemplateRef:
+                  name: vector-routing-verification
+                arguments:
+                  parameters:
+                    - name: target-agent
+                    - name: route-key
+                    - name: routing-reason
+                    - name: event-type
+                    - name: namespace
+                    - name: service
+                    - name: pod
+                    - name: severity
+                    - name: dedupe-key
+          parameters:
+            - src:
+                dependencyName: route-test-event
+                dataKey: body.target_agent
+              dest: spec.arguments.parameters.0.value
+            - src:
+                dependencyName: route-test-event
+                dataKey: body.route_key
+              dest: spec.arguments.parameters.1.value
+            - src:
+                dependencyName: route-test-event
+                dataKey: body.routing_reason
+              dest: spec.arguments.parameters.2.value
+            - src:
+                dependencyName: route-test-event
+                dataKey: body.event_type
+              dest: spec.arguments.parameters.3.value
+            - src:
+                dependencyName: route-test-event
+                dataKey: body.namespace
+              dest: spec.arguments.parameters.4.value
+            - src:
+                dependencyName: route-test-event
+                dataKey: body.service
+              dest: spec.arguments.parameters.5.value
+            - src:
+                dependencyName: route-test-event
+                dataKey: body.pod
+              dest: spec.arguments.parameters.6.value
+            - src:
+                dependencyName: route-test-event
+                dataKey: body.severity
+              dest: spec.arguments.parameters.7.value
+            - src:
+                dependencyName: route-test-event
+                dataKey: body.dedupe_key
+              dest: spec.arguments.parameters.8.value
+      rateLimit:
+        requestsPerUnit: 10
+        unit: Minute
+      retryStrategy:
+        steps: 3
+        duration: 10s

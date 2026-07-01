@@ -1,0 +1,222 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vector-alert-kafka-normalizer-config
+  namespace: argo-events
+  labels:
+    app.kubernetes.io/name: vector-alert-kafka-normalizer
+    app.kubernetes.io/part-of: confluent-cloud-pipeline
+data:
+  vector.yaml: |
+    api:
+      enabled: true
+      address: 0.0.0.0:8686
+
+    sources:
+      alertmanager_raw:
+        type: kafka
+        bootstrap_servers: "${CONFLUENT_BOOTSTRAP}"
+        group_id: vector-alert-kafka-normalizer
+        topics:
+          - alertmanager-events
+        decoding:
+          codec: json
+        librdkafka_options:
+          security.protocol: sasl_ssl
+          sasl.mechanism: PLAIN
+          sasl.username: "${CONFLUENT_SA_KEY}"
+          sasl.password: "${CONFLUENT_SA_SECRET}"
+
+    transforms:
+      normalize_alert:
+        type: remap
+        inputs:
+          - alertmanager_raw
+        source: |
+          original = .
+          .raw_topic = "alertmanager-events"
+          .schema_version = "observability.triage.v1"
+          .normalized_at = now()
+          .raw = original
+          .source = to_string(.source) ?? "unknown"
+          .event_type = "prometheus-alert"
+          .cluster = to_string(.cluster) ?? "unknown"
+          .environment = "unknown"
+          .severity = "warning"
+          .namespace = "unknown"
+          .object_kind = "Unknown"
+          .pod = ""
+          .service = "unknown"
+          .alert_name = "unknown"
+          .reason = "unknown"
+          .alert_status = "firing"
+          .incident_candidate = false
+          .automation_allowed = false
+          .automation_policy = "default-deny"
+
+          if exists(.alertmanager) {
+            .source = "alertmanager"
+            .alert_status = to_string(.alertmanager.status) ?? "firing"
+            .alert_name = to_string(.alertmanager.alerts[0].labels.alertname) ?? to_string(.alertmanager.commonLabels.alertname) ?? "AlertmanagerAlert"
+            .severity = to_string(.alertmanager.alerts[0].labels.severity) ?? to_string(.alertmanager.commonLabels.severity) ?? "warning"
+            .namespace = to_string(.alertmanager.alerts[0].labels.namespace) ?? to_string(.alertmanager.commonLabels.namespace) ?? "unknown"
+            .pod = to_string(.alertmanager.alerts[0].labels.pod) ?? ""
+            .service = to_string(.alertmanager.alerts[0].labels.service) ?? to_string(.alertmanager.commonLabels.service) ?? "unknown"
+            .environment = to_string(.alertmanager.alerts[0].labels.environment) ?? "unknown"
+            .object_kind = if .pod != "" { "Pod" } else { "Service" }
+            .reason = .alert_name
+          } else if exists(.client) && .client == "Grafana" {
+            .source = "grafana"
+            .event_type = "grafana-alert"
+            .alert_status = if exists(.state) && .state == "ok" { "resolved" } else { "firing" }
+            .alert_name = to_string(.ruleName) ?? to_string(.incident_key) ?? "GrafanaAlert"
+            .severity = to_string(.labels.severity) ?? "warning"
+            .namespace = to_string(.labels.namespace) ?? "unknown"
+            .service = to_string(.labels.service) ?? "unknown"
+            .environment = to_string(.labels.environment) ?? "unknown"
+            .object_kind = "Service"
+            .reason = .alert_name
+            .alertmanager = {
+              "status": .alert_status,
+              "alerts": [{
+                "status": .alert_status,
+                "labels": {
+                  "alertname": .alert_name,
+                  "severity": .severity,
+                  "namespace": .namespace,
+                  "service": .service,
+                  "environment": .environment,
+                  "source": "grafana"
+                },
+                "annotations": {
+                  "summary": to_string(.description) ?? to_string(.title) ?? "Grafana alert"
+                }
+              }]
+            }
+          }
+
+          if .severity == "critical" || .environment == "prod" {
+            .incident_candidate = true
+          }
+
+          if includes(["platform-security", "security"], .namespace) {
+            .target_agent = "security-hardening-agent"
+            .route_domain = "security"
+            .routing_reason = "security or compliance event"
+          } else if starts_with(.namespace, "kube-") || starts_with(.namespace, "istio-") || starts_with(.namespace, "argo-") || .namespace == "monitoring" || .namespace == "platform-tools" {
+            .target_agent = "platform-ops-agent"
+            .route_domain = "platform"
+            .routing_reason = "platform namespace or control-plane event"
+          } else if .service != "unknown" && .service != "" {
+            .target_agent = "aks-sre-triage-agent"
+            .route_domain = "application"
+            .routing_reason = "application service event"
+          } else {
+            .target_agent = "sre-triage-agent"
+            .route_domain = "fallback"
+            .routing_reason = "missing stable service ownership"
+          }
+
+          service_for_key = if .service == "" { "unknown" } else { .service }
+          .route_key = join!([.route_domain, .environment, .namespace, service_for_key, .severity, .target_agent], ".")
+          .dedupe_key = join!([.cluster, .namespace, service_for_key, .alert_name], ":")
+
+      accepted_events:
+        type: filter
+        inputs:
+          - normalize_alert
+        condition:
+          type: vrl
+          source: '.alert_status == "firing"'
+
+      suppress_duplicates:
+        type: dedupe
+        inputs:
+          - accepted_events
+        fields:
+          match:
+            - dedupe_key
+        cache:
+          num_events: 1000
+
+    sinks:
+      alertmanager_triage:
+        type: kafka
+        inputs:
+          - suppress_duplicates
+        bootstrap_servers: "${CONFLUENT_BOOTSTRAP}"
+        topic: alertmanager-events-triage
+        encoding:
+          codec: json
+        librdkafka_options:
+          security.protocol: sasl_ssl
+          sasl.mechanism: PLAIN
+          sasl.username: "${CONFLUENT_SA_KEY}"
+          sasl.password: "${CONFLUENT_SA_SECRET}"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vector-alert-kafka-normalizer
+  namespace: argo-events
+  labels:
+    app.kubernetes.io/name: vector-alert-kafka-normalizer
+    app.kubernetes.io/part-of: confluent-cloud-pipeline
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vector-alert-kafka-normalizer
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vector-alert-kafka-normalizer
+        app.kubernetes.io/part-of: confluent-cloud-pipeline
+    spec:
+      containers:
+        - name: vector
+          image: timberio/vector:0.45.0-debian
+          imagePullPolicy: IfNotPresent
+          args:
+            - --config
+            - /etc/vector/vector.yaml
+          env:
+            - name: CONFLUENT_BOOTSTRAP
+              valueFrom:
+                secretKeyRef:
+                  name: confluent-credentials
+                  key: bootstrap
+            - name: CONFLUENT_SA_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: confluent-credentials
+                  key: key
+            - name: CONFLUENT_SA_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: confluent-credentials
+                  key: secret
+          ports:
+            - name: api
+              containerPort: 8686
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: api
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: api
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          volumeMounts:
+            - name: config
+              mountPath: /etc/vector
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: vector-alert-kafka-normalizer-config
