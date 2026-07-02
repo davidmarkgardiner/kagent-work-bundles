@@ -106,6 +106,8 @@ Record every pause action and rollback command.
 Prefer the Argo CLI when available:
 
 ```bash
+kubectl config current-context
+
 argo delete -A --completed --older 14d --dry-run --query-chunk-size 500
 argo delete -A --completed --older 14d --query-chunk-size 500
 
@@ -116,12 +118,99 @@ argo delete -A --completed --older 3d --dry-run --query-chunk-size 500
 argo delete -A --completed --older 3d --query-chunk-size 500
 ```
 
+If `kubectl config current-context` is empty, the Argo CLI will fail with:
+
+```text
+Error: invalid configuration: no configuration has been provided, try setting KUBERNETES_MASTER environment variable
+```
+
+Either select the target context first:
+
+```bash
+kubectl config use-context {{MGMT_KUBE_CONTEXT}}
+```
+
+or pass the context explicitly on every command:
+
+```bash
+argo --context {{MGMT_KUBE_CONTEXT}} delete -A --completed --older 14d --dry-run --query-chunk-size 500
+argo --context {{MGMT_KUBE_CONTEXT}} delete -A --completed --older 14d --query-chunk-size 500
+```
+
 Tighten the retention gradually. Watch API server, etcd, Argo controller, and
 namespace workflow counts between each pass.
 
 If Argo CLI access is not available, use Kubernetes deletion carefully by
 namespace and label/field scope. Do not run a blanket `kubectl delete wf -A
 --all` unless the platform owner has explicitly approved that loss of evidence.
+
+Validation note: this command shape was verified with Argo CLI `v3.7.1` against
+the local `kind-argo-workflow` context using two labelled test workflows. The
+dry-run selected only the labelled terminal workflows, and the non-dry-run
+deleted them. The same test also confirmed that `--completed` includes terminal
+`Error` workflows, so keep the staged retention policy if failed/error workflow
+evidence must be retained longer than successful runs.
+
+### 3a. Large Backlog Fast Path
+
+For very large backlogs, for example `{{WORKFLOW_COUNT}}` in the hundreds of
+thousands, `argo delete --completed` can be too slow because it still deletes
+workflows one at a time. `--query-chunk-size` chunks the list request, not the
+delete operations.
+
+Use the bundled batched deleter when the Argo CLI path is too slow:
+
+```bash
+cd work-agent-bundles/argo-workflow-retention-cleanup
+
+./scripts/delete-completed-workflows-batched.sh \
+  --context {{MGMT_KUBE_CONTEXT}} \
+  --older 14d \
+  --batch-size 200 \
+  --parallel 4 \
+  --dry-run
+
+./scripts/delete-completed-workflows-batched.sh \
+  --context {{MGMT_KUBE_CONTEXT}} \
+  --older 14d \
+  --batch-size 200 \
+  --parallel 4 \
+  --yes
+```
+
+Then tighten gradually:
+
+```bash
+./scripts/delete-completed-workflows-batched.sh --context {{MGMT_KUBE_CONTEXT}} --older 7d --batch-size 200 --parallel 4 --dry-run
+./scripts/delete-completed-workflows-batched.sh --context {{MGMT_KUBE_CONTEXT}} --older 7d --batch-size 200 --parallel 4 --yes
+
+./scripts/delete-completed-workflows-batched.sh --context {{MGMT_KUBE_CONTEXT}} --older 3d --batch-size 200 --parallel 4 --dry-run
+./scripts/delete-completed-workflows-batched.sh --context {{MGMT_KUBE_CONTEXT}} --older 3d --batch-size 200 --parallel 4 --yes
+```
+
+The script:
+
+- lists candidate workflows once per pass using `kubectl get workflows -o json`;
+- filters by age and terminal phase with `jq`;
+- deletes many workflow names per `kubectl delete` request;
+- limits concurrent delete requests with `--parallel`;
+- requires `--dry-run` or explicit `--yes`.
+
+Start with `--batch-size 100 --parallel 2` on a pressured management cluster.
+Increase to `--batch-size 200 --parallel 4` only if API server, etcd, and Argo
+controller health remain stable. Avoid high parallelism; deleting 250,000 CRs is
+still API-server and etcd work even when client-side round trips are reduced.
+
+If failed/error workflows need longer retention, clean successful workflows
+first:
+
+```bash
+./scripts/delete-completed-workflows-batched.sh \
+  --context {{MGMT_KUBE_CONTEXT}} \
+  --older 1d \
+  --phases Succeeded \
+  --dry-run
+```
 
 ### 4. Treat Stale Running Or Idle Workflows Separately
 
