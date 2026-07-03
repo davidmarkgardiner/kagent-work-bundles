@@ -144,6 +144,17 @@ For the work-specific two-cluster chaos verification, use
 management cluster running Grafana/Prometheus and the separate events cluster
 running Vector, Kafka access, Argo Events, Argo Workflows, and the agent path.
 
+For Kafka topic naming and split decisions, use
+[`KAFKA-TOPIC-DESIGN-README.md`](KAFKA-TOPIC-DESIGN-README.md). It explains why
+the first rollout should usually start with one actionable topic plus optional
+quarantine/audit topics, then split by route domain only when needed.
+
+For the specific Grafana UI alert rule -> webhook -> Vector payload shape, use
+[`GRAFANA-WEBHOOK-PAYLOAD-PROOF-README.md`](GRAFANA-WEBHOOK-PAYLOAD-PROOF-README.md).
+It records the home-lab verification and the key parsing rule: read
+`alerts[].labels` for per-alert fields such as `pod`, then fall back to
+`commonLabels`.
+
 ## Evidence From Public Spike
 
 Verified in the public/sanitized environment:
