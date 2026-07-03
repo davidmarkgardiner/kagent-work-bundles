@@ -155,6 +155,13 @@ It records the home-lab verification and the key parsing rule: read
 `alerts[].labels` for per-alert fields such as `pod`, then fall back to
 `commonLabels`.
 
+For the richer triage-agent context contract, use
+[`RICH-ALERT-CONTEXT-README.md`](RICH-ALERT-CONTEXT-README.md) and
+[`prompts/08-prove-rich-alert-context.md`](prompts/08-prove-rich-alert-context.md).
+This proves that `event_name`, `event_reason`, resource identity, routing
+labels, and investigation annotations can be sent through the webhook path when
+the alert rule supplies them.
+
 ## Evidence From Public Spike
 
 Verified in the public/sanitized environment:
