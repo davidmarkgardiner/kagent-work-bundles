@@ -33,6 +33,7 @@ required=(
   "TICKET-QUALITY-CONTRACT.md"
   "FAILURE-MODE-TESTS.md"
   "PROMOTION-GATE.md"
+  "TWO-CLUSTER-CHAOS-README.md"
   "payload/REFERENCE.md"
   "payload/observability-vector/README.md"
   "payload/observability-vector/manifests/01-vector-alertmanager-normalizer.yaml"

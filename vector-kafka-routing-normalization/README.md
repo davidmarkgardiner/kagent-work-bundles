@@ -139,6 +139,11 @@ path. Use [`scenarios/SCENARIO-PACK.md`](scenarios/SCENARIO-PACK.md),
 [`FAILURE-MODE-TESTS.md`](FAILURE-MODE-TESTS.md), and
 [`PROMOTION-GATE.md`](PROMOTION-GATE.md) before rollout.
 
+For the work-specific two-cluster chaos verification, use
+[`TWO-CLUSTER-CHAOS-README.md`](TWO-CLUSTER-CHAOS-README.md). It covers the
+management cluster running Grafana/Prometheus and the separate events cluster
+running Vector, Kafka access, Argo Events, Argo Workflows, and the agent path.
+
 ## Evidence From Public Spike
 
 Verified in the public/sanitized environment:
