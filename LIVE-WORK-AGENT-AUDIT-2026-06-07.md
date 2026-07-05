@@ -43,9 +43,9 @@ cluster state allowed it:
   read-only as documented.
 - Re-ran the front-door/specialist governance audit and found no dangerous
   tools on the checked triage agents.
-- Checked GCloud Secret Manager and found a valid GitLab API token in
-  `radiant-pen-425209-e5/gitlab-token-holmes`. Refreshed the home-lab
-  Kubernetes GitLab secrets from that value without printing it.
+- Checked the approved secret manager and found a valid GitLab API token at
+  `{{SECRET_MANAGER_PROJECT}}/{{GITLAB_TOKEN_SECRET_NAME}}`. Refreshed the
+  home-lab Kubernetes GitLab secrets from that value without printing it.
 - Proved the GitLab-lite MCP pod can call GitLab `/api/v4/user` with HTTP 200,
   and its MCP `tools/list` exposes `gitlab_create_mr_demo`.
 - Confirmed the official hosted GitLab MCP remains blocked after token refresh:
