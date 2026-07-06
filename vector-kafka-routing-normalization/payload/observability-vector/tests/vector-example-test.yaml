@@ -33,45 +33,114 @@ transforms:
       .incident_candidate = false
       .automation_allowed = false
       .automation_policy = "default-deny"
+      .event_name = ""
+      .event_reason = ""
+      .event_context = ""
+      .suggested_kubectl = ""
+      .suggested_log_query = ""
+      .runbook_url = ""
+      .dashboard_url = ""
 
       if exists(.alertmanager) {
         .source = "alertmanager"
         .event_type = "prometheus-alert"
         .alert_status = to_string(.alertmanager.status) ?? "firing"
         .alert_name = to_string(.alertmanager.alerts[0].labels.alertname) ?? to_string(.alertmanager.commonLabels.alertname) ?? "AlertmanagerAlert"
+        alert_cluster = to_string(.alertmanager.alerts[0].labels.cluster) ?? ""
+        common_cluster = to_string(.alertmanager.commonLabels.cluster) ?? ""
+        .cluster = if alert_cluster != "" { alert_cluster } else if common_cluster != "" { common_cluster } else { .cluster }
         .severity = to_string(.alertmanager.alerts[0].labels.severity) ?? to_string(.alertmanager.commonLabels.severity) ?? "warning"
         .namespace = to_string(.alertmanager.alerts[0].labels.namespace) ?? to_string(.alertmanager.commonLabels.namespace) ?? "unknown"
         .pod = to_string(.alertmanager.alerts[0].labels.pod) ?? ""
         .service = to_string(.alertmanager.alerts[0].labels.service) ?? to_string(.alertmanager.commonLabels.service) ?? "unknown"
         .environment = to_string(.alertmanager.alerts[0].labels.environment) ?? "unknown"
         .object_kind = if .pod != "" { "Pod" } else { "Service" }
-        .reason = to_string(.alertmanager.alerts[0].labels.reason) ?? .alert_name
+        .event_name = to_string(.alertmanager.alerts[0].labels.event_name) ?? .alert_name
+        .event_reason = to_string(.alertmanager.alerts[0].labels.event_reason) ?? to_string(.alertmanager.alerts[0].labels.reason) ?? to_string(.alertmanager.alerts[0].annotations.event_reason) ?? .alert_name
+        .reason = .event_reason
+        .event_context = to_string(.alertmanager.alerts[0].annotations.event_context) ?? to_string(.alertmanager.alerts[0].annotations.description) ?? ""
+        .suggested_kubectl = to_string(.alertmanager.alerts[0].annotations.suggested_kubectl) ?? ""
+        .suggested_log_query = to_string(.alertmanager.alerts[0].annotations.suggested_log_query) ?? ""
+        .runbook_url = to_string(.alertmanager.alerts[0].annotations.runbook_url) ?? ""
+        .dashboard_url = to_string(.alertmanager.alerts[0].annotations.dashboard_url) ?? to_string(.alertmanager.alerts[0].annotations.grafana_panel_url) ?? to_string(.alertmanager.alerts[0].generatorURL) ?? ""
+      } else if exists(.alerts) {
+        .source = "grafana"
+        .event_type = "grafana-managed-alert"
+        .alert_status = to_string(.status) ?? "firing"
+        .alert_name = to_string(.alerts[0].labels.alertname) ?? to_string(.commonLabels.alertname) ?? "GrafanaAlert"
+        alert_cluster = to_string(.alerts[0].labels.cluster) ?? ""
+        common_cluster = to_string(.commonLabels.cluster) ?? ""
+        .cluster = if alert_cluster != "" { alert_cluster } else if common_cluster != "" { common_cluster } else { .cluster }
+        .severity = to_string(.alerts[0].labels.severity) ?? to_string(.commonLabels.severity) ?? "warning"
+        .namespace = to_string(.alerts[0].labels.namespace) ?? to_string(.commonLabels.namespace) ?? "unknown"
+        .pod = to_string(.alerts[0].labels.pod) ?? to_string(.commonLabels.pod) ?? ""
+        service_fallback = if .pod != "" { .pod } else { "unknown" }
+        .service = to_string(.alerts[0].labels.service) ?? to_string(.commonLabels.service) ?? service_fallback
+        .environment = to_string(.alerts[0].labels.environment) ?? to_string(.commonLabels.environment) ?? "unknown"
+        object_kind_fallback = if .pod != "" { "Pod" } else { "Service" }
+        .object_kind = to_string(.alerts[0].labels.involved_object_kind) ?? object_kind_fallback
+        .event_name = to_string(.alerts[0].labels.event_name) ?? .alert_name
+        .event_reason = to_string(.alerts[0].labels.event_reason) ?? to_string(.alerts[0].labels.reason) ?? to_string(.alerts[0].annotations.event_reason) ?? .alert_name
+        .reason = .event_reason
+        .event_context = to_string(.alerts[0].annotations.event_context) ?? to_string(.alerts[0].annotations.description) ?? ""
+        .suggested_kubectl = to_string(.alerts[0].annotations.suggested_kubectl) ?? ""
+        .suggested_log_query = to_string(.alerts[0].annotations.suggested_log_query) ?? ""
+        .runbook_url = to_string(.alerts[0].annotations.runbook_url) ?? to_string(.commonAnnotations.runbook_url) ?? ""
+        .dashboard_url = to_string(.alerts[0].annotations.dashboard_url) ?? to_string(.alerts[0].annotations.grafana_panel_url) ?? to_string(.commonAnnotations.grafana_panel_url) ?? to_string(.alerts[0].generatorURL) ?? ""
+        .alertmanager = {
+          "status": .alert_status,
+          "receiver": to_string(.receiver) ?? "grafana",
+          "alerts": .alerts,
+          "commonLabels": .commonLabels,
+          "commonAnnotations": .commonAnnotations,
+          "externalURL": to_string(.externalURL) ?? ""
+        }
       } else if exists(.client) && .client == "Grafana" {
         .source = "grafana"
         .event_type = "grafana-alert"
         .alert_status = if exists(.state) && .state == "ok" { "resolved" } else { "firing" }
         .alert_name = to_string(.ruleName) ?? to_string(.incident_key) ?? "GrafanaAlert"
+        alert_cluster = to_string(.labels.cluster) ?? ""
+        .cluster = if alert_cluster != "" { alert_cluster } else { .cluster }
         .severity = to_string(.labels.severity) ?? "warning"
         .namespace = to_string(.labels.namespace) ?? "unknown"
+        .pod = to_string(.labels.pod) ?? ""
         .service = to_string(.labels.service) ?? "unknown"
         .environment = to_string(.labels.environment) ?? "unknown"
-        .object_kind = "Service"
-        .reason = .alert_name
+        .object_kind = if .pod != "" { "Pod" } else { "Service" }
+        .event_name = to_string(.labels.event_name) ?? .alert_name
+        .event_reason = to_string(.labels.event_reason) ?? to_string(.labels.reason) ?? .alert_name
+        .reason = .event_reason
+        .event_context = to_string(original.event_context) ?? to_string(.description) ?? ""
+        .suggested_kubectl = to_string(original.suggested_kubectl) ?? ""
+        .suggested_log_query = to_string(original.suggested_log_query) ?? ""
+        .runbook_url = to_string(original.runbook_url) ?? ""
+        .dashboard_url = to_string(original.dashboard_url) ?? ""
         .alertmanager = {
           "status": .alert_status,
           "alerts": [{
             "status": .alert_status,
             "labels": {
               "alertname": .alert_name,
+              "cluster": .cluster,
               "severity": .severity,
               "namespace": .namespace,
+              "pod": .pod,
               "service": .service,
               "environment": .environment,
-              "source": "grafana"
+              "source": "grafana",
+              "event_name": .event_name,
+              "event_reason": .event_reason
             },
             "annotations": {
               "summary": to_string(.description) ?? to_string(.title) ?? "Grafana alert",
-              "details": to_string(.details) ?? ""
+              "description": to_string(.description) ?? "",
+              "details": to_string(.details) ?? "",
+              "event_context": .event_context,
+              "suggested_kubectl": .suggested_kubectl,
+              "suggested_log_query": .suggested_log_query,
+              "runbook_url": .runbook_url,
+              "dashboard_url": .dashboard_url
             }
           }]
         }
@@ -87,6 +156,47 @@ transforms:
         .environment = to_string(.labels.environment) ?? "unknown"
         .reason = to_string(original.reason) ?? "unknown"
         .alert_name = .reason
+        .event_name = .alert_name
+        .event_reason = .reason
+        .event_context = to_string(.message) ?? ""
+        .suggested_kubectl = if .pod != "" { join!(["kubectl -n", .namespace, "describe pod", .pod], " ") } else { "" }
+        .suggested_log_query = if .pod != "" { join!(["{namespace=\"", .namespace, "\", pod=\"", .pod, "\"}"], "") } else { "" }
+        .alertmanager = {
+          "status": "firing",
+          "alerts": [{
+            "status": "firing",
+            "labels": {
+              "alertname": .alert_name,
+              "cluster": .cluster,
+              "severity": .severity,
+              "namespace": .namespace,
+              "pod": .pod,
+              "service": .service,
+              "environment": .environment,
+              "source": "alloy",
+              "event_name": .event_name,
+              "event_reason": .event_reason
+            },
+            "annotations": {
+              "summary": to_string(.message) ?? "Kubernetes event",
+              "event_context": .event_context,
+              "suggested_kubectl": .suggested_kubectl,
+              "suggested_log_query": .suggested_log_query
+            }
+          }]
+        }
+      }
+
+      if exists(.alertmanager.alerts) {
+        .alerts = .alertmanager.alerts
+        .alerts[0].labels.cluster = .cluster
+        .alerts[0].labels.event_name = .event_name
+        .alerts[0].labels.event_reason = .event_reason
+        .alerts[0].annotations.event_context = .event_context
+        .alerts[0].annotations.suggested_kubectl = .suggested_kubectl
+        .alerts[0].annotations.suggested_log_query = .suggested_log_query
+        .alerts[0].annotations.runbook_url = .runbook_url
+        .alerts[0].annotations.dashboard_url = .dashboard_url
       }
 
       if .severity == "critical" || .environment == "prod" {

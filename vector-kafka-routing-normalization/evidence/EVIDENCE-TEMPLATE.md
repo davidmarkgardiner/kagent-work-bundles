@@ -43,19 +43,37 @@ STATUS: PASS | PARTIAL | BLOCKED
 
 - RAW_KAFKA_RECORD:
 - NORMALIZED_KAFKA_RECORD:
+- NORMALIZED_KAFKA_RECORD_HAS_CLUSTER:
+- NORMALIZED_KAFKA_RECORD_HAS_EVENT_REASON:
+- NORMALIZED_KAFKA_RECORD_HAS_RICH_CONTEXT:
+- Normalized `cluster`:
+- Normalized `event_reason`:
+- Normalized `event_context`:
+- Normalized `suggested_kubectl`:
+- Normalized `suggested_log_query`:
 - Topic/partition/offset evidence:
 
 ## Grafana MCP End-To-End Evidence
 
 - GRAFANA_TEST_ALERT:
+- GRAFANA_ALERT_FIRED_FROM_GRAFANA_ALERTING:
 - Grafana alert rule name/UID:
 - MANAGER_CONTACT_POINT_DELIVERY:
 - Notification route/policy:
 - ARGO_SENSOR_TRIGGER:
+- ARGO_SENSOR_PAYLOAD_HAS_CLUSTER:
+- ARGO_SENSOR_PAYLOAD_HAS_EVENT_REASON:
+- ARGO_SENSOR_PAYLOAD_HAS_RICH_CONTEXT:
+- Argo workflow name:
+- Argo alert payload field evidence:
 - TRIAGE_WORKFLOW:
 - KIT_AGENT_ANALYSIS:
 - GITLAB_TICKET:
+- GITLAB_TICKET_INCLUDES_CLUSTER:
+- GITLAB_TICKET_INCLUDES_EVENT_REASON:
+- GITLAB_TICKET_INCLUDES_RICH_CONTEXT:
 - GitLab issue/ticket URL or ID:
+- GitLab ticket rich-context excerpt:
 - Temporary alert cleanup:
 
 ## Routing Evidence

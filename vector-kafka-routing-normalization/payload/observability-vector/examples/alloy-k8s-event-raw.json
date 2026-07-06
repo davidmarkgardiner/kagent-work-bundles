@@ -1,0 +1,22 @@
+{
+  "source": "alloy",
+  "cluster": "aks-dev-01",
+  "event_time": "2026-06-29T18:21:00Z",
+  "type": "Warning",
+  "reason": "FailedScheduling",
+  "message": "0/3 nodes are available: insufficient cpu.",
+  "involvedObject": {
+    "kind": "Pod",
+    "namespace": "platform-tools",
+    "name": "load-test-runner-6f8b7d8f9d-r7q2m"
+  },
+  "metadata": {
+    "name": "load-test-runner.1860f2",
+    "namespace": "platform-tools"
+  },
+  "labels": {
+    "service": "load-test-runner",
+    "environment": "dev",
+    "team": "platform"
+  }
+}

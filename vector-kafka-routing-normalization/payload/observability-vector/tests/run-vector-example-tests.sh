@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VECTOR_IMAGE="${VECTOR_IMAGE:-timberio/vector:0.45.0-debian}"
-CONFIG_FILE="${ROOT_DIR}/observability/vector/tests/vector-example-test.yaml"
-EXAMPLES_DIR="${ROOT_DIR}/observability/vector/examples"
+CONFIG_FILE="${ROOT_DIR}/tests/vector-example-test.yaml"
+EXAMPLES_DIR="${ROOT_DIR}/examples"
 
 run_vector() {
   docker run --rm -i \
@@ -73,6 +73,22 @@ assert_json_field "$grafana_output" '.event_type' 'grafana-alert' 'grafana event
 assert_json_field "$grafana_output" '.target_agent' 'aks-sre-triage-agent' 'grafana target_agent'
 assert_json_field "$grafana_output" '.service' 'checkout-api' 'grafana service'
 assert_json_field "$grafana_output" '.dedupe_key' 'unknown:payments:checkout-api:HighCPUUsage' 'grafana dedupe_key'
+
+echo "Testing Grafana-managed Alerting rich context contract..."
+grafana_managed_output="$(run_one grafana-managed grafana-alertmanager-rich.json)"
+assert_json_field "$grafana_managed_output" '.schema_version' 'observability.triage.v1' 'grafana-managed schema'
+assert_json_field "$grafana_managed_output" '.source' 'grafana' 'grafana-managed source'
+assert_json_field "$grafana_managed_output" '.event_type' 'grafana-managed-alert' 'grafana-managed event_type'
+assert_json_field "$grafana_managed_output" '.cluster' 'aks-dev-01' 'grafana-managed cluster'
+assert_json_field "$grafana_managed_output" '.event_name' 'CheckoutApiWarningEvent' 'grafana-managed event_name'
+assert_json_field "$grafana_managed_output" '.event_reason' 'BackOff' 'grafana-managed event_reason'
+assert_json_field "$grafana_managed_output" '.reason' 'BackOff' 'grafana-managed reason'
+assert_json_field "$grafana_managed_output" '.event_context' 'event_name=CheckoutApiWarningEvent; event_reason=BackOff; cluster=aks-dev-01; namespace=payments; pod=checkout-api-7f9d9c4b6c-n7p2v; count=7' 'grafana-managed event_context'
+assert_json_field "$grafana_managed_output" '.suggested_kubectl' 'kubectl -n payments describe pod checkout-api-7f9d9c4b6c-n7p2v' 'grafana-managed suggested_kubectl'
+assert_json_field "$grafana_managed_output" '.suggested_log_query' '{namespace="payments", pod="checkout-api-7f9d9c4b6c-n7p2v"} |= "Back-off"' 'grafana-managed suggested_log_query'
+assert_json_field "$grafana_managed_output" '.alerts[0].labels.cluster' 'aks-dev-01' 'grafana-managed argo cluster'
+assert_json_field "$grafana_managed_output" '.alerts[0].labels.event_reason' 'BackOff' 'grafana-managed argo event_reason'
+assert_json_field "$grafana_managed_output" '.alerts[0].annotations.suggested_kubectl' 'kubectl -n payments describe pod checkout-api-7f9d9c4b6c-n7p2v' 'grafana-managed argo suggested_kubectl'
 
 echo "Testing Alloy/Kubernetes event contract and platform routing..."
 alloy_output="$(run_one alloy alloy-k8s-event-raw.json)"

@@ -1,0 +1,21 @@
+{
+  "client": "Grafana",
+  "incident_key": "grafana-cpu-saturation-payments-checkout-api",
+  "title": "CPU saturation on checkout-api",
+  "description": "CPU usage is above 95 percent for checkout-api.",
+  "details": "Panel threshold breach from Grafana managed alerting.",
+  "ruleName": "HighCPUUsage",
+  "state": "alerting",
+  "labels": {
+    "namespace": "payments",
+    "service": "checkout-api",
+    "severity": "warning",
+    "environment": "prod"
+  },
+  "evalMatches": [
+    {
+      "metric": "container_cpu_usage_seconds_total",
+      "value": 0.97
+    }
+  ]
+}

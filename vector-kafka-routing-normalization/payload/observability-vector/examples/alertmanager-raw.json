@@ -1,0 +1,39 @@
+{
+  "source": "alertmanager",
+  "cluster": "aks-dev-01",
+  "received_at": "2026-06-29T18:20:53Z",
+  "alertmanager": {
+    "status": "firing",
+    "receiver": "confluent-shim",
+    "groupKey": "{}:{alertname=\"PodCrashLooping\"}",
+    "commonLabels": {
+      "alertname": "PodCrashLooping",
+      "severity": "critical",
+      "namespace": "payments",
+      "service": "checkout-api"
+    },
+    "commonAnnotations": {
+      "summary": "checkout-api pod is crash looping"
+    },
+    "alerts": [
+      {
+        "status": "firing",
+        "labels": {
+          "alertname": "PodCrashLooping",
+          "severity": "critical",
+          "namespace": "payments",
+          "pod": "checkout-api-7d8f9c6d4f-l2t9x",
+          "service": "checkout-api",
+          "environment": "prod"
+        },
+        "annotations": {
+          "summary": "checkout-api pod is crash looping",
+          "description": "The checkout-api pod has restarted repeatedly in the last 10 minutes.",
+          "runbook_url": "https://runbooks.example.invalid/checkout-api-crashloop"
+        },
+        "startsAt": "2026-06-29T18:18:00Z",
+        "generatorURL": "https://prometheus.example.invalid/graph"
+      }
+    ]
+  }
+}

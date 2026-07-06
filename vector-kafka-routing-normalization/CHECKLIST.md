@@ -20,11 +20,16 @@
 | Vector rollout healthy | deployment ready, probe status | TODO |
 | Raw event produce verified | topic, partition, offset | TODO |
 | Normalized event consumed | topic, partition, offset | TODO |
+| Normalized record preserves cluster | `cluster` is the real Grafana alert label/commonLabel, not `unknown` | TODO |
+| Normalized record preserves event reason | `event_reason` and `reason` match the Grafana/Kubernetes event reason | TODO |
+| Normalized record preserves rich context | `event_context`, `suggested_kubectl`, and `suggested_log_query` are present where the alert provided them | TODO |
 | Actionable topic contains actionable records only | consumed sample set and rejected noise examples | TODO |
 | Route-verification workflow succeeds | workflow name and parameters | TODO |
 | Production triage workflow triggered | workflow name and phase | TODO |
+| Argo sensor receives rich context | workflow parameter/payload includes `cluster`, `event_reason`, `event_context`, `suggested_kubectl`, and `suggested_log_query` | TODO |
 | Kit/kagent analysis completed | workflow/agent evidence | TODO |
 | GitLab ticket created | issue URL/ID, redacted if required | TODO |
+| GitLab ticket includes rich context | ticket body includes `cluster`, `event_reason`, suggested kubectl, suggested log query, dashboard/runbook links where available | TODO |
 | App route verified | target agent and route key | TODO |
 | Platform route verified | target agent and route key | TODO |
 | Security route verified | target agent and route key | TODO |
