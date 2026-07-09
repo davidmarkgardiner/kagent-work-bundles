@@ -1,0 +1,70 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: agentic-triage-event-smoke-rules
+  namespace: "{{MONITORING_NAMESPACE}}"
+  labels:
+    release: "{{PROMETHEUS_RELEASE_LABEL}}"
+    app.kubernetes.io/name: agentic-triage-event-smoke
+    app.kubernetes.io/part-of: agentic-triage-smoke
+spec:
+  groups:
+    - name: agentic-triage-event-smoke
+      interval: 30s
+      rules:
+        - alert: AgenticTriageEventFailedSchedulingSmoke
+          expr: |
+            kube_pod_status_unschedulable{
+              namespace="{{SMOKE_NAMESPACE}}"
+            } > 0
+          for: 30s
+          labels:
+            severity: warning
+            triage: "true"
+            route_to: smart-triage
+            source_type: events
+            smoke: event-failedscheduling
+            run_id: "{{RUN_ID}}"
+          annotations:
+            summary: "Smoke pod cannot be scheduled in {{ $labels.namespace }}"
+            description: "Alertmanager event-routing smoke for {{ $labels.namespace }}/{{ $labels.pod }}. This uses kube_pod_status_unschedulable as the Kubernetes event symptom metric."
+            event_reason: "FailedScheduling"
+            smoke_run_id: "{{RUN_ID}}"
+---
+# Prometheus Operator adds a namespace matcher for the namespace that owns an
+# AlertmanagerConfig. Put this object in the same namespace matched by the alert
+# payload, otherwise the generated route will not match.
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: agentic-triage-event-smoke-webhook
+  namespace: "{{SMOKE_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/name: agentic-triage-event-smoke
+    app.kubernetes.io/part-of: agentic-triage-smoke
+spec:
+  route:
+    receiver: smart-triage-event-smoke-webhook
+    groupBy:
+      - alertname
+      - namespace
+      - pod
+      - run_id
+      - source_type
+    groupWait: 1s
+    groupInterval: 30s
+    repeatInterval: 5m
+    matchers:
+      - name: triage
+        matchType: =
+        value: "true"
+      - name: route_to
+        matchType: =
+        value: smart-triage
+  receivers:
+    - name: smart-triage-event-smoke-webhook
+      webhookConfigs:
+        - url: http://{{SMART_TRIAGE_EVENTSOURCE_SERVICE}}.{{ARGO_EVENTS_NAMESPACE}}.svc:12000/alerts
+          sendResolved: true
+          maxAlerts: 10
+          timeout: 10s

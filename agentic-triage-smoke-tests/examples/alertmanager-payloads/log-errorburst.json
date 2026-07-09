@@ -1,0 +1,45 @@
+{
+  "receiver": "agentic-triage-smart-triage-webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "AgenticTriageSmokeLogErrorBurst",
+        "severity": "warning",
+        "cluster": "{{CLUSTER_NAME}}",
+        "environment": "dev",
+        "namespace": "{{SMOKE_NAMESPACE}}",
+        "workload": "{{SMOKE_WORKLOAD}}",
+        "pod": "{{SMOKE_POD}}",
+        "container": "{{SMOKE_CONTAINER}}",
+        "run_id": "{{RUN_ID}}",
+        "smoke": "log-errorburst",
+        "source_type": "logs"
+      },
+      "annotations": {
+        "summary": "Smoke workload emitted an error log burst",
+        "description": "Grafana Loki alert for the agentic triage log-errorburst smoke.",
+        "query": "sum by (namespace,pod,container) (count_over_time({namespace=\"{{SMOKE_NAMESPACE}}\",container=\"{{SMOKE_CONTAINER}}\"} |= \"AGENTIC_TRIAGE_SMOKE_ERROR\" | json | run_id=\"{{RUN_ID}}\" [5m])) >= 5",
+        "sample_log": "AGENTIC_TRIAGE_SMOKE_ERROR run_id={{RUN_ID}} smoke=log-errorburst failure=synthetic_error_burst"
+      },
+      "startsAt": "{{ISO8601_STARTS_AT}}",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "fingerprint": "{{RUN_ID}}-log-errorburst"
+    }
+  ],
+  "groupLabels": {
+    "alertname": "AgenticTriageSmokeLogErrorBurst",
+    "namespace": "{{SMOKE_NAMESPACE}}"
+  },
+  "commonLabels": {
+    "alertname": "AgenticTriageSmokeLogErrorBurst",
+    "severity": "warning",
+    "run_id": "{{RUN_ID}}",
+    "smoke": "log-errorburst",
+    "source_type": "logs"
+  },
+  "commonAnnotations": {
+    "summary": "Smoke workload emitted an error log burst"
+  }
+}

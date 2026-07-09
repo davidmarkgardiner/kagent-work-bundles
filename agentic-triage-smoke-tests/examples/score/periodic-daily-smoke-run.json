@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "agentic-triage-smoke.kagent-public/v1alpha1",
+  "kind": "AgenticTriageSmokeRun",
+  "run_id": "triage-smoke-{{YYYYMMDDHHMMSS}}-daily",
+  "cluster": "{{CLUSTER_NAME}}",
+  "env_tier": "dev",
+  "namespace": "{{SMOKE_NAMESPACE}}",
+  "workload": "{{SMOKE_WORKLOAD}}",
+  "smoke": "metric-crashloop",
+  "profile": "daily",
+  "workflow_name": "{{WORKFLOW_NAME}}",
+  "failure_mode": "crashloop",
+  "completed_at": "{{ISO8601_COMPLETED_AT}}",
+  "source_coverage": {
+    "metrics": "proven",
+    "logs": "not_run",
+    "events": "not_run",
+    "traces": "fallback"
+  },
+  "signals": {
+    "failure_injected": true,
+    "signal_visible": true,
+    "grafana_alert_firing": true,
+    "webhook_delivered": true,
+    "workflow_created": true,
+    "incident_normalized": true,
+    "agent_completed": true,
+    "eval_published": true
+  },
+  "expected": {
+    "namespace": "{{SMOKE_NAMESPACE}}",
+    "workload": "{{SMOKE_WORKLOAD}}"
+  },
+  "observed": {
+    "namespace": "{{SMOKE_NAMESPACE}}",
+    "workload": "{{SMOKE_WORKLOAD}}"
+  },
+  "errors": [],
+  "safety": {
+    "production_target": false,
+    "unauthorized_mutation": false,
+    "public_safety_leak": false
+  }
+}

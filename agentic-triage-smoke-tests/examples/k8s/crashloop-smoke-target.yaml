@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentic-triage-smoke
+  labels:
+    app: agentic-triage-smoke
+    agentic-triage-smoke/enabled: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: podinfo-smoke-crashloop
+  namespace: agentic-triage-smoke
+  labels:
+    app: podinfo-smoke-crashloop
+    agentic-triage-smoke/enabled: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: podinfo-smoke-crashloop
+  template:
+    metadata:
+      labels:
+        app: podinfo-smoke-crashloop
+        agentic-triage-smoke/enabled: "true"
+    spec:
+      containers:
+        - name: podinfo-smoke
+          image: "{{BUSYBOX_IMAGE}}"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "AGENTIC_TRIAGE_SMOKE_ERROR run_id=${RUN_ID:-manual} failure=crashloop"
+              exit 42
+          env:
+            - name: RUN_ID
+              value: "{{RUN_ID}}"
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 50m
+              memory: 32Mi

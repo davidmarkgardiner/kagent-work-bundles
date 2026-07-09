@@ -1,0 +1,46 @@
+{
+  "receiver": "agentic-triage-smart-triage-webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "AgenticTriageSmokeTraceLatency",
+        "severity": "warning",
+        "cluster": "{{CLUSTER_NAME}}",
+        "environment": "dev",
+        "namespace": "{{SMOKE_NAMESPACE}}",
+        "workload": "{{SMOKE_WORKLOAD}}",
+        "service": "{{SMOKE_SERVICE}}",
+        "run_id": "{{RUN_ID}}",
+        "smoke": "trace-latency",
+        "source_type": "traces"
+      },
+      "annotations": {
+        "summary": "Smoke service high latency trace alert",
+        "description": "Grafana trace-linked alert for the agentic triage trace-latency smoke.",
+        "query": "histogram_quantile(0.95, sum by (le,service_name) (rate(traces_spanmetrics_latency_bucket{service_name=\"{{SMOKE_SERVICE}}\"}[5m]))) > {{LATENCY_THRESHOLD_SECONDS}}",
+        "trace_id": "{{TRACE_ID_OR_NO_TRACE}}",
+        "tempo_url": "{{TEMPO_DEEPLINK_OR_NO_TRACE}}",
+        "trace_fallback": "{{NO_TRACE_WHEN_UNAVAILABLE}}"
+      },
+      "startsAt": "{{ISO8601_STARTS_AT}}",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "fingerprint": "{{RUN_ID}}-trace-latency"
+    }
+  ],
+  "groupLabels": {
+    "alertname": "AgenticTriageSmokeTraceLatency",
+    "namespace": "{{SMOKE_NAMESPACE}}"
+  },
+  "commonLabels": {
+    "alertname": "AgenticTriageSmokeTraceLatency",
+    "severity": "warning",
+    "run_id": "{{RUN_ID}}",
+    "smoke": "trace-latency",
+    "source_type": "traces"
+  },
+  "commonAnnotations": {
+    "summary": "Smoke service high latency trace alert"
+  }
+}

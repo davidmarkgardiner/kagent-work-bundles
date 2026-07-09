@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentic-triage-event-smoke
+  labels:
+    agentic-triage-smoke: "true"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: event-smoke-unschedulable
+  namespace: agentic-triage-event-smoke
+  labels:
+    app.kubernetes.io/name: event-smoke-unschedulable
+    run_id: triage-smoke-{{YYYYMMDD}}-event-routing
+spec:
+  nodeSelector:
+    agentic-triage-smoke/nonexistent-node: "true"
+  containers:
+    - name: pause
+      image: "{{PAUSE_IMAGE}}"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits:
+          cpu: 20m
+          memory: 32Mi

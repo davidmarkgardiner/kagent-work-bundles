@@ -1,0 +1,46 @@
+{
+  "receiver": "agentic-triage-smart-triage-webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "AgenticTriageSmokeMetricCrashLoop",
+        "severity": "warning",
+        "cluster": "{{CLUSTER_NAME}}",
+        "environment": "dev",
+        "namespace": "{{SMOKE_NAMESPACE}}",
+        "workload": "{{SMOKE_WORKLOAD}}",
+        "deployment": "{{SMOKE_WORKLOAD}}",
+        "pod": "{{SMOKE_POD}}",
+        "container": "{{SMOKE_CONTAINER}}",
+        "run_id": "{{RUN_ID}}",
+        "smoke": "metric-crashloop",
+        "source_type": "metrics",
+        "reason": "Error"
+      },
+      "annotations": {
+        "summary": "Smoke workload container terminated with Error",
+        "description": "Grafana metric alert for the agentic triage metric-crashloop smoke.",
+        "query": "kube_pod_container_status_terminated_reason{namespace=\"{{SMOKE_NAMESPACE}}\",reason=\"Error\"} > 0"
+      },
+      "startsAt": "{{ISO8601_STARTS_AT}}",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "fingerprint": "{{RUN_ID}}-metric-crashloop"
+    }
+  ],
+  "groupLabels": {
+    "alertname": "AgenticTriageSmokeMetricCrashLoop",
+    "namespace": "{{SMOKE_NAMESPACE}}"
+  },
+  "commonLabels": {
+    "alertname": "AgenticTriageSmokeMetricCrashLoop",
+    "severity": "warning",
+    "run_id": "{{RUN_ID}}",
+    "smoke": "metric-crashloop",
+    "source_type": "metrics"
+  },
+  "commonAnnotations": {
+    "summary": "Smoke workload container terminated with Error"
+  }
+}

@@ -1,0 +1,121 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: agentic-triage-smoke-rules
+  namespace: "{{MONITORING_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/name: agentic-triage-smoke
+spec:
+  groups:
+    - name: agentic-triage-smoke
+      rules:
+        - alert: AgenticTriageSmokeRunnerDead
+          expr: |
+            absent_over_time(agentic_triage_smoke_score{env_tier="dev"}[2h])
+            and absent_over_time(agentic_triage_smoke_passed{env_tier="dev"}[2h])
+            and absent_over_time(agentic_triage_smoke_hard_failures{env_tier="dev"}[2h])
+          for: 15m
+          labels:
+            severity: critical
+            route_to: "{{ALERT_ROUTE}}"
+          annotations:
+            summary: "Agentic triage smoke runner appears dead"
+            description: "No agentic triage smoke metrics were observed for dev in the last 2h."
+        - alert: AgenticTriageSmokeNoRecentCompletion
+          expr: |
+            sum by (cluster, env_tier) (
+              increase(kagent_incident_triaged_total{env_tier="dev"}[24h])
+            ) == 0
+          for: 15m
+          labels:
+            severity: warning
+            route_to: "{{ALERT_ROUTE}}"
+          annotations:
+            summary: "No recent agentic triage smoke completion"
+            description: "No dev smoke triage completion was observed for cluster {{ $labels.cluster }} in the last 24h."
+        - alert: AgenticTriageSmokeQuickProfileMissing
+          expr: |
+            absent_over_time(agentic_triage_smoke_score{env_tier="dev",profile="quick"}[30m])
+          for: 5m
+          labels:
+            severity: warning
+            route_to: "{{ALERT_ROUTE}}"
+          annotations:
+            summary: "Agentic triage quick smoke is missing"
+            description: "No quick-profile agentic triage smoke score has been published in the last 30m."
+        - alert: AgenticTriageSmokeDailyProfileStale
+          expr: |
+            time() - agentic_triage_smoke_last_success_timestamp_seconds{env_tier="dev",profile="daily"} > 90000
+          for: 15m
+          labels:
+            severity: warning
+            route_to: "{{ALERT_ROUTE}}"
+          annotations:
+            summary: "Agentic triage daily smoke is stale"
+            description: "No successful daily smoke has been observed for cluster {{ $labels.cluster }} in more than 25h."
+        - alert: AgenticTriageSmokeScoreLow
+          expr: |
+            agentic_triage_smoke_score{env_tier="dev"} < 0.85
+          for: 10m
+          labels:
+            severity: warning
+            route_to: "{{ALERT_ROUTE}}"
+          annotations:
+            summary: "Agentic triage smoke score is low"
+            description: "Smoke run {{ $labels.run_id }} profile {{ $labels.profile }} scored {{ $value }}."
+        - alert: AgenticTriageSmokeScoreLowPersistent
+          expr: |
+            agentic_triage_smoke_score{env_tier="dev"} < 0.85
+          for: 1h
+          labels:
+            severity: critical
+            route_to: "{{ALERT_ROUTE}}"
+          annotations:
+            summary: "Agentic triage smoke score remains low"
+            description: "Smoke run {{ $labels.run_id }} profile {{ $labels.profile }} has remained below threshold for 1h."
+        - alert: AgenticTriageSmokeHardFailure
+          expr: |
+            agentic_triage_smoke_hard_failures{env_tier="dev"} > 0
+          for: 1m
+          labels:
+            severity: critical
+            route_to: "{{ALERT_ROUTE}}"
+          annotations:
+            summary: "Agentic triage smoke hard failure"
+            description: "Smoke run {{ $labels.run_id }} profile {{ $labels.profile }} reported hard failures."
+        - alert: AgenticTriageSmokeSourceCoverageRegression
+          expr: |
+            agentic_triage_smoke_source_coverage{
+              env_tier="dev",
+              source=~"metrics|logs|events|traces",
+              status=~"not_run|unsupported"
+            } > 0
+          for: 24h
+          labels:
+            severity: warning
+            route_to: "{{ALERT_ROUTE}}"
+          annotations:
+            summary: "Agentic triage smoke source coverage is incomplete"
+            description: "Source {{ $labels.source }} has status {{ $labels.status }} for cluster {{ $labels.cluster }}."
+        - alert: AgenticTriageSmokeLifecycleHardFailure
+          expr: |
+            sum by (cluster, namespace, workflow_name, run_id) (
+              agent_lifecycle_eval_hard_failures{env_tier="dev"}
+            ) > 0
+          for: 1m
+          labels:
+            severity: critical
+            route_to: "{{ALERT_ROUTE}}"
+          annotations:
+            summary: "Agentic triage smoke lifecycle hard failure"
+            description: "Smoke run {{ $labels.run_id }} has lifecycle hard failures in workflow {{ $labels.workflow_name }}."
+        - alert: AgenticTriageSmokeLifecycleScoreLow
+          expr: |
+            agent_lifecycle_eval_score{env_tier="dev"} < 0.85
+          for: 10m
+          labels:
+            severity: warning
+            route_to: "{{ALERT_ROUTE}}"
+          annotations:
+            summary: "Agentic triage smoke lifecycle score is low"
+            description: "Smoke run {{ $labels.run_id }} scored {{ $value }} for workflow {{ $labels.workflow_name }}."

@@ -1,0 +1,48 @@
+{
+  "receiver": "agentic-triage-smart-triage-webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "AgenticTriageSmokeEventFailedScheduling",
+        "severity": "warning",
+        "cluster": "{{CLUSTER_NAME}}",
+        "environment": "dev",
+        "namespace": "{{SMOKE_NAMESPACE}}",
+        "workload": "{{SMOKE_WORKLOAD}}",
+        "pod": "{{SMOKE_POD}}",
+        "run_id": "{{RUN_ID}}",
+        "smoke": "event-failedscheduling",
+        "source_type": "events",
+        "event_reason": "FailedScheduling",
+        "involved_object_kind": "Pod",
+        "involved_object_name": "{{SMOKE_POD}}"
+      },
+      "annotations": {
+        "summary": "Smoke pod failed scheduling",
+        "description": "Grafana event alert for the agentic triage event-failedscheduling smoke.",
+        "query_loki": "sum by (namespace,involved_object_name,reason) (count_over_time({namespace=\"{{SMOKE_NAMESPACE}}\",job=~\".*event.*\"} |= \"FailedScheduling\" |= \"{{RUN_ID}}\" [5m])) > 0",
+        "query_prometheus": "sum by (namespace,reason,involved_object_name) (increase(kube_event_count{namespace=\"{{SMOKE_NAMESPACE}}\",reason=\"FailedScheduling\"}[5m])) > 0",
+        "event_context": "Controlled smoke pod could not be scheduled due to an impossible node selector or resource request."
+      },
+      "startsAt": "{{ISO8601_STARTS_AT}}",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "fingerprint": "{{RUN_ID}}-event-failedscheduling"
+    }
+  ],
+  "groupLabels": {
+    "alertname": "AgenticTriageSmokeEventFailedScheduling",
+    "namespace": "{{SMOKE_NAMESPACE}}"
+  },
+  "commonLabels": {
+    "alertname": "AgenticTriageSmokeEventFailedScheduling",
+    "severity": "warning",
+    "run_id": "{{RUN_ID}}",
+    "smoke": "event-failedscheduling",
+    "source_type": "events"
+  },
+  "commonAnnotations": {
+    "summary": "Smoke pod failed scheduling"
+  }
+}

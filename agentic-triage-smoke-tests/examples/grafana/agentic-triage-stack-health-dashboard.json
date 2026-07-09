@@ -1,0 +1,784 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prom}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "sum(kagent_agent_ready{cluster=~\"$cluster\",namespace=~\"$namespace\",agent=~\"$agent\"})",
+          "legendFormat": "ready agents",
+          "refId": "A"
+        }
+      ],
+      "title": "Kagent Agents Ready",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prom}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(agentgateway_requests_total{cluster=~\"$cluster\",status=~\"2..\"}[5m])) > 0",
+          "legendFormat": "gateway success",
+          "refId": "A"
+        }
+      ],
+      "title": "Agent Gateway Traffic Healthy",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prom}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 1,
+          "max": 10,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 7
+              },
+              {
+                "color": "green",
+                "value": 8.5
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "avg(agentic_triage_smoke_score{cluster=~\"$cluster\",env_tier=~\"$env_tier\"}) * 10",
+          "legendFormat": "smoke score / 10",
+          "refId": "A"
+        }
+      ],
+      "title": "Latest Smoke Score / 10",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prom}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "sum(agentic_triage_smoke_hard_failures{cluster=~\"$cluster\",env_tier=~\"$env_tier\"}) + sum(agent_lifecycle_eval_hard_failures{cluster=~\"$cluster\",env_tier=~\"$env_tier\"})",
+          "legendFormat": "hard failures",
+          "refId": "A"
+        }
+      ],
+      "title": "Hard Failures",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prom}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (run_id, smoke, source_type) (increase(kagent_incident_received_total{cluster=~\"$cluster\",env_tier=~\"$env_tier\"}[2h]))",
+          "legendFormat": "received {{run_id}} {{source_type}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (run_id, smoke, source_type) (increase(kagent_incident_triaged_total{cluster=~\"$cluster\",env_tier=~\"$env_tier\"}[2h]))",
+          "legendFormat": "triaged {{run_id}} {{source_type}}",
+          "refId": "B"
+        }
+      ],
+      "title": "Incident Funnel",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prom}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (agent, status) (rate(kagent_agent_requests_total{cluster=~\"$cluster\",namespace=~\"$namespace\",agent=~\"$agent\"}[5m]))",
+          "legendFormat": "{{agent}} {{status}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Kagent A2A Request Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prom}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 11
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (route, status) (rate(agentgateway_requests_total{cluster=~\"$cluster\"}[5m]))",
+          "legendFormat": "{{route}} {{status}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (route, status) (rate(agentgateway_a2a_requests_total{cluster=~\"$cluster\"}[5m]))",
+          "legendFormat": "a2a {{route}} {{status}}",
+          "refId": "B"
+        }
+      ],
+      "title": "Agent Gateway Request Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prom}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 11
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (namespace, workflow_name, phase) (increase(argo_workflows_count{namespace=~\"$argo_namespace\"}[2h]))",
+          "legendFormat": "{{workflow_name}} {{phase}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (namespace, phase) (kube_pod_status_phase{namespace=~\"$argo_namespace\",pod=~\".*smart-triage.*\"})",
+          "legendFormat": "pod {{namespace}} {{phase}}",
+          "refId": "B"
+        }
+      ],
+      "title": "Workflow Health",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prom}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (namespace, pod, phase) (kube_pod_status_phase{namespace=~\"$argo_events_namespace\",pod=~\".*eventsource.*|.*sensor.*\"})",
+          "legendFormat": "{{pod}} {{phase}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (namespace, pod) (increase(kube_pod_container_status_restarts_total{namespace=~\"$argo_events_namespace\",pod=~\".*eventsource.*|.*sensor.*\"}[2h]))",
+          "legendFormat": "{{pod}} restarts",
+          "refId": "B"
+        }
+      ],
+      "title": "EventSource And Sensor Pods",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prom}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (component, status) (rate(vector_component_sent_events_total{cluster=~\"$cluster\"}[5m]))",
+          "legendFormat": "vector sent {{component}} {{status}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (component) (rate(vector_component_errors_total{cluster=~\"$cluster\"}[5m]))",
+          "legendFormat": "vector errors {{component}}",
+          "refId": "B"
+        },
+        {
+          "expr": "sum by (topic) (kafka_consumergroup_lag{topic=~\"$kafka_topic\"})",
+          "legendFormat": "kafka lag {{topic}}",
+          "refId": "C"
+        }
+      ],
+      "title": "Vector And Kafka Health",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prom}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 25
+      },
+      "id": 11,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "expr": "time() - agentic_triage_smoke_last_success_timestamp_seconds{cluster=~\"$cluster\",env_tier=~\"$env_tier\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Smoke Freshness Seconds",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prom}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 25
+      },
+      "id": 12,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "expr": "agentic_triage_smoke_source_coverage{cluster=~\"$cluster\",env_tier=~\"$env_tier\",source=~\"metrics|logs|events|traces\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Source Coverage",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "${datasource_loki}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "id": 13,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${datasource_loki}"
+          },
+          "expr": "{namespace=~\"$namespace\"} |= \"$run_id\"",
+          "refId": "A"
+        }
+      ],
+      "title": "Smoke Logs By Run ID",
+      "type": "logs"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [
+    "agentic-triage",
+    "smoke",
+    "kagent",
+    "agentgateway"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "Prometheus",
+          "value": "prometheus"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Prometheus datasource",
+        "multi": false,
+        "name": "datasource_prom",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "Loki",
+          "value": "loki"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Loki datasource",
+        "multi": false,
+        "name": "datasource_loki",
+        "options": [],
+        "query": "loki",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": ".*",
+          "value": ".*"
+        },
+        "hide": 0,
+        "label": "Cluster",
+        "name": "cluster",
+        "query": ".*",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "dev",
+          "value": "dev"
+        },
+        "hide": 0,
+        "label": "Environment tier",
+        "name": "env_tier",
+        "query": "dev",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": ".*",
+          "value": ".*"
+        },
+        "hide": 0,
+        "label": "Kagent namespace",
+        "name": "namespace",
+        "query": ".*",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": ".*",
+          "value": ".*"
+        },
+        "hide": 0,
+        "label": "Agent",
+        "name": "agent",
+        "query": ".*",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "argo",
+          "value": "argo"
+        },
+        "hide": 0,
+        "label": "Argo namespace",
+        "name": "argo_namespace",
+        "query": "argo",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "argo-events",
+          "value": "argo-events"
+        },
+        "hide": 0,
+        "label": "Argo Events namespace",
+        "name": "argo_events_namespace",
+        "query": "argo-events",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": ".*",
+          "value": ".*"
+        },
+        "hide": 0,
+        "label": "Kafka topic",
+        "name": "kafka_topic",
+        "query": ".*",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": ".*",
+          "value": ".*"
+        },
+        "hide": 0,
+        "label": "Run ID",
+        "name": "run_id",
+        "query": ".*",
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-2h",
+    "to": "now"
+  },
+  "timezone": "",
+  "title": "Agentic Triage Stack Health",
+  "uid": "agentic-triage-stack-health",
+  "version": 1,
+  "weekStart": ""
+}

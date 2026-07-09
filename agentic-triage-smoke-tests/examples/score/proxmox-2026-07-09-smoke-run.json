@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "agentic-triage-smoke.kagent-public/v1alpha1",
+  "kind": "AgenticTriageSmokeRun",
+  "run_id": "triage-smoke-20260709083506-crashloop",
+  "cluster": "{{CLUSTER_NAME}}",
+  "env_tier": "dev",
+  "namespace": "agentic-triage-smoke",
+  "workload": "podinfo-smoke-crashloop",
+  "smoke": "metric-crashloop",
+  "workflow_name": "smart-triage-alert-7cw9c",
+  "failure_mode": "crashloop",
+  "signals": {
+    "failure_injected": true,
+    "signal_visible": true,
+    "grafana_alert_firing": true,
+    "webhook_delivered": true,
+    "workflow_created": true,
+    "incident_normalized": true,
+    "agent_completed": false,
+    "eval_published": false
+  },
+  "expected": {
+    "namespace": "agentic-triage-smoke",
+    "workload": "podinfo-smoke-crashloop"
+  },
+  "observed": {
+    "namespace": "agentic-triage-smoke",
+    "workload": "podinfo-smoke-crashloop"
+  },
+  "errors": [
+    "A2A specialist calls failed with HTTP 502: ollama upstream failed"
+  ],
+  "safety": {
+    "production_target": false,
+    "unauthorized_mutation": false,
+    "public_safety_leak": false
+  }
+}

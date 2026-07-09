@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agentic Triage Smoke Tests</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f7f8fb;
+      color: #172033;
+    }
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+    h1 {
+      font-size: 34px;
+      margin: 0 0 10px;
+      letter-spacing: 0;
+    }
+    p {
+      line-height: 1.5;
+      color: #44506a;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(140px, 1fr));
+      gap: 12px;
+      margin: 28px 0;
+    }
+    .node {
+      background: #ffffff;
+      border: 1px solid #d8dee9;
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 96px;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    }
+    .node strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #172033;
+    }
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .metric {
+      background: #eef6f3;
+      border: 1px solid #bdd8cf;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .warn {
+      background: #fff7e8;
+      border-color: #e8c882;
+    }
+    code {
+      background: #e9edf5;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    @media (max-width: 860px) {
+      .flow,
+      .matrix {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Agentic Triage Smoke Tests</h1>
+    <p>
+      A new server is green only when Grafana-origin signals create completed
+      kagent runs, the agent output is source-backed, lifecycle scoring passes,
+      and failure states are visible in Grafana.
+    </p>
+
+    <section class="flow" aria-label="end to end smoke flow">
+      <div class="node"><strong>Grafana signals</strong>Metrics, logs, events, traces or explicit fallback.</div>
+      <div class="node"><strong>Alert intake</strong>Alertmanager-compatible replay or test contact point.</div>
+      <div class="node"><strong>Smart triage</strong>kagent specialists fan out and synthesize one result.</div>
+      <div class="node"><strong>Lifecycle eval</strong>Score output quality, evidence, safety, and completion.</div>
+      <div class="node"><strong>Grafana health</strong>Fleet dashboard and alerts show green or failure.</div>
+    </section>
+
+    <section class="matrix" aria-label="smoke matrix">
+      <div class="metric"><strong>Metrics</strong><br>CrashLoop, restarts, CPU, memory.</div>
+      <div class="metric"><strong>Logs</strong><br>Loki error burst with cited LogQL.</div>
+      <div class="metric"><strong>Events</strong><br>FailedScheduling, ImagePull, quota, warning events.</div>
+      <div class="metric"><strong>Traces</strong><br>Tempo deeplink or <code>NO_TRACE</code>.</div>
+      <div class="metric warn"><strong>Negative case</strong><br>Low score or hard failure must alert.</div>
+      <div class="metric warn"><strong>Dedup</strong><br>Same fingerprint suppresses duplicate fan-out.</div>
+      <div class="metric"><strong>Periodic</strong><br>Daily dev checks, weekly controlled chaos.</div>
+      <div class="metric"><strong>Targets</strong><br>Whiskey app, podinfo, cert-manager, external-dns.</div>
+    </section>
+  </main>
+</body>
+</html>

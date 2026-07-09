@@ -1,0 +1,40 @@
+apiVersion: platform.example.com/v1alpha1
+kind: AgenticTriageSmokeRequest
+metadata:
+  name: "{{RUN_ID}}"
+spec:
+  cluster: "{{CLUSTER_NAME}}"
+  environment: "nonprod"
+  server: "{{SERVER_NAME}}"
+  target:
+    namespace: "{{TARGET_NAMESPACE}}"
+    workload: "{{TARGET_WORKLOAD}}"
+    service: "{{TARGET_SERVICE}}"
+    podSelector: "{{TARGET_POD_SELECTOR}}"
+  routing:
+    alertOriginCluster: "{{ALERT_ORIGIN_CLUSTER}}"
+    grafanaContactPoint: "{{GRAFANA_TEST_CONTACT_POINT}}"
+    alertRoute: "{{ALERT_ROUTE}}"
+    webhookHop: "direct|vector" # "vector" if Grafana/Alertmanager webhook lands in Vector before the smart-triage EventSource
+    vectorEndpoint: "{{VECTOR_WEBHOOK_ENDPOINT}}" # required only when webhookHop is "vector"
+    vectorCluster: "{{VECTOR_CLUSTER}}" # required only when webhookHop is "vector"
+    argoNamespace: "{{ARGO_NAMESPACE}}"
+    argoEventsNamespace: "{{ARGO_EVENTS_NAMESPACE}}"
+  agents:
+    smokeAgentName: "{{SMOKE_AGENT_NAME}}"
+    grafanaEvidenceAgent: "grafana-evidence-agent"
+    modelConfig: "{{MODEL_CONFIG}}"
+  smokes:
+    metricCrashloop: true
+    metricCpuOrMemory: true
+    logErrorBurst: true
+    kubernetesEvent: true
+    traceOrFallback: true
+    dedupReplay: true
+    negativeAgentHealth: true
+  safety:
+    productionAllowed: false
+    dryRunRemediation: true
+    requireHitlBeforeMutation: true
+    namespaceAllowlist:
+      - "{{TARGET_NAMESPACE}}"

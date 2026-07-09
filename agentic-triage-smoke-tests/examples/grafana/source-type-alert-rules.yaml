@@ -1,0 +1,145 @@
+# Grafana alerting provisioning example for agentic triage source-type smokes.
+# This file is illustrative and placeholder-safe. Validate against the Grafana
+# version installed in the target cluster before applying.
+apiVersion: 1
+contactPoints:
+  - orgId: 1
+    name: agentic-triage-smart-triage-webhook
+    receivers:
+      - uid: agentic-triage-smart-triage-webhook
+        type: webhook
+        settings:
+          url: http://{{SMART_TRIAGE_EVENTSOURCE_SERVICE}}.{{ARGO_EVENTS_NAMESPACE}}.svc.cluster.local:12000/alerts
+          httpMethod: POST
+        disableResolveMessage: true
+groups:
+  - orgId: 1
+    name: agentic-triage-source-type-smokes
+    folder: Agentic Triage Smoke
+    interval: 30s
+    rules:
+      - uid: ats-metric-crashloop
+        title: Agentic Triage Smoke Metric CrashLoop {{RUN_ID}}
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "{{PROMETHEUS_DATASOURCE_UID}}"
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: A
+              expr: 'kube_pod_container_status_terminated_reason{namespace="{{SMOKE_NAMESPACE}}",reason="Error"} > 0'
+              intervalMs: 1000
+              maxDataPoints: 43200
+        noDataState: NoData
+        execErrState: Error
+        for: 30s
+        labels:
+          cluster: "{{CLUSTER_NAME}}"
+          namespace: "{{SMOKE_NAMESPACE}}"
+          workload: "{{SMOKE_WORKLOAD}}"
+          run_id: "{{RUN_ID}}"
+          smoke: metric-crashloop
+          source_type: metrics
+        annotations:
+          summary: Smoke workload container terminated with Error
+          description: Agentic triage metrics smoke from Grafana to webhook.
+      - uid: ats-log-errorburst
+        title: Agentic Triage Smoke Log Error Burst {{RUN_ID}}
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "{{LOKI_DATASOURCE_UID}}"
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: A
+              expr: 'sum by (namespace,pod,container) (count_over_time({namespace="{{SMOKE_NAMESPACE}}",container="{{SMOKE_CONTAINER}}"} |= "AGENTIC_TRIAGE_SMOKE_ERROR" | json | run_id="{{RUN_ID}}" [5m])) >= 5'
+              intervalMs: 1000
+              maxDataPoints: 43200
+        noDataState: NoData
+        execErrState: Error
+        for: 30s
+        labels:
+          cluster: "{{CLUSTER_NAME}}"
+          namespace: "{{SMOKE_NAMESPACE}}"
+          workload: "{{SMOKE_WORKLOAD}}"
+          run_id: "{{RUN_ID}}"
+          smoke: log-errorburst
+          source_type: logs
+        annotations:
+          summary: Smoke workload emitted an error log burst
+          description: Agentic triage Loki smoke from Grafana to webhook.
+      - uid: ats-event-failedscheduling
+        title: Agentic Triage Smoke Event FailedScheduling {{RUN_ID}}
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "{{LOKI_DATASOURCE_UID}}"
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: A
+              expr: 'sum by (namespace,involved_object_name,reason) (count_over_time({namespace="{{SMOKE_NAMESPACE}}",job=~".*event.*"} |= "FailedScheduling" |= "{{RUN_ID}}" [5m])) > 0'
+              intervalMs: 1000
+              maxDataPoints: 43200
+        noDataState: NoData
+        execErrState: Error
+        for: 30s
+        labels:
+          cluster: "{{CLUSTER_NAME}}"
+          namespace: "{{SMOKE_NAMESPACE}}"
+          workload: "{{SMOKE_WORKLOAD}}"
+          run_id: "{{RUN_ID}}"
+          smoke: event-failedscheduling
+          source_type: events
+          event_reason: FailedScheduling
+        annotations:
+          summary: Smoke pod failed scheduling
+          description: Agentic triage Kubernetes event smoke from Grafana to webhook.
+      - uid: ats-trace-latency
+        title: Agentic Triage Smoke Trace Latency {{RUN_ID}}
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: "{{PROMETHEUS_DATASOURCE_UID}}"
+            relativeTimeRange:
+              from: 300
+              to: 0
+            model:
+              refId: A
+              expr: 'histogram_quantile(0.95, sum by (le,service_name) (rate(traces_spanmetrics_latency_bucket{service_name="{{SMOKE_SERVICE}}"}[5m]))) > {{LATENCY_THRESHOLD_SECONDS}}'
+              intervalMs: 1000
+              maxDataPoints: 43200
+        noDataState: NoData
+        execErrState: Error
+        for: 30s
+        labels:
+          cluster: "{{CLUSTER_NAME}}"
+          namespace: "{{SMOKE_NAMESPACE}}"
+          workload: "{{SMOKE_WORKLOAD}}"
+          service: "{{SMOKE_SERVICE}}"
+          run_id: "{{RUN_ID}}"
+          smoke: trace-latency
+          source_type: traces
+        annotations:
+          summary: Smoke service high latency trace alert
+          description: Agentic triage trace-linked smoke from Grafana to webhook.
+          trace_id: "{{TRACE_ID_OR_NO_TRACE}}"
+          tempo_url: "{{TEMPO_DEEPLINK_OR_NO_TRACE}}"
+policies:
+  - orgId: 1
+    receiver: agentic-triage-smart-triage-webhook
+    group_by:
+      - alertname
+      - run_id
+      - smoke
+    routes:
+      - receiver: agentic-triage-smart-triage-webhook
+        object_matchers:
+          - - run_id
+            - =~
+            - triage-smoke-.*

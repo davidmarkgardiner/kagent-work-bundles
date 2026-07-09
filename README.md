@@ -30,6 +30,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 | `runtime-model-gateway-readiness/` | Runtime, model, Agent Gateway, A2A, and MCP preflight | Proves model backend, Agent Gateway, A2A, and required MCP servers are live before downstream demos |
 | `sre-grafana-mcp-observability/` | Grafana MCP observability | SRE asks a kagent front door to build/verify dashboards, alerts, logs, metrics, and GitOps observability changes |
 | `grafana-kafka-alert-verification/` | Grafana Alerting to Kafka verification | Proves real Grafana alert firing, consumes the Confluent Kafka record, captures payload shape, and records the schema validation decision |
+| `agentic-triage-smoke-tests/` | Agentic triage smoke tests | Proves metrics, logs, events, traces or trace fallback, agent correctness, and Grafana health after a new install |
 | `sre-adoption-feedback-loop/` | SRE adoption and feedback loop | SRE onboards one app, uses/reviews the workflow, captures feedback, routes improvements, and reports adoption |
 | `kagent-triage-v2-kb-gitlab-mcp/` | KB + doc2vec/querydoc + GitLab MCP | Agent updates KB docs through GitLab MCP, reindexes querydoc, and proves cited retrieval |
 | `gitlab-mcp-gitops-pr/` | GitLab MCP GitOps PRs | Agent creates a branch, updates code/YAML/docs, opens an MR, and leaves it for human review |
@@ -49,18 +50,19 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 2. `runtime-model-gateway-readiness/` - stop here and fix blockers before live fanout, chaos, GitOps PR, or SRE demo sessions
 3. `sre-grafana-mcp-observability/`
 4. `grafana-kafka-alert-verification/`
-5. `sre-adoption-feedback-loop/`
-6. `kagent-triage-v2-kb-gitlab-mcp/`
-7. `gitlab-mcp-gitops-pr/`
-8. `a2a-smart-triage-workflows/`
-9. `chaos-reliability-remediation/`
-10. `lifecycle-evaluation-review-manager/`
-11. `hitl-remediation-approval/`
-12. `policy-governance-safety/`
-13. `incident-evidence-trace-log-metrics/`
-14. `memory-mcp-shared-context/`
-15. `byo-kagent-onboarding/`
-16. `aks-fleet-reporting-day2/`
+5. `agentic-triage-smoke-tests/`
+6. `sre-adoption-feedback-loop/`
+7. `kagent-triage-v2-kb-gitlab-mcp/`
+8. `gitlab-mcp-gitops-pr/`
+9. `a2a-smart-triage-workflows/`
+10. `chaos-reliability-remediation/`
+11. `lifecycle-evaluation-review-manager/`
+12. `hitl-remediation-approval/`
+13. `policy-governance-safety/`
+14. `incident-evidence-trace-log-metrics/`
+15. `memory-mcp-shared-context/`
+16. `byo-kagent-onboarding/`
+17. `aks-fleet-reporting-day2/`
 
 ## Future Bundle Ideas
 
