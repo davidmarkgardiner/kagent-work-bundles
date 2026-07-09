@@ -64,6 +64,32 @@ Do not hand-edit the Grafana UI or guess at API calls when MCP tooling can do
 it. If Grafana MCP tools are not available in your session, stop and report
 that as a blocker before proceeding.
 
+Important: Loki log and Kubernetes event smokes do not require an additional
+custom tool. They require normal LGTM configuration:
+
+```text
+pod logs -> Alloy or Promtail -> Loki -> Grafana LogQL alert
+Kubernetes events -> Alloy loki.source.kubernetes_events -> Loki -> Grafana LogQL alert
+Grafana alert -> Alertmanager/contact point -> Vector or direct webhook -> triage
+```
+
+Before declaring the log or event source unsupported, check whether the missing
+piece is simply YAML/configuration:
+
+- Alloy or Promtail is not scraping pod logs into Loki;
+- Alloy `loki.source.kubernetes_events` is not configured;
+- Loki labels differ from the example LogQL queries;
+- Grafana has no LogQL alert rule for the smoke marker or event reason;
+- the Grafana notification policy/contact point does not route
+  `source_type=logs` or `source_type=events` to the triage webhook path;
+- Vector/Kafka normalization drops `run_id`, `fingerprint`, `namespace`,
+  `workload`, or `source_type`.
+
+Metric alerts do not automatically include nearby logs/events. If the metric
+smoke needs log/event context, verify that an enrichment step or agent-side
+Loki query is present. Log and event smokes should be generated as first-class
+Grafana Loki alerts.
+
 State explicitly in your first status update: "environment topology
 confirmed" plus:
 
@@ -82,20 +108,31 @@ Do not proceed to smoke execution until those are known.
 3. Read `work-agent-bundles/agentic-triage-smoke-tests/ALERTMANAGER-EVENT-ROUTING.md`
    and compare it against what you confirmed in step 0. Note any divergence
    (e.g. Vector hop not described there) in your evidence.
-4. Fill `requests/agentic-triage-smoke-request.yaml` with the work-environment
+4. Verify or install the normal configuration needed for first-class Loki
+   source alerts:
+   - pod log ingestion into Loki for the smoke namespace;
+   - Kubernetes event ingestion into Loki using Alloy
+     `loki.source.kubernetes_events` or an equivalent approved event exporter;
+   - Grafana LogQL alert rules for `log-errorburst` and
+     `event-failedscheduling`;
+   - notification routing for `source_type=logs` and `source_type=events`
+     into the same Vector/direct webhook path as metrics.
+   If any item is absent, document the exact missing config and either apply
+   the approved YAML/config through the work process or mark that smoke red.
+5. Fill `requests/agentic-triage-smoke-request.yaml` with the work-environment
    values confirmed in step 0. Do not write secrets into repo files.
-5. Run `scripts/verify-bundle.sh`.
-6. Run the runtime readiness gate in
+6. Run `scripts/verify-bundle.sh`.
+7. Run the runtime readiness gate in
    `work-agent-bundles/kagent-agentic-cluster-smoke-tests.md`.
-7. Import or verify an equivalent Grafana dashboard for general stack health
+8. Import or verify an equivalent Grafana dashboard for general stack health
    using `examples/grafana/agentic-triage-stack-health-dashboard.json`.
    Use Grafana MCP if available. Confirm panels or replacement queries cover
    kagent agent readiness, agentgateway request health, workflow health,
    EventSource/Sensor pods, Vector/Kafka health when used, smoke freshness, and
    source coverage.
-8. Execute the smoke matrix for metrics, logs, events, traces or trace fallback,
+9. Execute the smoke matrix for metrics, logs, events, traces or trace fallback,
    dedup, and one negative health case.
-9. Capture evidence in `evidence/EVIDENCE-TEMPLATE.md`, including the
+10. Capture evidence in `evidence/EVIDENCE-TEMPLATE.md`, including the
    confirmed topology from step 0 and, if Vector is in the path, one sample
    showing the alert payload before and after Vector.
 

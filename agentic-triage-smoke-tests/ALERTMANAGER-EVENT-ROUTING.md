@@ -13,6 +13,17 @@ Kubernetes metrics/logs/events/traces
 -> kagent specialists
 ```
 
+If the work environment uses Vector and Kafka between Grafana/Alertmanager and
+Argo Events, keep the same alert-source design and insert those transport hops:
+
+```text
+Grafana alerting or Alertmanager
+-> Vector webhook receiver
+-> Kafka topic
+-> Kafka EventSource or consumer
+-> smart-triage Sensor/Workflow
+```
+
 This means the legacy direct path:
 
 ```text
@@ -21,6 +32,12 @@ Kubernetes event stream -> Alloy/custom bridge -> Argo EventSource
 
 can be turned off only after equivalent event coverage is proven through
 Alertmanager-compatible alerts.
+
+No extra event-processing product is required for the Loki-backed event route.
+The required work is configuration: collect Kubernetes events with Alloy
+`loki.source.kubernetes_events`, write them to Loki with useful labels, create
+a Grafana LogQL alert over those labels, and route that alert to the existing
+triage webhook path.
 
 ## Live Verification
 
@@ -70,6 +87,13 @@ kube_pod_status_unschedulable{namespace=~"{{TARGET_NAMESPACE_REGEX}}"} > 0
 That is enough to detect failed scheduling, but it is not the same as proving a
 raw Kubernetes `Warning` event source unless the event exporter/Loki or
 `kube_event_count` path is also captured.
+
+The same distinction applies to logs. A Prometheus metric alert does not
+automatically carry related Loki log lines. To make logs first-class triage
+inputs, ensure pod logs are ingested into Loki and create Grafana LogQL alert
+rules for the error patterns or smoke markers that should open triage.
+Correlation from a metric alert to nearby logs/events is a separate enrichment
+step that can be done by the triage agent or by a webhook enrichment service.
 
 ## Namespace Targeting
 
@@ -179,6 +203,36 @@ sum(count_over_time(
 
 Use a short evaluation window for periodic smoke rules. A long range query can
 keep Grafana alerting on a historical event after the failure pod is deleted.
+
+## Loki Log Rules
+
+For application log smokes, the required path is:
+
+```text
+pod stdout/stderr -> Alloy or Promtail -> Loki -> Grafana LogQL alert
+```
+
+Use a deterministic smoke marker so the alert can be joined to the workflow:
+
+```text
+AGENTIC_TRIAGE_SMOKE_ERROR run_id={{RUN_ID}} smoke=log-errorburst failure=synthetic_error_burst
+```
+
+Example LogQL:
+
+```logql
+sum by (cluster, namespace, pod, container) (
+  count_over_time(
+    {namespace="{{SMOKE_NAMESPACE}}", container="{{SMOKE_CONTAINER}}"}
+    |= "AGENTIC_TRIAGE_SMOKE_ERROR"
+    |= "run_id={{RUN_ID}}"
+  [5m])
+) >= 5
+```
+
+Before enabling the alert, prove the marker is queryable in Loki Explore and
+record the exact label set. If the marker exists in `kubectl logs` but not in
+Loki, the failure is log shipping, not triage.
 
 ## Alertmanager Routing
 

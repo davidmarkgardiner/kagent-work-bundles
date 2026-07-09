@@ -8,10 +8,22 @@ failure/event/log/trace signal -> Grafana alert rule -> webhook contact point
 -> smoke score and Grafana health metrics
 ```
 
+If the work cluster routes alerts through Vector and Kafka, replace the direct
+webhook hop with:
+
+```text
+Grafana alert rule -> Alertmanager/contact point -> Vector -> Kafka
+-> Kafka EventSource or consumer -> smart-triage Workflow
+```
+
 `metric-crashloop` intake and `event-failedscheduling` via Alloy/Loki are
 live-proven in the current Proxmox evidence. Trace fallback is live-proven as
 `NO_TRACE`. Loki application logs remain blocked/not proven because the smoke
 pod log marker did not reach Loki during the 2026-07-09 run.
+
+The log and event examples below are standard Grafana/LGTM configuration. They
+do not require a separate custom tool. They do require that the underlying
+records are present in Loki before Grafana can alert on them.
 
 ## Shared Webhook Target
 
@@ -92,11 +104,13 @@ sum by (namespace, pod, container) (
   count_over_time(
     {namespace="{{SMOKE_NAMESPACE}}", container="{{SMOKE_CONTAINER}}"}
     |= "AGENTIC_TRIAGE_SMOKE_ERROR"
-    | json
-    | run_id="{{RUN_ID}}"
+    |= "run_id={{RUN_ID}}"
   [5m])
 ) >= 5
 ```
+
+Use the real Loki labels discovered in Explore. Do not assume logs are JSON
+unless the application actually emits JSON and the Loki pipeline parses it.
 
 Webhook replay payload:
 
@@ -107,6 +121,8 @@ examples/alertmanager-payloads/log-errorburst.json
 Required proof:
 
 ```text
+kubectl logs shows the marker
+Loki Explore returns the same marker for the same run_id
 Grafana state: Alerting
 LogQL query and sample timestamp range captured
 EventSource: request received and published
@@ -170,6 +186,8 @@ examples/alertmanager-payloads/event-failedscheduling.json
 Required proof:
 
 ```text
+Kubernetes event exists or existed for the smoke workload
+Loki Explore returns the event record for the same pod/run
 Grafana state: Alerting
 event_reason=FailedScheduling survives normalization
 EventSource: request received and published

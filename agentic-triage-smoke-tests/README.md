@@ -24,6 +24,29 @@ public bundle and fill real values only inside the approved work environment.
 - Defines periodic dev-cluster smoke checks for future app targets such as
   cert-manager and external-dns.
 
+## Work Replication Note
+
+The Loki log and Kubernetes event alert path does not require a separate custom
+tool or a new event bridge. It is ordinary LGTM configuration:
+
+```text
+pod logs -> Alloy or Promtail -> Loki -> Grafana LogQL alert
+Kubernetes events -> Alloy loki.source.kubernetes_events -> Loki -> Grafana LogQL alert
+Grafana alert -> Alertmanager/contact point -> Vector or direct webhook -> triage
+```
+
+What changes is the alert source and query language. Metrics alerts use
+PromQL against Prometheus/Mimir. Log and event alerts use LogQL against Loki
+after the relevant records have been ingested. The delivery path after the
+Grafana alert fires can be the same smart-triage webhook path used for metric
+alerts.
+
+This is not automatic metric-alert correlation. If a Prometheus metric alert
+fires and the agents need nearby logs or Kubernetes events, add an enrichment
+step or have the triage agent query Loki/Tempo using the alert labels and time
+window. For log and event smokes, the triggering evidence should already be in
+the Loki alert result and annotations.
+
 ## Current Evidence Boundary
 
 As of 2026-07-09, the live evidence proves several sub-paths:
@@ -95,6 +118,7 @@ Per-source Grafana alert examples are in:
 
 ```text
 ALERTMANAGER-EVENT-ROUTING.md
+LGTM-LOG-EVENT-TRIAGE-README.md
 SOURCE-TYPE-ALERT-EXAMPLES.md
 examples/grafana/agentic-triage-stack-health-dashboard.json
 examples/grafana/source-type-alert-rules.yaml
