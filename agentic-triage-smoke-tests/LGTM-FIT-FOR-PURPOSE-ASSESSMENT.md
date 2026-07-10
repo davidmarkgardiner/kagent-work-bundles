@@ -8,6 +8,11 @@ A platform that only emits metric threshold alerts, without a supported way to
 alert on logs/events or enrich metric alerts with nearby evidence, is not
 sufficient for this use case.
 
+For the estimated impact of a metrics-only setup, see
+`LGTM-METRICS-ONLY-COVERAGE.md`. The short version is that metrics-only
+alerting is roughly 35-45% useful coverage for automated triage: good for
+symptom detection, weak for source-backed investigation.
+
 Using OpenTelemetry for log ingestion does not make the requirement invalid.
 It changes where metadata should live:
 
