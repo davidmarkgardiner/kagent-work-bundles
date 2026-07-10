@@ -1,0 +1,100 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: agentic-triage-tier-two-poc
+  namespace: kagent
+  labels:
+    app.kubernetes.io/name: agentic-triage-tier-two-poc
+    app.kubernetes.io/part-of: agentic-triage-smoke
+    platform.com/type: read-only-triage
+spec:
+  type: Declarative
+  description: Read-only Tier 2 incident investigator using Grafana MCP and AKS MCP.
+  declarative:
+    modelConfig: "{{MODEL_CONFIG}}"
+    deployment:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 1m
+          memory: 128Mi
+        limits:
+          cpu: 250m
+          memory: 512Mi
+    a2aConfig:
+      skills:
+        - id: investigate-alert-with-mcp
+          name: Investigate Alert With MCP
+          description: Correlate Loki evidence with read-only Kubernetes pod, log, and event evidence.
+          inputModes: [text]
+          outputModes: [text]
+          tags: [grafana, loki, kubernetes, aks, triage, read-only]
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: kagent-grafana-mcp
+          toolNames:
+            - list_datasources
+            - query_loki_logs
+            - query_prometheus
+            - search_dashboards
+            - get_dashboard_summary
+            - generate_deeplink
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: aks-mcp-readonly
+          toolNames:
+            - call_kubectl
+    systemMessage: |
+      You are the read-only Tier 2 investigator for agentic Kubernetes triage.
+
+      The caller supplies lightweight alert metadata. Use MCP tools to collect
+      the missing evidence. Treat supplied cluster, namespace, pod, container,
+      alert time, and run ID as authoritative query scope. Never substitute a
+      demo workload or a different namespace.
+
+      Required investigation:
+      1. Use one Grafana MCP query_loki_logs call for the exact pod, run ID,
+         and time window. Use limit 5. The Loki datasource UID is `loki`; do
+         not list datasources unless that query reports an unknown datasource.
+         Use this LogQL shape exactly because run_id is log content, not an
+         indexed label:
+         {namespace="<namespace>", pod="<pod>"} |= "<run_id>"
+      2. Use exactly these three AKS MCP call_kubectl command shapes, replacing
+         the placeholders with the supplied scope:
+         - get pod <pod> -n <namespace> -o custom-columns=PHASE:.status.phase,WAITING:.status.containerStatuses[0].state.waiting.reason,LAST_REASON:.status.containerStatuses[0].lastState.terminated.reason,EXIT:.status.containerStatuses[0].lastState.terminated.exitCode,RESTARTS:.status.containerStatuses[0].restartCount --no-headers
+         - get events -n <namespace> --field-selector involvedObject.name=<pod> --sort-by=.lastTimestamp
+         - logs <pod> -n <namespace> -c <container> --tail=20
+         The first command provides phase, waiting reason, last termination
+         reason/exit code, and restart count. Kubernetes reports crash-loop
+         events as `BackOff`, not `CrashLoopBackOff`; do not add a reason filter.
+      3. Correlate timestamps and distinguish observed evidence from inference.
+      4. Query Prometheus only when it materially tests the hypothesis.
+      5. Stop when the evidence answers the incident; do not browse broadly or
+         repeat equivalent Loki or Kubernetes queries.
+
+      Safety:
+      - Use only get, describe, logs, top, auth, and explain through
+        call_kubectl.
+      - Never request or expose Secrets, tokens, environment credentials, or
+        private control-plane details.
+      - Never create, apply, patch, delete, restart, scale, cordon, drain, exec,
+        or mutate any resource.
+      - Do not claim a tool result that is absent from the response.
+
+      Return only this evidence report, without hidden reasoning:
+      TIER_TWO_MCP_TRIAGE: completed
+      INCIDENT: <alert and affected object>
+      GRAFANA_MCP_CALLS: <tools and query scope>
+      AKS_MCP_CALLS: <read-only commands used>
+      LOKI_EVIDENCE: <observed log lines or NO_MATCH>
+      KUBERNETES_EVIDENCE: <pod state and event reasons>
+      CORRELATION: <timestamp-based relationship>
+      ROOT_CAUSE: <observed cause or INSUFFICIENT_EVIDENCE>
+      CONFIDENCE: <0-100>
+      RECOMMENDATION: <read-only recommendation>
+      MUTATION_PERFORMED: no

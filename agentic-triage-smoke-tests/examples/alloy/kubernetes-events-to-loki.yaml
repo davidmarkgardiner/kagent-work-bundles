@@ -1,11 +1,14 @@
+# Standalone smoke event exporter. If the target environment already collects
+# Kubernetes events with Alloy, merge the config and labels into that managed
+# installation instead. Do not run both paths or events may be duplicated.
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: alloy-k8s-events-config
+  name: agentic-triage-alloy-events-config
   namespace: "{{MONITORING_NAMESPACE}}"
   labels:
-    app: alloy-k8s-events
-    app.kubernetes.io/part-of: alloy-k8s-events
+    app: agentic-triage-alloy-events
+    app.kubernetes.io/part-of: agentic-triage-smoke
 data:
   config.alloy: |
     logging {
@@ -28,7 +31,7 @@ data:
           environment  = coalesce(env("CLUSTER_ENVIRONMENT"), "{{CLUSTER_ENVIRONMENT}}"),
           region       = coalesce(env("CLUSTER_REGION"), "{{CLUSTER_REGION}}"),
           source       = "alloy",
-          pipeline     = "alloy-k8s-events-loki",
+          pipeline     = "agentic-triage-alloy-events-loki",
           payload_type = "kubernetes-event",
           test_scope   = "{{SMOKE_NAMESPACE}}",
         }
@@ -38,14 +41,11 @@ data:
         expressions = {
           event_type     = "type",
           event_reason   = "reason",
-          event_message  = "message",
+          event_message  = "msg",
           event_count    = "count",
-          obj_kind       = "involvedObject.kind",
-          obj_name       = "involvedObject.name",
-          obj_namespace  = "involvedObject.namespace",
-          first_time     = "firstTimestamp",
-          last_time      = "lastTimestamp",
-          source_comp    = "source.component",
+          obj_kind       = "kind",
+          obj_name       = "name",
+          source_comp    = "sourcecomponent",
         }
       }
 
@@ -54,7 +54,6 @@ data:
           event_type    = "",
           event_reason  = "",
           obj_kind      = "",
-          obj_namespace = "",
         }
       }
 
@@ -79,13 +78,22 @@ data:
       }
     }
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: agentic-triage-alloy-events
+  namespace: "{{MONITORING_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/name: agentic-triage-alloy-events
+    app.kubernetes.io/part-of: agentic-triage-smoke
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: alloy-k8s-events-read
+  name: agentic-triage-alloy-events-read
   namespace: "{{SMOKE_NAMESPACE}}"
   labels:
-    app.kubernetes.io/part-of: alloy-k8s-events
+    app.kubernetes.io/part-of: agentic-triage-smoke
 rules:
   - apiGroups: [""]
     resources: ["events", "pods"]
@@ -97,15 +105,84 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: alloy-k8s-events-read
+  name: agentic-triage-alloy-events-read
   namespace: "{{SMOKE_NAMESPACE}}"
   labels:
-    app.kubernetes.io/part-of: alloy-k8s-events
+    app.kubernetes.io/part-of: agentic-triage-smoke
 subjects:
   - kind: ServiceAccount
-    name: alloy-k8s-events
+    name: agentic-triage-alloy-events
     namespace: "{{MONITORING_NAMESPACE}}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: alloy-k8s-events-read
+  name: agentic-triage-alloy-events-read
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentic-triage-alloy-events
+  namespace: "{{MONITORING_NAMESPACE}}"
+  labels:
+    app.kubernetes.io/name: agentic-triage-alloy-events
+    app.kubernetes.io/part-of: agentic-triage-smoke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: agentic-triage-alloy-events
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: agentic-triage-alloy-events
+        app.kubernetes.io/part-of: agentic-triage-smoke
+    spec:
+      serviceAccountName: agentic-triage-alloy-events
+      containers:
+        - name: alloy
+          image: "{{ALLOY_IMAGE}}"
+          imagePullPolicy: IfNotPresent
+          args:
+            - run
+            - /etc/alloy/config.alloy
+            - --storage.path=/var/lib/alloy/data
+            - --server.http.listen-addr=0.0.0.0:12345
+          env:
+            - name: CLUSTER_NAME
+              value: "{{CLUSTER_NAME}}"
+            - name: CLUSTER_ENVIRONMENT
+              value: "{{CLUSTER_ENVIRONMENT}}"
+            - name: CLUSTER_REGION
+              value: "{{CLUSTER_REGION}}"
+          ports:
+            - name: http
+              containerPort: 12345
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: http
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          volumeMounts:
+            - name: config
+              mountPath: /etc/alloy
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/alloy/data
+      volumes:
+        - name: config
+          configMap:
+            name: agentic-triage-alloy-events-config
+        - name: data
+          emptyDir: {}

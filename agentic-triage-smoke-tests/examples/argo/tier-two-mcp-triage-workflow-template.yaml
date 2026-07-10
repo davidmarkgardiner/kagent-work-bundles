@@ -1,0 +1,218 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: agentic-triage-tier-two
+  namespace: argo
+  labels:
+    app.kubernetes.io/name: agentic-triage-tier-two
+    app.kubernetes.io/part-of: agentic-triage-smoke
+spec:
+  entrypoint: main
+  serviceAccountName: smart-triage-fanout-workflow
+  activeDeadlineSeconds: 600
+  ttlStrategy:
+    secondsAfterCompletion: 86400
+    secondsAfterSuccess: 86400
+    secondsAfterFailure: 3600
+  arguments:
+    parameters:
+      - name: alert_source
+        value: vector-kafka
+      - name: alert_payload
+        value: "{}"
+      - name: agent_url
+        value: http://agentic-triage-tier-two-poc.kagent:8080/
+  templates:
+    - name: main
+      dag:
+        tasks:
+          - name: normalize-alert
+            template: normalize-alert
+          - name: investigate
+            dependencies: [normalize-alert]
+            template: call-tier-two
+            arguments:
+              parameters:
+                - name: normalized_alert
+                  value: "{{tasks.normalize-alert.outputs.parameters.normalized-alert}}"
+          - name: score
+            dependencies: [investigate]
+            template: score
+            arguments:
+              parameters:
+                - name: normalized_alert
+                  value: "{{tasks.normalize-alert.outputs.parameters.normalized-alert}}"
+                - name: report
+                  value: "{{tasks.investigate.outputs.parameters.report}}"
+                - name: task_id
+                  value: "{{tasks.investigate.outputs.parameters.task-id}}"
+                - name: transport
+                  value: "{{tasks.investigate.outputs.parameters.transport}}"
+    - name: normalize-alert
+      outputs:
+        parameters:
+          - name: normalized-alert
+            valueFrom:
+              path: /tmp/normalized.txt
+          - name: run-id
+            valueFrom:
+              path: /tmp/run-id.txt
+      script:
+        image: alpine:3.19
+        command: [sh]
+        source: |
+          set -eu
+          apk add --no-cache jq >/dev/null
+          cat > /tmp/payload.json <<'PAYLOAD'
+          {{workflow.parameters.alert_payload}}
+          PAYLOAD
+
+          jq -e '.alerts | length > 0' /tmp/payload.json >/dev/null
+          jq -r '((.alerts | map(select(.status == "firing")) | .[0]) // .alerts[0]) as $a |
+            [
+              "ALERT_SOURCE: {{workflow.parameters.alert_source}}",
+              "ALERT_NAME: " + ($a.labels.alertname // "unknown"),
+              "ALERT_STATUS: " + ($a.status // .status // "unknown"),
+              "CLUSTER: " + ($a.labels.cluster // "unknown"),
+              "NAMESPACE: " + ($a.labels.namespace // "unknown"),
+              "POD: " + ($a.labels.pod // "unknown"),
+              "CONTAINER: " + ($a.labels.container // "unknown"),
+              "SERVICE: " + ($a.labels.service_name // $a.labels.service // "unknown"),
+              "SEVERITY: " + ($a.labels.severity // "unknown"),
+              "SOURCE_TYPE: " + ($a.labels.source_type // "unknown"),
+              "RUN_ID: " + ($a.labels.run_id // "unknown"),
+              "STARTS_AT: " + ($a.startsAt // "unknown"),
+              "ENDS_AT: " + ($a.endsAt // "unknown"),
+              "FINGERPRINT: " + ($a.fingerprint // "unknown")
+            ] | .[]' /tmp/payload.json > /tmp/normalized.txt
+          jq -r '((.alerts | map(select(.status == "firing")) | .[0]) // .alerts[0]).labels.run_id // "unknown"' \
+            /tmp/payload.json > /tmp/run-id.txt
+          test "$(cat /tmp/run-id.txt)" != unknown
+          cat /tmp/normalized.txt
+    - name: call-tier-two
+      inputs:
+        parameters:
+          - name: normalized_alert
+      outputs:
+        parameters:
+          - name: report
+            valueFrom:
+              path: /tmp/report.txt
+          - name: task-id
+            valueFrom:
+              path: /tmp/task-id.txt
+          - name: transport
+            valueFrom:
+              path: /tmp/transport.txt
+      script:
+        image: alpine:3.19
+        command: [sh]
+        source: |
+          set -eu
+          apk add --no-cache curl jq coreutils >/dev/null
+          context_id="$(cat /proc/sys/kernel/random/uuid)"
+
+          cat > /tmp/prompt.txt <<'PROMPT'
+          Investigate this alert using the required Grafana MCP and AKS MCP
+          reads. Use ALERT_QUERY_START and ALERT_QUERY_END as the exact Loki
+          window; do not use STARTS_AT as the query start. The normalized
+          metadata below is authoritative and deliberately
+          excludes log lines, event output, exit code, restart count, image
+          details, and root cause.
+
+          {{inputs.parameters.normalized_alert}}
+          PROMPT
+          printf '\nALERT_QUERY_START: %s\nALERT_QUERY_END: %s\n' \
+            "$(date -u -d '15 minutes ago' +%Y-%m-%dT%H:%M:%SZ)" \
+            "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /tmp/prompt.txt
+
+          jq -n \
+            --arg id "tier-two-{{workflow.name}}" \
+            --arg message_id "msg-tier-two-{{workflow.name}}" \
+            --arg context_id "$context_id" \
+            --arg text "$(cat /tmp/prompt.txt)" \
+            '{jsonrpc:"2.0",id:$id,method:"message/send",params:{message:{
+              messageId:$message_id,contextId:$context_id,
+              role:"user",parts:[{kind:"text",text:$text}]
+            }}}' > /tmp/request.json
+
+          http_code="$(curl -sS -m 240 -w '%{http_code}' \
+            -X POST "{{workflow.parameters.agent_url}}" \
+            -H 'Content-Type: application/json' -d @/tmp/request.json \
+            -o /tmp/a2a-response.json || true)"
+          if [ "$http_code" = 200 ] && jq -e '.result' /tmp/a2a-response.json >/dev/null 2>&1; then
+            jq '.result' /tmp/a2a-response.json > /tmp/task.json
+            echo direct > /tmp/transport.txt
+          else
+            echo controller-poll > /tmp/transport.txt
+            attempt=0
+            while [ "$attempt" -lt 48 ]; do
+              attempt=$((attempt + 1))
+              if curl -fsS -m 10 "http://kagent-controller.kagent:8083/api/sessions/${context_id}/tasks?user_id=A2A_USER_${context_id}" \
+                -o /tmp/task-response.json && jq -e \
+                '(.data | length) > 0 and ((.data[-1].status.state == "completed") or (.data[-1].status.state == "failed"))' \
+                /tmp/task-response.json >/dev/null 2>&1; then
+                jq '.data[-1]' /tmp/task-response.json > /tmp/task.json
+                break
+              fi
+              sleep 5
+            done
+          fi
+
+          test -s /tmp/task.json
+          jq -r '.id' /tmp/task.json > /tmp/task-id.txt
+          test "$(jq -r '.status.state' /tmp/task.json)" = completed
+          jq -r 'if (.artifacts // [] | length) > 0 then
+            [.artifacts[]?.parts[]? | select(.kind == "text") | .text] | join("\n")
+            else [.status.message.parts[]? | select(.kind == "text") | .text] | join("\n") end' \
+            /tmp/task.json > /tmp/report.raw.txt
+          awk 'BEGIN{skip=0} /<think>/{skip=1; next} /<\/think>/{skip=0; next} skip==0{print}' \
+            /tmp/report.raw.txt | sed 's/[*`]//g' > /tmp/report.txt
+          cat /tmp/report.txt
+    - name: score
+      inputs:
+        parameters:
+          - name: normalized_alert
+          - name: report
+          - name: task_id
+          - name: transport
+      outputs:
+        parameters:
+          - name: score
+            valueFrom:
+              path: /tmp/score.txt
+          - name: result
+            valueFrom:
+              path: /tmp/result.json
+      script:
+        image: alpine:3.19
+        command: [sh]
+        source: |
+          set -eu
+          cat > /tmp/normalized.txt <<'NORMALIZED'
+          {{inputs.parameters.normalized_alert}}
+          NORMALIZED
+          cat > /tmp/report.txt <<'REPORT'
+          {{inputs.parameters.report}}
+          REPORT
+
+          points=0
+          grep -Fq 'RUN_ID:' /tmp/normalized.txt && points=$((points + 1))
+          grep -Fq 'TIER_TWO_MCP_TRIAGE: completed' /tmp/report.txt && points=$((points + 1))
+          grep -Fq 'query_loki_logs' /tmp/report.txt && points=$((points + 1))
+          grep -Fq 'get pod' /tmp/report.txt && points=$((points + 1))
+          grep -Fq 'get events' /tmp/report.txt && points=$((points + 1))
+          grep -Fq 'logs ' /tmp/report.txt && points=$((points + 1))
+          grep -Fq 'MUTATION_PERFORMED: no' /tmp/report.txt && points=$((points + 1))
+          if grep -Eqi 'LOKI_EVIDENCE: *(NO_MATCH|.*failed|.*HTTP 5)' /tmp/report.txt; then
+            points=$((points - 1))
+          fi
+
+          printf '%s' "$points" > /tmp/score.txt
+          status=failed
+          [ "$points" -eq 7 ] && status=passed
+          printf '{"status":"%s","score":%s,"max_score":7,"task_id":"%s","transport":"%s"}\n' \
+            "$status" "$points" "{{inputs.parameters.task_id}}" "{{inputs.parameters.transport}}" \
+            > /tmp/result.json
+          cat /tmp/result.json
+          [ "$status" = passed ]

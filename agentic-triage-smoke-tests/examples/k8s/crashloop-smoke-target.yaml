@@ -33,7 +33,11 @@ spec:
             - /bin/sh
             - -c
             - |
-              echo "AGENTIC_TRIAGE_SMOKE_ERROR run_id=${RUN_ID:-manual} failure=crashloop"
+              i=1
+              while [ "$i" -le 5 ]; do
+                echo "AGENTIC_TRIAGE_SMOKE_ERROR run_id=${RUN_ID:-manual} reason=CrashLoopBackOffSimulation failure=synthetic_error_burst seq=$i"
+                i=$((i + 1))
+              done
               exit 42
           env:
             - name: RUN_ID

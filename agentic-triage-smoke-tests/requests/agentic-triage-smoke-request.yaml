@@ -20,9 +20,22 @@ spec:
     vectorCluster: "{{VECTOR_CLUSTER}}" # required only when webhookHop is "vector"
     argoNamespace: "{{ARGO_NAMESPACE}}"
     argoEventsNamespace: "{{ARGO_EVENTS_NAMESPACE}}"
+  observability:
+    monitoringNamespace: "{{MONITORING_NAMESPACE}}"
+    smokeNamespace: "{{SMOKE_NAMESPACE}}"
+    prometheusDatasourceUid: "{{PROMETHEUS_DATASOURCE_UID}}"
+    lokiDatasourceUid: "{{LOKI_DATASOURCE_UID}}"
+    lokiGatewayService: "{{LOKI_GATEWAY_SERVICE}}"
+    grafanaAlertWebhookUrl: "{{GRAFANA_ALERT_WEBHOOK_URL}}"
+    smokeContainer: "{{SMOKE_CONTAINER}}"
+    eventSmokePod: "{{EVENT_SMOKE_POD}}"
+    clusterEnvironment: "{{CLUSTER_ENVIRONMENT}}"
+    clusterRegion: "{{CLUSTER_REGION}}"
   agents:
     smokeAgentName: "{{SMOKE_AGENT_NAME}}"
     grafanaEvidenceAgent: "grafana-evidence-agent"
+    tierTwoAgent: "agentic-triage-tier-two-poc"
+    tierTwoWorkflowTemplate: "agentic-triage-tier-two"
     modelConfig: "{{MODEL_CONFIG}}"
   smokes:
     metricCrashloop: true

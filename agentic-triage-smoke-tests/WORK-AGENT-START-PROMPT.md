@@ -119,6 +119,15 @@ Do not proceed to smoke execution until those are known.
      into the same Vector/direct webhook path as metrics.
    If any item is absent, document the exact missing config and either apply
    the approved YAML/config through the work process or mark that smoke red.
+   Start from these tested bundle assets and adapt them to the installed
+   versions rather than recreating the queries from memory:
+   - `examples/monitoring/promtail-smoke-namespace-values.yaml`;
+   - `examples/alloy/kubernetes-events-to-loki.yaml`;
+   - `examples/grafana/source-type-alert-rules.yaml`;
+   - `examples/k8s/crashloop-smoke-target.yaml`;
+   - `examples/k8s/failed-scheduling-smoke-target.yaml`.
+   Do not claim container-image enrichment unless a structured `image` field is
+   visible in the firing webhook payload; image was not part of the live proof.
 5. Fill `requests/agentic-triage-smoke-request.yaml` with the work-environment
    values confirmed in step 0. Do not write secrets into repo files.
 6. Run `scripts/verify-bundle.sh`.

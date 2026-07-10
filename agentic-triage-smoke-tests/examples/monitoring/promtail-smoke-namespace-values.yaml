@@ -1,0 +1,15 @@
+# Merge into the Promtail Helm values used by the target environment.
+# Replace placeholders only in the private deployment repository.
+config:
+  snippets:
+    extraRelabelConfigs:
+      - action: replace
+        replacement: "{{CLUSTER_NAME}}"
+        target_label: cluster
+      - action: replace
+        replacement: logs
+        target_label: source_type
+      - action: keep
+        source_labels:
+          - namespace
+        regex: (kagent|argo-events|argo|agentic-triage-event-smoke)

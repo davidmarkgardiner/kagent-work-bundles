@@ -1,0 +1,8 @@
+# Merge into the kagent Helm values when the bundled Grafana MCP is enabled.
+# Current Grafana MCP images reject unlisted Kubernetes service Host headers.
+grafana-mcp:
+  args:
+    - --transport
+    - streamable-http
+    - --allowed-hosts
+    - kagent-grafana-mcp.kagent:8000,kagent-grafana-mcp.kagent.svc:8000,kagent-grafana-mcp.kagent.svc.cluster.local:8000

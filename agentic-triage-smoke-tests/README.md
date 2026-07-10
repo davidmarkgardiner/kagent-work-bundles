@@ -49,7 +49,7 @@ the Loki alert result and annotations.
 
 ## Current Evidence Boundary
 
-As of 2026-07-09, the live evidence proves several sub-paths:
+As of 2026-07-10, the live evidence proves several sub-paths:
 
 ```text
 Run A:
@@ -64,6 +64,20 @@ Run C:
 Kubernetes FailedScheduling event -> Alloy Kubernetes event source -> Loki
 -> Grafana Loki alert -> smart-triage webhook/EventSource -> Argo Workflow
 -> HITL/eval success
+
+Run D:
+pod error logs -> Promtail -> Loki -> Grafana LogQL alert
+-> smart-triage webhook/EventSource -> Argo Workflow -> Kimi specialists
+-> incident synthesis -> HITL gate
+
+Run E:
+metadata-only alert context -> kagent Tier 2 agent -> Grafana MCP Loki query
++ read-only AKS MCP pod/events/logs -> correlated diagnosis
+
+Run F:
+pod log failure -> Loki -> Grafana LogQL alert -> Vector webhook -> Kafka
+-> Argo EventSource/Sensor -> Tier 2 Workflow -> kagent MCP investigation
+-> deterministic 7/7 score
 ```
 
 No single continuous `run_id` has yet proven
@@ -71,11 +85,13 @@ No single continuous `run_id` has yet proven
 in one run. Treat that as the next required metrics smoke before claiming the
 metric crashloop path is fully end to end.
 
-The live evidence now proves one real Grafana-origin Kubernetes event alert via
-Alloy and Loki. It also proves the explicit `NO_TRACE` fallback marker in a
-live workflow. It does not yet prove application log alerts, real Tempo trace
-alerts, alert-to-GitLab-ticket updates, or a single continuous metric crashloop
-run all the way through Kimi and eval. Those smoke types remain required before
+The live evidence now proves real Grafana-origin Kubernetes event and
+application-log alerts via Loki, including reason, pod/workload identity, full
+event message or parsed log failure, and a ready-to-run evidence query in the
+triage payload. It also proves the explicit `NO_TRACE` fallback marker in a
+live workflow. It does not yet prove a real Tempo trace alert,
+alert-to-GitLab-ticket updates, or a single continuous metric crashloop run all
+the way through Kimi and eval. Those smoke types remain required before
 claiming full source coverage.
 
 ## Required Upstream Repo Assets
@@ -114,16 +130,75 @@ claiming full source coverage.
 7. Score the smoke with `scripts/score-smoke-run.py`.
 8. Send `prompts/CRITIQUE-PROMPT.md` to a separate review agent.
 
+## Repeatability Status
+
+The application-log and Kubernetes-event paths are documented, live-tested,
+and represented by placeholder-safe configuration in this bundle:
+
+| Layer | Reusable asset | Live status |
+|---|---|---|
+| Application log generator | `examples/k8s/crashloop-smoke-target.yaml` | Proven pattern |
+| Pod log collection | `examples/monitoring/promtail-smoke-namespace-values.yaml` | Proven configuration shape |
+| Kubernetes event generator | `examples/k8s/failed-scheduling-smoke-target.yaml` | Proven |
+| Kubernetes event export | `examples/alloy/kubernetes-events-to-loki.yaml` | Proven configuration shape |
+| Grafana LogQL rules and contact point | `examples/grafana/source-type-alert-rules.yaml` | Log/event query shapes proven; provisioning schema must match installed Grafana |
+| Webhook and workflow routing | `a2a/smart-triage-fanout-demo/` and this bundle's routing examples | Direct route proven |
+| Enriched triage normalization | `a2a/smart-triage-fanout-demo/workflow-template.yaml` | Proven with captured live Grafana payload |
+| Tier 2 kagent investigator | `examples/kagent/tier-two-mcp-triage-agent.yaml` | Grafana MCP plus AKS MCP investigation proven from metadata-only input |
+| AKS MCP least privilege | `examples/kagent/aks-mcp-readonly-values.yaml` and `platform/aks-mcp/chart/templates/rbac.yaml` | Pods, events, and pod logs allowed; Secrets and mutations denied |
+| Grafana MCP service access | `examples/kagent/grafana-mcp-host-validation-values.yaml` | Tool discovery and Loki query proven after explicit Host allowlist |
+| Periodic Tier 2 workflow | `examples/argo/tier-two-mcp-triage-workflow-template.yaml` | Vector/Kafka-triggered metadata-only MCP investigation and strict 7/7 score proven |
+
+This does not mean every observability source is complete. A real Tempo trace
+alert, structured container image enrichment, parameterized periodic alert
+rules, and source-accurate post-HITL lifecycle scoring remain explicit gaps.
+
+The direct Tier 2 proof is documented in
+`evidence/PROXMOX-TIER-TWO-MCP-TRIAGE-2026-07-10.md`. The continuous
+Grafana-to-Vector-to-Kafka proof is documented in
+`evidence/PROXMOX-TIER-TWO-KAFKA-E2E-2026-07-10.md`. The workflow includes
+controller-task polling for retryable A2A response failures.
+
+## Configuration
+
+Fill values in `requests/agentic-triage-smoke-request.yaml`, then substitute the
+matching placeholders in the example manifests. Important observability values
+include:
+
+```text
+{{CLUSTER_NAME}}
+{{CLUSTER_ENVIRONMENT}}
+{{CLUSTER_REGION}}
+{{MONITORING_NAMESPACE}}
+{{SMOKE_NAMESPACE}}
+{{SMOKE_CONTAINER}}
+{{EVENT_SMOKE_POD}}
+{{PROMETHEUS_DATASOURCE_UID}}
+{{LOKI_DATASOURCE_UID}}
+{{LOKI_GATEWAY_SERVICE}}
+{{GRAFANA_ALERT_WEBHOOK_URL}}
+{{ALLOY_IMAGE}}
+```
+
+Use an approved local-registry image where the target cluster blocks public
+registries. Do not write credentials or environment-specific private URLs into
+the public bundle. Replace only the uppercase environment placeholders. Keep
+Grafana runtime templates such as `{{ $labels.pod }}` and LogQL templates such
+as `{{.name}}` intact; Grafana/Loki evaluates those at runtime.
+
 Per-source Grafana alert examples are in:
 
 ```text
 ALERTMANAGER-EVENT-ROUTING.md
+LGTM-EVIDENCE-BRIDGE-GAP.md
 LGTM-FIT-FOR-PURPOSE-ASSESSMENT.md
+LGTM-INTEGRATION-PROBLEM-STATEMENT.md
 LGTM-LOG-EVENT-TRIAGE-README.md
 LGTM-METRICS-ONLY-COVERAGE.md
 SOURCE-TYPE-ALERT-EXAMPLES.md
 examples/grafana/agentic-triage-stack-health-dashboard.json
 examples/grafana/source-type-alert-rules.yaml
+examples/monitoring/promtail-smoke-namespace-values.yaml
 examples/alertmanager-payloads/
 ```
 
@@ -177,9 +252,42 @@ evidence/PROXMOX-LOG-LOKI-SMOKE-BLOCKED-2026-07-09.md
 evidence/PROXMOX-TRACE-FALLBACK-2026-07-09.md
 ```
 
-The log smoke is intentionally marked `not_proven`: the pod emitted the marker,
-but Promtail did not deliver it to Loki during the smoke window. The trace smoke
-is marked `fallback_proven`, not real Tempo coverage.
+The 2026-07-09 log smoke is intentionally marked `not_proven`: the pod emitted
+the marker, but Promtail did not deliver it to Loki during that smoke window.
+The 2026-07-10 retest below closes that log-ingestion gap. The trace smoke is
+still marked `fallback_proven`, not real Tempo coverage.
+
+The 2026-07-10 recovery and final live event/log alert proof is captured in:
+
+```text
+evidence/PROXMOX-LGTM-BRIDGE-LIVE-PREFLIGHT-2026-07-10.md
+```
+
+That retest identifies and fixes the Promtail namespace filter, proves both
+LogQL alerts and their enriched webhook payloads, fixes specialist OOM and
+hard-coded demo context, and verifies corrected incident synthesis at the HITL
+gate.
+
+The metadata-only Tier 2 investigation proof is captured in:
+
+```text
+evidence/PROXMOX-TIER-TWO-MCP-TRIAGE-2026-07-10.md
+```
+
+That run proves a kagent Agent can use Grafana MCP and read-only AKS MCP to
+recover and correlate Loki logs, pod state, Kubernetes events, and container
+logs. At the time of that direct proof, automatic Kafka/workflow dispatch and
+the A2A recovery path were still open; the follow-up below closes the dispatch
+path and implements controller polling.
+
+The follow-up continuous Kafka proof is captured in:
+
+```text
+evidence/PROXMOX-TIER-TWO-KAFKA-E2E-2026-07-10.md
+```
+
+That run preserves one run ID from Grafana through Vector, Kafka, Argo Events,
+kagent, Grafana MCP, AKS MCP, and a deterministic 7/7 workflow score.
 
 The specialist capacity fix is captured in:
 

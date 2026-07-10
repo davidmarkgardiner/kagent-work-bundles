@@ -1,0 +1,18 @@
+# Use with platform/aks-mcp/chart. Read-only application mode must be paired
+# with read-only RBAC; an Agent system prompt alone is not a security boundary.
+image:
+  repository: "{{AKS_MCP_IMAGE_REPOSITORY}}"
+  tag: "{{AKS_MCP_IMAGE_TAG}}"
+  pullPolicy: IfNotPresent
+app:
+  transport: streamable-http
+  accessLevel: readonly
+  timeout: 600
+  logLevel: info
+rbac:
+  create: true
+  includeSecrets: false
+config:
+  enabledComponents:
+    - kubectl
+  allowNamespaces: []

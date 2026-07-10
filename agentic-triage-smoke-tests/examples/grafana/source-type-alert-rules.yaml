@@ -1,6 +1,7 @@
 # Grafana alerting provisioning example for agentic triage source-type smokes.
-# This file is illustrative and placeholder-safe. Validate against the Grafana
-# version installed in the target cluster before applying.
+# The log and event query shapes match the 2026-07-10 live proof. The file is
+# placeholder-safe; validate provisioning schema against the installed Grafana
+# version before applying.
 apiVersion: 1
 contactPoints:
   - orgId: 1
@@ -9,7 +10,16 @@ contactPoints:
       - uid: agentic-triage-smart-triage-webhook
         type: webhook
         settings:
-          url: http://{{SMART_TRIAGE_EVENTSOURCE_SERVICE}}.{{ARGO_EVENTS_NAMESPACE}}.svc.cluster.local:12000/alerts
+          url: "{{GRAFANA_ALERT_WEBHOOK_URL}}"
+          httpMethod: POST
+        disableResolveMessage: true
+  - orgId: 1
+    name: agentic-triage-vector-kafka-webhook
+    receivers:
+      - uid: agentic-triage-vector-kafka-webhook
+        type: webhook
+        settings:
+          url: "{{VECTOR_WEBHOOK_URL}}"
           httpMethod: POST
         disableResolveMessage: true
 groups:
@@ -47,7 +57,7 @@ groups:
           description: Agentic triage metrics smoke from Grafana to webhook.
       - uid: ats-log-errorburst
         title: Agentic Triage Smoke Log Error Burst {{RUN_ID}}
-        condition: A
+        condition: C
         data:
           - refId: A
             datasourceUid: "{{LOKI_DATASOURCE_UID}}"
@@ -56,9 +66,36 @@ groups:
               to: 0
             model:
               refId: A
-              expr: 'sum by (namespace,pod,container) (count_over_time({namespace="{{SMOKE_NAMESPACE}}",container="{{SMOKE_CONTAINER}}"} |= "AGENTIC_TRIAGE_SMOKE_ERROR" | json | run_id="{{RUN_ID}}" [5m])) >= 5'
+              queryType: range
+              editorMode: code
+              expr: 'sum by (cluster,namespace,pod,container,app,service_name,node_name,reason,failure,run_id) (count_over_time({namespace="{{SMOKE_NAMESPACE}}",source_type="logs"} |= "AGENTIC_TRIAGE_SMOKE_ERROR" | logfmt | run_id="{{RUN_ID}}" [5m]))'
               intervalMs: 1000
               maxDataPoints: 43200
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+                  operator:
+                    type: and
+                  query:
+                    params: [C]
+                  reducer:
+                    type: last
+                    params: []
+                  type: query
         noDataState: NoData
         execErrState: Error
         for: 30s
@@ -69,12 +106,16 @@ groups:
           run_id: "{{RUN_ID}}"
           smoke: log-errorburst
           source_type: logs
+          route_to: vector-kafka
         annotations:
-          summary: Smoke workload emitted an error log burst
-          description: Agentic triage Loki smoke from Grafana to webhook.
+          summary: 'Pod log error {{ $labels.reason }} in {{ $labels.namespace }}/{{ $labels.pod }}'
+          description: 'Cluster={{ $labels.cluster }} namespace={{ $labels.namespace }} pod={{ $labels.pod }} container={{ $labels.container }} service={{ $labels.service_name }} node={{ $labels.node_name }} reason={{ $labels.reason }} failure={{ $labels.failure }} run_id={{ $labels.run_id }}'
+          log_reason: '{{ $labels.reason }}'
+          failure: '{{ $labels.failure }}'
+          evidence_query: '{cluster="{{ $labels.cluster }}", namespace="{{ $labels.namespace }}", pod="{{ $labels.pod }}", source_type="logs"} |= "AGENTIC_TRIAGE_SMOKE_ERROR"'
       - uid: ats-event-failedscheduling
         title: Agentic Triage Smoke Event FailedScheduling {{RUN_ID}}
-        condition: A
+        condition: C
         data:
           - refId: A
             datasourceUid: "{{LOKI_DATASOURCE_UID}}"
@@ -83,9 +124,36 @@ groups:
               to: 0
             model:
               refId: A
-              expr: 'sum by (namespace,involved_object_name,reason) (count_over_time({namespace="{{SMOKE_NAMESPACE}}",job=~".*event.*"} |= "FailedScheduling" |= "{{RUN_ID}}" [5m])) > 0'
+              queryType: range
+              editorMode: code
+              expr: 'sum by (cluster,namespace,event_reason,event_type,pod,event_message) (count_over_time({job="kubernetes-events",namespace="{{SMOKE_NAMESPACE}}",event_reason="FailedScheduling"} | json | name="{{EVENT_SMOKE_POD}}" | label_format pod="{{.name}}", event_message="{{.msg}}" [5m]))'
               intervalMs: 1000
               maxDataPoints: 43200
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+                  operator:
+                    type: and
+                  query:
+                    params: [C]
+                  reducer:
+                    type: last
+                    params: []
+                  type: query
         noDataState: NoData
         execErrState: Error
         for: 30s
@@ -98,8 +166,11 @@ groups:
           source_type: events
           event_reason: FailedScheduling
         annotations:
-          summary: Smoke pod failed scheduling
-          description: Agentic triage Kubernetes event smoke from Grafana to webhook.
+          summary: 'Kubernetes {{ $labels.event_reason }} event for {{ $labels.namespace }}/{{ $labels.pod }}'
+          description: 'Cluster={{ $labels.cluster }} namespace={{ $labels.namespace }} pod={{ $labels.pod }} type={{ $labels.event_type }} reason={{ $labels.event_reason }}'
+          event_reason: '{{ $labels.event_reason }}'
+          event_message: '{{ $labels.event_message }}'
+          evidence_query: '{job="kubernetes-events", namespace="{{ $labels.namespace }}", event_reason="{{ $labels.event_reason }}"} |= "{{ $labels.pod }}"'
       - uid: ats-trace-latency
         title: Agentic Triage Smoke Trace Latency {{RUN_ID}}
         condition: A
@@ -138,6 +209,11 @@ policies:
       - run_id
       - smoke
     routes:
+      - receiver: agentic-triage-vector-kafka-webhook
+        object_matchers:
+          - - route_to
+            - =
+            - vector-kafka
       - receiver: agentic-triage-smart-triage-webhook
         object_matchers:
           - - run_id

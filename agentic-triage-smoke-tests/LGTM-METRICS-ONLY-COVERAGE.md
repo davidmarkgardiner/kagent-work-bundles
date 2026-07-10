@@ -131,3 +131,6 @@ is to ask the LGTM team to close those gaps. If they cannot, the go/no-go
 decision should include hosting or operating our own Grafana/LGTM stack where
 we control Alloy, Loki, alert provisioning, notification policies, API/MCP
 access, and smoke-test automation.
+
+For the proposed bridge design for event reasons and pod log errors, see
+`LGTM-EVIDENCE-BRIDGE-GAP.md`.
