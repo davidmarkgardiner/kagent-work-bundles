@@ -98,6 +98,7 @@ claiming full source coverage.
 
 | Asset | Use |
 |---|---|
+| `work-agent-bundles/agentic-triage-smoke-tests/DESIRED-STATE.md` | Acceptance contract, hard failures, required evidence, and final verdict format |
 | `work-agent-bundles/kagent-agentic-cluster-smoke-tests.md` | Runtime and A2A completion gate before alert testing |
 | `a2a/smart-triage-fanout-demo/` | Alertmanager replay, fan-out workflow, dedup, HITL, lifecycle eval hook |
 | `agents/grafana-evidence-agent/` | Shared Grafana metrics/logs/traces evidence specialist |
@@ -121,14 +122,17 @@ claiming full source coverage.
 
 ## How To Run
 
-1. Run `bash scripts/verify-bundle.sh`.
-2. Fill `requests/agentic-triage-smoke-request.yaml` in the work context.
-3. Run `WORK-AGENT-START-PROMPT.md` with the work-side agent.
-4. Execute runtime readiness from `work-agent-bundles/kagent-agentic-cluster-smoke-tests.md`.
-5. Execute the smoke matrix in `SMOKE-RUNBOOK.md`.
-6. Capture evidence with `evidence/EVIDENCE-TEMPLATE.md`.
-7. Score the smoke with `scripts/score-smoke-run.py`.
-8. Send `prompts/CRITIQUE-PROMPT.md` to a separate review agent.
+1. Read `DESIRED-STATE.md` and select the test profile.
+2. Run `bash scripts/verify-bundle.sh`.
+3. Fill `requests/agentic-triage-smoke-request.yaml` in the work context.
+4. Run `WORK-AGENT-START-PROMPT.md` with the work-side agent.
+5. Execute runtime readiness from `work-agent-bundles/kagent-agentic-cluster-smoke-tests.md`.
+6. Execute the selected profile in `SMOKE-RUNBOOK.md`.
+7. Capture evidence with `evidence/EVIDENCE-TEMPLATE.md`.
+8. Score the smoke with `scripts/score-smoke-run.py` and complete the
+   desired-state comparison matrix.
+9. Send `prompts/CRITIQUE-PROMPT.md` and the evidence package to a separate
+   review agent.
 
 ## Repeatability Status
 

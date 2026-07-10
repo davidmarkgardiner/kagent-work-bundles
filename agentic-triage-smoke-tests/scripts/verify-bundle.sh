@@ -6,6 +6,7 @@ repo_root="$(cd "$bundle_dir/../.." && pwd)"
 
 required_files=(
   "README.md"
+  "DESIRED-STATE.md"
   "FRONT-SHEET.md"
   "SMOKE-RUNBOOK.md"
   "ALERTMANAGER-EVENT-ROUTING.md"
@@ -60,6 +61,9 @@ if command -v python3 >/dev/null 2>&1; then
 from pathlib import Path
 root = Path("$bundle_dir")
 needles = [
+    "DS-16",
+    "tier-two-continuous",
+    "7/7",
     "metric-crashloop",
     "log-errorburst",
     "event-failedscheduling",

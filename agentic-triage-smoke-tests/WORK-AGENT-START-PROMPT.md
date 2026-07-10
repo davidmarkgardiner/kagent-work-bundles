@@ -103,12 +103,15 @@ Do not proceed to smoke execution until those are known.
 
 ## Steps
 
-1. Read `work-agent-bundles/agentic-triage-smoke-tests/README.md`.
-2. Read `work-agent-bundles/agentic-triage-smoke-tests/SMOKE-RUNBOOK.md`.
-3. Read `work-agent-bundles/agentic-triage-smoke-tests/ALERTMANAGER-EVENT-ROUTING.md`
+1. Read `work-agent-bundles/agentic-triage-smoke-tests/DESIRED-STATE.md`,
+   select a test profile, and treat every mandatory gate and hard failure as
+   the acceptance contract. Do not combine evidence from different run IDs.
+2. Read `work-agent-bundles/agentic-triage-smoke-tests/README.md`.
+3. Read `work-agent-bundles/agentic-triage-smoke-tests/SMOKE-RUNBOOK.md`.
+4. Read `work-agent-bundles/agentic-triage-smoke-tests/ALERTMANAGER-EVENT-ROUTING.md`
    and compare it against what you confirmed in step 0. Note any divergence
    (e.g. Vector hop not described there) in your evidence.
-4. Verify or install the normal configuration needed for first-class Loki
+5. Verify or install the normal configuration needed for first-class Loki
    source alerts:
    - pod log ingestion into Loki for the smoke namespace;
    - Kubernetes event ingestion into Loki using Alloy
@@ -128,20 +131,23 @@ Do not proceed to smoke execution until those are known.
    - `examples/k8s/failed-scheduling-smoke-target.yaml`.
    Do not claim container-image enrichment unless a structured `image` field is
    visible in the firing webhook payload; image was not part of the live proof.
-5. Fill `requests/agentic-triage-smoke-request.yaml` with the work-environment
+6. Fill `requests/agentic-triage-smoke-request.yaml` with the work-environment
    values confirmed in step 0. Do not write secrets into repo files.
-6. Run `scripts/verify-bundle.sh`.
-7. Run the runtime readiness gate in
+7. Run `scripts/verify-bundle.sh`.
+8. Run the runtime readiness gate in
    `work-agent-bundles/kagent-agentic-cluster-smoke-tests.md`.
-8. Import or verify an equivalent Grafana dashboard for general stack health
+9. Import or verify an equivalent Grafana dashboard for general stack health
    using `examples/grafana/agentic-triage-stack-health-dashboard.json`.
    Use Grafana MCP if available. Confirm panels or replacement queries cover
    kagent agent readiness, agentgateway request health, workflow health,
    EventSource/Sensor pods, Vector/Kafka health when used, smoke freshness, and
    source coverage.
-9. Execute the smoke matrix for metrics, logs, events, traces or trace fallback,
-   dedup, and one negative health case.
-10. Capture evidence in `evidence/EVIDENCE-TEMPLATE.md`, including the
+10. Execute the selected profile. For `tier-two-continuous`, prove one complete
+    log or event path and all `DS-01` through `DS-16` gates. For
+    `full-source-campaign`, also execute metrics, logs, events, traces or trace
+    fallback, dedup, and one negative health case. For `periodic-health`, use a
+    controlled non-destructive canary and prove freshness and failure alerting.
+11. Capture evidence in `evidence/EVIDENCE-TEMPLATE.md`, including the
    confirmed topology from step 0 and, if Vector is in the path, one sample
    showing the alert payload before and after Vector.
 
@@ -151,6 +157,10 @@ healthy.
 
 Required final answer:
 
+- selected desired-state profile, single continuous `run_id`, deterministic
+  score, and completed `DS-01` through `DS-16` comparison matrix;
+- explicit hard failures, deviations, cleanup status, and next owner using the
+  final verdict format in `DESIRED-STATE.md`;
 - confirmed topology: alert-origin cluster, receiving cluster, and whether
   Vector or a direct webhook sits in front of the smart-triage EventSource;
 - verdict: `red`, `amber`, or `green`;

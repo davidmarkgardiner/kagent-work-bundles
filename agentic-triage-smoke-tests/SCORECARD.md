@@ -12,6 +12,12 @@ Use two gates:
 The Proxmox run on 2026-07-09 passed the alert-intake part but failed the agent
 completion part because the model backend returned `502`.
 
+For the `tier-two-continuous` profile, `DESIRED-STATE.md` is stricter than the
+weighted campaign score below: all mandatory gates must pass in one continuous
+`run_id`, and the dedicated Workflow score must be exactly `7/7`. The `0.85`
+threshold remains the aggregate readiness gate for the broader
+`full-source-campaign`; it cannot be used to accept a partial Tier 2 path.
+
 ## Gate 1: Smoke Readiness
 
 This gate answers:

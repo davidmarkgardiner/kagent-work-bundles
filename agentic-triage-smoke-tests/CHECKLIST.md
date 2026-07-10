@@ -12,7 +12,8 @@
 
 - [ ] Metrics crashloop/restart smoke completed.
 - [ ] Metrics CPU/memory pressure smoke completed or explicitly skipped with reason.
-- [ ] Loki log error-burst smoke completed. Current status: blocked by log shipping to Loki.
+- [x] Loki log error-burst pattern live-proven in the reference environment.
+  A new deployment must produce its own evidence against `DESIRED-STATE.md`.
 - [x] Kubernetes event smoke completed.
 - [x] Trace smoke completed or `NO_TRACE` fallback was explicit. Current status: fallback only, not real Tempo.
 - [ ] Duplicate fingerprint suppresses duplicate fan-out.
