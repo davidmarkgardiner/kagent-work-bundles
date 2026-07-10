@@ -44,3 +44,7 @@ The work-side replication path is configuration-first:
 Metric alerts remain useful, but they are not enough by themselves. If a metric
 alert needs related logs/events, the triage agent or an enrichment service must
 query Loki around the alert time window.
+
+For the fuller work-team assessment, including OTel/Loki label guidance and
+go/no-go criteria for managed LGTM versus self-hosted Grafana/LGTM, see
+`LGTM-FIT-FOR-PURPOSE-ASSESSMENT.md`.

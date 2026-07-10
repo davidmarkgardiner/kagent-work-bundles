@@ -118,6 +118,7 @@ Per-source Grafana alert examples are in:
 
 ```text
 ALERTMANAGER-EVENT-ROUTING.md
+LGTM-FIT-FOR-PURPOSE-ASSESSMENT.md
 LGTM-LOG-EVENT-TRIAGE-README.md
 SOURCE-TYPE-ALERT-EXAMPLES.md
 examples/grafana/agentic-triage-stack-health-dashboard.json
