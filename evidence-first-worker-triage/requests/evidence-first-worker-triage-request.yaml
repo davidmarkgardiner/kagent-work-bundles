@@ -1,0 +1,22 @@
+apiVersion: triage.kagent.dev/v1alpha1
+kind: EvidenceFirstWorkerTriageRequest
+metadata:
+  name: {{PILOT_NAME}}
+  namespace: {{MANAGEMENT_NAMESPACE}}
+spec:
+  worker:
+    cluster: {{WORKER_CLUSTER_NAME}}
+    namespace: {{NON_PRODUCTION_NAMESPACE}}
+    allowedSignals: [log, kubernetes-event]
+  kafka:
+    evidenceTopic: triage.{{ENVIRONMENT}}.{{TENANT}}.evidence.v3
+    quarantineTopic: triage.{{ENVIRONMENT}}.{{TENANT}}.quarantine.v3
+    recordKey: incident_fingerprint
+  management:
+    idempotencyWindow: 24h
+    triageMode: read-only
+    ticketMode: idempotent
+  safety:
+    alertmanagerChangeAllowed: false
+    remediationAllowed: false
+    publicSafeOutputRequired: true

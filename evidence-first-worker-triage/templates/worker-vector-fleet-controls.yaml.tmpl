@@ -1,0 +1,56 @@
+# Review scaffold only. Merge into the approved worker Vector release; do not
+# apply without a reviewed Vector config, Kafka identity and storage class.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ${PILOT_NAME}-vector
+  namespace: ${WORKER_NAMESPACE}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ${PILOT_NAME}-vector
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${PILOT_NAME}-vector
+  namespace: ${WORKER_NAMESPACE}
+  labels:
+    app.kubernetes.io/name: ${PILOT_NAME}-vector
+    triage.kagent.dev/pilot: ${PILOT_NAME}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ${PILOT_NAME}-vector
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ${PILOT_NAME}-vector
+    spec:
+      # Add topology spread and a restricted service account in the target overlay.
+      containers:
+        - name: vector
+          image: ${VECTOR_IMAGE}
+          volumeMounts:
+            - name: buffer
+              mountPath: /var/lib/vector
+          # The reviewed Vector config must set disk buffering, explicit producer
+          # delivery policy, versioned redaction and signature allow-list.
+      volumes:
+        - name: buffer
+          persistentVolumeClaim:
+            claimName: ${PILOT_NAME}-vector-buffer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ${PILOT_NAME}-vector-buffer
+  namespace: ${WORKER_NAMESPACE}
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: ${VECTOR_BUFFER_SIZE}
+  storageClassName: ${APPROVED_STORAGE_CLASS}

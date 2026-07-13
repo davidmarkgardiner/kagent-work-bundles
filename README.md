@@ -30,6 +30,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 | `runtime-model-gateway-readiness/` | Runtime, model, Agent Gateway, A2A, and MCP preflight | Proves model backend, Agent Gateway, A2A, and required MCP servers are live before downstream demos |
 | `sre-grafana-mcp-observability/` | Grafana MCP observability | SRE asks a kagent front door to build/verify dashboards, alerts, logs, metrics, and GitOps observability changes |
 | `grafana-kafka-alert-verification/` | Grafana Alerting to Kafka verification | Proves real Grafana alert firing, consumes the Confluent Kafka record, captures payload shape, and records the schema validation decision |
+| `evidence-first-worker-triage/` | Worker log/event evidence to management triage | Proves Alloy + Vector + Kafka evidence transport to management Argo/kagent without Alertmanager in the trigger path |
 | `agentic-triage-smoke-tests/` | Agentic triage smoke tests | Proves metrics, logs, events, traces or trace fallback, agent correctness, and Grafana health after a new install |
 | `sre-adoption-feedback-loop/` | SRE adoption and feedback loop | SRE onboards one app, uses/reviews the workflow, captures feedback, routes improvements, and reports adoption |
 | `kagent-triage-v2-kb-gitlab-mcp/` | KB + doc2vec/querydoc + GitLab MCP | Agent updates KB docs through GitLab MCP, reindexes querydoc, and proves cited retrieval |

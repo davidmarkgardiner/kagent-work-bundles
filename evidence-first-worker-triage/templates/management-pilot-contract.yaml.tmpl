@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${PILOT_NAME}-evidence-triage-contract
+  namespace: ${MANAGEMENT_NAMESPACE}
+data:
+  accepted_schema_majors: "v2,v3"
+  evidence_topic: "triage.${ENVIRONMENT}.${TENANT}.evidence.v3"
+  quarantine_topic: "triage.${ENVIRONMENT}.${TENANT}.quarantine.v3"
+  record_key: "incident_fingerprint"
+  worker_cluster: "${WORKER_CLUSTER_NAME}"
+  ttl_backend: "${DURABLE_TTL_BACKEND}"
+  kafka_auth_mode: "${KAFKA_AUTH_MODE}"
+  data_classification_reference: "${DATA_CLASSIFICATION_REFERENCE}"
+  alertmanager_change_allowed: "false"
+  remediation_allowed: "false"
+  note: "Contract only; implement validation, durable TTL, DLQ and ticket idempotency before pilot."
