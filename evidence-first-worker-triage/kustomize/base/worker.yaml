@@ -1,0 +1,152 @@
+apiVersion: v1
+kind: Namespace
+metadata: {name: evidence-first-demo}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: evidence-first-alloy}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: evidence-first-alloy-read}
+rules:
+- apiGroups: [""]
+  resources: [pods, pods/log, events]
+  verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: evidence-first-alloy-read}
+subjects: [{kind: ServiceAccount, name: evidence-first-alloy}]
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: evidence-first-alloy-read}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: evidence-first-alloy-config}
+data:
+  evidence-fragment.alloy: |
+    // Pilot-only collector. It uses namespace-scoped read-only RBAC.
+    discovery.kubernetes "evidence_pods" { role = "pod" }
+    discovery.relabel "evidence_logs" {
+      targets = discovery.kubernetes.evidence_pods.targets
+      rule { source_labels = ["__meta_kubernetes_namespace"]; regex = sys.env("TRIAGE_WORKER_NAMESPACE"); action = "keep" }
+      rule { source_labels = ["__meta_kubernetes_namespace"]; target_label = "namespace" }
+      rule { source_labels = ["__meta_kubernetes_pod_name"]; target_label = "pod" }
+      rule { source_labels = ["__meta_kubernetes_pod_container_name"]; target_label = "container" }
+      rule { source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]; target_label = "service" }
+    }
+    loki.source.kubernetes "evidence_logs" { targets = discovery.relabel.evidence_logs.output; forward_to = [loki.process.evidence_logs.receiver] }
+    loki.source.kubernetes_events "evidence_events" { namespaces = [sys.env("TRIAGE_WORKER_NAMESPACE")]; log_format = "json"; forward_to = [loki.process.evidence_events.receiver] }
+    loki.process "evidence_logs" { stage.static_labels { values = {cluster = sys.env("TRIAGE_CLUSTER_NAME"), source_type = "pod-log"} }; forward_to = [otelcol.receiver.loki.evidence_vector.receiver] }
+    loki.process "evidence_events" {
+      stage.json { expressions = { event_reason = "reason", event_type = "type", namespace = "involvedObject.namespace", pod = "involvedObject.name" } }
+      stage.static_labels { values = {cluster = sys.env("TRIAGE_CLUSTER_NAME"), source_type = "kubernetes-event"} }
+      forward_to = [otelcol.receiver.loki.evidence_vector.receiver]
+    }
+    otelcol.receiver.loki "evidence_vector" { output { logs = [otelcol.exporter.otlphttp.evidence_vector.input] } }
+    otelcol.exporter.otlphttp "evidence_vector" { client { endpoint = "http://evidence-first-vector:4318" } }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: evidence-first-alloy}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: evidence-first-alloy}}
+  template:
+    metadata: {labels: {app: evidence-first-alloy}}
+    spec:
+      serviceAccountName: evidence-first-alloy
+      containers:
+      - name: alloy
+        image: grafana/alloy:v1.12.2
+        args: [run, /etc/alloy/config.alloy, --storage.path=/var/lib/alloy]
+        env:
+        - {name: TRIAGE_WORKER_NAMESPACE, valueFrom: {configMapKeyRef: {name: evidence-first-vars, key: WORKER_NAMESPACE}}}
+        - {name: TRIAGE_CLUSTER_NAME, valueFrom: {configMapKeyRef: {name: evidence-first-vars, key: WORKER_CLUSTER_NAME}}}
+        volumeMounts: [{name: config, mountPath: /etc/alloy, readOnly: true}]
+      volumes: [{name: config, configMap: {name: evidence-first-alloy-config}}]
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: evidence-first-vector-config}
+data:
+  vector.yaml: |
+    data_dir: /var/lib/vector
+    sources:
+      alloy_otlp: {type: opentelemetry, http: {address: 0.0.0.0:4318}}
+    transforms:
+      normalize:
+        type: remap
+        inputs: [alloy_otlp.logs]
+        source: |
+          message = to_string(.message) ?? to_string(.body) ?? ""
+          safe = truncate(redact(message, filters: [r'(?i)(password|token|api[_-]?key|secret)\\s*[=:]\\s*[^\\s,;]+']), 512, suffix: "…")
+          cluster = to_string(.cluster) ?? to_string(.attributes.cluster) ?? "unknown"
+          namespace = to_string(.namespace) ?? to_string(.attributes.namespace) ?? "unknown"
+          workload = to_string(.service) ?? to_string(.attributes.service) ?? "unknown"
+          reason = to_string(.event_reason) ?? to_string(.attributes.event_reason) ?? "log-error-signature"
+          source_type = to_string(.source_type) ?? to_string(.attributes.source_type) ?? "pod-log"
+          event_type = to_string(.event_type) ?? to_string(.attributes.event_type) ?? ""
+          . = {"schema_version":"observability.triage.v3","incident_fingerprint":sha2(join!([cluster,namespace,workload,reason],":")),"delivery_key":sha2(join!([cluster,namespace,workload,reason,safe],":")),"cluster":cluster,"namespace":namespace,"workload":workload,"reason":reason,"signal_kind":if source_type == "kubernetes-event" {"event"} else {"log"},"event_type":event_type,"evidence":{"summary":safe},"automation_allowed":false}
+      incident_only:
+        type: filter
+        inputs: [normalize]
+        condition: '(.signal_kind == "log" && match(string!(.evidence.summary), r'"'"'(?i)(error|exception|fatal|failed|crashloop|back-off|oom)'"'"')) || (.signal_kind == "event" && .event_type == "Warning" && match(string!(.reason), r'"'"'^(FailedScheduling|OOMKilled|OOMKilling|BackOff|Failed|Unhealthy)$'"'"'))'
+      exact_duplicate_suppression:
+        type: dedupe
+        inputs: [incident_only]
+        fields: {match: [delivery_key]}
+        cache: {num_events: 10000}
+    sinks:
+      confluent:
+        type: kafka
+        inputs: [exact_duplicate_suppression]
+        bootstrap_servers: "${KAFKA_BOOTSTRAP}"
+        topic: "${KAFKA_TOPIC}"
+        key_field: incident_fingerprint
+        encoding: {codec: json}
+        buffer: {type: disk, max_size: 1Gi, when_full: block}
+        librdkafka_options: {security.protocol: sasl_ssl, sasl.mechanism: PLAIN, sasl.username: "${CONFLUENT_SA_KEY}", sasl.password: "${CONFLUENT_SA_SECRET}"}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: evidence-first-vector}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app: evidence-first-vector}}
+  template:
+    metadata: {labels: {app: evidence-first-vector}}
+    spec:
+      containers:
+      - name: vector
+        image: timberio/vector:0.45.0-debian
+        args: ["--config", "/etc/vector/vector.yaml"]
+        ports: [{name: otlp, containerPort: 4318}]
+        env:
+        - name: CONFLUENT_SA_KEY
+          valueFrom: {secretKeyRef: {name: REPLACE_KAFKA_SECRET_NAME, key: key}}
+        - name: CONFLUENT_SA_SECRET
+          valueFrom: {secretKeyRef: {name: REPLACE_KAFKA_SECRET_NAME, key: secret}}
+        - name: KAFKA_BOOTSTRAP
+          valueFrom: {configMapKeyRef: {name: evidence-first-vars, key: KAFKA_BOOTSTRAP}}
+        - name: KAFKA_TOPIC
+          valueFrom: {configMapKeyRef: {name: evidence-first-vars, key: KAFKA_TOPIC}}
+        volumeMounts: [{name: config, mountPath: /etc/vector, readOnly: true}, {name: buffer, mountPath: /var/lib/vector}]
+      volumes:
+      - {name: config, configMap: {name: evidence-first-vector-config}}
+      - {name: buffer, persistentVolumeClaim: {claimName: evidence-first-vector-buffer}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: evidence-first-vector}
+spec: {selector: {app: evidence-first-vector}, ports: [{name: otlp, port: 4318, targetPort: otlp}]}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {name: evidence-first-vector-buffer}
+spec: {accessModes: [ReadWriteOnce], resources: {requests: {storage: 1Gi}}}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: {name: evidence-first-vector}
+spec: {minAvailable: 1, selector: {matchLabels: {app: evidence-first-vector}}}

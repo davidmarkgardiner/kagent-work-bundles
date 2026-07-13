@@ -1,0 +1,155 @@
+# Additive worker-cluster pilot. Merge the Alloy fragment into the existing
+# Alloy release; do not install another cluster-wide Alloy instance.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${PILOT_NAME}-alloy-evidence-fragment
+  namespace: ${WORKER_NAMESPACE}
+data:
+  evidence-fragment.alloy: |
+    // Merge this fragment into the approved existing Alloy configuration.
+    // Scope is intentionally one pilot namespace.
+    discovery.kubernetes "evidence_pods" { role = "pod" }
+    discovery.relabel "evidence_pod_logs" {
+      targets = discovery.kubernetes.evidence_pods.targets
+      rule { source_labels = ["__meta_kubernetes_namespace"]; regex = "${WORKER_NAMESPACE}"; action = "keep" }
+      rule { source_labels = ["__meta_kubernetes_namespace"]; target_label = "namespace" }
+      rule { source_labels = ["__meta_kubernetes_pod_name"]; target_label = "pod" }
+      rule { source_labels = ["__meta_kubernetes_pod_container_name"]; target_label = "container" }
+      rule { source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]; target_label = "service" }
+    }
+    loki.source.kubernetes "evidence_pod_logs" {
+      targets = discovery.relabel.evidence_pod_logs.output
+      forward_to = [loki.process.evidence_pod_logs.receiver]
+    }
+    loki.source.kubernetes_events "evidence_events" {
+      namespaces = ["${WORKER_NAMESPACE}"]
+      job_name = "kubernetes-events"
+      log_format = "json"
+      forward_to = [loki.process.evidence_events.receiver]
+    }
+    loki.process "evidence_pod_logs" {
+      stage.static_labels { values = { cluster = "${WORKER_CLUSTER_NAME}", environment = "${ENVIRONMENT}", source_type = "pod-log" } }
+      forward_to = [otelcol.receiver.loki.evidence_vector.receiver]
+    }
+    loki.process "evidence_events" {
+      stage.json { expressions = { event_reason = "reason", namespace = "involvedObject.namespace", pod = "involvedObject.name" } }
+      stage.static_labels { values = { cluster = "${WORKER_CLUSTER_NAME}", environment = "${ENVIRONMENT}", source_type = "kubernetes-event" } }
+      forward_to = [otelcol.receiver.loki.evidence_vector.receiver]
+    }
+    otelcol.receiver.loki "evidence_vector" { output { logs = [otelcol.processor.batch.evidence_vector.input] } }
+    otelcol.processor.batch "evidence_vector" {
+      timeout = "2s"
+      send_batch_size = 100
+      output { logs = [otelcol.exporter.otlphttp.evidence_vector.input] }
+    }
+    otelcol.exporter.otlphttp "evidence_vector" {
+      client { endpoint = "http://${PILOT_NAME}-vector.${WORKER_NAMESPACE}.svc.cluster.local:4318" }
+      sending_queue { enabled = true; queue_size = 1000 }
+      retry_on_failure { enabled = true; initial_interval = "1s"; max_interval = "30s"; max_elapsed_time = "5m" }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${PILOT_NAME}-vector-config
+  namespace: ${WORKER_NAMESPACE}
+data:
+  vector.yaml: |
+    data_dir: /var/lib/vector
+    sources:
+      alloy_otlp:
+        type: opentelemetry
+        http: { address: 0.0.0.0:4318 }
+    transforms:
+      normalize:
+        type: remap
+        inputs: [alloy_otlp.logs]
+        source: |
+          source_type = to_string(.source_type) ?? to_string(.attributes.source_type) ?? "pod-log"
+          cluster = to_string(.cluster) ?? to_string(.attributes.cluster) ?? "unknown"
+          namespace = to_string(.namespace) ?? to_string(.attributes.namespace) ?? "unknown"
+          pod = to_string(.pod) ?? to_string(.attributes.pod) ?? ""
+          container = to_string(.container) ?? to_string(.attributes.container) ?? ""
+          service = to_string(.service) ?? to_string(.attributes.service) ?? "unknown"
+          reason = to_string(.event_reason) ?? to_string(.attributes.event_reason) ?? "log-error-signature"
+          message = to_string(.message) ?? to_string(.body) ?? ""
+          safe = truncate(redact(message, filters: [r'(?i)(password|passwd|pwd|token|api[_-]?key|secret|client_secret)\\s*[=:]\\s*[^\\s,;]+', r'(?i)(authorization\\s*[:=]\\s*bearer\\s+)[^\\s,;]+', r'(?i)(cookie|set-cookie)\\s*[:=]\\s*[^\\r\\n]+']), 512, suffix: "…")
+          signature = replace(safe, r'\\b[0-9a-f]{8,}\\b', "<id>")
+          . = {"schema_version":"observability.triage.v3", "incident_fingerprint":sha2(join!([cluster, namespace, service, reason, signature], ":")), "delivery_key":sha2(join!([cluster, namespace, pod, reason, safe], ":")), "cluster":cluster, "environment":"${ENVIRONMENT}", "namespace":namespace, "workload":service, "pod":pod, "container":container, "signal_kind":if source_type == "kubernetes-event" { "event" } else { "log" }, "reason":reason, "observed_at":to_string(now()), "severity":if match(safe, r'(?i)(fatal|oom|back-off|crashloop)') { "critical" } else { "warning" }, "evidence":{"summary":safe,"representative_lines":[safe]}, "automation_allowed":false}
+      incident_only:
+        type: filter
+        inputs: [normalize]
+        condition: '.signal_kind == "event" || match(string!(.evidence.summary), r'"'"'(?i)(error|exception|fatal|failed|back-off|crashloop|oom)'"'"')'
+      exact_burst_control:
+        type: dedupe
+        inputs: [incident_only]
+        fields: { match: [delivery_key] }
+        cache: { num_events: 10000 }
+    sinks:
+      confluent:
+        type: kafka
+        inputs: [exact_burst_control]
+        bootstrap_servers: "${KAFKA_BOOTSTRAP}"
+        topic: "${KAFKA_TOPIC}"
+        key_field: incident_fingerprint
+        encoding: { codec: json }
+        buffer: { type: disk, max_size: ${VECTOR_BUFFER_SIZE}, when_full: block }
+        librdkafka_options:
+          security.protocol: sasl_ssl
+          sasl.mechanism: PLAIN
+          sasl.username: "${CONFLUENT_SA_KEY}"
+          sasl.password: "${CONFLUENT_SA_SECRET}"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${PILOT_NAME}-vector
+  namespace: ${WORKER_NAMESPACE}
+spec:
+  selector: { app.kubernetes.io/name: ${PILOT_NAME}-vector }
+  ports: [{ name: otlp-http, port: 4318, targetPort: otlp-http }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${PILOT_NAME}-vector
+  namespace: ${WORKER_NAMESPACE}
+spec:
+  replicas: 2
+  selector: { matchLabels: { app.kubernetes.io/name: ${PILOT_NAME}-vector } }
+  template:
+    metadata: { labels: { app.kubernetes.io/name: ${PILOT_NAME}-vector } }
+    spec:
+      serviceAccountName: ${WORKER_VECTOR_SERVICE_ACCOUNT}
+      containers:
+      - name: vector
+        image: ${VECTOR_IMAGE}
+        args: ["--config", "/etc/vector/vector.yaml"]
+        ports: [{ name: otlp-http, containerPort: 4318 }]
+        env:
+        - name: CONFLUENT_SA_KEY
+          valueFrom: { secretKeyRef: { name: ${KAFKA_SECRET_NAME}, key: ${KAFKA_USERNAME_KEY} } }
+        - name: CONFLUENT_SA_SECRET
+          valueFrom: { secretKeyRef: { name: ${KAFKA_SECRET_NAME}, key: ${KAFKA_PASSWORD_KEY} } }
+        volumeMounts:
+        - { name: config, mountPath: /etc/vector, readOnly: true }
+        - { name: buffer, mountPath: /var/lib/vector }
+      volumes:
+      - { name: config, configMap: { name: ${PILOT_NAME}-vector-config } }
+      - { name: buffer, persistentVolumeClaim: { claimName: ${PILOT_NAME}-vector-buffer } }
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: ${PILOT_NAME}-vector-buffer, namespace: ${WORKER_NAMESPACE} }
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: ${APPROVED_STORAGE_CLASS}
+  resources: { requests: { storage: ${VECTOR_BUFFER_SIZE} } }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: { name: ${PILOT_NAME}-vector, namespace: ${WORKER_NAMESPACE} }
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app.kubernetes.io/name: ${PILOT_NAME}-vector } }

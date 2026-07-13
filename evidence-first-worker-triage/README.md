@@ -34,6 +34,33 @@ reuse it rather than creating a parallel broker or a duplicate credential.
 12. `payload/REFERENCE.md`
 13. `evidence/EVIDENCE-TEMPLATE.md`
 
+## Human-operated pilot commands
+
+Create a private values file from `templates/pilot-values.env.example`; it
+contains secret *references*, never credential values. Then run:
+
+```bash
+# Render and prove the manifests can be accepted, without changing the cluster.
+bash scripts/deploy-pilot.sh --values /secure/pilot-values.env
+
+# Apply the additive worker/management pilot after the server dry run passes.
+bash scripts/deploy-pilot.sh --values /secure/pilot-values.env --apply
+
+# Confirm Vector, Argo consumer objects, required secrets and recent workflows.
+bash scripts/verify-healthy.sh --values /secure/pilot-values.env
+
+# Generate a log error, OOM, scheduling and image-pull event in the pilot namespace.
+bash scripts/simulate-failures.sh --values /secure/pilot-values.env
+
+# Remove only the controlled fixtures when evidence has been captured.
+bash scripts/simulate-failures.sh --values /secure/pilot-values.env --cleanup
+```
+
+The Alloy fragment must be merged into the already-installed Alloy release.
+The management claim endpoint is deliberately an approved durable TTL service;
+the scripts refuse placeholder values rather than replacing it with a
+proof-only ConfigMap dedupe.
+
 Run the local structure check first:
 
 ```bash

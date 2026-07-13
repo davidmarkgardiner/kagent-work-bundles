@@ -1,0 +1,58 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: default
+resources:
+  - ../../base
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+  - name: evidence-first-vars
+    envs: [values.env]
+replacements:
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.WORKER_NAMESPACE}
+    targets: [{select: {kind: ConfigMap, name: evidence-first-vars}, fieldPaths: [metadata.namespace]}]
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.WORKER_NAMESPACE}
+    targets:
+      - {select: {kind: ServiceAccount, name: evidence-first-alloy}, fieldPaths: [metadata.namespace]}
+      - {select: {kind: Role, name: evidence-first-alloy-read}, fieldPaths: [metadata.namespace]}
+      - {select: {kind: RoleBinding, name: evidence-first-alloy-read}, fieldPaths: [metadata.namespace]}
+      - {select: {kind: ConfigMap, name: evidence-first-alloy-fragment}, fieldPaths: [metadata.namespace]}
+      - {select: {kind: ConfigMap, name: evidence-first-vector-config}, fieldPaths: [metadata.namespace]}
+      - {select: {kind: Deployment, name: evidence-first-vector}, fieldPaths: [metadata.namespace]}
+      - {select: {kind: Service, name: evidence-first-vector}, fieldPaths: [metadata.namespace]}
+      - {select: {kind: PersistentVolumeClaim, name: evidence-first-vector-buffer}, fieldPaths: [metadata.namespace]}
+      - {select: {kind: PodDisruptionBudget, name: evidence-first-vector}, fieldPaths: [metadata.namespace]}
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.MANAGEMENT_NAMESPACE}
+    targets:
+      - {select: {kind: EventSource, name: evidence-first-confluent}, fieldPaths: [metadata.namespace]}
+      - {select: {kind: Sensor, name: evidence-first-triage}, fieldPaths: [metadata.namespace]}
+      - {select: {kind: WorkflowTemplate, name: evidence-first-triage}, fieldPaths: [metadata.namespace]}
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.KAFKA_BOOTSTRAP}
+    targets: [{select: {kind: EventSource, name: evidence-first-confluent}, fieldPaths: [spec.kafka.evidence.url]}]
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.KAFKA_TOPIC}
+    targets: [{select: {kind: EventSource, name: evidence-first-confluent}, fieldPaths: [spec.kafka.evidence.topic]}]
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.KAFKA_CONSUMER_GROUP}
+    targets: [{select: {kind: EventSource, name: evidence-first-confluent}, fieldPaths: [spec.kafka.evidence.consumerGroup.groupName]}]
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.KAFKA_SECRET_NAME}
+    targets:
+      - {select: {kind: Deployment, name: evidence-first-vector}, fieldPaths: [spec.template.spec.containers.0.env.0.valueFrom.secretKeyRef.name, spec.template.spec.containers.0.env.1.valueFrom.secretKeyRef.name]}
+      - {select: {kind: EventSource, name: evidence-first-confluent}, fieldPaths: [spec.kafka.evidence.sasl.userSecret.name, spec.kafka.evidence.sasl.passwordSecret.name]}
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.KAFKA_CA_SECRET_NAME}
+    targets: [{select: {kind: EventSource, name: evidence-first-confluent}, fieldPaths: [spec.kafka.evidence.tls.caCertSecret.name]}]
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.IDEMPOTENCY_SECRET_NAME}
+    targets: [{select: {kind: WorkflowTemplate, name: evidence-first-triage}, fieldPaths: [spec.templates.2.script.env.1.valueFrom.secretKeyRef.name]}]
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.IDEMPOTENCY_CLAIM_URL}
+    targets: [{select: {kind: WorkflowTemplate, name: evidence-first-triage}, fieldPaths: [spec.templates.2.script.env.0.value]}]
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.KAGENT_A2A_URL}
+    targets: [{select: {kind: WorkflowTemplate, name: evidence-first-triage}, fieldPaths: [spec.templates.3.script.env.0.value]}]
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.KAGENT_AGENT_NAME}
+    targets: [{select: {kind: WorkflowTemplate, name: evidence-first-triage}, fieldPaths: [spec.templates.3.script.env.1.value]}]
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.ARGO_EVENTS_SERVICE_ACCOUNT}
+    targets:
+      - {select: {kind: EventSource, name: evidence-first-confluent}, fieldPaths: [spec.template.serviceAccountName]}
+      - {select: {kind: Sensor, name: evidence-first-triage}, fieldPaths: [spec.template.serviceAccountName]}
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.ARGO_WORKFLOW_SERVICE_ACCOUNT}
+    targets: [{select: {kind: WorkflowTemplate, name: evidence-first-triage}, fieldPaths: [spec.serviceAccountName]}]
+  - source: {kind: ConfigMap, name: evidence-first-vars, fieldPath: data.GITLAB_SECRET_NAME}
+    targets:
+      - {select: {kind: WorkflowTemplate, name: evidence-first-triage}, fieldPaths: [spec.templates.4.script.env.0.valueFrom.secretKeyRef.name, spec.templates.4.script.env.1.valueFrom.secretKeyRef.name, spec.templates.4.script.env.2.valueFrom.secretKeyRef.name]}
