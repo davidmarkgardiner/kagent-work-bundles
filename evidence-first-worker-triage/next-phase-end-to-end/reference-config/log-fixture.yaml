@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: payments-api-log-evidence-fixture
+  namespace: agentic-triage-proof
+  labels:
+    app: payments-api
+    app.kubernetes.io/name: payments-api
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage
+spec:
+  restartPolicy: Never
+  containers:
+    - name: payments-api
+      image: busybox:1.36
+      command: [sh, -c]
+      args:
+        - 'echo "ERROR synthetic payment authorization timeout request_id=proof-log-20260713"; sleep 90'
+      resources:
+        requests: {cpu: 10m, memory: 16Mi}
+        limits: {cpu: 50m, memory: 32Mi}

@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ensure-incident-triage-topic
+  namespace: redpanda
+  labels:
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: rpk
+          image: docker.redpanda.com/redpandadata/redpanda:v24.3.5
+          command: [sh, -ec]
+          args:
+            - rpk topic create incident-triage-requests --brokers redpanda.redpanda.svc.cluster.local:9092 --partitions 1 --replicas 1 || rpk topic list --brokers redpanda.redpanda.svc.cluster.local:9092 | grep -qx incident-triage-requests
