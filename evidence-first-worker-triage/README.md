@@ -33,6 +33,10 @@ reuse it rather than creating a parallel broker or a duplicate credential.
 11. `requests/evidence-first-worker-triage-request.yaml`
 12. `payload/REFERENCE.md`
 13. `evidence/EVIDENCE-TEMPLATE.md`
+14. `LGTM-ALERT-COVERAGE-BASELINE.md` — asserted current-alert baseline, gap
+    model and defensible coverage calculation
+15. `TEAMS-LGTM-ALERT-COVERAGE-REQUEST.md` — concise request for the rule and
+    target evidence needed to measure coverage
 
 ## Human-operated pilot commands
 
