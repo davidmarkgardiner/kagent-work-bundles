@@ -21,11 +21,17 @@ support, and can still leave the agent doing a second lookup to reconstruct the
 incident.
 
 For this specific agent-evidence use case, we therefore consider the
-LGTM/Alertmanager route not fit for purpose as the primary transport. This is
-not a proposal to remove LGTM: Alertmanager remains appropriate for human
-metric paging, and Grafana/Loki remain valuable for dashboards, search and
-follow-up investigation. It is a decision not to let the current LGTM gaps
-continue to block delivery of the triage system.
+LGTM/Alertmanager route not fit for purpose as the primary transport.
+
+> LGTM remains useful for human paging and dashboards. But it is not currently
+> a sufficient evidence source for automated triage: it tells us that some
+> symptoms exist, while logs, Kubernetes events, traces, and critical
+> platform/application coverage remain missing. We need the evidence-first path
+> so the agent receives the incident context needed to diagnose, not just an
+> alarm.
+
+It is a decision not to let the current LGTM gaps continue to block delivery of
+the triage system.
 
 We have proven a simpler alternative in non-production:
 
