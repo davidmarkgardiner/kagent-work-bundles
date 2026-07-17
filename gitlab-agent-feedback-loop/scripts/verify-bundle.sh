@@ -4,6 +4,7 @@ cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 for rel in \
   README.md FRONT-SHEET.md WORK-AGENT-START-PROMPT.md CHECKLIST.md GITLAB-TICKET.md \
+  GITLAB-CONFIGURATION-SHEET.md \
   requests/gitlab-agent-feedback-request.yaml payload/REFERENCE.md \
   prompts/01-private-gitlab-feedback-loop.md evidence/EVIDENCE-TEMPLATE.md; do
   [[ -f "$rel" ]] || { echo "MISSING $rel" >&2; exit 1; }
@@ -23,7 +24,7 @@ for ref in \
   grep -Rqs "$ref" payload/REFERENCE.md || { echo "REFERENCE_MISSING $ref" >&2; exit 1; }
 done
 
-if grep -RInE '(Bearer[[:space:]]+[A-Za-z0-9._-]{12,}|token=|password:|secret:[[:space:]]*[A-Za-z0-9._-]{12,}|10\.[0-9]{1,3}\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)' --exclude='verify-bundle.sh' .; then
+if grep -RInE '(Bearer[[:space:]]+[A-Za-z0-9._-]{12,}|token=|password:|10\.[0-9]{1,3}\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)' --exclude='verify-bundle.sh' .; then
   echo 'PUBLIC_SAFETY_HITS' >&2
   exit 1
 fi

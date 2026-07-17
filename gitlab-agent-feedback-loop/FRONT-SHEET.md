@@ -9,9 +9,10 @@ GitLab Issue comment, with one auditable response and no duplicate replies.
 
 1. `WORK-AGENT-START-PROMPT.md`
 2. `CHECKLIST.md`
-3. `requests/gitlab-agent-feedback-request.yaml`
-4. `payload/REFERENCE.md`
-5. `evidence/EVIDENCE-TEMPLATE.md`
+3. `GITLAB-CONFIGURATION-SHEET.md`
+4. `requests/gitlab-agent-feedback-request.yaml`
+5. `payload/REFERENCE.md`
+6. `evidence/EVIDENCE-TEMPLATE.md`
 
 ## Target Path
 
