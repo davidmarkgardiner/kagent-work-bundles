@@ -35,4 +35,4 @@ controlled-test-proven operational coverage
 An objective will only count as covered when it has a defined rule, applies to
 the intended targets, routes to the right owner and has been proven end to end.
 The detailed baseline and gap model is in
-`LGTM-ALERT-COVERAGE-BASELINE.md`.
+`BASELINE.md`.

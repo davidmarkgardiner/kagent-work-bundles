@@ -33,17 +33,12 @@ reuse it rather than creating a parallel broker or a duplicate credential.
 11. `requests/evidence-first-worker-triage-request.yaml`
 12. `payload/REFERENCE.md`
 13. `evidence/EVIDENCE-TEMPLATE.md`
-14. `LGTM-ALERT-COVERAGE-BASELINE.md` — asserted current-alert baseline, gap
-    model and defensible coverage calculation
-15. `LGTM-QUERY-AND-ALERT-EXAMPLES.md` — index for five focused LGTM
-    implementation-example sheets
-16. `LGTM-METRICS-ALERT-EXAMPLES.md` — PromQL/synthetic metric candidates
-17. `LGTM-KUBERNETES-EVENT-ALERT-EXAMPLES.md` — Alloy, LogQL and event alerts
-18. `LGTM-APPLICATION-LOG-ALERT-EXAMPLES.md` — reusable application/controller log alerts
-19. `LGTM-TRACE-NETWORK-ALERT-EXAMPLES.md` — traces, Cilium and Hubble examples
-20. `LGTM-NODE-AUTOPROVISIONING-SCHEDULING-EXAMPLES.md` — NAP, scheduling and eviction coverage
-21. `TEAMS-LGTM-ALERT-COVERAGE-REQUEST.md` — concise request for the rule and
-    target evidence needed to measure coverage
+14. `lgtm-alert-coverage/` — the LGTM alert-coverage handoff, separable from the
+    triage pilot and readable on its own. Start at its `README.md`; it holds
+    the asserted coverage baseline and gap model, the rule/target evidence
+    request for the LGTM team, and five implementation-example sheets covering
+    metrics, Kubernetes events, application logs, traces/network and node
+    auto-provisioning.
 
 ## Human-operated pilot commands
 
