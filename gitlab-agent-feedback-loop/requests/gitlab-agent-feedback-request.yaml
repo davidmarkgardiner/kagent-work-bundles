@@ -1,0 +1,13 @@
+apiVersion: platform.example.io/v1alpha1
+kind: WorkAgentRequest
+metadata:
+  name: gitlab-agent-feedback-loop
+spec:
+  gitlabProject: "{{GITLAB_PROJECT}}"
+  inboundPath: /gitlab-agent-feedback
+  ingressMode: "{{INTERNAL_INGRESS_OR_VIRTUALSERVICE}}"
+  allowlistedUsers:
+    - "{{GITLAB_USERNAME}}"
+  waitingLabel: agent:waiting-for-human
+  agentService: "{{READ_ONLY_FEEDBACK_AGENT_SERVICE}}"
+  evidenceDestination: "{{APPROVED_EVIDENCE_LOCATION}}"
