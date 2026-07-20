@@ -48,7 +48,7 @@ ticket (`create-gitlab-issue` `safe_incident`).
 | `service` | `.service` | ✅ | ✅ | **service** ✅ |
 | `namespace` | `.namespace` | ✅ | ✅ | scope ✅ |
 | `observed_timestamp` | `.timestamp` | ✅ | ✅ | when ✅ |
-| `dedupe_key` / `delivery_key` | sha of cluster:ns:pod | ✅ | ✅ (fingerprint label) | correlation ✅ |
+| `dedupe_key` / `delivery_key` | sha of cluster:ns:pod | ✅ | ✅ (fingerprint label) | correlation ✅, but NOT pod-churn-stable — see `evidence/phase4-payload-contract.md` |
 | `automation_allowed: false` | constant | ✅ | ✅ | read-only guard ✅ |
 
 Reconstructed envelope for the captured BackOff event (what the allow-list

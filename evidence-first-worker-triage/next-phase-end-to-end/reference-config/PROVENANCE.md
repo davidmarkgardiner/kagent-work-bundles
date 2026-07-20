@@ -23,7 +23,10 @@ This is the **red proof**, not an office manifest. Per the parent bundle
 
 - Idempotency here is a **ConfigMap dedupe** (`claim-24h-window` in
   `03-argo.yaml`). The office needs an **approved durable TTL store** — this is
-  Phase 3/5 work, not a copy-paste.
+  Phase 3/5 work, not a copy-paste. Separately, this file's delete-then-create
+  claim refresh is also non-atomic (a correctness bug, not just a durability
+  gap) — see `../KNOWN-DEFECTS-AND-REPROVE.md` and
+  `../applied-config/03-argo-augmented.yaml` for the compare-and-swap fix.
 - Kafka is single-cluster Redpanda. Office needs **Confluent identity + ACLs**.
 - Namespace/topic/endpoint values are proof values. Replace with approved ones.
 - Secrets are **references only** (`${CONFLUENT_SA_SECRET}`, `$GITLAB_TOKEN`,

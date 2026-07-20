@@ -21,6 +21,12 @@ workflow that consumed it. Confirm event classes cover at least
 FailedScheduling, OOMKilled/OOMKilling, and image pull / BackOff. Prove a
 duplicate of the same incident within the dedupe window creates no second
 workflow. Leave Alertmanager untouched.
+
+Note: on the proof cluster, `OOMKilled`/`OOMKilling` is never emitted as a
+Kubernetes Event by this kubelet (verified absent even when the OOM kill
+itself is confirmed via container exit code) — a platform boundary, not a
+pipeline defect. `Unhealthy` was substituted as the third proven class; see
+`evidence/phase1-smoke-tests.md` for the full analysis.
 ```
 
 ## Do
@@ -72,7 +78,7 @@ service, namespace, timestamp, and the two fields the red proof was missing —
 ```text
 LOG_EVIDENCE_PATH_PROVEN: yes
 EVENT_EVIDENCE_PATH_PROVEN: yes
-EVENT_CLASSES_COVERED: FailedScheduling,OOMKilled,ImagePull   # >= 3
+EVENT_CLASSES_COVERED: FailedScheduling,BackOff(ImagePull),Unhealthy   # >= 3; OOMKilled substituted, see note above
 REPLAY_SUPPRESSED: yes
 ALERTMANAGER_UNCHANGED: yes
 OUTPUT_SANITIZED: yes

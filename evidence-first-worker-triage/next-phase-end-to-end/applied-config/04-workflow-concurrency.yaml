@@ -1,0 +1,14 @@
+# Phase 5: bounds concurrent red-agentic-triage workflow instances (DS-10).
+# Scoped to this WorkflowTemplate only via its own key -- deliberately does
+# NOT touch the shared, cluster-wide workflow-controller-configmap that other
+# pipelines on this cluster also depend on. Referenced by
+# 03-argo-augmented.yaml's WorkflowTemplate spec.synchronization.semaphore.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: triage-workflow-concurrency
+  namespace: argo-events
+  labels:
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage
+data:
+  red-agentic-triage: "5"

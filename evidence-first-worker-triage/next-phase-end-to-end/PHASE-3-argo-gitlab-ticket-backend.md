@@ -36,6 +36,13 @@ The backend already exists at proof level in `reference-config/03-argo.yaml`:
 it — swap the ConfigMap dedupe for a durable TTL store — it does not build from
 zero. Read `reference-config/PROVENANCE.md`.
 
+Do not apply `reference-config/03-argo.yaml`'s `claim-24h-window` verbatim: its
+delete-then-create claim logic is non-atomic and lets two concurrent workflows
+both win a claim for one incident (reproduced live as tickets #446/#447 during
+Phase 0 re-proof). Use the resourceVersion-guarded compare-and-swap in
+`applied-config/03-argo-augmented.yaml` instead — see
+`evidence/phase0-reprove-redaction-and-correlation.md`.
+
 ## Do
 
 1. Add the ticket-creation step to the Argo workflow **after** the agent step,

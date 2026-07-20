@@ -58,6 +58,13 @@ Current event allow-lists — and they do **not** match each other:
 **Bug:** Argo drops `OOMKilling` that Vector permits — an OOMKilling event
 passes Vector then dies at Argo. Align the two lists.
 
+**Also note:** aligning the lists does not by itself close OOM coverage — on
+the proof cluster's kubelet, `OOMKilled`/`OOMKilling` is never emitted as a
+Kubernetes Event at all (confirmed via `kubectl get events --field-selector
+reason=OOMKilling` returning nothing even when the OOM kill itself is
+confirmed via container exit code). That gap is a platform boundary, not a
+filter-alignment bug; see `evidence/phase1-smoke-tests.md`.
+
 Common actionable **Warning** events not covered today:
 
 | Should fire | Class |

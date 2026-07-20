@@ -46,7 +46,11 @@ Constraints, unchanged from the parent bundle:
   already in the YAML (see reference-config/CHANGES-FROM-PROOF.md). Apply it and
   prove it. Do not redesign it. If a Vector VRL or Argo line is rejected at
   render/dry-run, fix that line against CHANGES-FROM-PROOF.md; do not rewrite
-  the pipeline.
+  the pipeline. Exception: `reference-config/03-argo.yaml`'s `claim-24h-window`
+  step has a known non-atomic delete-then-create claim race (found live during
+  Phase 0 re-proof); use `applied-config/03-argo-augmented.yaml`'s
+  resourceVersion-guarded compare-and-swap version of that step instead — see
+  `KNOWN-DEFECTS-AND-REPROVE.md`.
 
 For each phase: do the work on the cluster (server-side dry run, then apply),
 then capture sanitized evidence into ../evidence/ and set that phase's "Done
