@@ -55,8 +55,21 @@ up{cluster="{{CLUSTER_NAME}}", job=~".*cilium.*agent.*"} == 0
 # Candidate: HubbleRelayUnavailable
 up{cluster="{{CLUSTER_NAME}}", job=~".*hubble.*relay.*"} == 0
 
+# Both rules above go silent if the target leaves service discovery rather than
+# failing its scrape — see CriticalTargetDown in the metrics sheet and pair each
+# with an absent_over_time companion. The `.*cilium.*` job regexes are a guess at
+# the local naming; confirm the real job labels before deploying, because a regex
+# that matches nothing looks identical to a healthy cluster.
+
 # Candidate: SustainedHubbleDrops
-sum by (cluster, namespace, direction) (
+# hubble_drop_total has no `namespace` and no `direction` label — its labels are
+# `reason` and `protocol` plus the configured context labels, which Hubble names
+# `source`/`destination`. Grouping by an absent label does not error: it
+# collapses every drop in the cluster into one series with empty namespace and
+# direction, so the alert fires but names no target and cannot be triaged.
+# `source`/`destination` require sourceContext/destinationContext to be enabled
+# in the Hubble metrics config — confirm that, and the real label set, first.
+sum by (cluster, source, destination, reason) (
   rate(hubble_drop_total{cluster="{{CLUSTER_NAME}}"}[5m])
 ) > {{DROPS_PER_SECOND_THRESHOLD}}
 
@@ -76,6 +89,13 @@ clamp_min(sum by (cluster, namespace) (
 ), 1)
 > {{DNS_FAILURE_RATE_THRESHOLD}}
 ~~~
+
+`HubbleDNSFailureRate` groups by `namespace` for the same reason and carries the
+same defect — replace it with the context labels your Hubble config actually
+emits. Two things to settle in Explore before this rule is trusted: whether
+those context labels are enabled at all, and whether `rcode` is exposed as a
+mnemonic (`SERVFAIL`) or as its numeric code (`2`). If it is numeric, the
+matcher above selects nothing and the rule silently never fires.
 
 A DROP verdict may be an intentional policy deny. Scope a deny/drop alert to a critical approved source/destination/port contract and correlate it with actual service impact.
 

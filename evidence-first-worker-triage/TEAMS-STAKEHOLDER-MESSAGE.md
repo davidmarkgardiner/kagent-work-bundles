@@ -3,7 +3,7 @@
 Hi all — we need to make a design decision on the evidence source for our
 agentic triage/CHAIR system.
 
-The accompanying `LGTM-ALERT-COVERAGE-BASELINE.md` records why this is now a
+The accompanying `lgtm-alert-coverage/BASELINE.md` records why this is now a
 delivery issue, not just an integration preference. The current alert set gives
 some useful metric/state symptoms, but does not evidence end-to-end coverage of
 logs and Kubernetes events for every application, shared platform service or

@@ -89,11 +89,32 @@ error about." Two fields needed for that are **not** in the current envelope:
    event type / log level (e.g. `OOMKilled|FailedScheduling` → `critical`,
    `Unhealthy|BackOff` → `warning`, log `FATAL|ERROR` → `critical|error`).
 
-2. **`container` — DROPPED.** The source record carries `container`
-   (`checkout-api`), but the Vector allow-list (`02-vector.yaml` lines 53-67)
-   does not re-emit it, so it never reaches the agent. On a multi-container pod
-   the agent can't tell which container failed. **Add** `container` to the
-   envelope allow-list.
+2. **`container` — RESOLVED 2026-07-21 (this doc was wrong about why).**
+   The earlier claim here — "the source record carries `container`
+   (`checkout-api`) but the Vector allow-list drops it" — was **incorrect**. It
+   was based on the fixture at
+   `observability/alloy-vector-kafka-triage/examples/crashloop-correlated.jsonl`,
+   a hand-written example, **not** captured Alloy output. A live raw capture
+   (`evidence/ALLOY-EVENT-RAW-CAPTURE-2026-07-21.md`) proves the Alloy
+   **event** path never produced a `container` field at all:
+   `loki.source.kubernetes_events` with `log_format="json"` emits a flattened
+   body with no `involvedObject` and no `container`; the container name exists
+   only inside `msg` text. There was never a `.container` for the allow-list to
+   drop.
+   - **Log path:** container was always present (Alloy label
+     `__meta_kubernetes_pod_container_name`) — proven, e.g. ticket #500.
+   - **Event path:** container is now parsed from `event.msg` in Vector
+     (`02-vector.yaml` `normalize`), mirroring the existing `.pod = event.name`
+     rescue — proven on ticket **#508** (`Container | the-failing-container`).
+     Best-effort by design: `msg` names the container for crashloop-class
+     events (`BackOff`, container-kill); probe (`Unhealthy`) and pod-scoped
+     (`FailedScheduling`, `Evicted`) events do not name one and stay empty.
+
+3. **`service` — log-path only, out of scope for events (decision 2026-07-21).**
+   The pod-log path carries `service` from the `app.kubernetes.io/name` label.
+   The k8s-event body has no equivalent, and the container/pod identity is what
+   triage needs — so an empty `service` on an event ticket is **accepted, not a
+   gap**. Do not chase it.
 
 Optional enrichment worth proving at the same time: for the **log** path,
 `.reason` defaults to the generic `log-error-signature`; the real error class
@@ -125,11 +146,21 @@ FIELD_MESSAGE_TYPE_PRESENT: yes        # signal_kind + source_type
 FIELD_ACTUAL_MESSAGE_PRESENT: yes      # evidence.representative_log_lines, redacted
 FIELD_REASON_WHAT_ERROR_PRESENT: yes   # reason + event_summary
 FIELD_POD_PRESENT: yes
-FIELD_SERVICE_PRESENT: yes
+FIELD_SERVICE_PRESENT: log-path-only    # events carry no service label — accepted, not a gap
 FIELD_NAMESPACE_PRESENT: yes
 FIELD_TIMESTAMP_PRESENT: yes
-FIELD_SEVERITY_ADDED_AND_PRESENT: yes  # was missing — must add
-FIELD_CONTAINER_ADDED_AND_PRESENT: yes # was dropped — must add
+FIELD_SEVERITY_ADDED_AND_PRESENT: yes   # was missing — added
+FIELD_CONTAINER_PRESENT: yes            # log: Alloy label; event: parsed from msg (#508)
+# Reach-back fields added 2026-07-21 so a MANAGEMENT-cluster agent (which cannot
+# live-inspect the worker) has every locator. Proven end-to-end on ticket #512.
+FIELD_NODE_PRESENT: yes                 # event: sourcehost; log: Alloy node label
+FIELD_OBJECT_KIND_PRESENT: yes          # event only (e.g. Pod); n/a for logs
+FIELD_EVENT_COUNT_PRESENT: yes          # event only; 0 for logs
+FIELD_REPORTING_COMPONENT_PRESENT: yes  # event only (e.g. kubelet); n/a for logs
+TICKET_HAS_REACHBACK_KUBECTL: yes       # copy-paste describe/logs/get-events block
+TICKET_LABELS_EVENT_VS_LOG_MESSAGE: yes # "Event message" / "Log error message"
+BOTH_SIGNALS_ONE_TICKET: yes            # log + correlated event in one issue (#512)
+REDACTION_IN_FINAL_TICKET: yes          # password/token redacted, useful text kept (#512)
 NO_FIELD_UNKNOWN_OR_EMPTY: yes
 PROVEN_ON_LOG_AND_EVENT_TICKET: yes    # a ticket per path, fields visible
 OUTPUT_SANITIZED: yes

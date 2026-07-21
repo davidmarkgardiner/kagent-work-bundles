@@ -3,6 +3,20 @@
 Run this with the implementation agent. Do not proceed past a failed check;
 capture the command output and fix the named component first.
 
+## 0. Confirm operator access and context
+
+- [ ] Confirm the exact worker-cluster and management-cluster `kubectl`
+  contexts; do not rely on whichever context happens to be active.
+- [ ] Confirm the implementation agent is already authenticated to both
+  clusters and has the required read/apply scope for this non-production pilot.
+- [ ] If using AKS MCP for read-only enrichment, record the approved worker
+  target(s), identity and read-only tool scope.
+- [ ] Collect the GitLab API/project and read-only kagent A2A endpoint details.
+- [ ] Collect existing image names/tags, Secret/CA references, service-account
+  names, Kafka topic/consumer group and durable-idempotency endpoint.
+- [ ] Keep this context in a private values file outside Git; do not place
+  credential values, tokens, CA material or private endpoints in this bundle.
+
 ## 1. Prepare values
 
 ```bash

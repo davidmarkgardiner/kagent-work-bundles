@@ -29,6 +29,13 @@ data:
         source_labels = ["__meta_kubernetes_pod_container_name"]
         target_label = "container"
       }
+      // Node the pod runs on. On a management cluster the triage agent cannot
+      // live-inspect the worker, so the node name must travel in the envelope
+      // for a human/agent to reach back to the right worker node.
+      rule {
+        source_labels = ["__meta_kubernetes_pod_node_name"]
+        target_label = "node"
+      }
       rule {
         source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
         target_label = "service"
@@ -60,17 +67,27 @@ data:
       forward_to = [otelcol.receiver.loki.vector.receiver]
     }
     loki.process "events" {
+      // loki.source.kubernetes_events with log_format="json" emits a FLATTENED
+      // event body. Top-level keys: count, kind, msg, name, reason, type,
+      // reportingcontroller, ... There is NO `involvedObject` object and NO
+      // `container` field (proven: evidence/ALLOY-EVENT-RAW-CAPTURE-2026-07-21.md).
+      // Extract only what is really present in the body:
+      //   - `reason` -> event_reason (top-level key).
+      //   - `name`   -> pod (top-level key = the involved object's name).
+      // `namespace` is NOT in the body; it is labelled by this source's own
+      // namespace watch (see loki.source.kubernetes_events namespaces=[...] above),
+      // so no extraction is needed for it here.
+      // `container` is not recoverable at this stage; for events that name it,
+      // it lives only inside `msg` text and is parsed downstream in Vector.
       stage.json {
         expressions = {
           event_reason = "reason",
-          namespace = "involvedObject.namespace",
-          pod = "involvedObject.name",
+          pod = "name",
         }
       }
       stage.labels {
         values = {
           event_reason = "",
-          namespace = "",
           pod = "",
         }
       }

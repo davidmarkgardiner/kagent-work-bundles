@@ -35,6 +35,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 | `sre-adoption-feedback-loop/` | SRE adoption and feedback loop | SRE onboards one app, uses/reviews the workflow, captures feedback, routes improvements, and reports adoption |
 | `kagent-triage-v2-kb-gitlab-mcp/` | KB + doc2vec/querydoc + GitLab MCP | Agent updates KB docs through GitLab MCP, reindexes querydoc, and proves cited retrieval |
 | `gitlab-mcp-gitops-pr/` | GitLab MCP GitOps PRs | Agent creates a branch, updates code/YAML/docs, opens an MR, and leaves it for human review |
+| `gitlab-agent-feedback-loop/` | GitLab Issue-comment feedback | Allowlisted human feedback reaches a read-only kagent through Argo Events and receives one bounded Issue-note response |
 | `chaos-reliability-remediation/` | Chaos and remediation proof | SRE requests controlled lower-env chaos, triage, gated remediation, recovery proof, and report |
 | `a2a-smart-triage-workflows/` | Agent-to-agent workflows | Coordinator fans out to specialists, preserves context, and produces one synthesized incident answer |
 | `memory-mcp-shared-context/` | Memory MCP and shared context | Agents seed, recall, and curate cross-session memory safely |
