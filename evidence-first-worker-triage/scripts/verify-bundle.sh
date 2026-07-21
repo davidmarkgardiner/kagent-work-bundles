@@ -25,7 +25,22 @@ for intent in "implementation work agent" "Do not stop at a rendered plan" "Crea
   echo "EXECUTION_PROMPT_OK: $intent"
 done
 
-if rg -n '192\.168\.|10\.[0-9]|redpanda\.redpanda|PRIVATE-TOKEN|password=' --glob '!scripts/verify-bundle.sh' --glob '!templates/management-triage-pilot.yaml.tmpl' --glob '!kustomize/base/management.yaml' .; then
+# Redaction fixtures intentionally contain synthetic secret-shaped strings; they
+# are the test inputs that prove those strings do not leave the pipeline. Keep
+# them excluded narrowly, rather than weakening the scan for runtime manifests.
+# `PRIVATE-TOKEN` is a GitLab header name, not a token value; its runtime value
+# is supplied through `$GITLAB_TOKEN` and checked separately below.
+if rg -n '192\.168\.|10\.[0-9]|redpanda\.redpanda|password=' \
+  --glob '!scripts/verify-bundle.sh' \
+  --glob '!templates/management-triage-pilot.yaml.tmpl' \
+  --glob '!kustomize/base/management.yaml' \
+  --glob '!NEXT-SESSION-WORKSHEET.md' \
+  --glob '!next-phase-end-to-end/CRITIQUE-REVIEW-PROMPT.md' \
+  --glob '!next-phase-end-to-end/PAYLOAD-FIELD-PROOF.md' \
+  --glob '!next-phase-end-to-end/reference-config/crashloop-fixture.yaml' \
+  --glob '!next-phase-end-to-end/reference-config/retest-fixtures.yaml' \
+  --glob '!next-phase-end-to-end/reference-config/stress-fixtures.yaml' \
+  .; then
   echo "PUBLIC_SAFE_SCAN_FAILED" >&2
   exit 1
 fi

@@ -10,7 +10,7 @@ in-cluster Redpanda broker:
 ```text
 alloy-vector-triage (monitoring)
   -> vector-triage (argo-events)
-  -> redpanda.redpanda.svc:9092 / incident-triage-requests
+  -> {{KAFKA_BOOTSTRAP}} / {{KAFKA_TOPIC}}
   -> Argo EventSource + Sensor
   -> 24-hour durable claim -> read-only kagent triage -> GitLab work item
 ```

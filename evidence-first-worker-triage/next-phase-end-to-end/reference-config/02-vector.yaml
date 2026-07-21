@@ -27,11 +27,40 @@ data:
           .pod = if pod_attribute == "" { to_string(event.name) ?? "" } else { pod_attribute }
           .service = to_string(.attributes.service) ?? "unknown"
           # Container helps the agent isolate which container failed on a
-          # multi-container pod. Kept as an explicit allow-listed field.
+          # multi-container pod. Pod-log path carries it as an Alloy label
+          # (.attributes.container). The k8s-event body has NO container field,
+          # so for events that name it the container lives only inside `msg`
+          # text (e.g. "Back-off restarting failed container <name> in pod ...").
+          # Rescue it from `event.msg` the same way `.pod` is rescued from
+          # `event.name` above. Pod-scoped events (FailedScheduling, Evicted)
+          # and probe msgs that omit the container name stay "".
           .container = to_string(.attributes.container) ?? ""
+          if .container == "" {
+            msg = to_string(event.msg) ?? ""
+            matched = parse_regex(msg, r'[Cc]ontainer (?P<c>[^\s]+)') ?? {}
+            # `string()` (not `to_string()`): parse_regex types the capture as a
+            # string, so on a no-match `matched.c` is null and `string()` errors,
+            # which the `?? ""` catches -> container stays "". `to_string()` here
+            # is inferred infallible and trips VRL E651.
+            .container = string(matched.c) ?? ""
+          }
           event_reason = to_string(.attributes.event_reason) ?? ""
           .reason = if event_reason == "" { "log-error-signature" } else { event_reason }
           .signal_kind = if .reason == "log-error-signature" { "log" } else { "event" }
+          # Origin / reach-back fields. On a MANAGEMENT cluster the triage agent
+          # CANNOT live-inspect the worker where this fired, so every locator it
+          # (or a human) would need to reach back must travel in the envelope.
+          #   node               - which worker node. Event: sourcehost. Log: Alloy node label.
+          #   event_count        - how many times this event has fired (event only).
+          #   object_kind        - involved object kind, e.g. Pod (event only).
+          #   reporting_component- who reported it, e.g. kubelet (event only).
+          node_attr = to_string(.attributes.node) ?? ""
+          .node = if node_attr != "" { node_attr } else { to_string(event.sourcehost) ?? "" }
+          .event_count = to_int(event.count) ?? 0
+          .object_kind = to_string(event.kind) ?? ""
+          reporting = to_string(event.reportingcontroller) ?? ""
+          if reporting == "" { reporting = to_string(event.sourcecomponent) ?? "" }
+          .reporting_component = reporting
           # `message` is untrusted workload data. Redact it before it becomes
           # part of the envelope, then construct an allow-listed envelope
           # below; raw OTLP fields must never reach Kafka, the agent or GitLab.
@@ -54,24 +83,41 @@ data:
             "representative_log_lines": truncate(safe_message, 4096, suffix: "…")
           }
           # This is a correlation key, not a local first-record-wins cache key.
-          # Every candidate is forwarded so a later BackOff can update the
-          # existing ticket rather than being silently dropped.
           # Events do not reliably carry the workload/service label that pod
           # logs have. Use the shared pod identity for this proof correlation
           # key so a later event can enrich the log-led ticket.
           .dedupe_key = sha2(join!([.cluster, .namespace, .pod], ":"))
-          .delivery_key = sha2(join!([.dedupe_key, .reason, .evidence.representative_log_lines], ":"))
+          # Burst control. A crashloop fires the SAME reason (BackOff) every few
+          # seconds; each event carries a volatile count / resourceVersion inside
+          # its evidence text, so hashing the evidence would mint a new
+          # delivery_key per repeat and spawn a new Argo workflow each time (one
+          # crashloop -> a dozen+ workflows queued against the concurrency
+          # semaphore). For EVENTS, key delivery on pod+reason only: identical
+          # repeats collapse to one record at suppress_exact_repeats below, while
+          # a genuinely different later reason (Failed -> BackOff, or OOMKilled)
+          # still passes and correlates on dedupe_key. For LOGS, .reason is the
+          # generic log-error-signature, so keep the evidence in the key to tell
+          # distinct log incidents apart.
+          .delivery_key = if .signal_kind == "event" {
+            sha2(join!([.dedupe_key, .reason], ":"))
+          } else {
+            sha2(join!([.dedupe_key, .reason, .evidence.representative_log_lines], ":"))
+          }
           .automation_allowed = false
           . = {
             "schema_version": .schema_version,
             "cluster": .cluster,
             "namespace": .namespace,
+            "node": .node,
             "pod": .pod,
             "container": .container,
             "service": .service,
             "reason": .reason,
             "severity": .severity,
             "signal_kind": .signal_kind,
+            "object_kind": .object_kind,
+            "event_count": .event_count,
+            "reporting_component": .reporting_component,
             "source_type": "opentelemetry",
             "observed_timestamp": to_string(.timestamp) ?? "",
             "dedupe_key": .dedupe_key,

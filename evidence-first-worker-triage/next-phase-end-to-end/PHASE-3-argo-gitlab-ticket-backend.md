@@ -62,5 +62,15 @@ MANAGEMENT_TTL_IDEMPOTENCY: yes
 GITLAB_TICKET_IDEMPOTENT: yes
 TICKET_CARRIES_AGENT_OUTPUT: yes   # triage/remediation text present in ticket
 TICKET_RETRY_NO_DUPLICATE: yes
+TICKET_BODY_HUMAN_READABLE_NOT_RAW_JSON: yes  # summary line + fact table + agent
+                                               # diagnosis up front; raw envelope
+                                               # and full evidence collapsed below
+                                               # (STRESS-TEST-2026-07-13.md P1).
+                                               # See reference-config/03-argo.yaml
+                                               # create-gitlab-issue for the
+                                               # rendered template — locally
+                                               # jq-tested against a sample
+                                               # envelope, not yet proven against
+                                               # a live GitLab ticket.
 OUTPUT_SANITIZED: yes
 ```
