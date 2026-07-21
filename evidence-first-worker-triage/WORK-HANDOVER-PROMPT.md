@@ -5,6 +5,27 @@ Use $evidence-first-worker-triage as the implementation work agent for a
 guarded, non-production worker-to-management evidence-triage pilot. Execute
 the configuration and proof; do not return a review-only answer.
 
+## Operator prerequisites — confirm before starting
+
+The operator must provide a private context/values file outside Git and confirm
+the implementation agent is already authenticated. Do not begin deployment
+until all of the following are available:
+
+- Exact worker-cluster and management-cluster `kubectl` context names; the
+  active context must be intentional, not merely the shell default.
+- If read-only enrichment uses AKS MCP, its approved worker-cluster target(s),
+  identity and read-only tool scope.
+- One approved non-production worker namespace and the worker cluster identity
+  that Alloy will stamp into every evidence envelope.
+- Existing Alloy, Vector, Kafka/Confluent, Argo, kagent and GitLab locations.
+- GitLab API/project configuration and the read-only kagent A2A endpoint.
+- Existing Secret/CA reference names, image names/tags, service accounts,
+  Kafka topic and consumer group, and the durable idempotency endpoint.
+
+Provide references and names only—never put credential values, tokens, CA
+material or private endpoints in Git or the handover prompt. If a prerequisite
+is missing, report it as the blocker instead of guessing.
+
 Start in work-agent-bundles/evidence-first-worker-triage/ and run:
 
   bash scripts/verify-bundle.sh
