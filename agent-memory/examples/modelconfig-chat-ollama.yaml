@@ -1,0 +1,17 @@
+# Chat/reasoning ModelConfig, fully local via Ollama.
+# This is the controller's default (name: default-model-config) so agents pick
+# it up without extra wiring. Swap for your work chat endpoint (Azure OpenAI,
+# LiteLLM, OpenRouter) in a real environment.
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  name: default-model-config
+  namespace: kagent
+spec:
+  provider: OpenAI                          # Ollama OpenAI-compatible API
+  model: qwen2.5:1.5b-instruct
+  apiKeySecret: ollama-dummy-key
+  apiKeySecretKey: OPENAI_API_KEY
+  openAI:
+    baseUrl: http://ollama.kagent.svc.cluster.local:11434/v1
+    temperature: "0.1"

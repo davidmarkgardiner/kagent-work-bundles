@@ -1,0 +1,99 @@
+# Schedule the certification workflow.
+#
+# `aks-certification` is on-demand today — there is no CronWorkflow for it. That
+# is fine for a provisioning gate ("was this cluster built to standard?") and
+# useless for a baseline ("has it drifted since last time?"), because a baseline
+# is only meaningful against its previous value.
+#
+# Same workflow, different cadence, different question:
+#   run on provision  -> certification gate
+#   run every 15 min  -> health monitor
+#
+# That property is why merging the two is the right call rather than building a
+# parallel system.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# ONE PER TARGET CLUSTER
+# ─────────────────────────────────────────────────────────────────────────────
+# aks-certification takes `cluster-name`, and the uk8s variant additionally
+# takes resourceGroup/subscriptionId — so the template is already shaped for
+# remote AKS targets. Run one CronWorkflow per cluster from the management
+# cluster, each with its own credentials, rather than installing a collector
+# into every worker.
+#
+# NOTE this depends on the management cluster being able to reach each worker's
+# API server. That is a genuine open question — do not assume it. The
+# worker→management direction is proven (see platform/agentgateway/
+# A2A-FLEET-DEMO.md); the reverse is not, and if it turns out to be blocked,
+# the fallback is a collector per worker pushing results outward.
+---
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: cluster-health-certification-red
+  namespace: argo-events
+  labels:
+    app.kubernetes.io/part-of: cluster-health-sentinel
+    platform.com/team: platform
+    platform.com/type: observability
+    target-cluster: red
+spec:
+  # Every 15 minutes. Picked to match the collector's event window, not from
+  # evidence — tune it in observe mode. Too fast and you pay for checks nobody
+  # reads; too slow and an acute incident is stale before anyone sees it.
+  schedule: "*/15 * * * *"
+  timezone: "UTC"
+  # A run that overlaps the previous one races on the pointer ConfigMap and can
+  # corrupt the transition state — which would break fire-once, the property
+  # that keeps this from becoming a pager loop.
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  suspend: false
+  workflowSpec:
+    workflowTemplateRef:
+      name: aks-certification
+    serviceAccountName: argo-events-sa
+    # A hung check must not hold the mutex and block the next run forever.
+    activeDeadlineSeconds: 900
+    ttlStrategy:
+      secondsAfterSuccess: 3600
+      secondsAfterFailure: 86400
+    synchronization:
+      # One certification run at a time per cluster.
+      mutex:
+        name: cluster-health-certification-red
+    arguments:
+      parameters:
+        - name: cluster-name
+          value: "red"
+        - name: namespaces-to-check
+          value: "default,kube-system,argo-events,kagent"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ONE PER CLUSTER — copy the block above, changing `name`, the `target-cluster`
+# label, the mutex name, and the `cluster-name` parameter:
+#
+#   metadata:
+#     name: cluster-health-certification-blue
+#     labels:
+#       target-cluster: blue
+#   spec:
+#     synchronization:
+#       mutex:
+#         name: cluster-health-certification-blue    # per-cluster, not shared
+#     arguments:
+#       parameters:
+#         - name: cluster-name
+#           value: "blue"
+#
+# The `target-cluster` label and `cluster-name` parameter are what let a fleet
+# view tell runs apart — and `cluster-name` is what the baseline check stamps
+# into every result, so a report can never be mistaken for another cluster's.
+#
+# Note the mutex name must differ per cluster. Sharing one mutex across clusters
+# would serialise the whole fleet behind a single lock.
+#
+# (No `---` separator here: a document containing only comments parses as null,
+# which fails schema validation.)

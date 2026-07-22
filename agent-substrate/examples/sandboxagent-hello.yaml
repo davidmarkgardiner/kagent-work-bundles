@@ -1,0 +1,24 @@
+apiVersion: kagent.dev/v1alpha2
+kind: SandboxAgent
+metadata:
+  name: hello-substrate
+  namespace: kagent
+spec:
+  type: Declarative
+  # REQUIRED: selects the substrate control plane. Without it the CRD rejects
+  # spec.substrate ("may only be set when spec.platform is substrate").
+  # The upstream doc example omits this — the live CRD (0.9.9) needs it.
+  platform: substrate
+  description: Tiny declarative agent running inside a substrate gVisor actor
+  declarative:
+    # Only the Go ADK runtime is supported on substrate today (Python is NOT).
+    runtime: go
+    modelConfig: default-model-config
+    systemMessage: |
+      You are a friendly assistant living inside an Agent Substrate sandbox.
+      When asked who you are, say "I am hello-substrate, a Go ADK declarative
+      agent running inside a gVisor actor."
+  substrate:
+    # Which substrate worker pool hosts this agent's actors.
+    workerPoolRef:
+      name: kagent-default

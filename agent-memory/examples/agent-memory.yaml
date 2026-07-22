@@ -1,0 +1,28 @@
+# A self-learning agent with durable native memory.
+# The ONLY thing that enables memory is the spec.declarative.memory block.
+# There is no `enabled: true` field — presence of the block IS the enablement.
+#
+# When memory is on, the runtime automatically adds three tools
+# (save_memory, load_memory, prefetch_memory) and an auto-save callback that
+# summarises the session every 5 user turns. prefetch_memory runs on the FIRST
+# user message of every new session — this is what gives cross-session recall.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: memory-selflearn-agent
+  namespace: kagent
+spec:
+  type: Declarative
+  description: Self-learning agent with durable native memory (Postgres+pgvector).
+  declarative:
+    modelConfig: default-model-config        # chat/reasoning model
+    memory:
+      modelConfig: embedding-model-config    # REQUIRED — embedding-capable ModelConfig
+      ttlDays: 7                             # optional; default 15; min 1
+    systemMessage: |
+      You are a self-learning platform assistant with long-term memory.
+      When the user tells you a durable fact or preference, call save_memory to
+      store it verbatim. When asked to recall something, use your loaded and
+      prefetched memories and load_memory. If you genuinely have no memory of
+      it, say "NO_MEMORY" rather than guessing. Keep answers to one or two
+      sentences.

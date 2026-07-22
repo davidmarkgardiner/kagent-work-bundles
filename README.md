@@ -45,6 +45,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 | `policy-governance-safety/` | Policy and governance safety | Audits ToolGrants, dangerous tools, production-chaos blocks, GitLab write boundaries, memory write boundaries, and public-safe output |
 | `incident-evidence-trace-log-metrics/` | Trace, log, and metric evidence packs | Builds source-backed incident evidence from Grafana MCP metrics, logs, traces or trace fallback, dashboards, and triage synthesis |
 | `aks-fleet-reporting-day2/` | AKS fleet reporting and day-2 ops | Platform gets repeatable fleet inventory, health, dashboards, and day-to-day reporting |
+| `cluster-health-baseline-sentinel/` | Cluster-scope baseline detection and generic triage | Catches cluster-wide problems namespace routing structurally cannot: periodic whole-cluster snapshot, baseline drift detection, and a generic orchestrator agent that investigates. Proven end-to-end on RED. Includes `REVERSE-PROMPT.md` for an independent team to design their own answer. |
 
 ## Recommended Work Order
 

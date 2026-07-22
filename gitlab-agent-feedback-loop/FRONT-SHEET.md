@@ -18,12 +18,20 @@ GitLab Issue comment, with one auditable response and no duplicate replies.
 
 ```text
 Private GitLab -> internal DNS / ingress / VirtualService -> Argo EventSource
--> Sensor -> Workflow -> read-only kagent -> GitLab Issue note
+-> Sensor -> short Workflow -> bounded Issue/thread hydration
+-> read-only kagent -> GitLab Issue note
 ```
 
 The EventSource is the only inbound endpoint. A VirtualService or internal
 ingress must route only `POST /gitlab-agent-feedback` to the EventSource
 service. Do not use a public Funnel in production.
+
+The workflow does not remain suspended while waiting for a person. It completes
+after its current action; each eligible GitLab comment starts a new short
+workflow that rehydrates bounded context. `agent-run-id: {{RUN_ID}}` in the
+Issue description maps to `agent-feedback-run-{{RUN_ID}}` in the `argo`
+namespace, written by the originating workflow and read by the feedback
+workflow. See the source POC's `run-state.example.yaml`.
 
 ## Required Markers
 
@@ -46,8 +54,12 @@ OUTPUT_SANITIZED: yes
   an explicit `@platform-agent` mention are accepted.
 - The EventSource bearer secret is an inbound authentication control; it is not
   a GitLab token.
-- The writer is a dedicated project bot token, limited to creating Issue notes.
-  Never use a personal CLI credential.
+- A separate reader token may only read the target Issue and notes; it supplies
+  bounded thread context to the agent.
+- The direct POC writer is a dedicated project bot token. GitLab `api` scope is
+  project-scoped but not endpoint-scoped; use a notes-only writer adapter when
+  the production boundary must be technically enforced. Never use a personal
+  CLI credential.
 - The agent must have no write-capable MCP tools. Any remediation goes to a
   separate GitOps MR/approval path.
 

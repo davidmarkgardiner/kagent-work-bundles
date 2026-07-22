@@ -1,0 +1,235 @@
+{
+    "schema_version": 1,
+    "cluster": "red",
+    "seq": 1,
+    "captured_at": "2026-07-15T10:56:53Z",
+    "truncated": false,
+    "sections": {
+        "nodes": {
+            "status": "ok",
+            "data": {
+                "total": 1,
+                "ready": 1,
+                "not_ready": [],
+                "unschedulable_count": 0,
+                "pressure_conditions": [],
+                "commit": [
+                    {
+                        "node": "homelab-control-plane",
+                        "cpu_commit_pct": 93.7,
+                        "memory_commit_pct": 52.7
+                    }
+                ],
+                "nodes": [
+                    {
+                        "node": "homelab-control-plane",
+                        "ready": true,
+                        "unschedulable": false,
+                        "allocatable_cpu_milli": 8000,
+                        "allocatable_memory_bytes": 33387196416,
+                        "requested_cpu_milli": 7497,
+                        "requested_memory_bytes": 17601396736,
+                        "cpu_commit_pct": 93.7,
+                        "memory_commit_pct": 52.7
+                    }
+                ],
+                "nodes_truncated": false
+            }
+        },
+        "scheduling": {
+            "status": "ok",
+            "data": {
+                "pending_count": 0,
+                "oldest_pending_seconds": 0,
+                "pending_pods": [],
+                "failed_scheduling_messages": []
+            }
+        },
+        "addons": {
+            "status": "ok",
+            "data": {
+                "checked": 56,
+                "namespaces_absent": [],
+                "degraded_count": 0,
+                "degraded": []
+            }
+        },
+        "events": {
+            "status": "ok",
+            "data": {
+                "window_minutes": 15,
+                "warning_total": 2,
+                "by_reason": [
+                    {
+                        "reason": "UnexpectedJob",
+                        "count": 2
+                    }
+                ],
+                "by_namespace": [
+                    {
+                        "namespace": "kagent",
+                        "count": 2
+                    }
+                ],
+                "excluded": [
+                    {
+                        "filter": "PolicyViolation",
+                        "count": 168
+                    }
+                ],
+                "excluded_total": 168,
+                "undated": 0
+            }
+        },
+        "workload_stress": {
+            "status": "ok",
+            "data": {
+                "oom_killed_containers": 0,
+                "crashloop_containers": 0,
+                "evicted_pods": 0,
+                "top_restarts": [
+                    {
+                        "namespace": "kube-system",
+                        "pod": "kindnet-vvst5",
+                        "restarts": 75
+                    },
+                    {
+                        "namespace": "metallb-system",
+                        "pod": "controller-bb5f47665-47t4c",
+                        "restarts": 62
+                    },
+                    {
+                        "namespace": "argo",
+                        "pod": "workflow-controller-6bdcdbcf98-dv29v",
+                        "restarts": 53
+                    },
+                    {
+                        "namespace": "metallb-system",
+                        "pod": "speaker-pbj4l",
+                        "restarts": 53
+                    },
+                    {
+                        "namespace": "kubeai",
+                        "pod": "kubeai-785fff5c48-nkqpv",
+                        "restarts": 51
+                    },
+                    {
+                        "namespace": "argo-events",
+                        "pod": "controller-manager-58644f9449-vjhmt",
+                        "restarts": 49
+                    },
+                    {
+                        "namespace": "kro-system",
+                        "pod": "kro-9f64dcf74-nw7j6",
+                        "restarts": 45
+                    },
+                    {
+                        "namespace": "kyverno",
+                        "pod": "kyverno-admission-controller-d4cf59786-mzm5l",
+                        "restarts": 45
+                    },
+                    {
+                        "namespace": "traefik",
+                        "pod": "traefik-55f5c5c45-4hd4c",
+                        "restarts": 44
+                    },
+                    {
+                        "namespace": "azureserviceoperator-system",
+                        "pod": "azureserviceoperator-controller-manager-74646c6ddd-pqhp5",
+                        "restarts": 42
+                    },
+                    {
+                        "namespace": "azureserviceoperator-system",
+                        "pod": "azureserviceoperator-controller-manager-74646c6ddd-bm9cz",
+                        "restarts": 41
+                    },
+                    {
+                        "namespace": "kube-system",
+                        "pod": "kube-controller-manager-homelab-control-plane",
+                        "restarts": 41
+                    },
+                    {
+                        "namespace": "kyverno",
+                        "pod": "kyverno-background-controller-7fc6bd485b-lr867",
+                        "restarts": 41
+                    },
+                    {
+                        "namespace": "kyverno",
+                        "pod": "kyverno-cleanup-controller-57669d57b9-jk6tj",
+                        "restarts": 41
+                    },
+                    {
+                        "namespace": "kyverno",
+                        "pod": "kyverno-reports-controller-8c9596b59-f2hhr",
+                        "restarts": 40
+                    },
+                    {
+                        "namespace": "holmes",
+                        "pod": "holmes-holmes-68779846b6-cdqfx",
+                        "restarts": 38
+                    },
+                    {
+                        "namespace": "kube-system",
+                        "pod": "kube-scheduler-homelab-control-plane",
+                        "restarts": 38
+                    },
+                    {
+                        "namespace": "cert-manager",
+                        "pod": "cert-manager-f87bc4fd6-n2qp9",
+                        "restarts": 34
+                    },
+                    {
+                        "namespace": "cert-manager",
+                        "pod": "cert-manager-cainjector-6b858db5cf-6fqp8",
+                        "restarts": 33
+                    },
+                    {
+                        "namespace": "cert-manager",
+                        "pod": "cert-manager-webhook-57df45f686-lb976",
+                        "restarts": 33
+                    }
+                ]
+            }
+        },
+        "storage": {
+            "status": "ok",
+            "data": {
+                "total": 8,
+                "not_bound_count": 0,
+                "not_bound": []
+            }
+        },
+        "control_plane": {
+            "status": "ok",
+            "data": {
+                "readyz": "ok",
+                "failing_checks": []
+            }
+        },
+        "ip_capacity": {
+            "status": "unavailable",
+            "error": "RuntimeError: azure workload identity not configured; ip_capacity not collected"
+        },
+        "triage_storm": {
+            "status": "ok",
+            "data": {
+                "window_minutes": 30,
+                "recent_triage_workflows": 0
+            }
+        }
+    },
+    "collector_health": {
+        "sections_ok": 8,
+        "sections_unavailable": [
+            "ip_capacity"
+        ]
+    },
+    "verdict": "warning",
+    "breached_checks": [
+        {
+            "check": "node_cpu_commit",
+            "severity": "warning",
+            "detail": "node homelab-control-plane CPU requests at 93.7% of allocatable"
+        }
+    ]
+}
