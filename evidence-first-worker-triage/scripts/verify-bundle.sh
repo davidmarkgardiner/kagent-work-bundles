@@ -40,6 +40,8 @@ if rg -n '192\.168\.|10\.[0-9]|redpanda\.redpanda|password=' \
   --glob '!next-phase-end-to-end/reference-config/crashloop-fixture.yaml' \
   --glob '!next-phase-end-to-end/reference-config/retest-fixtures.yaml' \
   --glob '!next-phase-end-to-end/reference-config/stress-fixtures.yaml' \
+  --glob '!next-phase-end-to-end/evidence/phase0-reprove-redaction-and-correlation.md' \
+  --glob '!next-phase-end-to-end/evidence/phase2-vector-config.md' \
   .; then
   echo "PUBLIC_SAFE_SCAN_FAILED" >&2
   exit 1

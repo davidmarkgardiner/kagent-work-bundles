@@ -1,0 +1,20 @@
+# Internet-reachable model endpoint so a fresh/isolated cluster (no in-cluster
+# AI gateway) can still drive the SandboxAgent. Swap for your work model endpoint.
+#
+# Create the secret first:
+#   kubectl -n kagent create secret generic openrouter-api-key \
+#     --from-literal=OPENROUTER_API_KEY="sk-or-v1-..."
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  name: default-model-config
+  namespace: kagent
+spec:
+  provider: OpenAI
+  model: qwen/qwen3-next-80b-a3b-instruct:free
+  apiKeySecret: openrouter-api-key
+  apiKeySecretKey: OPENROUTER_API_KEY
+  openAI:
+    baseUrl: https://openrouter.ai/api/v1
+    maxTokens: 1200
+    temperature: "0.1"

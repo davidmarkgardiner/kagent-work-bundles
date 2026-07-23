@@ -14,12 +14,50 @@ the approved secret manager or deployment configuration; do not commit them.
 | Allowlisted GitLab usernames | `{{GITLAB_ALLOWED_USERNAMES}}` |
 | Feedback agent service | `{{READ_ONLY_FEEDBACK_AGENT_SERVICE}}` |
 | Inbound webhook secret | stored outside Git |
+| Issue reader token | stored outside Git |
 | Writer bot token | stored outside Git |
 
-## 2. Create the GitLab Writer Identity
+## 2. Create the GitLab Reader Token
 
-Create a dedicated project bot or service account. It must only be able to add
-notes to Issues in this project.
+Project access tokens create project-scoped bot users. Use them rather than a
+personal access token. The bot is scoped to this one project, but its effective
+abilities are still the combination of its selected role and token scope.
+
+1. Open the target project.
+2. Go to **Settings → Access tokens**.
+3. Select **Add new token**.
+4. Use name `agent-feedback-reader` and a short, documented expiry date.
+5. Select role **Reporter**. This avoids repository push permission and can
+   read private/confidential Issue context where permitted.
+6. Select only scope **read_api**.
+7. Select **Create project access token**.
+8. Copy the token immediately into the approved secret manager. GitLab shows
+   it once only; do not paste it into chat, tickets, terminals, or Git.
+
+The reader is used only for `GET /projects/:id/issues/:iid` and
+`GET /projects/:id/issues/:iid/notes`.
+
+## 3. Create the GitLab Writer Token
+
+Repeat **Settings → Access tokens → Add new token** with:
+
+| Field | Value |
+|---|---|
+| Name | `agent-feedback-writer` |
+| Expiry | short, documented, and monitored |
+| Role | **Reporter** initially; raise only if the target GitLab version rejects issue-note creation |
+| Scope | **api** |
+
+GitLab's `api` scope is broad within the project token's project boundary.
+Reporter prevents repository push, but it does **not** make the token endpoint
+limited to Issue-note creation; do not claim that it does.
+
+For this POC, record the role/scope and prove the bot identity posts the note.
+For production where the writer must be technically unable to perform other API
+writes, deploy a small writer adapter: the workflow sends it a validated agent
+response, the adapter owns the project token, rejects every operation except
+`POST /projects/:id/issues/:iid/notes`, and emits an audit record. Keep the
+token out of the Argo workflow namespace in that model.
 
 Do not use a personal CLI token. Do not grant repository push, merge-request
 approval, project-settings, group-management, or administrator permissions.
@@ -27,28 +65,35 @@ approval, project-settings, group-management, or administrator permissions.
 Store its API token in the approved secret manager as the value later mounted
 into the `gitlab-agent-feedback-writer` secret.
 
-## 3. Create the Webhook
+## 4. Create the Webhook
 
 In the target GitLab project:
 
 1. Open **Settings → Webhooks**.
 2. Set the URL to the webhook endpoint above.
-3. Enable **Comment events** (called Note events by some GitLab versions).
-4. Configure a custom HTTP header:
+3. Leave SSL verification enabled. The internal ingress certificate must chain
+   to a CA trusted by the GitLab host.
+4. Enable **Comment events** (called Note events by some GitLab versions).
+5. Configure a custom HTTP header:
 
    ```text
    Authorization: Bearer {{GITLAB_WEBHOOK_SECRET}}
    ```
 
-5. Save the webhook, then use GitLab's test/delivery view to confirm it reaches
+6. Save the webhook, then use GitLab's test/delivery view to confirm it reaches
    the endpoint.
+
+If the GitLab version cannot add a custom `Authorization` header, do not weaken
+the EventSource. Put a small authenticated/signature-verifying adapter in front
+of it that converts the GitLab request into the required bearer-authenticated
+internal request.
 
 The current EventSource uses bearer authentication because the installed Argo
 Events CRD supports `authSecret`. If the private GitLab version offers a
 different webhook signing mechanism, place a signature verifier in front of
 the EventSource before changing the authentication model.
 
-## 4. Configure the Cluster-side Secret References
+## 5. Configure the Cluster-side Secret References
 
 Create these secrets through the approved secret-management process, never in
 Git:
@@ -63,13 +108,32 @@ namespace: argo
 secret: gitlab-agent-feedback-writer
 key: api-token
 value: {{GITLAB_NOTE_WRITER_TOKEN}}
+
+namespace: argo
+secret: gitlab-agent-feedback-reader
+key: api-token
+value: {{GITLAB_ISSUE_READER_TOKEN}}
 ```
 
 Configure the workflow's `allowed_users` value and feedback-agent service name
 through the approved overlay/replacements mechanism. Keep the source
 placeholders intact.
 
-## 5. Prepare a Test Issue
+## 6. Configure the Ticket-producing Workflow
+
+When an agent creates an Issue for human feedback, it must:
+
+1. Write a bounded state record named `agent-feedback-run-{{RUN_ID}}` in the
+   `argo` namespace, using the source `run-state.example.yaml` contract.
+2. Put `agent-run-id: {{RUN_ID}}` on its own line in the Issue description.
+3. Apply label `agent:waiting-for-human`.
+4. End its workflow; it must not remain suspended waiting for a human.
+
+Each later eligible comment starts a fresh workflow. That workflow reads the
+Issue, newest bounded notes, and the matching run-state record before invoking
+the read-only agent.
+
+## 7. Prepare a Test Issue
 
 1. Create an Issue.
 2. Add label `agent:waiting-for-human`.
@@ -82,7 +146,15 @@ placeholders intact.
 Expected result: one workflow runs and one bot note appears. The note must say
 that it did not execute remediation or GitOps changes.
 
-## 6. Verify Safety and Replay Behaviour
+The workflow finishes rather than suspending. Each eligible new comment starts
+a fresh workflow, which reads the Issue and newest bounded notes before it
+calls the read-only agent. An originating agent may include
+`agent-run-id: {{RUN_ID}}` in the Issue description and its originating
+workflow must write the bounded `agent-feedback-run-{{RUN_ID}}` ConfigMap in
+the `argo` namespace. The feedback workflow reads that record when it exists;
+do not place raw logs or credentials in either record.
+
+## 8. Verify Safety and Replay Behaviour
 
 | Test | Expected result |
 |---|---|
@@ -96,7 +168,17 @@ that it did not execute remediation or GitOps changes.
 Capture sanitized delivery, workflow, and Issue-note evidence in
 `evidence/EVIDENCE-TEMPLATE.md`.
 
-## 7. Private-network Checks
+## 9. Rotation and Revocation
+
+- Record reader and writer token expiry dates in the team secret inventory.
+- Rotate each token before expiry through **Settings → Access tokens**.
+- Update only the matching Kubernetes secret through the approved secret flow.
+- Trigger a new synthetic Issue comment to prove the new secret is used.
+- Revoke the old project token after the new-token proof succeeds.
+- Immediately revoke and replace any token that appears in terminal output,
+  chat history, a ticket, a commit, or an artifact.
+
+## 10. Private-network Checks
 
 - GitLab webhook workers can resolve and reach the internal ingress or
   VirtualService.

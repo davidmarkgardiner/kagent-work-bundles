@@ -60,8 +60,17 @@ read-only boundary: the agent diagnoses and advises; it does not auto-remediate.
 needs — cluster, message type, the actual message, what the error is, pod,
 service?" It maps every envelope field to where it is set, whether it reaches
 the agent, and whether it lands in the ticket, backed by the two real red-proof
-tickets (#430 log path, #431 event path). It also flags the two fields the work
-agent must add and prove: `severity` and `container`. Phases 1 and 4 point here.
+tickets (#430 log path, #431 event path). It records the earlier `severity` and
+`container` gaps and their subsequent proof; the current reference Vector
+contract includes both. Phases 1 and 4 point here.
+
+## Kafka payload replay while access is pending
+
+`KAFKA-PAYLOAD-REPLAY-SHEET.md` is the one-page handoff for validating the
+Argo `incident` contract before Kafka permissions arrive, then replaying the
+identical JSON through Kafka after approval. It keeps the direct-Argo and
+Kafka-backed proofs distinct, so a working workflow parameter is not mistaken
+for confirmed broker delivery.
 
 ## Working config included
 

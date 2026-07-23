@@ -1,0 +1,30 @@
+# Embedding ModelConfig — the REQUIRED piece for native memory.
+# spec.declarative.memory.modelConfig on an Agent must point at a ModelConfig
+# whose provider can emit embeddings. kagent hardcodes 768 dimensions, so
+# nomic-embed-text (native 768-dim) is an exact match with no truncation.
+#
+# Fully local via Ollama — no external key, no rate limits. This is what
+# unblocks memory on an air-gapped / offline lab where no OpenAI embedding
+# endpoint is reachable.
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  name: embedding-model-config
+  namespace: kagent
+spec:
+  provider: OpenAI                       # Ollama exposes an OpenAI-compatible API
+  model: nomic-embed-text
+  apiKeySecret: ollama-dummy-key         # Ollama ignores the key; secret must exist
+  apiKeySecretKey: OPENAI_API_KEY
+  openAI:
+    baseUrl: http://ollama.kagent.svc.cluster.local:11434/v1
+---
+# Dummy key secret (Ollama does not authenticate; kagent still requires the ref).
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ollama-dummy-key
+  namespace: kagent
+type: Opaque
+stringData:
+  OPENAI_API_KEY: "ollama-local-no-auth"

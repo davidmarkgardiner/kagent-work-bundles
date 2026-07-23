@@ -1,0 +1,39 @@
+# kagent Helm values for durable native memory (Postgres + pgvector).
+# Proven on an isolated kind cluster 2026-07-16 (kagent 0.9.10 chart).
+#
+# The two things that make memory work:
+#   1. vectorEnabled: true  -> controller runs the pgvector migration + sets
+#      DATABASE_VECTOR_ENABLED=true.
+#   2. a Postgres image that ACTUALLY has pgvector. The chart's bundled default
+#      is docker.io/library/postgres:18.3-alpine, which does NOT ship pgvector,
+#      so the migration fails. Override to pgvector/pgvector.
+#
+# registry: ghcr.io avoids the cr.kagent.dev golang-adk mirror 404 (see the
+# agent-substrate bundle for detail).
+
+registry: ghcr.io
+
+database:
+  postgres:
+    # Bundled Postgres is dev/eval ONLY. For work use an external managed
+    # PostgreSQL with the vector extension instead (url/urlFile below).
+    vectorEnabled: true
+    bundled:
+      enabled: true
+      image:
+        registry: docker.io
+        repository: pgvector      # override org/namespace
+        name: pgvector            # override image name
+        tag: "pg17"               # pgvector tag (NOT a postgres tag)
+      storage: 1Gi
+
+# ---- Production shape (external managed Postgres) ----
+# database:
+#   postgres:
+#     vectorEnabled: true
+#     url: ""                 # or urlFile mounted from a Secret (preferred)
+#     bundled:
+#       enabled: false
+# Then, one-off on the DB:  CREATE EXTENSION IF NOT EXISTS vector;
+# (On Azure Database for PostgreSQL, add `vector` to azure.extensions and
+#  restart the server BEFORE CREATE EXTENSION.)
