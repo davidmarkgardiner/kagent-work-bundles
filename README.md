@@ -119,6 +119,7 @@ git remote add work-bundles https://github.com/davidmarkgardiner/kagent-work-bun
 scripts/sync-work-bundles-repo.sh
 ```
 
-The script publishes the committed subtree to the sister repository's `main`
-branch. Do not make independent edits in the sister repository; the next source
-sync will overwrite them.
+Run that command from a clean `kagent-public` checkout; the script deliberately
+lives only in the source repository. It publishes the committed subtree to the
+sister repository's `main` branch. Do not make independent edits in the sister
+repository; the next source sync will overwrite them.
