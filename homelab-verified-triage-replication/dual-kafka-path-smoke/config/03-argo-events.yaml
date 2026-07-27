@@ -1,0 +1,139 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: dual-kafka-topic-a
+  namespace: argo-events
+  labels: {app.kubernetes.io/part-of: dual-kafka-path-smoke}
+spec:
+  kafka:
+    smoke-a:
+      url: "{{KAFKA_BOOTSTRAP}}"
+      topic: "{{KAFKA_TOPIC_A}}"
+      version: 2.5.0
+      jsonBody: true
+      consumerGroup: {groupName: "{{KAFKA_GROUP_A}}", oldest: false}
+      sasl:
+        mechanism: PLAIN
+        userSecret: {name: confluent-credentials, key: key}
+        passwordSecret: {name: confluent-credentials, key: secret}
+      tls: {insecureSkipVerify: true}
+  template: {serviceAccountName: argo-events-sa}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: dual-kafka-topic-b
+  namespace: argo-events
+  labels: {app.kubernetes.io/part-of: dual-kafka-path-smoke}
+spec:
+  kafka:
+    smoke-b:
+      url: "{{KAFKA_BOOTSTRAP}}"
+      topic: "{{KAFKA_TOPIC_B}}"
+      version: 2.5.0
+      jsonBody: true
+      consumerGroup: {groupName: "{{KAFKA_GROUP_B}}", oldest: false}
+      sasl:
+        mechanism: PLAIN
+        userSecret: {name: confluent-credentials, key: key}
+        passwordSecret: {name: confluent-credentials, key: secret}
+      tls: {insecureSkipVerify: true}
+  template: {serviceAccountName: argo-events-sa}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: dual-kafka-sensor-a
+  namespace: argo-events
+  labels: {app.kubernetes.io/part-of: dual-kafka-path-smoke}
+spec:
+  eventBusName: default
+  template: {serviceAccountName: argo-events-sa}
+  dependencies:
+    - name: smoke-a
+      eventSourceName: dual-kafka-topic-a
+      eventName: smoke-a
+      filters:
+        data:
+          - {path: body.schema_version, type: string, value: ["dual-kafka-smoke.v1"]}
+          - {path: body.pipeline, type: string, value: ["dual-kafka-path-smoke"]}
+  triggers:
+    - template:
+        name: hello-a
+        conditions: smoke-a
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: dual-kafka-hello-a-
+                namespace: argo-events
+                labels: {app.kubernetes.io/part-of: dual-kafka-path-smoke, dual-kafka-path: a}
+              spec:
+                workflowTemplateRef: {name: dual-kafka-hello}
+                arguments: {parameters: [{name: path, value: a}, {name: message}]}
+          parameters:
+            - src: {dependencyName: smoke-a, dataKey: body.message}
+              dest: spec.arguments.parameters.1.value
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: dual-kafka-sensor-b
+  namespace: argo-events
+  labels: {app.kubernetes.io/part-of: dual-kafka-path-smoke}
+spec:
+  eventBusName: default
+  template: {serviceAccountName: argo-events-sa}
+  dependencies:
+    - name: smoke-b
+      eventSourceName: dual-kafka-topic-b
+      eventName: smoke-b
+      filters:
+        data:
+          - {path: body.schema_version, type: string, value: ["dual-kafka-smoke.v1"]}
+          - {path: body.pipeline, type: string, value: ["dual-kafka-path-smoke"]}
+  triggers:
+    - template:
+        name: hello-b
+        conditions: smoke-b
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: dual-kafka-hello-b-
+                namespace: argo-events
+                labels: {app.kubernetes.io/part-of: dual-kafka-path-smoke, dual-kafka-path: b}
+              spec:
+                workflowTemplateRef: {name: dual-kafka-hello}
+                arguments: {parameters: [{name: path, value: b}, {name: message}]}
+          parameters:
+            - src: {dependencyName: smoke-b, dataKey: body.message}
+              dest: spec.arguments.parameters.1.value
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: dual-kafka-hello
+  namespace: argo-events
+  labels: {app.kubernetes.io/part-of: dual-kafka-path-smoke}
+spec:
+  serviceAccountName: argo-events-sa
+  entrypoint: hello
+  podGC: {strategy: OnPodCompletion, deleteDelayDuration: 1m}
+  ttlStrategy: {secondsAfterSuccess: 600, secondsAfterFailure: 3600}
+  arguments:
+    parameters:
+      - {name: path}
+      - {name: message}
+  templates:
+    - name: hello
+      container:
+        image: busybox:1.36
+        command: [sh, -c]
+        args: ["echo HELLO dual-kafka-path={{workflow.parameters.path}} message='{{workflow.parameters.message}}'"]

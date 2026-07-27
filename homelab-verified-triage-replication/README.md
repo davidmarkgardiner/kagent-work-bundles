@@ -47,6 +47,8 @@ RESTART-SAFETY-AND-DELIVERY-VERIFICATION.md
 TOPIC-ISOLATION-AND-SENSOR-SCOPING.md
                        work-agent handoff for keeping shared-topic LGTM and
                        other unrelated records out of triage workflows
+dual-kafka-path-smoke/ basic two-topic/two-consumer-group diagnostic with
+                       hello Workflows; use before restoring full triage logic
 config/                 the five manifests, in apply order (+ kustomization)
 fixtures/               disposable pods that generate real log + event signals
 scripts/                deploy / verify / smoke-test / teardown, all context-explicit
