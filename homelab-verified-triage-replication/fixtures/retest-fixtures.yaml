@@ -1,0 +1,35 @@
+# Controlled regression fixtures for the fixes recorded in STRESS-TEST-2026-07-13.md.
+# All values are synthetic. Delete this file's resources immediately after evidence capture.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: auth-redaction-regression-v3
+  namespace: agentic-triage-proof
+  labels:
+    app.kubernetes.io/name: auth-api
+    triage-test: redaction-regression-v3
+spec:
+  restartPolicy: Never
+  containers:
+    - name: auth-api
+      image: busybox:1.36
+      command: [sh, -c]
+      args:
+        - 'echo "FATAL synthetic redaction regression v3 password=synthetic-password token=synthetic-token authorization=Bearer synthetic-bearer"; sleep 180'
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: checkout-correlation-regression-v3
+  namespace: agentic-triage-proof
+  labels:
+    app.kubernetes.io/name: checkout-api
+    triage-test: correlation-regression-v3
+spec:
+  restartPolicy: Always
+  containers:
+    - name: checkout-api
+      image: busybox:1.36
+      command: [sh, -c]
+      args:
+        - 'echo "ERROR synthetic checkout failure request_id=correlation-regression-v3"; exit 1'

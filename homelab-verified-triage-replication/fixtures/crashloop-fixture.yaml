@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: checkout-api-evidence-fixture
+  namespace: agentic-triage-proof
+  labels:
+    app: checkout-api
+    app.kubernetes.io/name: checkout-api
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage
+spec:
+  restartPolicy: Always
+  containers:
+    - name: checkout-api
+      image: busybox:1.36
+      command: [sh, -c]
+      args:
+        - 'echo "ERROR database authentication failed password=placeholder-credential"; exit 1'
+      resources:
+        requests: {cpu: 10m, memory: 16Mi}
+        limits: {cpu: 50m, memory: 32Mi}

@@ -106,3 +106,19 @@ Before giving the bundle set to a work-side implementation agent, hand
 [`PEER-REVIEW-PROMPT.md`](PEER-REVIEW-PROMPT.md) to a separate review agent.
 That reviewer should check handover clarity, required variables, token
 efficiency, safety boundaries, and missing concepts without claiming live proof.
+
+## Sister repository mirror
+
+The public repository [`davidmarkgardiner/kagent-work-bundles`](https://github.com/davidmarkgardiner/kagent-work-bundles)
+mirrors this directory at its repository root, so a work environment can clone
+only these bundles. `kagent-public` is the source of truth: make reviewed bundle
+changes here, merge them to `main`, then run:
+
+```bash
+git remote add work-bundles https://github.com/davidmarkgardiner/kagent-work-bundles.git
+scripts/sync-work-bundles-repo.sh
+```
+
+The script publishes the committed subtree to the sister repository's `main`
+branch. Do not make independent edits in the sister repository; the next source
+sync will overwrite them.

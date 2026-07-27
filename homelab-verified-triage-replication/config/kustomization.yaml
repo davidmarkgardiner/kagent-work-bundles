@@ -1,0 +1,17 @@
+# Apply order matters: the semaphore ConfigMap must exist before the
+# WorkflowTemplate that references it, or the controller admits nothing.
+# `kubectl apply -k config/` respects this ordering.
+#
+# scripts/deploy.sh is still the recommended entry point — it preflights the
+# prerequisites (Secrets, ServiceAccounts, CRDs, EventBus, agent) first, so a
+# missing dependency is a clear message rather than a half-applied stack.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - 00-namespace.yaml
+  - 04-workflow-concurrency.yaml
+  - 02-vector.yaml
+  - 01-alloy.yaml
+  - 03-argo.yaml
+commonLabels:
+  app.kubernetes.io/part-of: alloy-vector-kafka-triage

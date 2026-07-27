@@ -1,0 +1,10 @@
+# Synthetic credential-shaped inputs prove redaction and are not credentials.
+fixtures/crashloop-fixture.yaml
+fixtures/retest-fixtures.yaml
+scripts/smoke-test.sh
+scripts/verify-bundle.sh
+evidence/VERIFICATION-2026-07-24.md
+
+# This contains the GitLab HTTP header name, while the value is always read from
+# the runtime Secret as $GITLAB_TOKEN.
+config/03-argo.yaml

@@ -1,0 +1,7 @@
+# Never commit a rendered values file — it names your real contexts, namespaces
+# and resource names even when it holds no credentials.
+values.env
+
+# Agent scratch DBs that some tooling drops into working directories.
+agentdb.rvf
+agentdb.rvf.lock
