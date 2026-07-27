@@ -13,5 +13,11 @@ resources:
   - 02-vector.yaml
   - 01-alloy.yaml
   - 03-argo.yaml
-commonLabels:
-  app.kubernetes.io/part-of: alloy-vector-kafka-triage
+# Keep this as metadata and Pod-template labelling only. `commonLabels` also
+# mutates Deployment selectors, which makes a later `kubectl apply -k` fail
+# against an already-running Deployment because selectors are immutable.
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: alloy-vector-kafka-triage
+    includeSelectors: false
+    includeTemplates: true

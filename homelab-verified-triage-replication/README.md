@@ -138,6 +138,22 @@ or CI check. It is safe to run at any time — it mutates nothing.
 `smoke-test.sh` **creates real GitLab work items**. That is the point of it.
 Close them afterwards; they all carry the `automated-triage` label.
 
+## Workflow housekeeping
+
+The shipped `red-agentic-triage` WorkflowTemplate is deliberately bounded:
+
+| Object | Policy | Why |
+|---|---|---|
+| Completed workflow Pods | Argo `podGC: OnPodCompletion` after a five-minute delay | Leaves a short inspection window, then prevents pod accumulation. |
+| Successful Workflow CRs | Argo TTL: one hour | Retains enough run history for normal smoke-test inspection without retaining thousands of completed runs. |
+| Failed Workflow CRs | Argo TTL: 24 hours | Preserves failure evidence for investigation before cleanup. |
+
+`verify.sh` fails if this policy is absent or altered. This is the per-workflow
+guardrail; it does not replace a one-off cleanup of any historical backlog that
+already exists in a cluster. For an existing backlog, start with the dry run in
+[`../argo-workflow-retention-cleanup/`](../argo-workflow-retention-cleanup/README.md)
+and scope it to the triage namespace/labels before approving deletion.
+
 ---
 
 ## Porting to work — what you must change

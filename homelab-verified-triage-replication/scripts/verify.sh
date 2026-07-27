@@ -117,6 +117,14 @@ echo
 echo "== 5. Backend (WorkflowTemplate, semaphore, agent) =="
 if $K -n argo-events get workflowtemplate red-agentic-triage >/dev/null 2>&1; then
   pass "workflowtemplate red-agentic-triage present"
+  pod_gc="$($K -n argo-events get workflowtemplate red-agentic-triage -o jsonpath='{.spec.podGC.strategy}' 2>/dev/null)"
+  ttl_success="$($K -n argo-events get workflowtemplate red-agentic-triage -o jsonpath='{.spec.ttlStrategy.secondsAfterSuccess}' 2>/dev/null)"
+  ttl_failure="$($K -n argo-events get workflowtemplate red-agentic-triage -o jsonpath='{.spec.ttlStrategy.secondsAfterFailure}' 2>/dev/null)"
+  if [ "$pod_gc" = "OnPodCompletion" ] && [ "$ttl_success" = "3600" ] && [ "$ttl_failure" = "86400" ]; then
+    pass "workflow housekeeping: Pods GC after completion; success TTL=1h; failure TTL=24h"
+  else
+    fail "workflow housekeeping mismatch (podGC=${pod_gc:-<unset>}, successTTL=${ttl_success:-<unset>}, failureTTL=${ttl_failure:-<unset>})"
+  fi
 else
   fail "workflowtemplate red-agentic-triage missing"
 fi

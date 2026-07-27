@@ -157,6 +157,16 @@ metadata:
 spec:
   serviceAccountName: argo-events-sa
   entrypoint: triage
+  # Keep the execution plane bounded. Completed Pods are useful briefly for an
+  # operator inspecting a new signal, then become pure kubelet/API-server load.
+  # Successful Workflow CRs have a short audit window; failed runs are retained
+  # for one day so their evidence can be investigated before Argo removes them.
+  podGC:
+    strategy: OnPodCompletion
+    deleteDelayDuration: 5m
+  ttlStrategy:
+    secondsAfterSuccess: 3600
+    secondsAfterFailure: 86400
   # Bound concurrent triage instances so a burst (e.g. a crashlooping pod firing
   # many BackOff events) cannot spawn unbounded concurrent Argo/agent/GitLab
   # work. Scoped to this WorkflowTemplate only, via its own ConfigMap — does NOT
