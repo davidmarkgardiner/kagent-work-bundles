@@ -41,6 +41,9 @@ Evidence for every claim: **[evidence/VERIFICATION-2026-07-24.md](evidence/VERIF
 README.md               you are here — what it is, prerequisites, how to port it
 FINDINGS-AND-FIXES.md   what was wrong, what was fixed, what is deliberate
 RUNBOOK.md              one page: what to do when something looks wrong
+RESTART-SAFETY-AND-DELIVERY-VERIFICATION.md
+                       work-agent handoff for proving delivery and persisting
+                       Alloy positions without assuming Vector disk buffering
 config/                 the five manifests, in apply order (+ kustomization)
 fixtures/               disposable pods that generate real log + event signals
 scripts/                deploy / verify / smoke-test / teardown, all context-explicit
