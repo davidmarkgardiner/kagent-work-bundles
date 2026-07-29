@@ -1,0 +1,201 @@
+# A deterministic, non-destructive signal set for the AKS specialist path.
+# The five Event objects are synthetic Warning Events associated with the Pods
+# below. They exercise collection, classification and routing without trying
+# to exhaust a node, delete a Secret, interrupt a spot node, or break networking.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aks-platform-triage-smoke
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: critical-log-smoke
+  labels:
+    app.kubernetes.io/name: critical-log-smoke
+    sre.platform.io/triage: "true"
+    sre.platform.io/workload-identity: critical-log-smoke
+spec:
+  restartPolicy: Never
+  containers:
+  - name: emitter
+    image: triage-smoke-image
+    command: [sh, -c]
+    args: ['echo "CRITICAL platform health probe failed: API dependency unavailable"; sleep 1800']
+    resources:
+      requests: {cpu: 10m, memory: 16Mi}
+      limits: {cpu: 50m, memory: 32Mi}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: error-log-smoke
+  labels:
+    app.kubernetes.io/name: error-log-smoke
+    sre.platform.io/triage: "true"
+    sre.platform.io/workload-identity: error-log-smoke
+spec:
+  restartPolicy: Never
+  containers:
+  - name: emitter
+    image: triage-smoke-image
+    command: [sh, -c]
+    args: ['echo "ERROR workload identity authentication failed: federated credential rejected"; sleep 1800']
+    resources:
+      requests: {cpu: 10m, memory: 16Mi}
+      limits: {cpu: 50m, memory: 32Mi}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: warning-log-smoke
+  labels:
+    app.kubernetes.io/name: warning-log-smoke
+    sre.platform.io/triage: "true"
+    sre.platform.io/workload-identity: warning-log-smoke
+spec:
+  restartPolicy: Never
+  containers:
+  - name: emitter
+    image: triage-smoke-image
+    command: [sh, -c]
+    args: ['echo "WARNING platform capacity trend indicates a future scheduling risk"; sleep 1800']
+    resources:
+      requests: {cpu: 10m, memory: 16Mi}
+      limits: {cpu: 50m, memory: 32Mi}
+---
+# Event target Pods run harmlessly. The Event resources below refer to them.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: oom-killed-event-smoke
+  labels: {app.kubernetes.io/name: oom-killed-event-smoke, sre.platform.io/triage: "true", sre.platform.io/workload-identity: oom-killed-event-smoke}
+spec:
+  restartPolicy: Never
+  containers:
+  - name: hold
+    image: triage-smoke-image
+    command: [sh, -c]
+    args: ['sleep 1800']
+    resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: missing-secret-event-smoke
+  labels: {app.kubernetes.io/name: missing-secret-event-smoke, sre.platform.io/triage: "true", sre.platform.io/workload-identity: missing-secret-event-smoke}
+spec:
+  restartPolicy: Never
+  containers:
+  - name: hold
+    image: triage-smoke-image
+    command: [sh, -c]
+    args: ['sleep 1800']
+    resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: failed-scheduling-event-smoke
+  labels: {app.kubernetes.io/name: failed-scheduling-event-smoke, sre.platform.io/triage: "true", sre.platform.io/workload-identity: failed-scheduling-event-smoke}
+spec:
+  restartPolicy: Never
+  containers:
+  - name: hold
+    image: triage-smoke-image
+    command: [sh, -c]
+    args: ['sleep 1800']
+    resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: spot-eviction-event-smoke
+  labels: {app.kubernetes.io/name: spot-eviction-event-smoke, sre.platform.io/triage: "true", sre.platform.io/workload-identity: spot-eviction-event-smoke}
+spec:
+  restartPolicy: Never
+  containers:
+  - name: hold
+    image: triage-smoke-image
+    command: [sh, -c]
+    args: ['sleep 1800']
+    resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: network-not-ready-event-smoke
+  labels: {app.kubernetes.io/name: network-not-ready-event-smoke, sre.platform.io/triage: "true", sre.platform.io/workload-identity: network-not-ready-event-smoke}
+spec:
+  restartPolicy: Never
+  containers:
+  - name: hold
+    image: triage-smoke-image
+    command: [sh, -c]
+    args: ['sleep 1800']
+    resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: oom-killed-smoke
+type: Warning
+reason: OOMKilled
+message: "Synthetic smoke event: container was OOM killed. No actual memory pressure was created."
+source: {component: aks-platform-triage-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: oom-killed-event-smoke, namespace: aks-platform-triage-smoke}
+firstTimestamp: "2026-01-01T00:00:00Z"
+lastTimestamp: "2026-01-01T00:00:00Z"
+count: 1
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: missing-secret-smoke
+type: Warning
+reason: FailedMount
+message: "Synthetic smoke event: secret not found while mounting workload volume. No Secret was removed."
+source: {component: aks-platform-triage-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: missing-secret-event-smoke, namespace: aks-platform-triage-smoke}
+firstTimestamp: "2026-01-01T00:00:00Z"
+lastTimestamp: "2026-01-01T00:00:00Z"
+count: 1
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: failed-scheduling-smoke
+type: Warning
+reason: FailedScheduling
+message: "Synthetic smoke event: no eligible nodes satisfied pod placement constraints."
+source: {component: aks-platform-triage-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: failed-scheduling-event-smoke, namespace: aks-platform-triage-smoke}
+firstTimestamp: "2026-01-01T00:00:00Z"
+lastTimestamp: "2026-01-01T00:00:00Z"
+count: 1
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: spot-eviction-smoke
+type: Warning
+reason: SpotEviction
+message: "Synthetic smoke event: spot node eviction notice received for workload placement review."
+source: {component: aks-platform-triage-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: spot-eviction-event-smoke, namespace: aks-platform-triage-smoke}
+firstTimestamp: "2026-01-01T00:00:00Z"
+lastTimestamp: "2026-01-01T00:00:00Z"
+count: 1
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: network-not-ready-smoke
+type: Warning
+reason: NetworkNotReady
+message: "Synthetic smoke event: node networking unavailable; transport and routing test only."
+source: {component: aks-platform-triage-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: network-not-ready-event-smoke, namespace: aks-platform-triage-smoke}
+firstTimestamp: "2026-01-01T00:00:00Z"
+lastTimestamp: "2026-01-01T00:00:00Z"
+count: 1

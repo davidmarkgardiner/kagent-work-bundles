@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# This deliberately fixed namespace makes the fixture a one-command deployment
+# on a cluster where it does not already exist. Add it to the worker Alloy
+# namespace allow-list before running the fixture.
+namespace: aks-platform-triage-smoke
+labels:
+- pairs:
+    app: aks-platform-triage-smoke
+images:
+- name: triage-smoke-image
+  newName: busybox
+  newTag: "1.36"
+
+resources:
+- specialist-smoke-fixtures.yaml
+
+# Kubernetes requires an Event's involvedObject.namespace to match the Event
+# namespace. Kustomize's namespace transformer does not rewrite this nested
+# field, so keep it aligned with the Namespace resource automatically.
+replacements:
+- source:
+    kind: Namespace
+    name: aks-platform-triage-smoke
+    fieldPath: metadata.name
+  targets:
+  - select:
+      kind: Event
+    fieldPaths:
+    - involvedObject.namespace

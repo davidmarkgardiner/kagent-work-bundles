@@ -165,22 +165,23 @@ Close them afterwards; they all carry the `automated-triage` label.
 
 ### Deploy all worker-cluster test fixtures
 
-The eight deliberate log/event generator Pods are one Kustomize unit. After
-the worker-side Alloy and management-side triage stack are healthy, deploy all
-of them with one command:
+The intended safe specialist smoke kit is one Kustomize unit. It creates its
+own narrow namespace, eight harmless log/event generator Pods, and five
+synthetic Warning Events. After the worker-side Alloy and management-side
+triage stack are healthy, deploy it with one command:
 
 ```bash
-kubectl --context <worker-context> apply -k fixtures/
+kubectl --context <worker-context> apply -k fixtures/fixtures/
 ```
 
-They are intentionally failing test workloads (including crash loops, an
-unschedulable Pod, OOM, missing ConfigMap and image-pull failure), so apply
-them only to the approved proof namespace. The default namespace is
-`agentic-triage-proof`; when porting this to work, change
-`fixtures/kustomization.yaml` and the Alloy scope together. Remove them with:
+The fixed namespace is `aks-platform-triage-smoke`; change it only alongside
+the Alloy and Sensor allow-lists. The image is an explicit Kustomize variable
+(`triage-smoke-image`, default `busybox:1.36`), so work can swap in its approved
+registry image in `fixtures/fixtures/kustomization.yaml`. Remove the whole
+safe kit with:
 
 ```bash
-kubectl --context <worker-context> delete -k fixtures/
+kubectl --context <worker-context> delete -k fixtures/fixtures/
 ```
 
 ## Workflow housekeeping
@@ -242,7 +243,8 @@ choose it, not template past it.
 | `config/03-argo.yaml` | Consumes Kafka, separates log/event routing, validates and claims incidents, calls the read-only agent, and creates or appends GitLab work items. |
 | `config/04-workflow-concurrency.yaml` | Sets the shared workflow semaphore so an incident burst cannot overwhelm the management plane. |
 | `config/kustomization.yaml` | The single direct-apply and eventual Flux entry point; use `kubectl apply -k config/`. |
-| `fixtures/` | One Kustomize unit containing eight safe, disposable log/event scenarios: `kubectl apply -k fixtures/`. |
+| `fixtures/fixtures/` | The intended one-command safe specialist smoke kit: eight Pods plus five synthetic Warning Events; `kubectl apply -k fixtures/fixtures/`. |
+| `fixtures/` | Legacy direct failure scenarios retained for focused regression drills. |
 | `scripts/deploy.sh` | Explicit context/prerequisite gate followed by the Kustomize apply. |
 | `scripts/verify.sh` | Read-only component, wiring, counter, and agent-health verification. |
 | `scripts/smoke-test.sh` | Generates a real log and event signal and proves the full route through to GitLab. |

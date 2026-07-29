@@ -156,7 +156,7 @@ data:
         # Normal. `.event_type == ""` is accepted so that an event source which
         # does not surface `type` degrades to the previous reason-only
         # behaviour rather than silently dropping every event.
-        condition: "(.signal_kind == \"event\" && (.event_type == \"Warning\" || .event_type == \"\") && match(string!(.reason), r'^(BackOff|Failed|FailedScheduling|OOMKilled|OOMKilling|Unhealthy|Evicted|FailedMount|FailedAttachVolume|FailedCreatePodSandBox|NetworkNotReady|ErrImagePull|ImagePullBackOff|NodeNotReady|Preempted|ProbeWarning|FailedSync|FailedKillPod|FailedCreate)$')) || (.signal_kind == \"log\" && match(string!(.evidence.representative_log_lines), r'(?i)(error|err|exception|fatal|panic|failed|fail|crashloop|back-?off|segfault|traceback|timeout|timed out|deadline exceeded|refused|unreachable|unavailable|denied|unauthorized|forbidden|deadlock|out of memory|oom|killed|500|502|503|504)'))"
+        condition: "(.signal_kind == \"event\" && (.event_type == \"Warning\" || .event_type == \"\") && match(string!(.reason), r'^(BackOff|Failed|FailedScheduling|OOMKilled|OOMKilling|Unhealthy|Evicted|FailedMount|FailedAttachVolume|FailedCreatePodSandBox|NetworkNotReady|SpotEviction|ErrImagePull|ImagePullBackOff|NodeNotReady|Preempted|ProbeWarning|FailedSync|FailedKillPod|FailedCreate)$')) || (.signal_kind == \"log\" && match(string!(.evidence.representative_log_lines), r'(?i)(error|err|exception|fatal|panic|failed|fail|crashloop|back-?off|segfault|traceback|timeout|timed out|deadline exceeded|refused|unreachable|unavailable|denied|unauthorized|forbidden|deadlock|out of memory|oom|killed|500|502|503|504)'))"
       suppress_exact_repeats:
         type: dedupe
         inputs: [incident_signals]

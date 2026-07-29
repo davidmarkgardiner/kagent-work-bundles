@@ -57,7 +57,9 @@ data:
       }
       rule {
         source_labels = ["__meta_kubernetes_namespace"]
-        regex = "agentic-triage-proof"
+        # The full proof fixtures and the safe specialist smoke kit are the
+        # only workload namespaces this collector is allowed to observe.
+        regex = "agentic-triage-proof|aks-platform-triage-smoke"
         action = "keep"
       }
     }
@@ -66,7 +68,7 @@ data:
       forward_to = [loki.process.pod_logs.receiver]
     }
     loki.source.kubernetes_events "events" {
-      namespaces = ["agentic-triage-proof"]
+      namespaces = ["agentic-triage-proof", "aks-platform-triage-smoke"]
       job_name = "kubernetes-events"
       log_format = "json"
       forward_to = [loki.process.events.receiver]
