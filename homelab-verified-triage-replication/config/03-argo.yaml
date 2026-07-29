@@ -83,7 +83,7 @@ spec:
           - {path: body.schema_version, type: string, value: ["observability.triage.v2"]}
           - {path: body.automation_allowed, type: bool, value: ["false"]}
           - {path: body.cluster, type: string, value: ["red"]}
-          - {path: body.namespace, type: string, value: ["agentic-triage-proof", "aks-platform-triage-smoke"]}
+          - {path: body.namespace, type: string, value: ["aks-istio-ingress", "aks-istio-egress", "aks-istio-system", "alloy", "flux-system", "gatekeeper-system", "kube-system", "kyverno", "logging", "monitoring", "xxx-system", "uk8s-config", "uk8s-core", "external-dns", "cert-manager", "external-secrets", "informer", "kro-system", "platform-test-app", "xxx-issuer-system", "agentic-triage-proof", "aks-platform-triage-smoke"]}
           - {path: body.signal_kind, type: string, value: ["log"]}
   triggers:
     - template:
@@ -126,7 +126,7 @@ spec:
           - {path: body.schema_version, type: string, value: ["observability.triage.v2"]}
           - {path: body.automation_allowed, type: bool, value: ["false"]}
           - {path: body.cluster, type: string, value: ["red"]}
-          - {path: body.namespace, type: string, value: ["agentic-triage-proof", "aks-platform-triage-smoke"]}
+          - {path: body.namespace, type: string, value: ["aks-istio-ingress", "aks-istio-egress", "aks-istio-system", "alloy", "flux-system", "gatekeeper-system", "kube-system", "kyverno", "logging", "monitoring", "xxx-system", "uk8s-config", "uk8s-core", "external-dns", "cert-manager", "external-secrets", "informer", "kro-system", "platform-test-app", "xxx-issuer-system", "agentic-triage-proof", "aks-platform-triage-smoke"]}
           - {path: body.signal_kind, type: string, value: ["event"]}
           - {path: body.reason, type: string, value: ["BackOff", "Failed", "FailedScheduling", "OOMKilled", "OOMKilling", "Unhealthy", "Evicted", "FailedMount", "FailedAttachVolume", "FailedCreatePodSandBox", "NetworkNotReady", "SpotEviction", "ErrImagePull", "ImagePullBackOff", "NodeNotReady", "Preempted", "ProbeWarning", "FailedSync", "FailedKillPod", "FailedCreate"]}
   triggers:

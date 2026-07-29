@@ -21,6 +21,8 @@ metadata:
   labels:
     app.kubernetes.io/part-of: alloy-vector-kafka-triage
 data:
+  TRIAGE_CLUSTER_NAME: red
+  TRIAGE_ENVIRONMENT: lab
   config.alloy: |
     logging {
       level = "info"
@@ -57,10 +59,17 @@ data:
       }
       rule {
         source_labels = ["__meta_kubernetes_namespace"]
-        # The full proof fixtures and the safe specialist smoke kit are the
-        # only workload namespaces this collector is allowed to observe.
-        regex = "agentic-triage-proof|aks-platform-triage-smoke"
+        # System: Istio add-ons, Alloy, Flux, Gatekeeper and kube-system.
+        # Application: the explicit engineering workloads below. Names are
+        # lowercase because Kubernetes Namespace names are lowercase.
+        regex = "aks-istio-ingress|aks-istio-egress|aks-istio-system|alloy|flux-system|gatekeeper-system|kube-system|kyverno|logging|monitoring|xxx-system|uk8s-config|uk8s-core|external-dns|cert-manager|external-secrets|informer|kro-system|platform-test-app|xxx-issuer-system|agentic-triage-proof|aks-platform-triage-smoke"
         action = "keep"
+      }
+      // Monitoring is in scope, but never collect this collector's own logs.
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app"]
+        regex = "alloy-vector-triage"
+        action = "drop"
       }
     }
     loki.source.kubernetes "pod_logs" {
@@ -68,7 +77,7 @@ data:
       forward_to = [loki.process.pod_logs.receiver]
     }
     loki.source.kubernetes_events "events" {
-      namespaces = ["agentic-triage-proof", "aks-platform-triage-smoke"]
+      namespaces = ["aks-istio-ingress", "aks-istio-egress", "aks-istio-system", "alloy", "flux-system", "gatekeeper-system", "kube-system", "kyverno", "logging", "monitoring", "xxx-system", "uk8s-config", "uk8s-core", "external-dns", "cert-manager", "external-secrets", "informer", "kro-system", "platform-test-app", "xxx-issuer-system", "agentic-triage-proof", "aks-platform-triage-smoke"]
       job_name = "kubernetes-events"
       log_format = "json"
       forward_to = [loki.process.events.receiver]
@@ -76,8 +85,8 @@ data:
     loki.process "pod_logs" {
       stage.static_labels {
         values = {
-          cluster = "red",
-          environment = "lab",
+          cluster = sys.env("TRIAGE_CLUSTER_NAME"),
+          environment = sys.env("TRIAGE_ENVIRONMENT"),
           source_type = "pod-log",
         }
       }
@@ -112,8 +121,8 @@ data:
       }
       stage.static_labels {
         values = {
-          cluster = "red",
-          environment = "lab",
+          cluster = sys.env("TRIAGE_CLUSTER_NAME"),
+          environment = sys.env("TRIAGE_ENVIRONMENT"),
           source_type = "kubernetes-event",
         }
       }
@@ -187,6 +196,11 @@ spec:
           resources:
             requests: {cpu: 50m, memory: 256Mi}
             limits: {cpu: 300m, memory: 512Mi}
+          env:
+            - name: TRIAGE_CLUSTER_NAME
+              valueFrom: {configMapKeyRef: {name: alloy-vector-triage-red-config, key: TRIAGE_CLUSTER_NAME}}
+            - name: TRIAGE_ENVIRONMENT
+              valueFrom: {configMapKeyRef: {name: alloy-vector-triage-red-config, key: TRIAGE_ENVIRONMENT}}
           volumeMounts:
             - name: config
               mountPath: /etc/alloy
