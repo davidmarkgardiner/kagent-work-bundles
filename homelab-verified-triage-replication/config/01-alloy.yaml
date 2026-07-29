@@ -59,9 +59,9 @@ data:
       }
       rule {
         source_labels = ["__meta_kubernetes_namespace"]
-        # System: Istio add-ons, Alloy, Flux, Gatekeeper and kube-system.
-        # Application: the explicit engineering workloads below. Names are
-        # lowercase because Kubernetes Namespace names are lowercase.
+        // System: Istio add-ons, Alloy, Flux, Gatekeeper and kube-system.
+        // Application: the explicit engineering workloads below. Names are
+        // lowercase because Kubernetes Namespace names are lowercase.
         regex = "aks-istio-ingress|aks-istio-egress|aks-istio-system|alloy|flux-system|gatekeeper-system|kube-system|kyverno|logging|monitoring|xxx-system|uk8s-config|uk8s-core|external-dns|cert-manager|external-secrets|informer|kro-system|platform-test-app|xxx-issuer-system|agentic-triage-proof|aks-platform-triage-smoke"
         action = "keep"
       }
