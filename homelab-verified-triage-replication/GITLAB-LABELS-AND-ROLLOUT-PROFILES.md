@@ -18,6 +18,27 @@ cluster/namespace pairs; never accept a wildcard identity from worker payloads.
 Use per-cluster credentials or mTLS before accepting many workers on shared
 OTLP ingress.
 
+## Where to copy each profile
+
+The profile blocks below describe values that must stay aligned in three
+places. Do not update only one of them:
+
+1. **Vector decision:** in `config/02-vector.yaml`, edit the
+   `transforms.incident_signals.condition` line. Replace the event-reason regex
+   with `eventReasons`, and replace the log regex with `logPattern`.
+2. **Argo admission:** in `config/03-argo.yaml`, edit the
+   `red-event-triage` Sensor filter at `body.reason`. Replace its list with the
+   same `eventReasons` list. This is the management-plane backstop.
+3. **Worker collection scope:** in `config/01-alloy.yaml`, update both the
+   pod-log namespace `regex` and the Kubernetes-events `namespaces` list with
+   the approved worker namespaces. Set the worker's `cluster` static label in
+   the same file to `{{CLUSTER_NAME}}`.
+
+The profiles below are ready to copy as policy values, but they have **not yet
+been live-smoke-tested against GitLab labels**. The bundle has passed Kustomize
+rendering and Kubernetes server-side dry-run; run one controlled smoke fixture
+after each profile change and check both the ticket labels and the ticket count.
+
 ```yaml
 # critical-only.yaml — start here
 cluster: "{{CLUSTER_NAME}}"
