@@ -203,20 +203,19 @@ spec:
       steps:
         - - name: claim-24h-window
             template: claim-24h-window
-        - - name: diagnose-readonly
-            template: diagnose-readonly
-            when: "{{steps.claim-24h-window.outputs.parameters.duplicate}} == false"
-        - - name: create-gitlab-issue
-            template: create-gitlab-issue
+        # A new incident and a duplicate take mutually exclusive nested paths.
+        # Do not repeat `when` clauses around a chain that reads another
+        # conditional step's outputs: Argo resolves those references even when
+        # the producer was skipped.
+        - - name: process-new-incident
+            template: process-new-incident
             when: "{{steps.claim-24h-window.outputs.parameters.duplicate}} == false"
             arguments:
               parameters:
                 - {name: dedupe-name, value: "{{steps.claim-24h-window.outputs.parameters.dedupe-name}}"}
-                - {name: diagnosis, value: "{{steps.diagnose-readonly.outputs.parameters.diagnosis}}"}
-                - {name: agent-status, value: "{{steps.diagnose-readonly.outputs.parameters.agent-status}}"}
                 - {name: first-seen, value: "{{steps.claim-24h-window.outputs.parameters.first-seen}}"}
-        - - name: append-correlated-evidence
-            template: append-correlated-evidence
+        - - name: process-duplicate-incident
+            template: process-duplicate-incident
             # F3: fires for EVERY duplicate. The old `&& issue-iid != ''` guard
             # made a duplicate-with-no-recorded-iid skip silently, dropping the
             # later signal's evidence while still reporting Succeeded. The
@@ -226,6 +225,36 @@ spec:
               parameters:
                 - {name: issue-iid, value: "{{steps.claim-24h-window.outputs.parameters.issue-iid}}"}
                 - {name: first-seen, value: "{{steps.claim-24h-window.outputs.parameters.first-seen}}"}
+
+    - name: process-new-incident
+      inputs:
+        parameters:
+          - name: dedupe-name
+          - name: first-seen
+      steps:
+        - - name: diagnose-readonly
+            template: diagnose-readonly
+        - - name: create-gitlab-issue
+            template: create-gitlab-issue
+            arguments:
+              parameters:
+                - {name: dedupe-name, value: "{{inputs.parameters.dedupe-name}}"}
+                - {name: diagnosis, value: "{{steps.diagnose-readonly.outputs.parameters.diagnosis}}"}
+                - {name: agent-status, value: "{{steps.diagnose-readonly.outputs.parameters.agent-status}}"}
+                - {name: first-seen, value: "{{inputs.parameters.first-seen}}"}
+
+    - name: process-duplicate-incident
+      inputs:
+        parameters:
+          - name: issue-iid
+          - name: first-seen
+      steps:
+        - - name: append-correlated-evidence
+            template: append-correlated-evidence
+            arguments:
+              parameters:
+                - {name: issue-iid, value: "{{inputs.parameters.issue-iid}}"}
+                - {name: first-seen, value: "{{inputs.parameters.first-seen}}"}
 
     - name: validate-schema
       outputs:
@@ -622,13 +651,13 @@ spec:
                   "A later signal for fingerprint `" + $i.dedupe_key[0:16] + "` (" + $i.signal_kind + ": " + $i.reason + ") was matched to this open ticket rather than opening a new one (correlation, or a retry after an unconfirmed claim).\n\n" +
                   "| Field | Value |\n|---|---|\n" +
                   "| Cluster (worker) | `" + $i.cluster + "` |\n" +
-                  "| Node | `" + (if ($i.node // "")!="" then $i.node else "n/a" end) + "` |\n" +
-                  "| Container | `" + (if ($i.container // "")!="" then $i.container else "n/a" end) + "` |\n" +
+                  "| Node | `" + (if ($i.node // "")!="" then $i.node else "" end) + "` |\n" +
+                  "| Container | `" + (if ($i.container // "")!="" then $i.container else "" end) + "` |\n" +
                   "| Reason | `" + $i.reason + "` |\n" +
-                  "| Severity | " + ($i.severity // "unknown") + " |\n" +
+                  "| Severity | " + ($i.severity // "") + " |\n" +
                   "| Signal kind | " + $i.signal_kind + " |\n" +
-                  "| Event type | " + (if ($i.event_type // "")!="" then $i.event_type else "n/a" end) + " |\n" +
-                  "| Object kind | " + (if ($i.object_kind // "")!="" then $i.object_kind else "n/a" end) + " |\n" +
+                  "| Event type | " + (if ($i.event_type // "")!="" then $i.event_type else "" end) + " |\n" +
+                  "| Object kind | " + (if ($i.object_kind // "")!="" then $i.object_kind else "" end) + " |\n" +
                   "| Event count | " + (($i.event_count // 0)|tostring) + " |\n" +
                   "| First seen (UTC) | " + $first_seen + " |\n" +
                   "| Last seen (UTC) | " + $last_seen + " |\n" +
@@ -664,7 +693,8 @@ spec:
               labels: (["automated-triage", ("triage-fingerprint-" + ($i.dedupe_key[0:16]))]
                        + (if $agent_status == "ok" then [] else ["triage-agent-unavailable"] end)),
               description: (
-                (if $i.severity=="critical" then "🔴" elif $i.severity=="warning" then "🟡" else "🟠" end) + " **" + (($i.severity // "error")|ascii_upcase) + " — " + $i.reason + "** on worker `" + $i.cluster + "` · `" + $i.namespace + "/" + $i.pod + "`" + (if ($i.container // "")!="" then " (container `" + $i.container + "`)" else "" end) + "\n\n" +
+                "## TL;DR\n" +
+                (if $i.severity=="critical" then "🔴" elif $i.severity=="warning" then "🟡" else "🟠" end) + " **" + (($i.severity // "error")|ascii_upcase) + " — " + $i.reason + "** on worker `" + $i.cluster + "` · `" + $i.namespace + "/" + $i.pod + "`" + (if ($i.container // "")!="" then " (container `" + $i.container + "`)" else "" end) + ". Review the read-only diagnosis and approve any GitOps or workflow remediation; no change has been made.\n\n" +
                 (if $agent_status == "ok" then "" else "> ⚠️ **Automated analysis was NOT available for this ticket.** See the triage section at the bottom.\n\n" end) +
                 "_Read-only automated triage via Alloy -> Vector -> Kafka -> Argo -> kagent. Incident is on worker cluster `" + $i.cluster + "`; this agent runs on the management cluster and diagnoses from the evidence below - it may have no live access to the worker. No remediation was executed._\n\n" +
                 "### Incident contract\n" +
@@ -672,17 +702,17 @@ spec:
                 "| Fingerprint | `" + ($i.dedupe_key[0:16]) + "` |\n" +
                 "| Cluster (worker) | `" + $i.cluster + "` |\n" +
                 "| Namespace | `" + $i.namespace + "` |\n" +
-                "| Node | `" + (if ($i.node // "")!="" then $i.node else "n/a" end) + "` |\n" +
+                "| Node | `" + (if ($i.node // "")!="" then $i.node else "" end) + "` |\n" +
                 "| Workload / Pod | `" + $i.pod + "` |\n" +
-                "| Container | `" + (if ($i.container // "")!="" then $i.container else "n/a" end) + "` |\n" +
-                "| Service | `" + (if (($i.service // "")!="" and ($i.service // "")!="unknown") then $i.service else "n/a" end) + "` |\n" +
+                "| Container | `" + (if ($i.container // "")!="" then $i.container else "" end) + "` |\n" +
+                "| Service | `" + (if (($i.service // "")!="" and ($i.service // "")!="unknown") then $i.service else "" end) + "` |\n" +
                 "| Signal kind | " + $i.signal_kind + " |\n" +
-                "| Event type | " + (if ($i.event_type // "")!="" then $i.event_type else "n/a" end) + " |\n" +
+                "| Event type | " + (if ($i.event_type // "")!="" then $i.event_type else "" end) + " |\n" +
                 "| Reason | `" + $i.reason + "` |\n" +
-                "| Severity | " + ($i.severity // "unknown") + " |\n" +
-                "| Object kind | " + (if ($i.object_kind // "")!="" then $i.object_kind else "n/a" end) + " |\n" +
+                "| Severity | " + ($i.severity // "") + " |\n" +
+                "| Object kind | " + (if ($i.object_kind // "")!="" then $i.object_kind else "" end) + " |\n" +
                 "| Event count | " + (($i.event_count // 0)|tostring) + " |\n" +
-                "| Reported by | " + (if ($i.reporting_component // "")!="" then $i.reporting_component else "n/a" end) + " |\n" +
+                "| Reported by | " + (if ($i.reporting_component // "")!="" then $i.reporting_component else "" end) + " |\n" +
                 "| First seen (UTC) | " + $first_seen + " |\n" +
                 "| Last seen (UTC) | " + $last_seen + " |\n" +
                 "| Agent analysis | " + (if $agent_status == "ok" then "available" else "UNAVAILABLE" end) + " |\n" +
@@ -775,13 +805,13 @@ spec:
                 "| Field | Value |\n|---|---|\n" +
                 "| Fingerprint | `" + ($i.dedupe_key[0:16]) + "` |\n" +
                 "| Cluster (worker) | `" + $i.cluster + "` |\n" +
-                "| Node | `" + (if ($i.node // "")!="" then $i.node else "n/a" end) + "` |\n" +
-                "| Container | `" + (if ($i.container // "")!="" then $i.container else "n/a" end) + "` |\n" +
+                "| Node | `" + (if ($i.node // "")!="" then $i.node else "" end) + "` |\n" +
+                "| Container | `" + (if ($i.container // "")!="" then $i.container else "" end) + "` |\n" +
                 "| Reason | `" + $i.reason + "` |\n" +
-                "| Severity | " + ($i.severity // "unknown") + " |\n" +
+                "| Severity | " + ($i.severity // "") + " |\n" +
                 "| Signal kind | " + $i.signal_kind + " |\n" +
-                "| Event type | " + (if ($i.event_type // "")!="" then $i.event_type else "n/a" end) + " |\n" +
-                "| Object kind | " + (if ($i.object_kind // "")!="" then $i.object_kind else "n/a" end) + " |\n" +
+                "| Event type | " + (if ($i.event_type // "")!="" then $i.event_type else "" end) + " |\n" +
+                "| Object kind | " + (if ($i.object_kind // "")!="" then $i.object_kind else "" end) + " |\n" +
                 "| Event count | " + (($i.event_count // 0)|tostring) + " |\n" +
                 "| First seen (UTC) | " + $first_seen + " |\n" +
                 "| Last seen (UTC) | " + $last_seen + " |\n" +

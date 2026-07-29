@@ -3,6 +3,9 @@ fixtures/crashloop-fixture.yaml
 fixtures/retest-fixtures.yaml
 scripts/smoke-test.sh
 scripts/verify-bundle.sh
+# This nested verifier deliberately looks for synthetic credential-shaped
+# strings as part of its own public-safety test.
+dual-kafka-path-smoke/scripts/verify-bundle.sh
 evidence/VERIFICATION-2026-07-24.md
 
 # This contains the GitLab HTTP header name, while the value is always read from

@@ -35,6 +35,26 @@ Evidence for every claim: **[evidence/VERIFICATION-2026-07-24.md](evidence/VERIF
 
 ---
 
+## Recommended execution order
+
+Everything needed is in this one folder, but use its two deployment paths in
+order:
+
+1. **Prove transport first:** run
+   [`dual-kafka-path-smoke/`](dual-kafka-path-smoke/). It sends one safe marker
+   through Alloy -> Vector -> Kafka and requires both independent Kafka
+   consumer-group/Sensor paths to create a `hello` Workflow. It contains its
+   own manifests, fixture, scripts, and live-run evidence.
+2. **Then prove triage:** run this folder's `config/`, `scripts/`, and
+   `fixtures/` to exercise the full log/event -> read-only kagent -> GitLab
+   work-item flow.
+
+The dual-path kit is deliberately nested here rather than maintained as a
+separate work bundle, so a single clone of this directory contains both the
+fast isolation test and the complete triage implementation.
+
+---
+
 ## Layout
 
 ```
