@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dual-kafka-marker
+  namespace: dual-kafka-smoke
+  labels:
+    app.kubernetes.io/name: dual-kafka-marker
+    app.kubernetes.io/part-of: dual-kafka-path-smoke
+spec:
+  restartPolicy: Never
+  containers:
+  - name: marker
+    image: dual-kafka-smoke-image
+    command: [sh, -c]
+    args:
+    - 'echo "DUAL-KAFKA-SMOKE $(date -u +%Y%m%dT%H%M%SZ) ERROR"; sleep 45'
+    resources:
+      requests: {cpu: 10m, memory: 16Mi}
+      limits: {cpu: 50m, memory: 32Mi}

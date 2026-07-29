@@ -10,12 +10,16 @@ data:
       alloy_otlp:
         type: opentelemetry
         http: {address: 0.0.0.0:4318}
+        grpc: {address: 0.0.0.0:4317}
       internal: {type: internal_metrics}
     transforms:
       smoke_only:
         type: filter
-        inputs: [alloy_otlp]
-        condition: 'contains(string!(.body), "DUAL-KAFKA-SMOKE")'
+        inputs: [alloy_otlp.logs]
+        # Alloy OTLP records differ by source/version: one may expose the log
+        # line as .message and another as .body. `string()` errors on null, so
+        # `??` provides a real fallback instead of calling `contains` on null.
+        condition: 'contains(string(.message) ?? string(.body) ?? "", "DUAL-KAFKA-SMOKE")'
       envelope:
         type: remap
         inputs: [smoke_only]
@@ -23,7 +27,7 @@ data:
           . = {
             "schema_version": "dual-kafka-smoke.v1",
             "pipeline": "dual-kafka-path-smoke",
-            "message": to_string(.body) ?? "",
+            "message": string(.message) ?? string(.body) ?? "",
           }
     sinks:
       kafka_a:
@@ -79,6 +83,9 @@ spec:
             - {name: api, containerPort: 8686}
             - {name: prom, containerPort: 9090}
           readinessProbe: {httpGet: {path: /health, port: api}, initialDelaySeconds: 5}
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 200m, memory: 256Mi}
           volumeMounts: [{name: config, mountPath: /etc/vector, readOnly: true}]
       volumes:
         - name: config

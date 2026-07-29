@@ -47,3 +47,7 @@ bash scripts/teardown.sh --context <ctx>
 Success is one hello Workflow from Sensor A and one from Sensor B for the same
 unique marker. The Vector metrics expose independent `kafka_a` and `kafka_b`
 counters to show whether both produces happened.
+
+The marker Pod is now a manifest at `fixtures/dual-kafka-marker.yaml`; the
+smoke script applies `fixtures/kustomization.yaml`. Replace its `images[].newName`
+with the approved work registry image before running the smoke script.

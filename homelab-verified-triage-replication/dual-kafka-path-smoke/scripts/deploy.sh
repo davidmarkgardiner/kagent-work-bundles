@@ -13,6 +13,11 @@ for check in \
 done
 $K apply --dry-run=server -k "$ROOT/config"
 $K apply -k "$ROOT/config"
+# ConfigMaps mounted as files update without forcing these processes to reload.
+# Restart the isolated smoke Deployments deliberately so an edited Alloy/Vector
+# config is what the following rollout status and smoke prove.
+$K -n monitoring rollout restart deploy/dual-kafka-alloy
+$K -n argo-events rollout restart deploy/dual-kafka-vector
 $K -n monitoring rollout status deploy/dual-kafka-alloy --timeout=120s
 $K -n argo-events rollout status deploy/dual-kafka-vector --timeout=120s
 echo "DEPLOY_OK: run bash scripts/verify.sh --context $CTX"

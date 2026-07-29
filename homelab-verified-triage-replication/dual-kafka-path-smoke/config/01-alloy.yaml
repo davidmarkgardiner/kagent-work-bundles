@@ -5,8 +5,13 @@ metadata:
   namespace: monitoring
 data:
   config.alloy: |
-    logging { level = "info" format = "logfmt" }
-    discovery.kubernetes "pods" { role = "pod" }
+    logging {
+      level  = "info"
+      format = "logfmt"
+    }
+    discovery.kubernetes "pods" {
+      role = "pod"
+    }
     discovery.relabel "smoke_pods" {
       targets = discovery.kubernetes.pods.targets
       rule {
@@ -20,20 +25,33 @@ data:
       forward_to = [loki.process.smoke.receiver]
     }
     loki.process "smoke" {
-      stage.static_labels { values = { pipeline = "dual-kafka-smoke" } }
+      stage.static_labels {
+        values = { pipeline = "dual-kafka-smoke" }
+      }
       forward_to = [otelcol.receiver.loki.vector.receiver]
     }
     otelcol.receiver.loki "vector" {
-      output { logs = [otelcol.processor.batch.vector.input] }
+      output {
+        logs = [otelcol.processor.batch.vector.input]
+      }
     }
     otelcol.processor.batch "vector" {
-      timeout = "1s"
+      timeout         = "1s"
       send_batch_size = 1
-      output { logs = [otelcol.exporter.otlphttp.vector.input] }
+      output {
+        logs = [otelcol.exporter.otlphttp.vector.input]
+      }
     }
     otelcol.exporter.otlphttp "vector" {
-      client { endpoint = "http://dual-kafka-vector.argo-events.svc.cluster.local:4318" }
-      retry_on_failure { enabled = true initial_interval = "1s" max_interval = "10s" max_elapsed_time = "1m" }
+      client {
+        endpoint = "http://dual-kafka-vector.argo-events.svc.cluster.local:4318"
+      }
+      retry_on_failure {
+        enabled          = true
+        initial_interval = "1s"
+        max_interval     = "10s"
+        max_elapsed_time = "1m"
+      }
     }
 ---
 apiVersion: apps/v1
@@ -56,6 +74,9 @@ spec:
           args: [run, /etc/alloy/config.alloy, --server.http.listen-addr=0.0.0.0:12345]
           ports: [{name: http, containerPort: 12345}]
           readinessProbe: {httpGet: {path: /-/ready, port: http}, initialDelaySeconds: 5}
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 200m, memory: 256Mi}
           volumeMounts: [{name: config, mountPath: /etc/alloy, readOnly: true}]
       volumes:
         - name: config
