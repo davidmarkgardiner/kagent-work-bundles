@@ -163,6 +163,26 @@ or CI check. It is safe to run at any time — it mutates nothing.
 `smoke-test.sh` **creates real GitLab work items**. That is the point of it.
 Close them afterwards; they all carry the `automated-triage` label.
 
+### Deploy all worker-cluster test fixtures
+
+The eight deliberate log/event generator Pods are one Kustomize unit. After
+the worker-side Alloy and management-side triage stack are healthy, deploy all
+of them with one command:
+
+```bash
+kubectl --context <worker-context> apply -k fixtures/
+```
+
+They are intentionally failing test workloads (including crash loops, an
+unschedulable Pod, OOM, missing ConfigMap and image-pull failure), so apply
+them only to the approved proof namespace. The default namespace is
+`agentic-triage-proof`; when porting this to work, change
+`fixtures/kustomization.yaml` and the Alloy scope together. Remove them with:
+
+```bash
+kubectl --context <worker-context> delete -k fixtures/
+```
+
 ## Workflow housekeeping
 
 The shipped `red-agentic-triage` WorkflowTemplate is deliberately bounded:
@@ -222,7 +242,7 @@ choose it, not template past it.
 | `config/03-argo.yaml` | Consumes Kafka, separates log/event routing, validates and claims incidents, calls the read-only agent, and creates or appends GitLab work items. |
 | `config/04-workflow-concurrency.yaml` | Sets the shared workflow semaphore so an incident burst cannot overwhelm the management plane. |
 | `config/kustomization.yaml` | The single direct-apply and eventual Flux entry point; use `kubectl apply -k config/`. |
-| `fixtures/` | Safe disposable log, crashloop, replay, and broker scenarios used by the smoke test. |
+| `fixtures/` | One Kustomize unit containing eight safe, disposable log/event scenarios: `kubectl apply -k fixtures/`. |
 | `scripts/deploy.sh` | Explicit context/prerequisite gate followed by the Kustomize apply. |
 | `scripts/verify.sh` | Read-only component, wiring, counter, and agent-health verification. |
 | `scripts/smoke-test.sh` | Generates a real log and event signal and proves the full route through to GitLab. |

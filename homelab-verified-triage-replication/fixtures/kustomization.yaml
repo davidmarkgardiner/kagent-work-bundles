@@ -1,0 +1,19 @@
+# One worker-cluster apply target for the deliberate log and event fixtures.
+#
+# The namespace is intentional: Alloy's proof configuration selects this
+# namespace. Change this value and the matching Alloy scope together when
+# porting the proof to work.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: agentic-triage-proof
+resources:
+  - log-fixture.yaml
+  - crashloop-fixture.yaml
+  - confluent-scenarios.yaml
+  - retest-fixtures.yaml
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: alloy-vector-kafka-triage
+      triage-fixture: "true"
+    includeSelectors: false
+    includeTemplates: true
