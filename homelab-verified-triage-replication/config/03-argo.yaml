@@ -668,6 +668,11 @@ spec:
               }' > /tmp/note.json
             curl --fail --silent --show-error --retry 3 --retry-all-errors -H "PRIVATE-TOKEN: $GITLAB_TOKEN" -H 'Content-Type: application/json' \
               --data @/tmp/note.json "$GITLAB_URL/api/v4/projects/$GITLAB_PROJECT_ID/issues/${existing_iid}/notes" > /dev/null
+            # A correlated ticket can receive a log and an event. Keep both.
+            signal_label="$(jq -r '"signal-" + .signal_kind' /tmp/incident.json)"
+            curl --fail --silent --show-error --retry 3 --retry-all-errors -X PUT \
+              -H "PRIVATE-TOKEN: $GITLAB_TOKEN" --data-urlencode "add_labels=$signal_label" \
+              "$GITLAB_URL/api/v4/projects/$GITLAB_PROJECT_ID/issues/${existing_iid}" > /dev/null
             token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
             curl --fail --silent --show-error --retry 3 --retry-all-errors --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
               -X PATCH "https://kubernetes.default.svc/api/v1/namespaces/argo-events/configmaps/{{inputs.parameters.dedupe-name}}" \
@@ -690,8 +695,11 @@ spec:
             {
               title: $title,
               # F1: a degraded ticket is queryable, not disguised.
-              labels: (["automated-triage", ("triage-fingerprint-" + ($i.dedupe_key[0:16]))]
-                       + (if $agent_status == "ok" then [] else ["triage-agent-unavailable"] end)),
+              labels: (["triage::automated", "source::alloy-vector-kafka", "route::non-lgtm",
+                        ("signal-" + $i.signal_kind), ("severity::" + ($i.severity // "error")),
+                        ("cluster::" + $i.cluster), ("namespace::" + $i.namespace),
+                        ("triage-fingerprint-" + ($i.dedupe_key[0:16]))]
+                       + (if $agent_status == "ok" then [] else ["triage::agent-unavailable"] end)),
               description: (
                 "## TL;DR\n" +
                 (if $i.severity=="critical" then "🔴" elif $i.severity=="warning" then "🟡" else "🟠" end) + " **" + (($i.severity // "error")|ascii_upcase) + " — " + $i.reason + "** on worker `" + $i.cluster + "` · `" + $i.namespace + "/" + $i.pod + "`" + (if ($i.container // "")!="" then " (container `" + $i.container + "`)" else "" end) + ". Review the read-only diagnosis and approve any GitOps or workflow remediation; no change has been made.\n\n" +
