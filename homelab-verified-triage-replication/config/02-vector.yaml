@@ -63,8 +63,6 @@ data:
             .container = string(matched.c) ?? ""
           }
           event_reason = to_string(.attributes.event_reason) ?? ""
-          .reason = if event_reason == "" { "log-error-signature" } else { event_reason }
-          .signal_kind = if .reason == "log-error-signature" { "log" } else { "event" }
           # F4: Kubernetes event severity class (Normal / Warning). The proof
           # config never carried this, so the filter below matched on `reason`
           # alone and would have accepted a Normal event that happened to share
@@ -92,6 +90,25 @@ data:
             r'(?i)(authorization\s*[:=]\s*bearer\s+)[^\s,;]+',
             r'(?i)(cookie|set-cookie)\s*[:=]\s*[^\r\n]+'
           ])
+          # Events retain their Kubernetes reason. Logs receive a deliberately
+          # small, stable category for titles, labels and aggregation; never
+          # use the raw workload message as a ticket title.
+          .reason = if event_reason != "" {
+            event_reason
+          } else if match(safe_message, r'(?i)(out of memory|\boom\b|memory exhaustion|killed)') {
+            "log-resource-exhaustion"
+          } else if match(safe_message, r'(?i)(unauthorized|authentication|credential|forbidden|access denied)') {
+            "log-authentication"
+          } else if match(safe_message, r'(?i)(timeout|timed out|deadline exceeded)') {
+            "log-timeout"
+          } else if match(safe_message, r'(?i)(unavailable|unreachable|connection refused|refused)') {
+            "log-availability"
+          } else if match(safe_message, r'(?i)(fatal|panic|critical|segfault)') {
+            "log-fatal"
+          } else {
+            "log-error"
+          }
+          .signal_kind = if event_reason == "" { "log" } else { "event" }
           # Explicit severity so the agent can prioritise without re-parsing the
           # message. Events map by reason class; logs map by text level.
           .severity = if .signal_kind == "event" {

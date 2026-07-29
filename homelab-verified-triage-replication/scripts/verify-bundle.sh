@@ -30,6 +30,12 @@ echo "SHELL_SYNTAX_OK"
 grep -q 'PRIVATE-TOKEN: \$GITLAB_TOKEN' config/03-argo.yaml
 grep -q '{{CONFLUENT_BOOTSTRAP}}' config/03-argo.yaml
 grep -q '{{CONFLUENT_TOPIC}}' config/03-argo.yaml
+! rg -q 'log-error-signature' config/02-vector.yaml
+rg -q 'log-resource-exhaustion' config/02-vector.yaml
+rg -q 'log-authentication' config/02-vector.yaml
+rg -q 'log-timeout' config/02-vector.yaml
+rg -q 'log-availability' config/02-vector.yaml
+rg -q 'log-fatal' config/02-vector.yaml
 ! rg -q 'pkc-[a-z0-9-]+\.[a-z0-9.-]+\.confluent\.cloud|project `[0-9]{5,}`' .
 echo "PUBLIC_SAFE_RUNTIME_CONTRACT_OK"
 
