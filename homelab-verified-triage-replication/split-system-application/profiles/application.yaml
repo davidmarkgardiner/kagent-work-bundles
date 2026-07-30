@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: application-triage-profile
+  namespace: monitoring
+data:
+  cluster: "{{CLUSTER_NAME}}"
+  scope: application
+  namespaces: "kyverno,logging,monitoring,xxx-system,uk8s-config,uk8s-core,external-dns,cert-manager,external-secrets,informer,kro-system,platform-test-app,xxx-issuer-system"
+  signal_profile: priority
+  kafka_topic: "{{APPLICATION_TRIAGE_TOPIC}}"
+  consumer_group: "{{APPLICATION_TRIAGE_GROUP}}"

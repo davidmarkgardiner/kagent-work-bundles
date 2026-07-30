@@ -1,0 +1,19 @@
+# Copy source: Tier 1 — system critical-only, application disabled.
+system:
+  replicas: 1
+  alloy:
+    namespaces: [aks-istio-ingress, aks-istio-egress, aks-istio-system, alloy, flux-system, gatekeeper-system, kube-system]
+  vector:
+    logPattern: '(?i)(fatal|panic|critical|out of memory|segfault)'
+    eventReasons: [OOMKilled, OOMKilling, FailedScheduling, Evicted, NodeNotReady, NetworkNotReady, FailedCreatePodSandBox]
+  argo:
+    eventReasons: [OOMKilled, OOMKilling, FailedScheduling, Evicted, NodeNotReady, NetworkNotReady, FailedCreatePodSandBox]
+application:
+  replicas: 0
+  alloy:
+    namespaces: [kyverno, logging, monitoring, xxx-system, uk8s-config, uk8s-core, external-dns, cert-manager, external-secrets, informer, kro-system, platform-test-app, xxx-issuer-system]
+  vector:
+    logPattern: '(?i)(fatal|panic|critical|out of memory|segfault)'
+    eventReasons: [OOMKilled, OOMKilling, FailedScheduling, Evicted, NodeNotReady, NetworkNotReady, FailedCreatePodSandBox]
+  argo:
+    eventReasons: [OOMKilled, OOMKilling, FailedScheduling, Evicted, NodeNotReady, NetworkNotReady, FailedCreatePodSandBox]

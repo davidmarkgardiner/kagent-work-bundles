@@ -1,0 +1,116 @@
+# System collector. Install this replacement path instead of the single
+# ../config/01-alloy.yaml collector.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: system-triage-alloy-config
+  namespace: monitoring
+data:
+  TRIAGE_CLUSTER_NAME: "{{CLUSTER_NAME}}"
+  TRIAGE_ENVIRONMENT: "{{ENVIRONMENT}}"
+  config.alloy: |
+    logging {
+      level = "info"
+      format = "logfmt"
+    }
+    discovery.kubernetes "pods" {
+      role = "pod"
+    }
+    discovery.relabel "system_pods" {
+      targets = discovery.kubernetes.pods.targets
+      rule { source_labels = ["__meta_kubernetes_namespace"]
+        target_label = "namespace" }
+      rule { source_labels = ["__meta_kubernetes_pod_name"]
+        target_label = "pod" }
+      rule { source_labels = ["__meta_kubernetes_pod_container_name"]
+        target_label = "container" }
+      rule { source_labels = ["__meta_kubernetes_pod_node_name"]
+        target_label = "node" }
+      rule { source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+        target_label = "service" }
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        regex = "aks-istio-ingress|aks-istio-egress|aks-istio-system|alloy|flux-system|gatekeeper-system|kube-system"
+        action = "keep"
+      }
+      // Never collect either split collector's own logs.
+      rule { source_labels = ["__meta_kubernetes_pod_label_app"]
+        regex = "system-triage-alloy|application-triage-alloy"
+        action = "drop" }
+    }
+    loki.source.kubernetes "pod_logs" {
+      targets = discovery.relabel.system_pods.output
+      forward_to = [loki.process.pod_logs.receiver]
+    }
+    loki.source.kubernetes_events "events" {
+      namespaces = ["aks-istio-ingress", "aks-istio-egress", "aks-istio-system", "alloy", "flux-system", "gatekeeper-system", "kube-system"]
+      job_name = "system-kubernetes-events"
+      log_format = "json"
+      forward_to = [loki.process.events.receiver]
+    }
+    loki.process "pod_logs" {
+      stage.static_labels { values = {
+        cluster = sys.env("TRIAGE_CLUSTER_NAME"),
+        environment = sys.env("TRIAGE_ENVIRONMENT"),
+        triage_scope = "system",
+        source_type = "pod-log",
+      } }
+      forward_to = [otelcol.receiver.loki.vector.receiver]
+    }
+    loki.process "events" {
+      stage.json { expressions = { event_reason = "reason",
+        pod = "name" } }
+      stage.labels { values = { event_reason = "", pod = "" } }
+      stage.static_labels { values = {
+        cluster = sys.env("TRIAGE_CLUSTER_NAME"),
+        environment = sys.env("TRIAGE_ENVIRONMENT"),
+        triage_scope = "system",
+        source_type = "kubernetes-event",
+      } }
+      forward_to = [otelcol.receiver.loki.vector.receiver]
+    }
+    otelcol.receiver.loki "vector" { output {
+      logs = [otelcol.processor.batch.vector.input]
+    } }
+    otelcol.processor.batch "vector" {
+      timeout = "2s"
+      send_batch_size = 100
+      output { logs = [otelcol.exporter.otlphttp.vector.input] }
+    }
+    otelcol.exporter.otlphttp "vector" {
+      client { endpoint = "http://system-triage-vector.argo-events.svc.cluster.local:4318" }
+      sending_queue { enabled = true
+        queue_size = 1000 }
+      retry_on_failure { enabled = true
+        initial_interval = "1s"
+        max_interval = "30s"
+        max_elapsed_time = "5m" }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: system-triage-alloy
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: system-triage-alloy}}
+  template:
+    metadata: {labels: {app: system-triage-alloy, triage-scope: system}}
+    spec:
+      serviceAccountName: alloy
+      containers:
+        - name: alloy
+          image: grafana/alloy:v1.18.0
+          args: [run, /etc/alloy/config.alloy, --storage.path=/var/lib/alloy/data, --server.http.listen-addr=0.0.0.0:12345]
+          ports: [{name: http, containerPort: 12345}]
+          readinessProbe: {httpGet: {path: /-/ready, port: http}, initialDelaySeconds: 10, periodSeconds: 15}
+          livenessProbe: {httpGet: {path: /-/ready, port: http}, initialDelaySeconds: 30, periodSeconds: 30, failureThreshold: 4}
+          resources: {requests: {cpu: 50m, memory: 256Mi}, limits: {cpu: 300m, memory: 512Mi}}
+          env:
+            - {name: TRIAGE_CLUSTER_NAME, valueFrom: {configMapKeyRef: {name: system-triage-alloy-config, key: TRIAGE_CLUSTER_NAME}}}
+            - {name: TRIAGE_ENVIRONMENT, valueFrom: {configMapKeyRef: {name: system-triage-alloy-config, key: TRIAGE_ENVIRONMENT}}}
+          volumeMounts: [{name: config, mountPath: /etc/alloy, readOnly: true}, {name: data, mountPath: /var/lib/alloy/data}]
+      volumes:
+        - {name: config, configMap: {name: system-triage-alloy-config}}
+        - {name: data, emptyDir: {}}

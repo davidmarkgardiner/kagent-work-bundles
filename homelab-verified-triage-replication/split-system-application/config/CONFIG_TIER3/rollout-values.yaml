@@ -1,0 +1,19 @@
+# Copy source: Tier 3 — both lanes admit the actionable priority set.
+system:
+  replicas: 1
+  alloy:
+    namespaces: [aks-istio-ingress, aks-istio-egress, aks-istio-system, alloy, flux-system, gatekeeper-system, kube-system]
+  vector:
+    logPattern: '(?i)(error|exception|fatal|panic|failed|timeout|unavailable|denied|forbidden|out of memory)'
+    eventReasons: [OOMKilled, FailedScheduling, Evicted, NodeNotReady, NetworkNotReady, FailedMount, FailedAttachVolume, ErrImagePull, ImagePullBackOff, Unhealthy]
+  argo:
+    eventReasons: [OOMKilled, FailedScheduling, Evicted, NodeNotReady, NetworkNotReady, FailedMount, FailedAttachVolume, ErrImagePull, ImagePullBackOff, Unhealthy]
+application:
+  replicas: 1
+  alloy:
+    namespaces: [kyverno, logging, monitoring, xxx-system, uk8s-config, uk8s-core, external-dns, cert-manager, external-secrets, informer, kro-system, platform-test-app, xxx-issuer-system]
+  vector:
+    logPattern: '(?i)(error|exception|fatal|panic|failed|timeout|unavailable|denied|forbidden|out of memory)'
+    eventReasons: [OOMKilled, FailedScheduling, Evicted, NodeNotReady, NetworkNotReady, FailedMount, FailedAttachVolume, ErrImagePull, ImagePullBackOff, Unhealthy]
+  argo:
+    eventReasons: [OOMKilled, FailedScheduling, Evicted, NodeNotReady, NetworkNotReady, FailedMount, FailedAttachVolume, ErrImagePull, ImagePullBackOff, Unhealthy]

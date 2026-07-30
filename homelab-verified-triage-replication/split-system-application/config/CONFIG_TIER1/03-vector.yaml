@@ -1,0 +1,134 @@
+# Each Vector instance has an independent OTLP receiver, process limits and
+# Kafka topic. They intentionally share the tested in-memory dedupe behaviour:
+# do not add Vector's disk Kafka buffer without a produce/consume proof.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: split-triage-vector-config
+  namespace: argo-events
+data:
+  vector.yaml: |
+    api: {enabled: true, address: 0.0.0.0:8686}
+    sources:
+      alloy_otlp:
+        type: opentelemetry
+        http: {address: 0.0.0.0:4318}
+        grpc: {address: 0.0.0.0:4317}
+      vector_metrics: {type: internal_metrics}
+    transforms:
+      normalize:
+        type: remap
+        inputs: [alloy_otlp.logs]
+        source: |
+          .schema_version = "observability.triage.v2"
+          .cluster = to_string(.attributes.cluster) ?? "unknown"
+          .namespace = to_string(.attributes.namespace) ?? "unknown"
+          .scope = to_string(.attributes.triage_scope) ?? get_env_var!("TRIAGE_SCOPE")
+          message = to_string(.message) ?? to_string(.body) ?? ""
+          event = parse_json(message) ?? {}
+          pod_attribute = to_string(.attributes.pod) ?? ""
+          .pod = if pod_attribute == "" { to_string(event.name) ?? "" } else { pod_attribute }
+          .container = to_string(.attributes.container) ?? ""
+          .service = to_string(.attributes.service) ?? "unknown"
+          .node = to_string(.attributes.node) ?? to_string(event.sourcehost) ?? ""
+          event_reason = to_string(.attributes.event_reason) ?? ""
+          .event_type = to_string(event.type) ?? ""
+          .reason = if event_reason != "" { event_reason } else if match(message, r'(?i)(out of memory|oom|killed)') { "log-resource-exhaustion" } else if match(message, r'(?i)(unauthorized|authentication|forbidden|access denied)') { "log-authentication" } else if match(message, r'(?i)(timeout|timed out|deadline exceeded)') { "log-timeout" } else if match(message, r'(?i)(unavailable|unreachable|connection refused)') { "log-availability" } else if match(message, r'(?i)(fatal|panic|critical|segfault)') { "log-fatal" } else { "log-error" }
+          .signal_kind = if event_reason == "" { "log" } else { "event" }
+          .severity = if .signal_kind == "event" { if includes(["OOMKilled", "OOMKilling", "FailedScheduling", "Evicted", "NodeNotReady", "FailedCreatePodSandBox"], .reason) { "critical" } else { "warning" } } else if match(message, r'(?i)(fatal|panic|critical|out of memory|oom|segfault)') { "critical" } else { "error" }
+          safe_message = redact(message, filters: [r'(?i)(password|passwd|pwd|token|api[_-]?key|secret|client_secret)\\s*[=:]\\s*[^\\s,;]+', r'(?i)(authorization\\s*[:=]\\s*bearer\\s+)[^\\s,;]+', r'(?i)(cookie|set-cookie)\\s*[:=]\\s*[^\\r\\n]+'])
+          .dedupe_key = sha2(join!([.cluster, .namespace, .pod], ":"))
+          .delivery_key = if .signal_kind == "event" { sha2(join!([.dedupe_key, .reason], ":")) } else { sha2(join!([.dedupe_key, .reason, safe_message], ":")) }
+          . = {"schema_version": .schema_version, "cluster": .cluster, "namespace": .namespace, "scope": .scope, "node": .node, "pod": .pod, "container": .container, "service": .service, "reason": .reason, "severity": .severity, "signal_kind": .signal_kind, "event_type": .event_type, "source_type": "opentelemetry", "dedupe_key": .dedupe_key, "delivery_key": .delivery_key, "automation_allowed": false, "evidence": {"event_summary": .reason, "representative_log_lines": truncate(safe_message, 4096, suffix: "…")}}
+      incident_signals:
+        type: filter
+        inputs: [normalize]
+        condition: "(.signal_kind == \"event\" && (.event_type == \"Warning\" || .event_type == \"\") && match(string!(.reason), r'^(OOMKilled|OOMKilling|FailedScheduling|Evicted|NodeNotReady|NetworkNotReady|FailedCreatePodSandBox)$')) || (.signal_kind == \"log\" && match(string!(.evidence.representative_log_lines), r'(?i)(fatal|panic|critical|out of memory|segfault)'))"
+      suppress_exact_repeats:
+        type: dedupe
+        inputs: [incident_signals]
+        fields: {match: [delivery_key]}
+        cache: {num_events: 10000}
+    sinks:
+      kafka:
+        type: kafka
+        inputs: [suppress_exact_repeats]
+        bootstrap_servers: "${CONFLUENT_BOOTSTRAP}"
+        topic: "${CONFLUENT_TOPIC}"
+        key_field: dedupe_key
+        encoding: {codec: json}
+        librdkafka_options: {security.protocol: sasl_ssl, sasl.mechanism: PLAIN, sasl.username: "${CONFLUENT_SA_KEY}", sasl.password: "${CONFLUENT_SA_SECRET}"}
+      metrics_exporter:
+        type: prometheus_exporter
+        inputs: [vector_metrics]
+        address: 0.0.0.0:9598
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: system-triage-vector
+  namespace: argo-events
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: system-triage-vector}}
+  template:
+    metadata: {labels: {app: system-triage-vector, triage-scope: system}}
+    spec:
+      containers:
+        - name: vector
+          image: timberio/vector:0.45.0-debian
+          args: [--config, /etc/vector/vector.yaml]
+          env:
+            - {name: TRIAGE_SCOPE, value: system}
+            - {name: CONFLUENT_BOOTSTRAP, valueFrom: {secretKeyRef: {name: confluent-credentials, key: bootstrap}}}
+            - {name: CONFLUENT_TOPIC, value: "{{SYSTEM_TRIAGE_TOPIC}}"}
+            - {name: CONFLUENT_SA_KEY, valueFrom: {secretKeyRef: {name: confluent-credentials, key: key}}}
+            - {name: CONFLUENT_SA_SECRET, valueFrom: {secretKeyRef: {name: confluent-credentials, key: secret}}}
+          ports: [{name: otlp-http, containerPort: 4318}, {name: otlp-grpc, containerPort: 4317}, {name: api, containerPort: 8686}, {name: metrics, containerPort: 9598}]
+          readinessProbe: {httpGet: {path: /health, port: api}, initialDelaySeconds: 5, periodSeconds: 15}
+          livenessProbe: {httpGet: {path: /health, port: api}, initialDelaySeconds: 20, periodSeconds: 30, failureThreshold: 4}
+          resources: {requests: {cpu: 100m, memory: 256Mi}, limits: {cpu: 500m, memory: 512Mi}}
+          volumeMounts: [{name: config, mountPath: /etc/vector, readOnly: true}]
+      volumes: [{name: config, configMap: {name: split-triage-vector-config}}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: system-triage-vector, namespace: argo-events}
+spec:
+  selector: {app: system-triage-vector}
+  ports: [{name: otlp-http, port: 4318, targetPort: otlp-http}, {name: otlp-grpc, port: 4317, targetPort: otlp-grpc}, {name: api, port: 8686, targetPort: api}, {name: metrics, port: 9598, targetPort: metrics}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: application-triage-vector
+  namespace: argo-events
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: application-triage-vector}}
+  template:
+    metadata: {labels: {app: application-triage-vector, triage-scope: application}}
+    spec:
+      containers:
+        - name: vector
+          image: timberio/vector:0.45.0-debian
+          args: [--config, /etc/vector/vector.yaml]
+          env:
+            - {name: TRIAGE_SCOPE, value: application}
+            - {name: CONFLUENT_BOOTSTRAP, valueFrom: {secretKeyRef: {name: confluent-credentials, key: bootstrap}}}
+            - {name: CONFLUENT_TOPIC, value: "{{APPLICATION_TRIAGE_TOPIC}}"}
+            - {name: CONFLUENT_SA_KEY, valueFrom: {secretKeyRef: {name: confluent-credentials, key: key}}}
+            - {name: CONFLUENT_SA_SECRET, valueFrom: {secretKeyRef: {name: confluent-credentials, key: secret}}}
+          ports: [{name: otlp-http, containerPort: 4318}, {name: otlp-grpc, containerPort: 4317}, {name: api, containerPort: 8686}, {name: metrics, containerPort: 9598}]
+          readinessProbe: {httpGet: {path: /health, port: api}, initialDelaySeconds: 5, periodSeconds: 15}
+          livenessProbe: {httpGet: {path: /health, port: api}, initialDelaySeconds: 20, periodSeconds: 30, failureThreshold: 4}
+          resources: {requests: {cpu: 100m, memory: 256Mi}, limits: {cpu: 500m, memory: 512Mi}}
+          volumeMounts: [{name: config, mountPath: /etc/vector, readOnly: true}]
+      volumes: [{name: config, configMap: {name: split-triage-vector-config}}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: application-triage-vector, namespace: argo-events}
+spec:
+  selector: {app: application-triage-vector}
+  ports: [{name: otlp-http, port: 4318, targetPort: otlp-http}, {name: otlp-grpc, port: 4317, targetPort: otlp-grpc}, {name: api, port: 8686, targetPort: api}, {name: metrics, port: 9598, targetPort: metrics}]

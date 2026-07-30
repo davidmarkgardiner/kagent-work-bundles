@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: system-triage-profile
+  namespace: monitoring
+data:
+  cluster: "{{CLUSTER_NAME}}"
+  scope: system
+  namespaces: "aks-istio-ingress,aks-istio-egress,aks-istio-system,alloy,flux-system,gatekeeper-system,kube-system"
+  signal_profile: critical-only
+  kafka_topic: "{{SYSTEM_TRIAGE_TOPIC}}"
+  consumer_group: "{{SYSTEM_TRIAGE_GROUP}}"

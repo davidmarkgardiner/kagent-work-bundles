@@ -1,0 +1,179 @@
+# Management-side Kafka consumers. The shared `red-agentic-triage`
+# WorkflowTemplate, its semaphore ConfigMap and its service account remain the
+# execution plane from ../config. This file replaces its single EventSource and
+# two Sensors with two isolated topic/group paths.
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: triage-kafka
+  namespace: argo-events
+spec:
+  kafka:
+    incident-triage-requests:
+      url: "{{CONFLUENT_BOOTSTRAP}}"
+      topic: "{{TRIAGE_TOPIC}}"
+      version: 2.5.0
+      jsonBody: true
+      partition: ''
+      consumerGroup: {groupName: "{{TRIAGE_CONSUMER_GROUP}}", oldest: false, rebalanceStrategy: ''}
+      sasl:
+        mechanism: PLAIN
+        userSecret: {name: confluent-credentials, key: key}
+        passwordSecret: {name: confluent-credentials, key: secret}
+      tls: {insecureSkipVerify: true}
+  template: {serviceAccountName: argo-events-sa}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: application-triage-kafka
+  namespace: argo-events
+spec:
+  kafka:
+    incident-triage-requests:
+      url: "{{CONFLUENT_BOOTSTRAP}}"
+      topic: "{{APPLICATION_TRIAGE_TOPIC}}"
+      version: 2.5.0
+      jsonBody: true
+      partition: ''
+      consumerGroup: {groupName: "{{APPLICATION_TRIAGE_GROUP}}", oldest: false, rebalanceStrategy: ''}
+      sasl:
+        mechanism: PLAIN
+        userSecret: {name: confluent-credentials, key: key}
+        passwordSecret: {name: confluent-credentials, key: secret}
+      tls: {insecureSkipVerify: true}
+  template: {serviceAccountName: argo-events-sa}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata: {name: system-log-triage, namespace: argo-events}
+spec:
+  eventBusName: default
+  template: {serviceAccountName: argo-events-sa}
+  dependencies:
+    - name: system-log
+      eventSourceName: triage-kafka
+      eventName: incident-triage-requests
+      filters:
+        data:
+          - {path: body.schema_version, type: string, value: ["observability.triage.v2"]}
+          - {path: body.automation_allowed, type: bool, value: ["false"]}
+          - {path: body.scope, type: string, value: ["system"]}
+          - {path: body.signal_kind, type: string, value: ["log"]}
+  triggers:
+    - template:
+        name: system-log-workflow
+        conditions: system-log
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata: {generateName: system-log-triage-, namespace: argo-events, labels: {triage-scope: system, triage-signal: log}}
+              spec: {workflowTemplateRef: {name: system-agentic-triage}, arguments: {parameters: [{name: incident}]}}
+          parameters:
+            - src: {dependencyName: system-log, dataKey: body}
+              dest: spec.arguments.parameters.0.value
+      rateLimit: {requestsPerUnit: 5, unit: Minute}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata: {name: system-event-triage, namespace: argo-events}
+spec:
+  eventBusName: default
+  template: {serviceAccountName: argo-events-sa}
+  dependencies:
+    - name: system-event
+      eventSourceName: triage-kafka
+      eventName: incident-triage-requests
+      filters:
+        data:
+          - {path: body.schema_version, type: string, value: ["observability.triage.v2"]}
+          - {path: body.automation_allowed, type: bool, value: ["false"]}
+          - {path: body.scope, type: string, value: ["system"]}
+          - {path: body.signal_kind, type: string, value: ["event"]}
+          - {path: body.reason, type: string, value: ["OOMKilled", "FailedScheduling", "Evicted", "NodeNotReady", "NetworkNotReady", "FailedMount", "FailedAttachVolume", "ErrImagePull", "ImagePullBackOff", "Unhealthy"]}
+  triggers:
+    - template:
+        name: system-event-workflow
+        conditions: system-event
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata: {generateName: system-event-triage-, namespace: argo-events, labels: {triage-scope: system, triage-signal: event}}
+              spec: {workflowTemplateRef: {name: system-agentic-triage}, arguments: {parameters: [{name: incident}]}}
+          parameters:
+            - src: {dependencyName: system-event, dataKey: body}
+              dest: spec.arguments.parameters.0.value
+      rateLimit: {requestsPerUnit: 5, unit: Minute}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata: {name: application-log-triage, namespace: argo-events}
+spec:
+  eventBusName: default
+  template: {serviceAccountName: argo-events-sa}
+  dependencies:
+    - name: application-log
+      eventSourceName: triage-kafka
+      eventName: incident-triage-requests
+      filters:
+        data:
+          - {path: body.schema_version, type: string, value: ["observability.triage.v2"]}
+          - {path: body.automation_allowed, type: bool, value: ["false"]}
+          - {path: body.scope, type: string, value: ["application"]}
+          - {path: body.signal_kind, type: string, value: ["log"]}
+  triggers:
+    - template:
+        name: application-log-workflow
+        conditions: application-log
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata: {generateName: application-log-triage-, namespace: argo-events, labels: {triage-scope: application, triage-signal: log}}
+              spec: {workflowTemplateRef: {name: application-agentic-triage}, arguments: {parameters: [{name: incident}]}}
+          parameters:
+            - src: {dependencyName: application-log, dataKey: body}
+              dest: spec.arguments.parameters.0.value
+      rateLimit: {requestsPerUnit: 5, unit: Minute}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata: {name: application-event-triage, namespace: argo-events}
+spec:
+  eventBusName: default
+  template: {serviceAccountName: argo-events-sa}
+  dependencies:
+    - name: application-event
+      eventSourceName: triage-kafka
+      eventName: incident-triage-requests
+      filters:
+        data:
+          - {path: body.schema_version, type: string, value: ["observability.triage.v2"]}
+          - {path: body.automation_allowed, type: bool, value: ["false"]}
+          - {path: body.scope, type: string, value: ["application"]}
+          - {path: body.signal_kind, type: string, value: ["event"]}
+          - {path: body.reason, type: string, value: ["OOMKilled", "FailedScheduling", "Evicted", "NodeNotReady", "NetworkNotReady", "FailedMount", "FailedAttachVolume", "ErrImagePull", "ImagePullBackOff", "Unhealthy"]}
+  triggers:
+    - template:
+        name: application-event-workflow
+        conditions: application-event
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata: {generateName: application-event-triage-, namespace: argo-events, labels: {triage-scope: application, triage-signal: event}}
+              spec: {workflowTemplateRef: {name: application-agentic-triage}, arguments: {parameters: [{name: incident}]}}
+          parameters:
+            - src: {dependencyName: application-event, dataKey: body}
+              dest: spec.arguments.parameters.0.value
+      rateLimit: {requestsPerUnit: 5, unit: Minute}
