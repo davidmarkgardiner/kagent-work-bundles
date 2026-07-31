@@ -49,10 +49,16 @@ data:
         inputs: [incident_signals]
         fields: {match: [delivery_key]}
         cache: {num_events: 10000}
+      suppress_incident_burst:
+        type: throttle
+        inputs: [suppress_exact_repeats]
+        key_field: "{{ delivery_key }}"
+        threshold: 1
+        window_secs: 900
     sinks:
       kafka:
         type: kafka
-        inputs: [suppress_exact_repeats]
+        inputs: [suppress_incident_burst]
         bootstrap_servers: "${CONFLUENT_BOOTSTRAP}"
         topic: "${CONFLUENT_TOPIC}"
         key_field: dedupe_key
