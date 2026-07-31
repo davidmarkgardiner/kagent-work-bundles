@@ -37,9 +37,11 @@ data:
           .signal_kind = if event_reason == "" { "log" } else { "event" }
           .severity = if .signal_kind == "event" { if includes(["OOMKilled", "OOMKilling", "FailedScheduling", "Evicted", "NodeNotReady", "FailedCreatePodSandBox"], .reason) { "critical" } else { "warning" } } else if match(message, r'(?i)(fatal|panic|critical|out of memory|oom|segfault)') { "critical" } else { "error" }
           safe_message = redact(message, filters: [r'(?i)(password|passwd|pwd|token|api[_-]?key|secret|client_secret)\\s*[=:]\\s*[^\\s,;]+', r'(?i)(authorization\\s*[:=]\\s*bearer\\s+)[^\\s,;]+', r'(?i)(cookie|set-cookie)\\s*[:=]\\s*[^\\r\\n]+'])
-          .dedupe_key = sha2(join!([.cluster, .namespace, .pod], ":"))
+          deployment = parse_regex(.pod, r'^(?P<name>.+)-[a-f0-9]{8,10}-[a-z0-9]{5}') ?? {}
+          .workload = string(deployment.name) ?? .pod
+          .dedupe_key = sha2(join!([.cluster, .namespace, .workload], ":"))
           .delivery_key = if .signal_kind == "event" { sha2(join!([.dedupe_key, .reason], ":")) } else { sha2(join!([.dedupe_key, .reason, safe_message], ":")) }
-          . = {"schema_version": .schema_version, "cluster": .cluster, "namespace": .namespace, "scope": .scope, "node": .node, "pod": .pod, "container": .container, "service": .service, "reason": .reason, "severity": .severity, "signal_kind": .signal_kind, "event_type": .event_type, "source_type": "opentelemetry", "dedupe_key": .dedupe_key, "delivery_key": .delivery_key, "automation_allowed": false, "evidence": {"event_summary": .reason, "representative_log_lines": truncate(safe_message, 4096, suffix: "…")}}
+          . = {"schema_version": .schema_version, "cluster": .cluster, "namespace": .namespace, "workload": .workload, "scope": .scope, "node": .node, "pod": .pod, "container": .container, "service": .service, "reason": .reason, "severity": .severity, "signal_kind": .signal_kind, "event_type": .event_type, "source_type": "opentelemetry", "dedupe_key": .dedupe_key, "delivery_key": .delivery_key, "automation_allowed": false, "evidence": {"event_summary": .reason, "representative_log_lines": truncate(safe_message, 4096, suffix: "…")}}
       incident_signals:
         type: filter
         inputs: [normalize]

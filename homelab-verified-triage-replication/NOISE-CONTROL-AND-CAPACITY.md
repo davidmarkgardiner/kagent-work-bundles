@@ -35,6 +35,14 @@ burst does not trigger one workflow per repeated Event count. Log delivery keys
 also include the redacted evidence line, so a materially different failure can
 still pass.
 
+Before that key is calculated, Vector derives a conservative `workload` identity
+from Deployment-style pod names. For example,
+`payments-api-7f85bd8ddc-ab123` becomes `payments-api`; the raw pod name stays
+in the evidence. The incident fingerprint is `cluster + namespace + workload`,
+so a replacement Pod with the same failure reuses the open ticket instead of
+creating another one. Pods that do not match that Deployment pattern retain
+their complete pod name as the workload identity.
+
 Watch:
 
 ```text
