@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: triage-evaluation-settings
+  namespace: argo-events
+data:
+  # Homelab defaults. The work overlay replaces the triage caller value, without
+  # copying the WorkflowTemplate or changing its logic.
+  triage-agent-url: http://kagent-controller.kagent:8083/api/a2a/kagent/evaluated-k8s-readonly-triage-agent/
+  required-tool-server: kagent-tool-server

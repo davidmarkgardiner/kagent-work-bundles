@@ -1,0 +1,11 @@
+# Expected result of one `kubectl apply -k smoke/` run.
+# One network-shaped signal in -> one GitLab ticket out, and the triage should
+# have consulted the network-flow agent along the way.
+expected:
+  - pod: smoke-network-crossns-dns
+    namespace: platform-test-app
+    tier: application
+    signal: pod-log
+    shape: cross-namespace-connectivity
+    v3_domain: infrastructure-outage
+    expect_network_agent_consulted: true   # primary agent should call aks-network-flow-triage

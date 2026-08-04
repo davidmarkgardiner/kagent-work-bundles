@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: triage-a2a-evaluation-gate
+  namespace: argo-events
+spec:
+  entrypoint: evaluate
+  arguments:
+    parameters:
+      - {name: incident}
+      - {name: diagnosis}
+      - {name: tool-audit}
+      # Homelab demonstration: the installed read-only key-agent tool server.
+      # Work deployment: override with aks-mcp.
+      - {name: required-tool-server, value: kagent-tool-server}
+  templates:
+    - name: evaluate
+      outputs:
+        parameters:
+          - {name: verdict, valueFrom: {path: /tmp/verdict}}
+          - {name: score, valueFrom: {path: /tmp/score}}
+          - {name: report, valueFrom: {path: /tmp/report.json}}
+      script:
+        image: badouralix/curl-jq:alpine
+        command: [sh]
+        source: |
+          set -eu
+          cat > /tmp/incident.json <<'EOF'
+          {{workflow.parameters.incident}}
+          EOF
+          cat > /tmp/diagnosis.txt <<'EOF'
+          {{workflow.parameters.diagnosis}}
+          EOF
+          cat > /tmp/tool-audit.json <<'EOF'
+          {{workflow.parameters.tool-audit}}
+          EOF
+          jq -n --arg required_tool_server '{{workflow.parameters.required-tool-server}}' --rawfile incident /tmp/incident.json --rawfile diagnosis /tmp/diagnosis.txt --rawfile audit /tmp/tool-audit.json '{jsonrpc:"2.0",id:"triage-evaluation",method:"message/send",params:{message:{role:"user",parts:[{kind:"text",text:("Evaluate this package. REQUIRED_TOOL_SERVER="+$required_tool_server+" INCIDENT="+$incident+" DIAGNOSIS="+$diagnosis+" IMMUTABLE_TOOL_AUDIT="+$audit)}]}}}' >/tmp/request.json
+          curl --fail --silent --show-error --max-time 240 -H 'Content-Type: application/json' --data @/tmp/request.json http://kagent-controller.kagent:8083/api/a2a/kagent/triage-evaluation-agent/ >/tmp/response.json
+          jq -r '[.result.artifacts[]?.parts[]?|select(.kind=="text")|.text]|last // empty' /tmp/response.json >/tmp/report.json
+          jq -e '.verdict == "PASS" or .verdict == "FAIL"' /tmp/report.json >/dev/null
+          jq -r '.verdict' /tmp/report.json >/tmp/verdict
+          jq -r '.score' /tmp/report.json >/tmp/score

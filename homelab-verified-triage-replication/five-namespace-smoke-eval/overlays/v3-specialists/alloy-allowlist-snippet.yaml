@@ -1,0 +1,24 @@
+# Reference snippet, NOT applied by kustomize. The v3 worker Alloy config
+# (aks-platform-triage-specialists/manifests/worker/01-alloy-signal-collection.yaml)
+# ships templated placeholders with only three namespace slots
+# ({{TRIAGE_NAMESPACE_A/B/C}}). This corpus spans five namespaces, so extend the
+# collection lists to include all five before running the smoke.
+#
+# In loki.source.kubernetes_events, set the namespaces list to include:
+namespaces:
+  - platform-test-app
+  - agentic-triage-proof
+  - cert-manager
+  - external-dns
+  - monitoring
+#
+# And ensure {{TRIAGE_NAMESPACE_REGEX}} in the discovery keep-rule matches the
+# same five, e.g.:
+#   regex = "platform-test-app|agentic-triage-proof|cert-manager|external-dns|monitoring"
+#
+# The event reasons emitted by this corpus (FailedScheduling, FailedMount,
+# NetworkNotReady, OOMKilled) are already in the v3 important-reasons set. The
+# single pod-log signal (agentic-triage-proof) is only collected if that
+# workload is in the v3 pod-log selection; the v3 collector intentionally scopes
+# pod logs to named platform workloads, so confirm it is selected or treat that
+# one signal as v2-only.

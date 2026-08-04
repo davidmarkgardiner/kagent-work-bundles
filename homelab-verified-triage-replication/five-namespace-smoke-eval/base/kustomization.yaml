@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Shared five-namespace smoke corpus. Do not apply this directly; apply one of
+# the overlays (overlays/v2-home-replication or overlays/v3-specialists) so the
+# path-specific prerequisites and notes travel with it.
+resources:
+  - 10-smoke-signals.yaml

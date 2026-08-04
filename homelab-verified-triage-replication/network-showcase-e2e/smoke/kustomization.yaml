@@ -1,0 +1,6 @@
+# Network-specific smoke signal. Apply AFTER agents/ and pipeline/ are deployed
+# and the GitLab credentials Secret exists. Delete after review.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - 10-network-smoke.yaml

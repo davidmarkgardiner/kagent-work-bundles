@@ -1,0 +1,17 @@
+# Bounds concurrent red-agentic-triage workflow instances. Scoped to that one
+# WorkflowTemplate via its own key — deliberately does NOT touch the shared,
+# cluster-wide workflow-controller-configmap that other pipelines depend on.
+# Referenced by 03-argo.yaml's WorkflowTemplate spec.synchronization.semaphore.
+#
+# Sizing: each running instance holds one agent call (up to 3 x 240s) plus a
+# couple of GitLab calls. 5 is what the red proof ran with. Raise only after
+# checking the agent backend can serve that many concurrent A2A requests.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: triage-workflow-concurrency
+  namespace: argo-events
+  labels:
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage
+data:
+  red-agentic-triage: "5"

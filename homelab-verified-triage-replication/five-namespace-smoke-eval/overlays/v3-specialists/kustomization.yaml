@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# v3 specialist path (../../../../aks-platform-triage-specialists).
+#
+# Prerequisites BEFORE this corpus produces tickets:
+#   1. The four specialist Agent CRs from aks-platform-triage-specialists/agents.yaml
+#      are Accepted+Ready, bound to a Ready read-only kagent-tool-server.
+#   2. The worker Alloy allow-list is TEMPLATED with {{PLACEHOLDER}} slots
+#      (aks-platform-triage-specialists/manifests/worker/01-alloy-signal-collection.yaml
+#      has only TRIAGE_NAMESPACE_A/B/C). Slot in all FIVE namespaces used here --
+#      see alloy-allowlist-snippet.yaml in this directory -- or the un-listed
+#      namespaces will emit signals that are never collected (missing tickets).
+#   3. The four domain Sensors + A2A workflow (manifests/management) are deployed
+#      and GitLab credentials exist in argo-events.
+#
+# Apply:  kubectl apply -k overlays/v3-specialists
+# Expect: five open GitLab tickets, one per pod, each routed to the v3_domain
+#         in expected-outcomes.yaml (network -> infrastructure-outage, etc.).
+#
+# NOTE on evaluation + specialists: the a2a-evaluation-gate currently wraps the
+# single v2 triage caller, NOT the four specialists. Wiring the evaluation gate
+# into each specialist (add triage-evaluation-agent as an Agent tool + a
+# controller-history check per Sensor) is unbuilt design work -- tracked as a
+# next step in the README, not shipped here.
+resources:
+  - ../../base

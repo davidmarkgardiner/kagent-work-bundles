@@ -1,0 +1,16 @@
+# kagent Agents for the end-to-end network showcase:
+#   10 primary triage agent  -- receives the Alloy signal; mounts the evaluation
+#      agent AND the network-flow agent as native A2A `type: Agent` tools.
+#   11 evaluation agent       -- read-only gate that scores the triage output.
+#   12 network-flow agent      -- Cilium/Hubble deep-dive specialist (showcase).
+#   13 evaluation gate WorkflowTemplate -- reusable direct-gate smoke.
+#
+# Apply these BEFORE the pipeline so the triage-agent-url in the evaluation
+# settings resolves.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - 10-primary-triage-agent.yaml
+  - 11-evaluation-agent.yaml
+  - 12-network-flow-agent.yaml
+  - 13-evaluation-gate-workflow.yaml

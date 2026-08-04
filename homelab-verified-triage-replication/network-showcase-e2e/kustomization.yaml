@@ -1,0 +1,11 @@
+# Top-level install: agents + pipeline (NOT the smoke signal — fire that
+# separately once the stack is Ready and GitLab creds exist).
+#
+#   kubectl apply -k network-showcase-e2e        # agents + pipeline
+#   kubectl apply -k network-showcase-e2e/smoke   # then the network signal
+#
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - agents
+  - pipeline
