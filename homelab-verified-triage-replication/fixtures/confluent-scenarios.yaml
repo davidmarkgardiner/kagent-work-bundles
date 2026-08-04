@@ -7,10 +7,24 @@ metadata:
   labels: {app.kubernetes.io/name: scheduler-test, triage-test: confluent-scheduling}
 spec:
   nodeSelector: {triage.example.invalid/node: no-such-node}
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    seccompProfile: {type: RuntimeDefault}
   containers:
     - name: app
       image: busybox:1.36
       command: [sh, -c, 'sleep 300']
+      resources:
+        requests: {cpu: 10m, memory: 16Mi}
+        limits: {cpu: 50m, memory: 32Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: {drop: [ALL]}
 ---
 apiVersion: v1
 kind: Pod
@@ -20,12 +34,23 @@ metadata:
   labels: {app.kubernetes.io/name: memory-test, triage-test: confluent-oom}
 spec:
   restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    seccompProfile: {type: RuntimeDefault}
   containers:
     - name: app
       image: busybox:1.36
       command: [sh, -c, 'echo "FATAL synthetic memory exhaustion"; head -c 128M /dev/zero > /dev/null']
       resources:
+        requests: {cpu: 10m, memory: 16Mi}
         limits: {memory: 32Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: {drop: [ALL]}
 ---
 apiVersion: v1
 kind: Pod
@@ -35,10 +60,23 @@ metadata:
   labels: {app.kubernetes.io/name: config-test, triage-test: confluent-configmap}
 spec:
   restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    seccompProfile: {type: RuntimeDefault}
   containers:
     - name: app
       image: busybox:1.36
       command: [sh, -c, 'echo "ERROR synthetic application cannot find ConfigMap app-settings-v999"; sleep 180']
+      resources:
+        requests: {cpu: 10m, memory: 16Mi}
+        limits: {cpu: 50m, memory: 32Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: {drop: [ALL]}
 ---
 apiVersion: v1
 kind: Pod
@@ -47,6 +85,20 @@ metadata:
   namespace: agentic-triage-proof
   labels: {app.kubernetes.io/name: image-test, triage-test: confluent-imagepull}
 spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    seccompProfile: {type: RuntimeDefault}
   containers:
     - name: app
       image: example.invalid/triage/no-such-image:latest
+      resources:
+        requests: {cpu: 10m, memory: 16Mi}
+        limits: {cpu: 50m, memory: 32Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: {drop: [ALL]}

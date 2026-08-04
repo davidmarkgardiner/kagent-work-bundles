@@ -10,12 +10,25 @@ metadata:
     triage-test: redaction-regression-v3
 spec:
   restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    seccompProfile: {type: RuntimeDefault}
   containers:
     - name: auth-api
       image: busybox:1.36
       command: [sh, -c]
       args:
         - 'echo "FATAL synthetic redaction regression v3 password=synthetic-password token=synthetic-token authorization=Bearer synthetic-bearer"; sleep 180'
+      resources:
+        requests: {cpu: 10m, memory: 16Mi}
+        limits: {cpu: 50m, memory: 32Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: {drop: [ALL]}
 ---
 apiVersion: v1
 kind: Pod
@@ -27,9 +40,22 @@ metadata:
     triage-test: correlation-regression-v3
 spec:
   restartPolicy: Always
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    seccompProfile: {type: RuntimeDefault}
   containers:
     - name: checkout-api
       image: busybox:1.36
       command: [sh, -c]
       args:
         - 'echo "ERROR synthetic checkout failure request_id=correlation-regression-v3"; exit 1'
+      resources:
+        requests: {cpu: 10m, memory: 16Mi}
+        limits: {cpu: 50m, memory: 32Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: {drop: [ALL]}
