@@ -89,6 +89,89 @@ aks-network-flow-triage as an Agent tool… skip it otherwise."* Then it always
 calls the evaluation agent before returning. So the routing is the agent's own
 reasoning over the evidence, not a hard-coded Sensor branch.
 
+## The evaluation gate — what it scores and how it reaches the ticket
+
+The evaluation agent (`agents/11-evaluation-agent.yaml`, `triage-evaluation-agent`)
+is an **independent, read-only gate between triage and GitLab**. It has NO tools
+(`tools: []`) and treats the incident, diagnosis and tool-audit as untrusted
+data — so it can't be steered by the workload's own logs. It returns JSON only:
+
+```json
+{"verdict":"PASS|FAIL","score":0-10,"failures":[...],
+ "required_fields_present":true|false,
+ "required_tool_server_calls_observed":true|false}
+```
+
+It PASSes only when the diagnosis carries every required field — TL;DR, overall
+health, evidence used, likely cause, risks, exact human-approved next steps, and
+confidence — AND includes non-empty tool evidence for the required tool server.
+`score` is 10 only when all requirements pass; missing/weak fields drop it.
+
+**How it runs (per incident):**
+1. The primary triage agent forms a diagnosis, then calls the evaluator as a
+   native A2A tool (`pipeline/03-argo.yaml` diagnose step).
+2. If `FAIL`, the primary corrects and re-calls — up to **3 attempts**.
+3. Argo independently checks the controller history proves a real tool call AND
+   a real evaluator A2A call happened (not just prose) before trusting the verdict.
+4. The verdict + score are written onto the ticket.
+
+**How the score reaches the ticket** (`pipeline/03-argo.yaml`):
+- Ticket table row: `| Evaluation | PASS (score X/10) |`
+- Label: `triage::evaluation-passed` or `triage::evaluation-failed`
+- The full evaluator JSON is embedded under `### Independent A2A evaluation`
+- 3 failed rounds → the ticket is still created, labelled `evaluation-failed`,
+  retaining the evidence for human review (no remediation is ever run).
+
+### Confidence score vs evaluation score — they are different
+
+The ticket carries **two** distinct signals; don't conflate them:
+
+| | Confidence | Evaluation score |
+|---|---|---|
+| Who sets it | the **triage agent itself**, in its `## Confidence` section | the **independent evaluator** agent |
+| What it means | how sure the triage agent is about ITS OWN diagnosis (self-reported) | an external quality grade 0–10: did the triage do its job — all fields present, real tool evidence |
+| Trust model | self-assessment (can be optimistic) | adversarial, read-only, untrusted-input second opinion |
+| On the ticket | inside the embedded triage body | `| Evaluation | PASS (score X/10) |` + label |
+
+Confidence answers "how sure is the agent it's right?"; the evaluation score
+answers "did the agent actually produce a complete, evidence-backed answer?" You
+want both high. A confident-but-incomplete answer is exactly what the evaluator
+is there to catch.
+
+### Areas to improve the eval logic (candidates, not yet built)
+- **Score-based gating:** a passing-but-low score (e.g. 6/10) still makes a
+  normal ticket. Add a `triage::low-confidence` label or reviewer flag below a
+  threshold so weak-but-passing answers get a human glance.
+- **Cross-check confidence vs evidence:** have the evaluator compare the triage's
+  self-reported confidence against the strength of its evidence, and fail
+  "high confidence + thin evidence".
+- **Structured failures feedback:** feed the evaluator's `failures[]` back into
+  the retry prompt field-by-field, not just as a JSON blob, to make corrections
+  more targeted.
+- **Per-field subscores** instead of a single 0–10, so the ticket shows exactly
+  which required field was weak.
+
+## Full-coverage smoke (all namespaces)
+
+`smoke/all-namespaces/` fires **one looping log + one Warning event per
+Alloy-watched namespace** — full coverage, and it puts the evaluation gate
+through varied incident shapes (the log category and event reason cycle across
+namespaces: resource, identity, scheduling, network, availability). Expect
+**two GitLab tickets per namespace**, each scored by the eval gate.
+
+```bash
+# Regenerate for YOUR cluster's Alloy allow-list (default = homelab list):
+smoke/all-namespaces/generate.sh <ns1> <ns2> ...
+# Fire the whole corpus (after agents/ + pipeline/ + GitLab creds):
+kubectl --context <ctx> apply -k smoke/all-namespaces
+scripts/verify-smoke.sh --context <ctx> --path v2   # point EXPECTED at all-namespaces/expected-outcomes.yaml
+kubectl --context <ctx> delete -k smoke/all-namespaces
+```
+
+Same collection caveats as any signal: the log pods **loop** (one-shot lines get
+missed), and Alloy must actually tail freshly-created pods — restart Alloy if the
+first signals produce no workflows.
+
 ## Portability notes
 
 - `pipeline/` is a **verbatim snapshot** of `../config` so this folder stands
