@@ -138,6 +138,34 @@ answers "did the agent actually produce a complete, evidence-backed answer?" You
 want both high. A confident-but-incomplete answer is exactly what the evaluator
 is there to catch.
 
+**Why the agent doesn't always report high confidence — and why that's good.**
+Confidence is a signal about *evidence sufficiency*, not self-doubt. The triage
+agent is read-only and evidence-starved by design: it runs on the management
+cluster, usually **cannot live-inspect the worker** where the incident fired,
+and often has only the redacted log/event envelope plus whatever the read-only
+tools return (no Hubble flows, no Azure identity data unless those MCPs are
+onboarded). So "lower confidence" means *"I inferred this from thin evidence and
+could not verify the live cluster state"* — which is genuinely useful: it tells
+the SRE where the analysis is a guess versus a verified fact. A triage that
+claims 100% confidence on one log line is *worse*, because it hides its own blind
+spots.
+
+**The honest caveat:** an LLM grading its *own* certainty is weakly calibrated
+(models skew overconfident and can't truly introspect), so raw confidence is a
+soft hint, not a metric to trust on its own. That is precisely why the
+**independent evaluator** exists — the evaluation score is the trustworthy
+signal because it is external, adversarial, and checks real tool evidence. When
+the two disagree (high confidence, low evaluation score), the gap is the tell
+that the analysis *looked* sure but was thin — trust the evaluation score. The
+best version of confidence is **evidence-grounded** ("high — verified via
+`k8s_get_events` + `k8s_get_pod_logs`") rather than raw introspection; see the
+eval-logic improvements below.
+
+The GitLab ticket now carries a short **"How to read the scores in this ticket"**
+legend at the bottom so any reader — not just the person who built the pipeline —
+understands the difference between the evaluation score and the triage
+confidence.
+
 ### Areas to improve the eval logic (candidates, not yet built)
 - **Score-based gating:** a passing-but-low score (e.g. 6/10) still makes a
   normal ticket. Add a `triage::low-confidence` label or reviewer flag below a

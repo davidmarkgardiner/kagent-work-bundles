@@ -787,7 +787,11 @@ spec:
                 "### " + (if $i.signal_kind=="event" then "Event message" else "Log error message" end) + " (redacted)\n```\n" + ($i.evidence.representative_log_lines | scrub) + "\n```\n\n" +
                 "### Reach-back — run against worker `" + $i.cluster + "`\n```\nkubectl --context " + $i.cluster + " -n " + $i.namespace + " describe pod " + $i.pod + "\nkubectl --context " + $i.cluster + " -n " + $i.namespace + " logs " + $i.pod + (if ($i.container // "")!="" then " -c " + $i.container else "" end) + " --previous\nkubectl --context " + $i.cluster + " -n " + $i.namespace + " get events --field-selector involvedObject.name=" + $i.pod + "\n```\n\n" +
                 "### Read-only kagent triage (includes confidence)\n" + ($diagnosis | scrub) + "\n\n" +
-                "### Independent A2A evaluation\n```json\n" + ($evaluation_report | scrub) + "\n```\n"
+                "### Independent A2A evaluation\n```json\n" + ($evaluation_report | scrub) + "\n```\n" +
+                "\n---\n### How to read the scores in this ticket\n" +
+                "- **Evaluation score (0-10)** - graded by an *independent, read-only* evaluator agent that treats this diagnosis as untrusted input. It checks the analysis is complete (all required fields) and backed by real tool evidence; it is the trustworthy quality signal. `triage::evaluation-failed` means it did not meet the bar after three correction rounds.\n" +
+                "- **Confidence** (in the triage section above) - the triage agent's OWN assessment of its diagnosis, grounded in the evidence it could gather. It runs read-only on the management cluster and often cannot live-inspect the worker, so lower confidence flags an inference rather than a verified fact - not a defect.\n" +
+                "- If the two disagree (e.g. high confidence but a low evaluation score), trust the evaluation score.\n"
               )
             }' > /tmp/issue.json
           curl --fail --silent --show-error --retry 3 --retry-all-errors -H "PRIVATE-TOKEN: $GITLAB_TOKEN" -H 'Content-Type: application/json' \
