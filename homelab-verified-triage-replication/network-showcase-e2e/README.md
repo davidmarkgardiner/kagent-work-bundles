@@ -6,6 +6,9 @@ call the **network-flow (Hubble) agent** for cluster-wide flow evidence, call th
 **evaluation agent** to score its own work, and create a GitLab ticket stamped
 with that score. Copy this whole folder to work and deploy it there.
 
+For the ordered work rollout and the homelab-derived failure-mode checks, use
+[`DEPLOYMENT-CHECKLIST.md`](DEPLOYMENT-CHECKLIST.md).
+
 ```
 Alloy event/log
   → primary triage agent (evaluated-k8s-readonly-triage-agent)
