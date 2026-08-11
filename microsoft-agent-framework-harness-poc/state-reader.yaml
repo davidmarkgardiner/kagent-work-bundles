@@ -1,0 +1,15 @@
+# Read-only helper for lab evidence collection; do not deploy in a shared cluster.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: maf-harness-state-reader
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: maf-harness-poc}
+spec:
+  restartPolicy: Never
+  containers:
+    - name: reader
+      image: busybox:1.37
+      command: [sh, -ec, 'find /state -maxdepth 2 -type f -name "*.json" -print -exec cat {} \;']
+      volumeMounts: [{name: state, mountPath: /state, readOnly: true}]
+  volumes: [{name: state, persistentVolumeClaim: {claimName: maf-harness-poc-state, readOnly: true}}]

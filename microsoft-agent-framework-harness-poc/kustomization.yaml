@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: kagent
 resources:
   - manifests.yaml
+  - sdlc-specialists.yaml
 configMapGenerator:
   - name: maf-harness-poc-app
     files:

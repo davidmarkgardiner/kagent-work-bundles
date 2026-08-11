@@ -1,0 +1,93 @@
+# Every specialist is intentionally tool-free. This proves A2A delegation and
+# evaluator gating without granting source-control, shell, or cluster-write access.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: maf-sdlc-plan
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: maf-harness-poc, maf-poc-role: plan}
+spec:
+  type: Declarative
+  description: Produces a bounded implementation plan for the Harness SDLC POC.
+  declarative:
+    runtime: go
+    modelConfig: default-model-config
+    a2aConfig: {skills: [{id: sdlc-plan, name: SDLC plan, description: Create a small ordered plan.}]}
+    systemMessage: |
+      You are the planning specialist. Return exactly: PLAN, 3-5 ordered tasks,
+      dependencies, and a definition of done. Do not use tools, claim a file was
+      created, or give financial advice.
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: maf-sdlc-build
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: maf-harness-poc, maf-poc-role: build}
+spec:
+  type: Declarative
+  description: Creates an implementation artifact outline from an approved plan.
+  declarative:
+    runtime: go
+    modelConfig: default-model-config
+    a2aConfig: {skills: [{id: sdlc-build, name: SDLC build, description: Design a small implementation artifact.}]}
+    systemMessage: |
+      You are the builder specialist. From the supplied plan, return exactly:
+      BUILD, a small changed-file list, implementation notes, and explicit
+      assumptions. This is a design artifact only: do not use tools, write files,
+      or claim a commit exists.
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: maf-sdlc-test
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: maf-harness-poc, maf-poc-role: test}
+spec:
+  type: Declarative
+  description: Defines automated validation required for the proposed change.
+  declarative:
+    runtime: go
+    modelConfig: default-model-config
+    a2aConfig: {skills: [{id: sdlc-test, name: SDLC test, description: Produce automated test requirements.}]}
+    systemMessage: |
+      You are the test specialist. From the supplied plan and build artifact,
+      return exactly: TEST, automated test cases, expected evidence, and any
+      blockers. Do not use tools or claim tests ran.
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: maf-sdlc-document
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: maf-harness-poc, maf-poc-role: document}
+spec:
+  type: Declarative
+  description: Defines documentation updates for the proposed change.
+  declarative:
+    runtime: go
+    modelConfig: default-model-config
+    a2aConfig: {skills: [{id: sdlc-document, name: SDLC documentation, description: Produce documentation requirements.}]}
+    systemMessage: |
+      You are the documentation specialist. From the supplied plan and build
+      artifact, return exactly: DOCS, documentation changes, operator notes, and
+      a validation checklist. Do not use tools or claim docs were published.
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: maf-sdlc-evaluator
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: maf-harness-poc, maf-poc-role: evaluate}
+spec:
+  type: Declarative
+  description: Independently evaluates the stage artifacts and gates the POC result.
+  declarative:
+    runtime: go
+    modelConfig: default-model-config
+    a2aConfig: {skills: [{id: sdlc-evaluate, name: SDLC evaluation, description: Independently score the SDLC evidence.}]}
+    systemMessage: |
+      You are the independent SDLC evaluator. Inspect the supplied PLAN, BUILD,
+      TEST, and DOCS artifacts. Return exactly: EVALUATION: PASS or FAIL;
+      SCORE: X/10; then concise evidence gaps. PASS only if all four artifacts
+      are present and internally consistent. Do not use tools or claim live tests.

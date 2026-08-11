@@ -1,6 +1,7 @@
 # Microsoft Agent Framework Harness + kagent POC
 
-Status: **proposed lab POC; live evidence is added only after the verifier passes.**
+Status: **bounded lab POC. Approval-to-kagent is live-verified; the expanded
+five-stage factory is deployed but not yet accepted as a full-chain proof.**
 
 This is a minimal, reversible test of a Microsoft Agent Framework Harness Agent
 as an approval-aware coordinator above kagent. It deliberately avoids GitLab
@@ -22,6 +23,25 @@ publication.
 5. State and a bounded A2A receipt remain in the PVC; Job logs are the
    verifier evidence.
 
+## SDLC factory extension
+
+After the approval receipt exists, `factory-job.yaml` starts another Harness
+Agent with exactly one tool, `run_full_sdlc_factory`. That tool delegates in
+order to five isolated kagent agents:
+
+1. `maf-sdlc-plan`
+2. `maf-sdlc-build`
+3. `maf-sdlc-test`
+4. `maf-sdlc-document`
+5. `maf-sdlc-evaluator`
+
+Each specialist is a real Ready kagent `Agent` CR but has **no tools**. The
+factory gives every stage its own A2A context, saves a receipt after every
+terminal response, clips handoff data to a bounded size, and fails closed when
+a stage has no terminal text or the evaluator does not return `EVALUATION: PASS`.
+This preserves the intended factory control shape without creating files,
+GitLab issues, branches, MRs, or cluster resources.
+
 ## Run
 
 ```bash
@@ -29,13 +49,17 @@ kubectl --context red apply -k .
 kubectl --context red -n kagent wait --for=condition=complete job/maf-harness-request --timeout=60s
 kubectl --context red apply -f approve-job.yaml
 sh ./scripts/verify.sh red
+kubectl --context red apply -f factory-job.yaml
+sh ./scripts/verify-factory.sh red
 ```
 
 ## Cleanup
 
 ```bash
 kubectl --context red -n kagent delete -f approve-job.yaml --ignore-not-found
+kubectl --context red -n kagent delete -f factory-job.yaml --ignore-not-found
 kubectl --context red -n kagent delete -f manifests.yaml --ignore-not-found
+kubectl --context red -n kagent delete -f sdlc-specialists.yaml --ignore-not-found
 ```
 
 The initial request and approval are intentionally separate Kubernetes Jobs so
@@ -50,3 +74,18 @@ autonomous SDLC factory.
 stage logged `awaiting-approval` with `tool_invoked=false`; the separately
 applied approval Job logged `HARNESS_APPROVAL_COMPLETED tool_invoked=True`.
 See [evidence/RUN-2026-08-11.md](evidence/RUN-2026-08-11.md).
+
+## Factory run boundary — 2026-08-11
+
+The five specialist Agents were deployed `Accepted=True, Ready=True`. The
+factory run produced terminal receipts for plan, build, and test. It was then
+stopped when later requests queued behind controller-side work from earlier
+cancelled attempts; cancelling the client Job does not reliably cancel the
+underlying kagent task. Therefore this repository does **not** claim a complete
+five-stage autonomous SDLC run. The factory is a valid bounded implementation
+and reproducer, but it needs durable per-stage execution outside that kagent
+task path (for example, one short Argo Workflow step per handoff) before it is
+promoted beyond the lab.
+
+The exact current architecture and proof boundary are in
+[SDLC-FACTORY-VISUALIZATION.html](SDLC-FACTORY-VISUALIZATION.html).
