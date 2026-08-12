@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-compliance-mcp-code
+  namespace: postgres-dab-mcp-poc
+data:
+  server.py: |
+    import os
+    from fastmcp import FastMCP
+    import psycopg
+
+    mcp = FastMCP("postgres-compliance-readonly")
+    DATABASE_URL = os.environ["POSTGRES_CONNECTION_STRING"]
+
+    def query(sql, params=()):
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, params)
+                columns = [item.name for item in cur.description]
+                return [dict(zip(columns, row)) for row in cur.fetchall()]
+
+    @mcp.tool()
+    def get_compliance_data_product_details() -> dict:
+        """Describe the only approved synthetic compliance product and its bounds."""
+        return {
+            "data_product": "synthetic-compliance-exceptions-v1",
+            "fields": {"severity_rank": "1 low, 2 medium, 3 high, 4 critical", "is_open": "true means open"},
+            "writes_supported": False,
+            "arbitrary_sql_supported": False,
+            "vector_search_exposed": False,
+        }
+
+    @mcp.tool()
+    def get_open_high_severity_compliance_findings() -> list[dict]:
+        """Return only open high/critical synthetic compliance findings."""
+        return query("SELECT finding_id, severity_rank, control_family_code, observed_at FROM public.v_compliance_exception_summary WHERE is_open = true AND severity_rank >= 3 ORDER BY finding_id")
+
+    if __name__ == "__main__":
+        mcp.run(transport="streamable-http", host="0.0.0.0", port=8000, path="/mcp", show_banner=False)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-compliance-mcp
+  namespace: postgres-dab-mcp-poc
+spec:
+  selector:
+    app.kubernetes.io/name: postgres-compliance-mcp
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-compliance-mcp
+  namespace: postgres-dab-mcp-poc
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres-compliance-mcp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres-compliance-mcp
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: adapter
+          image: python:3.12-slim
+          command: ["sh", "-ec"]
+          args:
+            - |
+              pip install --no-cache-dir --target /tmp/site fastmcp==2.14.3 'psycopg[binary]==3.2.12' packaging==25.0
+              exec env PYTHONPATH=/tmp/site python /app/server.py
+          env:
+            - name: POSTGRES_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-dab-poc-reader
+                  key: postgres-url
+          ports:
+            - name: http
+              containerPort: 8000
+          volumeMounts:
+            - name: code
+              mountPath: /app/server.py
+              subPath: server.py
+              readOnly: true
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 1m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: code
+          configMap:
+            name: postgres-compliance-mcp-code

@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-dab-sql-mcp-config
+  namespace: postgres-dab-mcp-poc
+data:
+  dab-config.json: |
+    {
+      "$schema": "https://github.com/Azure/data-api-builder/releases/download/v2.0.9/dab.draft.schema.json",
+      "data-source": {
+        "database-type": "postgresql",
+        "connection-string": "@env('POSTGRES_CONNECTION_STRING')"
+      },
+      "runtime": {
+        "host": {
+          "mode": "production",
+          "max-response-size-mb": 1,
+          "authentication": { "provider": "Unauthenticated" }
+        },
+        "rest": { "enabled": false },
+        "graphql": { "enabled": false },
+        "mcp": {
+          "enabled": true,
+          "path": "/mcp",
+          "description": "Read-only synthetic compliance summary. No writes, arbitrary SQL, embeddings, raw tables, or server-side aggregate tool.",
+          "dml-tools": {
+            "describe-entities": true,
+            "create-record": false,
+            "read-records": true,
+            "update-record": false,
+            "delete-record": false,
+            "execute-entity": false,
+            "aggregate-records": false
+          }
+        }
+      },
+      "entities": {
+        "ComplianceExceptionSummary": {
+          "source": { "object": "public.v_compliance_exception_summary", "type": "view" },
+          "description": "Synthetic compliance findings. severity_rank: 1 low, 2 medium, 3 high, 4 critical. is_open identifies open findings. control_family_code: 10 identity, 20 network, 30 logging. Use small read-only results only.",
+          "fields": [
+            { "name": "finding_id", "description": "Synthetic finding identifier.", "primary-key": true },
+            { "name": "severity_rank", "description": "1 low, 2 medium, 3 high, 4 critical." },
+            { "name": "is_open", "description": "True means open." },
+            { "name": "control_family_code", "description": "10 identity, 20 network, 30 logging." },
+            { "name": "observed_at", "description": "Synthetic finding observation date." }
+          ],
+          "permissions": [{ "role": "anonymous", "actions": ["read"] }],
+          "mcp": { "dml-tools": true }
+        }
+      }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-dab-sql-mcp
+  namespace: postgres-dab-mcp-poc
+spec:
+  selector:
+    app.kubernetes.io/name: postgres-dab-sql-mcp
+  ports:
+    - name: http
+      port: 5000
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-dab-sql-mcp
+  namespace: postgres-dab-mcp-poc
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres-dab-sql-mcp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres-dab-sql-mcp
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: dab
+          image: mcr.microsoft.com/azure-databases/data-api-builder:2.0.9@sha256:ad5ac1793049f95fdd4210ca50d3c913855553139b64992046a071cd63eeead0
+          args: ["--ConfigFileName", "/App/dab-config.json"]
+          ports:
+            - name: http
+              containerPort: 5000
+          env:
+            - name: POSTGRES_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-dab-poc-reader
+                  key: connection-string
+          volumeMounts:
+            - name: config
+              mountPath: /App/dab-config.json
+              subPath: dab-config.json
+              readOnly: true
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: config
+          configMap:
+            name: postgres-dab-sql-mcp-config

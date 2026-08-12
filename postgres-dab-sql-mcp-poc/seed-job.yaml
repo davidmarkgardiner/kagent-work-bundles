@@ -1,0 +1,72 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-dab-poc-seed
+  namespace: postgres-dab-mcp-poc
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 604800
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      containers:
+        - name: seed
+          image: pgvector/pgvector:0.8.6-pg17-bookworm
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-dab-poc-admin
+                  key: credential
+            - name: DAB_READER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-dab-poc-reader
+                  key: credential
+          command: ["sh", "-ec"]
+          args:
+            - |
+              until pg_isready -h postgres-dab-poc -U postgres -d governed_data; do sleep 2; done
+              psql -v ON_ERROR_STOP=1 -h postgres-dab-poc -U postgres -d governed_data <<'SQL'
+              CREATE EXTENSION IF NOT EXISTS vector;
+              DROP VIEW IF EXISTS public.v_compliance_exception_summary;
+              DROP TABLE IF EXISTS public.compliance_findings;
+              CREATE TABLE public.compliance_findings (
+                finding_id integer PRIMARY KEY,
+                severity text NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+                status text NOT NULL CHECK (status IN ('open', 'closed')),
+                control_family text NOT NULL,
+                finding_summary text NOT NULL,
+                observed_at date NOT NULL,
+                embedding vector(3) NOT NULL
+              );
+              INSERT INTO public.compliance_findings VALUES
+                (101, 'critical', 'open', 'identity', 'Privileged access review overdue', DATE '2026-08-01', '[0.98,0.02,0.01]'),
+                (102, 'high', 'open', 'network', 'Public ingress exception lacks current approval', DATE '2026-08-03', '[0.10,0.91,0.03]'),
+                (103, 'medium', 'closed', 'logging', 'Log retention policy reviewed', DATE '2026-07-18', '[0.05,0.09,0.92]');
+              CREATE INDEX compliance_findings_embedding_hnsw
+                ON public.compliance_findings USING hnsw (embedding vector_cosine_ops);
+              CREATE VIEW public.v_compliance_exception_summary AS
+                SELECT finding_id,
+                  CASE severity WHEN 'low' THEN 1 WHEN 'medium' THEN 2 WHEN 'high' THEN 3 WHEN 'critical' THEN 4 END::smallint AS severity_rank,
+                  (status = 'open') AS is_open,
+                  CASE control_family WHEN 'identity' THEN 10 WHEN 'network' THEN 20 WHEN 'logging' THEN 30 END::smallint AS control_family_code,
+                  observed_at
+                FROM public.compliance_findings;
+              SQL
+              if ! psql -At -h postgres-dab-poc -U postgres -d governed_data \
+                   -c "SELECT 1 FROM pg_roles WHERE rolname = 'dab_reader'" | grep -qx 1; then
+                psql -v ON_ERROR_STOP=1 -h postgres-dab-poc -U postgres -d governed_data \
+                  -c "CREATE ROLE dab_reader LOGIN PASSWORD '$DAB_READER_PASSWORD'";
+              else
+                psql -v ON_ERROR_STOP=1 -h postgres-dab-poc -U postgres -d governed_data \
+                  -c "ALTER ROLE dab_reader PASSWORD '$DAB_READER_PASSWORD'";
+              fi
+              psql -v ON_ERROR_STOP=1 -h postgres-dab-poc -U postgres -d governed_data <<'SQL'
+              REVOKE ALL ON SCHEMA public FROM PUBLIC;
+              GRANT USAGE ON SCHEMA public TO dab_reader;
+              GRANT SELECT ON public.v_compliance_exception_summary TO dab_reader;
+              SQL

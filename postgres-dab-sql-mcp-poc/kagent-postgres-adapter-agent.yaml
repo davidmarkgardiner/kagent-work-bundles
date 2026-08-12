@@ -1,0 +1,43 @@
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: postgres-compliance-readonly-mcp
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  description: Bounded read-only PostgreSQL compliance MCP fallback; synthetic data only.
+  protocol: STREAMABLE_HTTP
+  url: http://postgres-compliance-mcp.postgres-dab-mcp-poc.svc.cluster.local:8000/mcp
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: postgres-compliance-lab-agent
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  type: Declarative
+  description: Read-only agent for one synthetic PostgreSQL compliance data product.
+  declarative:
+    runtime: python
+    modelConfig: agentgateway-minimax
+    systemMessage: |
+      You answer synthetic compliance questions only. First call
+      get_compliance_data_product_details, then call the applicable bounded
+      read-only tool. Never request, generate, or execute raw SQL; never write,
+      query embeddings, or claim access to RDS, production, or real compliance
+      data. State the count and concise returned facts.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: postgres-compliance-readonly-mcp
+          namespace: kagent
+          toolNames:
+            - get_compliance_data_product_details
+            - get_open_high_severity_compliance_findings
