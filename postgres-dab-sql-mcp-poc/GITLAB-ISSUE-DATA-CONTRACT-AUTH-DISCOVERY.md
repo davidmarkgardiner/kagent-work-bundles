@@ -41,6 +41,9 @@ The demonstrated functions were:
 
 Live evidence: [PostgreSQL/pgvector POC README]({{REPO_URL}}/work-agent-bundles/postgres-dab-sql-mcp-poc/README.md), [run record]({{REPO_URL}}/work-agent-bundles/postgres-dab-sql-mcp-poc/evidence/POC-RUN-2026-08-12.md), and [trimmed A2A receipt]({{REPO_URL}}/work-agent-bundles/postgres-dab-sql-mcp-poc/evidence/A2A-CONVERSATIONAL-RECEIPT-2026-08-12.json).
 
+For a side-by-side explanation of AKS-MCP, GitHub MCP, and this bounded data
+MCP pattern, see [MCP tool grouping comparison]({{REPO_URL}}/work-agent-bundles/postgres-dab-sql-mcp-poc/MCP-TOOL-GROUPING-COMPARISON.md).
+
 ### Verified current capability — boundary
 
 The Agent did not receive arbitrary SQL, database credentials, write tools,
