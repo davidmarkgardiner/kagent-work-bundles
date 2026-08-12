@@ -50,6 +50,10 @@ parameterised-query tools.
 See the [data MCP plan](../../platform/data-mcp/README.md#starburst-data-mesh-poc-decision-and-handoff-plan)
 for the decision gates and evidence contract.
 
+For the honest production-fit comparison, exact tested images, air-gapped
+registry preparation, and office native-Starburst runbook, see
+[OFFICE-REPLICATION.md](OFFICE-REPLICATION.md).
+
 ## Cleanup
 
     sh work-agent-bundles/starburst-trino-data-mcp-poc/scripts/teardown.sh red
