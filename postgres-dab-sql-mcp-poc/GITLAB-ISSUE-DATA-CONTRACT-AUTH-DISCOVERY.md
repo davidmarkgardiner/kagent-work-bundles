@@ -64,7 +64,7 @@ product suitable for the POC:
 |---|---|
 | Business questions | Four or five high-value questions an operator needs answered |
 | Product owner | Named data owner accountable for fields, definitions, and approval |
-| Source | PostgreSQL RDS, Starburst/data mesh, semantic layer, or another service |
+| Source | Azure Database for PostgreSQL, Starburst/data mesh, semantic layer, or another Azure service |
 | Safe interface | Curated view, stored procedure, parameterised query, API, or existing MCP function |
 | Allowed fields | Exact output columns, classification, masking/redaction rules |
 | Inputs | Typed parameters, required/optional status, allowed values/ranges, maximum date window |
@@ -116,28 +116,27 @@ Separate the three distinct boundaries below; they are not interchangeable.
 
 #### Important authentication clarification
 
-AKS Workload Identity authenticates a pod to Microsoft Entra-protected Azure
-resources. It does not by itself make an AKS workload an Amazon RDS PostgreSQL
-database principal. If the target is RDS, the data/AWS teams must confirm one
-of the supported designs, for example:
+For Azure Database for PostgreSQL Flexible Server, the preferred path to
+validate is: an AKS service account federates to a user-assigned managed
+identity through AKS Workload Identity; the MCP service obtains a Microsoft
+Entra access token; Azure PostgreSQL maps that identity to a dedicated
+read-only PostgreSQL role; and the service passes the short-lived token when
+opening its TLS connection. The Agent never receives that token.
 
-1. **AWS IAM database authentication**: the MCP workload obtains an AWS
-   identity through an approved federation mechanism and generates a short
-   lived RDS IAM database-authentication token; or
-2. **Dedicated read-only database user**: a secret-delivery system injects a
-   rotated credential only into the MCP service, never the Agent; or
-3. **Existing data-mesh/proxy endpoint**: the MCP service authenticates to the
-   approved endpoint rather than directly to PostgreSQL.
+The fallback is a dedicated read-only database user delivered and rotated only
+for the MCP workload through the approved secret mechanism. A third option is
+an existing authenticated Starburst/data-mesh endpoint, in which case the MCP
+service authenticates to that approved endpoint rather than directly to
+PostgreSQL.
 
 Agent Gateway can be valuable for the agent-to-MCP boundary, but it does not
-automatically solve RDS database authentication unless it is deliberately
-configured as the authenticated/proxied data-service path.
+replace the database/data-mesh authentication and role grants unless it is
+deliberately configured as that authenticated proxy.
 
-AWS documents IAM database authentication for RDS PostgreSQL, including
-short-lived authentication tokens and the `rds-db:connect` permission model:
-[RDS IAM authentication overview](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html).
-AKS Workload Identity is documented as a pod-to-Microsoft Entra resource
-identity mechanism: [AKS Workload Identity overview](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview).
+Microsoft documents AKS Workload Identity as a pod-to-Microsoft Entra identity
+mechanism: [AKS Workload Identity overview](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview). Azure Database for PostgreSQL Flexible Server
+supports Microsoft Entra authentication for managed identities and maps those
+identities to PostgreSQL roles: [managed identity connection guidance](https://learn.microsoft.com/en-us/azure/postgresql/security/security-connect-with-managed-identity).
 
 ## Proposed POC completion criteria
 

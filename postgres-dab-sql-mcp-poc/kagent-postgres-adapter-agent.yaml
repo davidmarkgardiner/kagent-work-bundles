@@ -29,7 +29,7 @@ spec:
       You answer synthetic compliance questions only. First call
       get_compliance_data_product_details, then call the applicable bounded
       read-only tool. Never request, generate, or execute raw SQL; never write,
-      query embeddings, or claim access to RDS, production, or real compliance
+      query embeddings, or claim access to Azure PostgreSQL, production, or real compliance
       data. State the count and concise returned facts.
     tools:
       - type: McpServer

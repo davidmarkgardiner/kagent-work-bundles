@@ -2,8 +2,8 @@
 
 Status: **live bounded PostgreSQL path PASS; official Microsoft DAB experiment
 PARTIAL.** This is a non-production HomeLab proof using synthetic compliance
-data. It is not an Amazon RDS connection, a production-data proof, or a claim
-that pgvector itself is exposed to the agent.
+data. It is not an Azure Database for PostgreSQL connection, a production-data
+proof, or a claim that pgvector itself is exposed to the agent.
 
 ## What passed live
 
@@ -33,16 +33,16 @@ vector-search tool. The adapter alone reads a pre-created lab-only read-only
 connection Secret. `automountServiceAccountToken: false` is set on all POC
 workloads.
 
-## What this means for RDS
+## What this means for Azure PostgreSQL
 
 Yes: the original Trino fallback used SQL, but this parallel POC proves the
 same kagent/MCP conversational pattern against **PostgreSQL**, with pgvector
-installed. Amazon RDS for PostgreSQL supports pgvector on supported engine
-versions; the exact engine/extension version must be confirmed in the target
-RDS instance before work starts.
+installed. Azure Database for PostgreSQL Flexible Server supports pgvector; the
+exact server version, extension version, and approved index/query pattern must
+be confirmed in the target environment before work starts.
 
-AWS maintains the version-specific extension matrix in its
-[RDS for PostgreSQL extension documentation](https://docs.aws.amazon.com/AmazonRDS/latest/PostgreSQLReleaseNotes/postgresql-extensions.html).
+Microsoft documents pgvector support and vector-query patterns for
+[Azure Database for PostgreSQL Flexible Server](https://learn.microsoft.com/en-us/azure/postgresql/azure-ai/generative-ai-develop-with-langchain).
 
 pgvector is a database capability, not an automatic agent permission. Keep
 vector similarity search behind a separate approved view or parameterised MCP
@@ -97,10 +97,11 @@ and [run record](evidence/POC-RUN-2026-08-12.md) are deliberately trimmed to
 synthetic facts and contain no connection material.
 
 The runtime package install in the custom adapter is a HomeLab convenience.
-For an office/RDS POC, build it in approved CI, scan/sign it, pin the digest,
-and mirror it internally. Use private connectivity/TLS, a dedicated RDS
-read-only role, secretless or short-lived identity where supported, audit, and
-one synthetic/masked view. Never put RDS credentials in an Agent manifest.
+For an office/Azure PostgreSQL POC, build it in approved CI, scan/sign it, pin
+the digest, and mirror it internally. Use private connectivity/TLS, a dedicated
+Microsoft Entra-backed read-only database role, AKS Workload Identity where
+approved, audit, and one synthetic/masked view. Never put database credentials
+or access tokens in an Agent manifest.
 
 ## Cleanup
 

@@ -31,7 +31,7 @@ spec:
       before reading it. To answer a count, request the small matching record
       set and count it yourself; no aggregate tool is available. Never request, generate, or execute raw
       SQL; never write, change schema, query embeddings, or claim access to
-      RDS, production, or real compliance data. Return a concise result and
+      Azure PostgreSQL, production, or real compliance data. Return a concise result and
       state when the requested data is out of scope.
     tools:
       - type: McpServer
