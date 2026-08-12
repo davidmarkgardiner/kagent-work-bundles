@@ -2,13 +2,16 @@
 
 **Suggested title:** Design review: kagent + Starburst data-mesh MCP proof of concept
 
-**Suggested labels:** architecture, data-platform, kubernetes, ai-agent, poc
+**Suggested labels:** architecture, data-platform, kubernetes, ai-agent, poc, starburst
 
 ## Why this issue exists
 
 We have been asked to close a gap: enable an AI agent to retrieve governed
 business/operational data through an MCP tool, without giving the agent broad
-database credentials or unrestricted write capability.
+database credentials or unrestricted write capability. Platform owns the
+kagent/Kubernetes/MCP integration side; this ticket asks the Starburst or Janis
+database owners to validate the data endpoint, authentication, governance, and
+audit contract that must sit behind it.
 
 We do not yet have sufficient visibility of the existing Starburst/data-mesh
 endpoint, data products, authentication model, or current tools. This issue is
@@ -27,15 +30,19 @@ A bounded, disposable Kubernetes POC passed live:
 
 The live verifier confirmed:
 
-- synthetic SQL query succeeded;
+- the synthetic SQL query and reseed lifecycle succeeded;
 - kagent discovered exactly three MCP tools;
 - the Agent was Accepted=True, Ready=True; and
-- the adapter exposed neither arbitrary SQL nor a write tool.
+- the adapter exposed neither arbitrary SQL nor a write tool; and
+- a conversational A2A request made the bounded
+  `get_overdue_risk_summary` tool call (`isError:false`) and returned the
+  expected risk-band counts to the caller.
 
 Evidence and reproducible YAML/scripts:
 - [HomeLab POC README]({{REPO_URL}}/work-agent-bundles/starburst-trino-data-mcp-poc/README.md)
 - [live proof receipt]({{REPO_URL}}/work-agent-bundles/starburst-trino-data-mcp-poc/evidence/POC-RUN-2026-08-12.md)
 - [office replication guide]({{REPO_URL}}/work-agent-bundles/starburst-trino-data-mcp-poc/OFFICE-REPLICATION.md)
+- [trimmed conversational A2A receipt]({{REPO_URL}}/work-agent-bundles/starburst-trino-data-mcp-poc/evidence/A2A-CONVERSATIONAL-RECEIPT-2026-08-12.json)
 
 ## Proposed production-shaped design
 
@@ -82,7 +89,7 @@ has explicit data-owner approval.
 | Images/air-gap | Unknown | Internal registry and pinned approved images/charts | What registry and supply-chain process applies? |
 | Agent Gateway | Not proven in the HomeLab data path | Optional policy/telemetry layer after version validation | Is it required or useful for this route? |
 
-## Questions for the Starburst/data/platform teams
+## Questions for Starburst / Janis database owners
 
 ### Starburst and data-mesh
 
@@ -102,17 +109,9 @@ has explicit data-owner approval.
 10. Can we prove denial for an out-of-scope product without touching production
     data?
 
-### Kubernetes/platform
-
-1. Which non-production cluster/namespace is approved?
-2. Is kagent already installed and connected to an approved model route?
-3. What is the approved path for secretless workload identity or short-lived
-   tokens?
-4. Is Agent Gateway required for MCP traffic, and does the installed release
-   support the intended authentication/policy controls?
-5. Which internal registry and Helm/OCI repositories must be used?
-6. What NetworkPolicy, TLS/CA, proxy, egress, scanning, signing, and logging
-   controls apply?
+Platform will supply the non-production Kubernetes namespace, kagent runtime,
+tool binding, network policy, image supply-chain controls, and evidence
+collection. No platform discovery is requested from the data owners.
 
 ## Proposed acceptance criteria
 
