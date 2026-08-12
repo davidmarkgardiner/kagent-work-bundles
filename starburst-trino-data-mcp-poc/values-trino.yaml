@@ -1,0 +1,34 @@
+# Disposable HomeLab-only Trino values. No production data, credentials, or endpoints.
+server:
+  workers: 1
+  coordinatorExtraConfig: |
+    query.max-run-time=30s
+    query.max-execution-time=25s
+coordinator:
+  config:
+    memory:
+      heapHeadroomPerNode: 256MB
+    query:
+      maxMemoryPerNode: 512MB
+    nodeScheduler:
+      includeCoordinator: true
+  jvm:
+    maxHeapSize: 1G
+  resources:
+    requests: {cpu: 250m, memory: 1500Mi}
+    limits: {cpu: "1", memory: 2Gi}
+worker:
+  config:
+    memory:
+      heapHeadroomPerNode: 256MB
+    query:
+      maxMemoryPerNode: 512MB
+  jvm:
+    maxHeapSize: 1G
+  resources:
+    requests: {cpu: 250m, memory: 1500Mi}
+    limits: {cpu: "1", memory: 2Gi}
+catalogs:
+  memory: |
+    connector.name=memory
+    memory.max-data-per-node=64MB
