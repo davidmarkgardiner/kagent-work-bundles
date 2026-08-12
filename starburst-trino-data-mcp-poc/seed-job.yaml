@@ -7,7 +7,10 @@ metadata:
     app.kubernetes.io/part-of: starburst-trino-data-mcp-poc
 spec:
   backoffLimit: 0
-  ttlSecondsAfterFinished: 3600
+  # Retain the initialisation receipt for the POC review window. The verifier
+  # independently queries the table, so expiry is never confused with data
+  # correctness.
+  ttlSecondsAfterFinished: 604800
   template:
     spec:
       restartPolicy: Never
@@ -17,4 +20,4 @@ spec:
           command: ["/bin/sh", "-ec"]
           args:
             - |
-              trino --server http://trino.data-mcp-poc.svc.cluster.local:8080 --execute "CREATE TABLE memory.default.account_risk AS SELECT * FROM (VALUES ('low', CAST(12 AS BIGINT), CAST(2400.00 AS DECIMAL(12,2))), ('medium', CAST(7 AS BIGINT), CAST(6100.00 AS DECIMAL(12,2))), ('high', CAST(3 AS BIGINT), CAST(9300.00 AS DECIMAL(12,2)))) AS t(risk_band, overdue_accounts, overdue_balance)"
+              trino --server http://trino.data-mcp-poc.svc.cluster.local:8080 --execute "DROP TABLE IF EXISTS memory.default.account_risk; CREATE TABLE memory.default.account_risk AS SELECT * FROM (VALUES ('low', CAST(12 AS BIGINT), CAST(2400.00 AS DECIMAL(12,2))), ('medium', CAST(7 AS BIGINT), CAST(6100.00 AS DECIMAL(12,2))), ('high', CAST(3 AS BIGINT), CAST(9300.00 AS DECIMAL(12,2)))) AS t(risk_band, overdue_accounts, overdue_balance)"

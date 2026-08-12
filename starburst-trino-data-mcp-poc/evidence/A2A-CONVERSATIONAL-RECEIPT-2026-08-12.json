@@ -1,0 +1,26 @@
+{
+  "evidence_type": "trimmed_controller_a2a_receipt",
+  "environment": "red HomeLab (non-production)",
+  "date": "2026-08-12",
+  "request": {
+    "agent": "trino-data-product-lab-agent",
+    "namespace": "kagent",
+    "prompt": "Use get_overdue_risk_summary. Reply with exactly: DATA_MCP_REPLY_OK, followed by the risk bands and account counts."
+  },
+  "result": {
+    "task_id": "bd953892-e236-4d35-8691-7dd3093c230b",
+    "context_id": "context-invoke-35629-1786540476",
+    "terminal_state": "completed",
+    "tool_call": {
+      "name": "get_overdue_risk_summary",
+      "is_error": false,
+      "structured_result": [
+        { "risk_band": "high", "overdue_accounts": "3", "overdue_balance": "9300.00" },
+        { "risk_band": "low", "overdue_accounts": "12", "overdue_balance": "2400.00" },
+        { "risk_band": "medium", "overdue_accounts": "7", "overdue_balance": "6100.00" }
+      ]
+    },
+    "final_agent_text": "DATA_MCP_REPLY_OK, high: 3, low: 12, medium: 7"
+  },
+  "scope": "This proves the bounded HomeLab fallback path: kagent to RemoteMCPServer to the three-tool adapter to Trino synthetic data. It does not prove native Starburst MCP, DAB SQL MCP, production authentication, production data governance, audit/query IDs, or performance."
+}
