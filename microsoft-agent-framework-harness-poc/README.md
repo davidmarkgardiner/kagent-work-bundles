@@ -89,3 +89,14 @@ promoted beyond the lab.
 
 The exact current architecture and proof boundary are in
 [SDLC-FACTORY-VISUALIZATION.html](SDLC-FACTORY-VISUALIZATION.html).
+
+## Go coordinator extension — verified 2026-08-13
+
+The separate [go-coordinator/](go-coordinator/) POC proves a narrower and more
+reliable control shape: fixed kagent A2A specialists, explicit approval,
+one externally executed Argo remediation receipt, then a recheck. It now also
+has bounded retry/fallback receipts and a deterministic receipt evaluator.
+This is custom Go orchestration, not a claim that the current Microsoft Agent
+Framework Go package provides the packaged looping, evaluation, or automatic
+OpenTelemetry features available in other language examples. See
+[go-coordinator/README.md](go-coordinator/README.md) and its live evidence.

@@ -19,12 +19,22 @@ import (
 	"time"
 )
 
-type stage struct{ Name, Agent, Prompt string }
+type stage struct {
+	Name, Agent, Prompt string
+	Attempt             int
+	FallbackFrom        string
+}
 type receipt struct {
-	Stage, Agent, State string `json:"stage,omitempty" json:"agent,omitempty" json:"state"`
-	HTTPStatus          int    `json:"http_status,omitempty"`
-	TerminalText        bool   `json:"terminal_text_present"`
-	Timestamp           string `json:"timestamp"`
+	Stage           string `json:"stage,omitempty"`
+	Agent           string `json:"agent,omitempty"`
+	State           string `json:"state"`
+	HTTPStatus      int    `json:"http_status,omitempty"`
+	TerminalText    bool   `json:"terminal_text_present"`
+	Attempt         int    `json:"attempt"`
+	FallbackFrom    string `json:"fallback_from,omitempty"`
+	ResponseExcerpt string `json:"response_excerpt,omitempty"`
+	Error           string `json:"error,omitempty"`
+	Timestamp       string `json:"timestamp"`
 }
 
 func main() {
@@ -43,8 +53,17 @@ func run(ctx context.Context) error {
 	if mode == "deny" {
 		return write(state, "go-harness-run.json", map[string]any{"status": "DENIED", "request": request, "remediation_started": false, "timestamp": now()})
 	}
+	if mode == "evaluate" {
+		result, err := evaluateRun(state)
+		if err != nil {
+			_ = write(state, "go-harness-evaluation.json", map[string]any{"kind": "go-harness-deterministic-evaluation", "result": "FAIL", "error": err.Error(), "timestamp": now()})
+			return err
+		}
+		fmt.Printf("evaluation=%s criteria=%d\n", result["result"], len(result["criteria"].([]string)))
+		return nil
+	}
 	if mode != "approve" {
-		return errors.New("MODE must be request, deny, or approve")
+		return errors.New("MODE must be request, deny, approve, or evaluate")
 	}
 	prior := map[string]any{}
 	if err := read(state, "go-harness-run.json", &prior); err != nil {
@@ -59,12 +78,12 @@ func run(ctx context.Context) error {
 		return errors.New("KAGENT_A2A_BASE_URL is required")
 	}
 	stages := []stage{
-		{"summarise", getenv("ISSUE_SUMMARISER_AGENT", "maf-go-issue-summariser"), request},
-		{"triage", getenv("SRE_TRIAGE_AGENT", "maf-go-sre-triage"), "Triage this synthetic incident:\n" + request},
-		{"health-before", getenv("UK8S_HEALTHCHECK_AGENT", "maf-go-uk8s-healthcheck"), "BASELINE: perform the synthetic POC health check."},
+		{Name: "summarise", Agent: getenv("ISSUE_SUMMARISER_AGENT", "maf-go-issue-summariser"), Prompt: request},
+		{Name: "triage", Agent: getenv("SRE_TRIAGE_AGENT", "maf-go-sre-triage"), Prompt: "Triage this synthetic incident:\n" + request},
+		{Name: "health-before", Agent: getenv("UK8S_HEALTHCHECK_AGENT", "maf-go-uk8s-healthcheck"), Prompt: "BASELINE: perform the synthetic POC health check."},
 	}
 	for _, s := range stages {
-		if err := call(ctx, base, state, s); err != nil {
+		if err := callWithRetry(ctx, base, state, s); err != nil {
 			return terminal(state, "BLOCKED", err)
 		}
 	}
@@ -78,34 +97,91 @@ func run(ctx context.Context) error {
 	if remediation["state"] != "Succeeded" {
 		return terminal(state, "FAIL", errors.New("remediation did not succeed"))
 	}
-	if err := call(ctx, base, state, stage{"health-after", getenv("UK8S_HEALTHCHECK_AGENT", "maf-go-uk8s-healthcheck"), "POST_REMEDIATION: perform the synthetic POC health check."}); err != nil {
+	if err := callWithRetry(ctx, base, state, stage{Name: "health-after", Agent: getenv("UK8S_HEALTHCHECK_AGENT", "maf-go-uk8s-healthcheck"), Prompt: "POST_REMEDIATION: perform the synthetic POC health check."}); err != nil {
 		return terminal(state, "FAIL", err)
 	}
 	return write(state, "go-harness-run.json", map[string]any{"status": "PASS", "request": request, "remediation_started": true, "loop_count": 1, "timestamp": now()})
 }
 
+// callWithRetry provides the Go replacement for unavailable packaged looping:
+// one retry of the same agent, then one explicitly configured equivalent
+// fallback. Every failed attempt remains a receipt; no remediation is retried.
+func callWithRetry(ctx context.Context, base, state string, s stage) error {
+	var last error
+	for attempt := 1; attempt <= 2; attempt++ {
+		s.Attempt = attempt
+		if err := call(ctx, base, state, s); err == nil {
+			return nil
+		} else {
+			last = err
+		}
+	}
+	fallback := os.Getenv(strings.ToUpper(strings.ReplaceAll(s.Name, "-", "_")) + "_FALLBACK_AGENT")
+	if fallback != "" && fallback != s.Agent {
+		original := s.Agent
+		s.Agent = fallback
+		s.Attempt = 3
+		s.FallbackFrom = original
+		if err := call(ctx, base, state, s); err == nil {
+			return nil
+		} else {
+			last = err
+		}
+	}
+	return fmt.Errorf("%s circuit-breaker opened after retry/fallback: %w", s.Name, last)
+}
+
 func call(ctx context.Context, base, state string, s stage) error {
-	p := map[string]any{"jsonrpc": "2.0", "id": "go-harness-" + s.Name, "method": "message/send", "params": map[string]any{"message": map[string]any{"kind": "message", "messageId": "go-harness-" + s.Name, "contextId": "go-harness-" + s.Name, "role": "user", "parts": []map[string]string{{"kind": "text", "text": s.Prompt}}}}}
+	if s.Attempt == 0 {
+		s.Attempt = 1
+	}
+	requestID := fmt.Sprintf("go-harness-%s-attempt-%d", s.Name, s.Attempt)
+	p := map[string]any{"jsonrpc": "2.0", "id": requestID, "method": "message/send", "params": map[string]any{"message": map[string]any{"kind": "message", "messageId": requestID, "contextId": requestID, "role": "user", "parts": []map[string]string{{"kind": "text", "text": s.Prompt}}}}}
 	b, _ := json.Marshal(p)
 	req, _ := http.NewRequestWithContext(ctx, http.MethodPost, base+"/"+s.Agent+"/", bytes.NewReader(b))
 	req.Header.Set("Content-Type", "application/json")
 	c := &http.Client{Timeout: 120 * time.Second}
 	resp, err := c.Do(req)
 	if err != nil {
+		_ = write(state, receiptName(s), receipt{Stage: s.Name, Agent: s.Agent, State: "failed", Attempt: s.Attempt, FallbackFrom: s.FallbackFrom, Error: err.Error(), Timestamp: now()})
 		return err
 	}
 	defer resp.Body.Close()
 	var data map[string]any
 	_ = json.NewDecoder(resp.Body).Decode(&data)
 	text := fmt.Sprint(data["result"])
-	r := receipt{Stage: s.Name, Agent: s.Agent, State: "completed", HTTPStatus: resp.StatusCode, TerminalText: resp.StatusCode == 200 && text != "map[]", Timestamp: now()}
-	if err := write(state, "go-a2a-"+s.Name+"-receipt.json", r); err != nil {
+	r := receipt{Stage: s.Name, Agent: s.Agent, State: "completed", HTTPStatus: resp.StatusCode, TerminalText: resp.StatusCode == 200 && text != "map[]", Attempt: s.Attempt, FallbackFrom: s.FallbackFrom, ResponseExcerpt: responseExcerpt(text), Timestamp: now()}
+	if !r.TerminalText {
+		r.State = "failed"
+		r.Error = fmt.Sprintf("unexpected HTTP status or missing terminal response: %d", resp.StatusCode)
+	}
+	if err := write(state, receiptName(s), r); err != nil {
 		return err
 	}
 	if !r.TerminalText {
 		return fmt.Errorf("%s returned no terminal response", s.Name)
 	}
 	return nil
+}
+
+func receiptName(s stage) string {
+	return fmt.Sprintf("go-a2a-%s-attempt-%d-receipt.json", s.Name, s.Attempt)
+}
+
+func clip(s string, max int) string {
+	if len(s) <= max {
+		return s
+	}
+	return s[:max] + "..."
+}
+
+// Agent output can contain incident or business data. Store it only in the
+// explicitly opted-in lab diagnostic mode; terminal status remains observable.
+func responseExcerpt(s string) string {
+	if os.Getenv("RECORD_RESPONSE_EXCERPT") != "true" {
+		return ""
+	}
+	return clip(s, 400)
 }
 
 func terminal(state, status string, err error) error {
