@@ -129,6 +129,16 @@ but too broad to select as the final governed data-agent interface without
 further owner-approved restrictions. See the [spike evidence](evidence/PREBUILT-POSTGRES-MCP-SPIKE-2026-08-13.md) and
 [isolated manifest](prebuilt-postgres-mcp-spike.yaml).
 
+## MCPg GHCR spike — verified 2026-08-13
+
+The newer pre-built `ghcr.io/devopam/mcpg` image was separately proven against
+the same synthetic PostgreSQL fixture over Streamable HTTP. kagent discovered
+the server and a restricted Agent used only schema tools. This is a stronger
+short-term candidate than the older CrystalDBA image, but MCPg's broad
+read-only discovery surface still requires explicit agent/gateway tool
+allowlists. See the [MCPg live evidence](evidence/MCPG-GHCR-READONLY-SPIKE-2026-08-13.md)
+and [disposable manifest](mcpg-readonly-spike.yaml).
+
 ## Azure PostgreSQL live connectivity proof
 
 A short-lived Azure Database for PostgreSQL Flexible Server proof subsequently
