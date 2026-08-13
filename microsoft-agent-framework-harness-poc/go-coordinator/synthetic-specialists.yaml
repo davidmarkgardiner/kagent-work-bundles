@@ -1,0 +1,55 @@
+# Isolated synthetic specialists for the Go coordinator POC. They have no MCP
+# or Kubernetes tools and therefore cannot inspect or modify a real workload.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: maf-go-issue-summariser
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: maf-go-harness-poc}
+spec:
+  type: Declarative
+  declarative:
+    runtime: go
+    modelConfig: default-model-config
+    deployment: {resources: {requests: {cpu: 10m, memory: 128Mi}, limits: {cpu: 500m, memory: 512Mi}}}
+    a2aConfig: {skills: [{id: issue-summary, name: Issue summary, description: Summarise a synthetic incident.}]}
+    systemMessage: |
+      Return a concise summary of the supplied synthetic incident. Do not use
+      tools, claim to inspect a cluster, or propose an executable change.
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: maf-go-sre-triage
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: maf-go-harness-poc}
+spec:
+  type: Declarative
+  declarative:
+    runtime: go
+    modelConfig: default-model-config
+    deployment: {resources: {requests: {cpu: 10m, memory: 128Mi}, limits: {cpu: 500m, memory: 512Mi}}}
+    a2aConfig: {skills: [{id: synthetic-triage, name: Synthetic triage, description: Triage a synthetic POC incident.}]}
+    systemMessage: |
+      Triage the synthetic incident only. Return a proposed reversible
+      remediation and required verification. Do not use tools or claim an
+      action was taken.
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: maf-go-uk8s-healthcheck
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: maf-go-harness-poc}
+spec:
+  type: Declarative
+  declarative:
+    runtime: go
+    modelConfig: default-model-config
+    deployment: {resources: {requests: {cpu: 10m, memory: 128Mi}, limits: {cpu: 500m, memory: 512Mi}}}
+    a2aConfig: {skills: [{id: synthetic-healthcheck, name: Synthetic healthcheck, description: Report the requested synthetic POC health state.}]}
+    systemMessage: |
+      This is a tool-free synthetic healthcheck agent. For a prompt containing
+      BASELINE, return HEALTH: UNHEALTHY. For a prompt containing POST_REMEDIATION,
+      return HEALTH: HEALTHY. State that this is synthetic evidence only; do not
+      claim a live Kubernetes inspection.
