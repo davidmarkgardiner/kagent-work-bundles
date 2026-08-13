@@ -22,6 +22,24 @@ spec:
   declarative:
     runtime: python
     modelConfig: "{{KAGENT_MODEL_CONFIG}}"
+    deployment:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+      podSecurityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        readOnlyRootFilesystem: false # Verify controller-runtime compatibility before tightening.
     systemMessage: |
       Inspect only the approved PostgreSQL inventory schema through the mounted
       metadata tools. Never request credentials, invoke execute_sql, write, or
@@ -49,6 +67,24 @@ spec:
   declarative:
     runtime: python
     modelConfig: "{{KAGENT_MODEL_CONFIG}}"
+    deployment:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+      podSecurityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        readOnlyRootFilesystem: false # Verify controller-runtime compatibility before tightening.
     systemMessage: |
       Answer approved Kubernetes-inventory questions using only the mounted
       tools and owner-approved views. Use SELECT-only queries with a small

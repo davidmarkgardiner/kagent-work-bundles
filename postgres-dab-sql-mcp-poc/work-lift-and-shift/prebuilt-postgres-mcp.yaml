@@ -37,10 +37,25 @@ spec:
       # Password-bootstrap mode. Change only after the UAMI/Entra token path is
       # independently live-proven for this selected MCP image.
       automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: postgres-mcp
-          image: "{{INTERNAL_REGISTRY}}/third-party/crystaldba-postgres-mcp@{{IMAGE_DIGEST}}"
+          # Same repository and runtime arguments as the HomeLab/Azure POC:
+          # crystaldba/postgres-mcp:latest. Resolve that tested source to an
+          # immutable digest, scan/sign it, then mirror this exact image path.
+          image: "{{INTERNAL_REGISTRY}}/third-party/crystaldba/postgres-mcp@{{IMAGE_DIGEST}}"
+          imagePullPolicy: IfNotPresent
           args: ["--access-mode=restricted", "--transport=sse"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: false # Image runtime needs validation before tightening.
           env:
             - name: DATABASE_URI
               valueFrom:

@@ -35,6 +35,15 @@ or Entra access token.
 | [kagent-agent.yaml](kagent-agent.yaml) | `RemoteMCPServer` pointing at the gateway and two least-privilege Agent examples. |
 | [WORK-LIFT-AND-SHIFT-CRITIQUE-PROMPT.md](WORK-LIFT-AND-SHIFT-CRITIQUE-PROMPT.md) | Read-only review prompt for a second agent. |
 
+The supplied Deployment deliberately references the **same source image used in
+the HomeLab and Azure proof**: `crystaldba/postgres-mcp`, with the same
+`--access-mode=restricted --transport=sse` arguments. The lab ran its mutable
+`latest` tag; work must resolve that tested source to an immutable digest,
+scan/sign it, and mirror it as
+`{{INTERNAL_REGISTRY}}/third-party/crystaldba/postgres-mcp@{{IMAGE_DIGEST}}`.
+Do not substitute an image called `crystaldba-postgres-mcp`—that would not be
+the same repository.
+
 ## Inputs required before any work deployment
 
 The supplied table/column spreadsheet is enough to begin tool and view design.
@@ -81,7 +90,13 @@ boundary for a generic SQL tool.
 4. **Apply the MCP service.** Render and apply
    `prebuilt-postgres-mcp.yaml`. It was live-tested with
    `--access-mode=restricted --transport=sse`; restricted mode is not a
-   substitute for database grants.
+   substitute for database grants. The template supplies a non-root pod and
+   container security context, RuntimeDefault seccomp, dropped Linux
+   capabilities, disabled privilege escalation, and CPU/memory requests and
+   limits. Both generated kagent Agent pods carry the same baseline controls
+   and their own CPU/memory requests and limits. Smoke-test the digest-pinned
+   image and generated Agent pods under these contexts before relying on them;
+   only then consider `readOnlyRootFilesystem: true` if compatible.
 5. **Put the service behind Agent Gateway when the work CRDs accept it.** Run
    the schema gate below, render `agentgateway-route.yaml`, then use the gateway
    URL from `kagent-agent.yaml`. If the gateway CRDs do not accept the template,
