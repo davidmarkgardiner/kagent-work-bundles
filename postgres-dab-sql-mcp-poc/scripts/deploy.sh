@@ -40,5 +40,5 @@ kubectl --context "$context" apply -f "$root/kagent-postgres-adapter-agent.yaml"
 # A RemoteMCPServer can briefly be NotAccepted while its backend restarts.
 # Do not hand the bundle to verification until the controller has rediscovered
 # the bounded tool surface.
-kubectl --context "$context" -n kagent wait --for=condition=Accepted remotemcpserver/postgres-compliance-readonly-mcp --timeout=3m
-kubectl --context "$context" -n kagent wait --for=condition=Ready agent/postgres-compliance-lab-agent --timeout=3m
+kubectl --context "$context" -n kagent wait --for=condition=Accepted remotemcpserver/postgres-kubernetes-inventory-readonly-mcp --timeout=3m
+kubectl --context "$context" -n kagent wait --for=condition=Ready agent/postgres-kubernetes-inventory-lab-agent --timeout=3m

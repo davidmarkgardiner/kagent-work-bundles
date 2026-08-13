@@ -32,30 +32,56 @@ spec:
               until pg_isready -h postgres-dab-poc -U postgres -d governed_data; do sleep 2; done
               psql -v ON_ERROR_STOP=1 -h postgres-dab-poc -U postgres -d governed_data <<'SQL'
               CREATE EXTENSION IF NOT EXISTS vector;
-              DROP VIEW IF EXISTS public.v_compliance_exception_summary;
-              DROP TABLE IF EXISTS public.compliance_findings;
-              CREATE TABLE public.compliance_findings (
-                finding_id integer PRIMARY KEY,
-                severity text NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
-                status text NOT NULL CHECK (status IN ('open', 'closed')),
-                control_family text NOT NULL,
-                finding_summary text NOT NULL,
-                observed_at date NOT NULL,
+              DROP VIEW IF EXISTS public.v_namespace_image_summary;
+              DROP TABLE IF EXISTS public.container_image_inventory;
+              DROP TABLE IF EXISTS public.kubernetes_namespace_inventory;
+              CREATE TABLE public.kubernetes_namespace_inventory (
+                namespace_name text PRIMARY KEY,
+                environment text NOT NULL CHECK (environment IN ('development', 'test', 'production')),
+                owner_team text NOT NULL,
+                workload_count integer NOT NULL CHECK (workload_count >= 0),
+                running_pod_count integer NOT NULL CHECK (running_pod_count >= 0),
+                observed_at date NOT NULL
+              );
+              CREATE TABLE public.container_image_inventory (
+                image_id integer PRIMARY KEY,
+                namespace_name text NOT NULL REFERENCES public.kubernetes_namespace_inventory(namespace_name),
+                workload_name text NOT NULL,
+                image_repository text NOT NULL,
+                image_tag text NOT NULL,
+                image_digest text NOT NULL,
+                critical_findings integer NOT NULL CHECK (critical_findings >= 0),
+                high_findings integer NOT NULL CHECK (high_findings >= 0),
+                scanned_at date NOT NULL,
                 embedding vector(3) NOT NULL
               );
-              INSERT INTO public.compliance_findings VALUES
-                (101, 'critical', 'open', 'identity', 'Privileged access review overdue', DATE '2026-08-01', '[0.98,0.02,0.01]'),
-                (102, 'high', 'open', 'network', 'Public ingress exception lacks current approval', DATE '2026-08-03', '[0.10,0.91,0.03]'),
-                (103, 'medium', 'closed', 'logging', 'Log retention policy reviewed', DATE '2026-07-18', '[0.05,0.09,0.92]');
-              CREATE INDEX compliance_findings_embedding_hnsw
-                ON public.compliance_findings USING hnsw (embedding vector_cosine_ops);
-              CREATE VIEW public.v_compliance_exception_summary AS
-                SELECT finding_id,
-                  CASE severity WHEN 'low' THEN 1 WHEN 'medium' THEN 2 WHEN 'high' THEN 3 WHEN 'critical' THEN 4 END::smallint AS severity_rank,
-                  (status = 'open') AS is_open,
-                  CASE control_family WHEN 'identity' THEN 10 WHEN 'network' THEN 20 WHEN 'logging' THEN 30 END::smallint AS control_family_code,
-                  observed_at
-                FROM public.compliance_findings;
+              INSERT INTO public.kubernetes_namespace_inventory VALUES
+                ('payments', 'production', 'payments-platform', 4, 12, DATE '2026-08-13'),
+                ('catalogue', 'production', 'commerce-platform', 3, 8, DATE '2026-08-13'),
+                ('developer-tools', 'development', 'platform-engineering', 5, 10, DATE '2026-08-13');
+              INSERT INTO public.container_image_inventory VALUES
+                (101, 'payments', 'payments-api', 'registry.example.invalid/payments-api', '2.4.1', 'sha256:synthetic-payments-api', 0, 2, DATE '2026-08-12', '[0.98,0.02,0.01]'),
+                (102, 'payments', 'payments-worker', 'registry.example.invalid/payments-worker', '1.9.0', 'sha256:synthetic-payments-worker', 1, 3, DATE '2026-08-12', '[0.10,0.91,0.03]'),
+                (103, 'catalogue', 'catalogue-api', 'registry.example.invalid/catalogue-api', '3.1.2', 'sha256:synthetic-catalogue-api', 0, 0, DATE '2026-08-11', '[0.05,0.09,0.92]'),
+                (104, 'developer-tools', 'build-runner', 'registry.example.invalid/build-runner', '0.7.4', 'sha256:synthetic-build-runner', 0, 1, DATE '2026-08-13', '[0.20,0.30,0.50]');
+              CREATE INDEX container_image_inventory_embedding_hnsw
+                ON public.container_image_inventory USING hnsw (embedding vector_cosine_ops);
+              CREATE VIEW public.v_namespace_image_summary AS
+                SELECT n.namespace_name,
+                  n.environment,
+                  n.owner_team,
+                  n.workload_count,
+                  n.running_pod_count,
+                  n.observed_at AS namespace_observed_at,
+                  i.workload_name,
+                  i.image_repository,
+                  i.image_tag,
+                  i.image_digest,
+                  i.critical_findings,
+                  i.high_findings,
+                  i.scanned_at
+                FROM public.kubernetes_namespace_inventory n
+                JOIN public.container_image_inventory i USING (namespace_name);
               SQL
               if ! psql -At -h postgres-dab-poc -U postgres -d governed_data \
                    -c "SELECT 1 FROM pg_roles WHERE rolname = 'dab_reader'" | grep -qx 1; then
@@ -68,5 +94,5 @@ spec:
               psql -v ON_ERROR_STOP=1 -h postgres-dab-poc -U postgres -d governed_data <<'SQL'
               REVOKE ALL ON SCHEMA public FROM PUBLIC;
               GRANT USAGE ON SCHEMA public TO dab_reader;
-              GRANT SELECT ON public.v_compliance_exception_summary TO dab_reader;
+              GRANT SELECT ON public.v_namespace_image_summary TO dab_reader;
               SQL

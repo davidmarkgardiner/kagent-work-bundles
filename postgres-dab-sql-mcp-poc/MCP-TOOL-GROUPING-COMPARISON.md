@@ -95,15 +95,15 @@ The live HomeLab POC intentionally started with two parameterless functions:
 
 ```json
 {
-  "tool": "get_compliance_data_product_details",
+  "tool": "get_kubernetes_inventory_data_product_details",
   "arguments": {}
 }
 ```
 
 ```json
 {
-  "tool": "get_open_high_severity_compliance_findings",
-  "arguments": {}
+  "tool": "get_image_risk_summary",
+  "arguments": {"namespace_name": "payments", "severity_min": "high"}
 }
 ```
 
@@ -153,7 +153,7 @@ Examples of sensible subsets:
 | AKS read-only investigator | `call_kubectl` only, with AKS-MCP configured read-only and namespace-limited; or dedicated read tools if available |
 | GitHub issue reviewer | `issue_read`, `get_file_contents`, `pull_request_read` |
 | GitHub PR publisher | only the necessary branch/file/PR write tools, under a separate write identity |
-| Data compliance analyst | `get_data_product_details`, `get_open_exceptions_summary`, and other approved read functions |
+| Kubernetes inventory analyst | `get_kubernetes_inventory_data_product_details`, `get_namespace_container_images`, `get_image_risk_summary` |
 
 ## Recommended Azure data-MCP function contract
 

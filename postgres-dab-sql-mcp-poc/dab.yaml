@@ -22,7 +22,7 @@ data:
         "mcp": {
           "enabled": true,
           "path": "/mcp",
-          "description": "Read-only synthetic compliance summary. No writes, arbitrary SQL, embeddings, raw tables, or server-side aggregate tool.",
+          "description": "Read-only synthetic Kubernetes namespace and image inventory. No writes, arbitrary SQL, embeddings, raw tables, or server-side aggregate tool.",
           "dml-tools": {
             "describe-entities": true,
             "create-record": false,
@@ -35,15 +35,18 @@ data:
         }
       },
       "entities": {
-        "ComplianceExceptionSummary": {
-          "source": { "object": "public.v_compliance_exception_summary", "type": "view" },
-          "description": "Synthetic compliance findings. severity_rank: 1 low, 2 medium, 3 high, 4 critical. is_open identifies open findings. control_family_code: 10 identity, 20 network, 30 logging. Use small read-only results only.",
+        "NamespaceImageSummary": {
+          "source": { "object": "public.v_namespace_image_summary", "type": "view" },
+          "description": "Synthetic Kubernetes namespace and container-image inventory. Use small read-only results only.",
           "fields": [
-            { "name": "finding_id", "description": "Synthetic finding identifier.", "primary-key": true },
-            { "name": "severity_rank", "description": "1 low, 2 medium, 3 high, 4 critical." },
-            { "name": "is_open", "description": "True means open." },
-            { "name": "control_family_code", "description": "10 identity, 20 network, 30 logging." },
-            { "name": "observed_at", "description": "Synthetic finding observation date." }
+            { "name": "namespace_name", "description": "Synthetic Kubernetes namespace.", "primary-key": true },
+            { "name": "workload_name", "description": "Synthetic workload name.", "primary-key": true },
+            { "name": "environment", "description": "Synthetic environment." },
+            { "name": "image_repository", "description": "Synthetic container image repository." },
+            { "name": "image_tag", "description": "Synthetic image tag." },
+            { "name": "critical_findings", "description": "Synthetic critical finding count." },
+            { "name": "high_findings", "description": "Synthetic high finding count." },
+            { "name": "scanned_at", "description": "Synthetic image scan date." }
           ],
           "permissions": [{ "role": "anonymous", "actions": ["read"] }],
           "mcp": { "dml-tools": true }

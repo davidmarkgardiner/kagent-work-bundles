@@ -36,8 +36,8 @@ The demonstrated functions were:
 
 | Function | Purpose | Inputs | Result |
 |---|---|---|---|
-| `get_compliance_data_product_details` | Retrieve the approved product contract | none | Product scope, fields, controls |
-| `get_open_high_severity_compliance_findings` | Return a bounded synthetic compliance summary | none in this first smoke | Count and safe summary rows |
+| `get_kubernetes_inventory_data_product_details` | Retrieve the approved product contract | none | Product scope, fields, controls |
+| `get_image_risk_summary` | Return bounded synthetic image-risk rows | `namespace_name`, `severity_min` | Count and safe summary rows |
 
 Live evidence: [PostgreSQL/pgvector POC README]({{REPO_URL}}/work-agent-bundles/postgres-dab-sql-mcp-poc/README.md), [run record]({{REPO_URL}}/work-agent-bundles/postgres-dab-sql-mcp-poc/evidence/POC-RUN-2026-08-12.md), and [trimmed A2A receipt]({{REPO_URL}}/work-agent-bundles/postgres-dab-sql-mcp-poc/evidence/A2A-CONVERSATIONAL-RECEIPT-2026-08-12.json).
 

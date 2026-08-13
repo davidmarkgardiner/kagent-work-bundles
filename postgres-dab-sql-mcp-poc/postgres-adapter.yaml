@@ -9,7 +9,7 @@ data:
     from fastmcp import FastMCP
     import psycopg
 
-    mcp = FastMCP("postgres-compliance-readonly")
+    mcp = FastMCP("postgres-kubernetes-inventory-readonly")
     DATABASE_URL = os.environ["POSTGRES_CONNECTION_STRING"]
 
     def query(sql, params=()):
@@ -20,20 +20,48 @@ data:
                 return [dict(zip(columns, row)) for row in cur.fetchall()]
 
     @mcp.tool()
-    def get_compliance_data_product_details() -> dict:
-        """Describe the only approved synthetic compliance product and its bounds."""
+    def get_kubernetes_inventory_data_product_details() -> dict:
+        """Describe the synthetic Kubernetes namespace and image inventory product."""
         return {
-            "data_product": "synthetic-compliance-exceptions-v1",
-            "fields": {"severity_rank": "1 low, 2 medium, 3 high, 4 critical", "is_open": "true means open"},
+            "data_product": "synthetic-kubernetes-namespace-image-inventory-v1",
+            "functions": [
+                "get_namespace_workload_summary",
+                "get_namespace_container_images",
+                "get_image_risk_summary",
+            ],
+            "allowed_namespaces": ["payments", "catalogue", "developer-tools"],
             "writes_supported": False,
             "arbitrary_sql_supported": False,
             "vector_search_exposed": False,
         }
 
     @mcp.tool()
-    def get_open_high_severity_compliance_findings() -> list[dict]:
-        """Return only open high/critical synthetic compliance findings."""
-        return query("SELECT finding_id, severity_rank, control_family_code, observed_at FROM public.v_compliance_exception_summary WHERE is_open = true AND severity_rank >= 3 ORDER BY finding_id")
+    def get_namespace_workload_summary(namespace_name: str) -> list[dict]:
+        """Return the synthetic workload and running-pod summary for one approved namespace."""
+        return query("""SELECT DISTINCT namespace_name, environment, owner_team, workload_count,
+                       running_pod_count, namespace_observed_at
+                       FROM public.v_namespace_image_summary WHERE namespace_name = %s""", (namespace_name,))
+
+    @mcp.tool()
+    def get_namespace_container_images(namespace_name: str, limit: int = 20) -> list[dict]:
+        """Return up to 20 synthetic container-image records for one approved namespace."""
+        if limit < 1 or limit > 20:
+            raise ValueError("limit must be between 1 and 20")
+        return query("""SELECT namespace_name, workload_name, image_repository, image_tag,
+                       image_digest, critical_findings, high_findings, scanned_at
+                       FROM public.v_namespace_image_summary WHERE namespace_name = %s
+                       ORDER BY workload_name LIMIT %s""", (namespace_name, limit))
+
+    @mcp.tool()
+    def get_image_risk_summary(namespace_name: str, severity_min: str = "high") -> list[dict]:
+        """Return synthetic image-risk rows for one namespace at high or critical severity."""
+        if severity_min not in ("high", "critical"):
+            raise ValueError("severity_min must be high or critical")
+        predicate = "critical_findings > 0" if severity_min == "critical" else "critical_findings > 0 OR high_findings > 0"
+        return query(f"""SELECT namespace_name, workload_name, image_repository, image_tag,
+                       critical_findings, high_findings, scanned_at
+                       FROM public.v_namespace_image_summary WHERE namespace_name = %s
+                       AND ({predicate}) ORDER BY workload_name""", (namespace_name,))
 
     if __name__ == "__main__":
         mcp.run(transport="streamable-http", host="0.0.0.0", port=8000, path="/mcp", show_banner=False)

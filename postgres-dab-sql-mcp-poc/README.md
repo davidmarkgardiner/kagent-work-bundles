@@ -1,7 +1,8 @@
-# PostgreSQL + pgvector data MCP HomeLab POC
+# PostgreSQL + pgvector Kubernetes inventory MCP HomeLab POC
 
 Status: **live bounded PostgreSQL path PASS; official Microsoft DAB experiment
-PARTIAL.** This is a non-production HomeLab proof using synthetic compliance
+PARTIAL.** This is a non-production HomeLab proof using synthetic Kubernetes
+namespace and container-image inventory
 data. It is not an Azure Database for PostgreSQL connection, a production-data
 proof, or a claim that pgvector itself is exposed to the agent.
 
@@ -12,26 +13,44 @@ conversational request
   -> kagent Agent
   -> explicit two-tool RemoteMCPServer binding
   -> bounded Streamable HTTP PostgreSQL MCP adapter
-  -> PostgreSQL + pgvector synthetic data
+  -> PostgreSQL + pgvector synthetic Kubernetes inventory
   -> concise answer
 ```
 
-The live answer to “How many open compliance findings are high severity or
-above?” was **2**. The Agent first called
-`get_compliance_data_product_details`, then
-`get_open_high_severity_compliance_findings`; both tool responses had
-`isError:false`.
+The next live proof asks: “Which container images in the `payments` namespace
+have high or critical findings?” The Agent must first call
+`get_kubernetes_inventory_data_product_details`, then
+`get_image_risk_summary(namespace_name="payments", severity_min="high")`.
+This proves that the agent passes named variables to a bounded tool rather than
+submitting raw SQL.
 
 The database proof also confirmed:
 
 - PostgreSQL `vector` extension version `0.8.6` was installed;
-- an HNSW vector index existed on the synthetic source table; and
+- an HNSW vector index existed on the synthetic image-inventory source table; and
 - the read-only database role could see only the curated summary view.
 
 The Agent has no database credentials, arbitrary SQL, write, raw-table, or
 vector-search tool. The adapter alone reads a pre-created lab-only read-only
 connection Secret. `automountServiceAccountToken: false` is set on all POC
 workloads.
+
+## Synthetic Kubernetes data contract
+
+| Data set | Synthetic fields | Purpose |
+|---|---|---|
+| Namespace inventory | namespace, environment, owner team, workload count, running pod count, observation date | Namespace health/context questions |
+| Image inventory | namespace, workload, image repository/tag/digest, high/critical finding counts, scan date | Container-image risk questions |
+
+The MCP exposes only these four read-only functions:
+
+1. `get_kubernetes_inventory_data_product_details()`
+2. `get_namespace_workload_summary(namespace_name)`
+3. `get_namespace_container_images(namespace_name, limit)`
+4. `get_image_risk_summary(namespace_name, severity_min)`
+
+The first three namespace values are synthetic: `payments`, `catalogue`, and
+`developer-tools`. The records do not describe the HomeLab cluster.
 
 ## What this means for Azure PostgreSQL
 
@@ -84,17 +103,21 @@ Expected markers:
 ```text
 POSTGRES_SEED_JOB_COMPLETED_OK
 PGVECTOR_EXTENSION_AND_INDEX_OK
-POSTGRES_SYNTHETIC_QUERY_OK count=2
+POSTGRES_SYNTHETIC_KUBERNETES_QUERY_OK namespace=payments count=2
 REMOTE_MCP_DISCOVERY_OK
 KAGENT_AGENT_READY_OK
-A2A_TWO_TOOL_CALLS_OK
+A2A_PARAMETERISED_TOOL_CALLS_OK
 A2A_CONVERSATIONAL_RESPONSE_OK
 VERIFY_PASS
 ```
 
-The checked-in [live A2A receipt](evidence/A2A-CONVERSATIONAL-RECEIPT-2026-08-12.json)
-and [run record](evidence/POC-RUN-2026-08-12.md) are deliberately trimmed to
-synthetic facts and contain no connection material.
+The checked-in [Kubernetes-inventory A2A receipt](evidence/KUBERNETES-INVENTORY-A2A-RECEIPT-2026-08-13.json)
+and [run record](evidence/KUBERNETES-INVENTORY-POC-RUN-2026-08-13.md) are
+deliberately trimmed to synthetic facts and contain no connection material.
+
+The earlier compliance-shaped receipts remain historical evidence for the
+initial PostgreSQL connectivity exercise; the current manifests and verifier
+are the Kubernetes-inventory POC described above.
 
 The runtime package install in the custom adapter is a HomeLab convenience.
 For an office/Azure PostgreSQL POC, build it in approved CI, scan/sign it, pin
