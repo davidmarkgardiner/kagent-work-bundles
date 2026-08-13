@@ -1,12 +1,36 @@
 # Microsoft Agent Framework Harness + kagent POC
 
-Status: **bounded lab POC. Approval-to-kagent is live-verified; the expanded
-five-stage factory is deployed but not yet accepted as a full-chain proof.**
+Status: **bounded lab POC. Python is the selected implementation language for
+the Microsoft Agent Framework coordinator. Approval-to-kagent is live-verified;
+the expanded five-stage factory is deployed but not yet accepted as a
+full-chain proof.**
 
 This is a minimal, reversible test of a Microsoft Agent Framework Harness Agent
 as an approval-aware coordinator above kagent. It deliberately avoids GitLab
 writes, shell access, Kubernetes credentials, production access, and external
 publication.
+
+## Language decision — Python selected
+
+Use [run.py](run.py) as the implementation to take forward. The current
+Microsoft Agent Framework documentation exposes its packaged looping,
+evaluation, and OpenTelemetry paths in Python, whereas the Go documentation
+does not currently provide the packaged looping or evaluation capabilities and
+the observability examples are C#/Python-oriented.
+
+The `go-coordinator/` directory remains as a **live-evidence companion** for
+the raw kagent A2A, approval, retry/fallback, and Argo receipt contract. It is
+not the recommended Microsoft Agent Framework production implementation and
+should not receive new feature work unless Go parity is later verified.
+
+The Python POC already uses a real Harness Agent with bounded
+`loop_max_iterations=2`. It has an independent kagent evaluator stage, but it
+does **not** yet prove the framework's native Python evaluation API or an
+OpenTelemetry exporter. Those are the next bounded additions once we select an
+approved telemetry backend and redaction policy.
+
+See [PYTHON-IMPLEMENTATION-DECISION.md](PYTHON-IMPLEMENTATION-DECISION.md) for
+the exact proof boundary and the next implementation steps.
 
 ## Flow
 
@@ -90,13 +114,13 @@ promoted beyond the lab.
 The exact current architecture and proof boundary are in
 [SDLC-FACTORY-VISUALIZATION.html](SDLC-FACTORY-VISUALIZATION.html).
 
-## Go coordinator extension — verified 2026-08-13
+## Go coordinator companion evidence — verified 2026-08-13
 
-The separate [go-coordinator/](go-coordinator/) POC proves a narrower and more
-reliable control shape: fixed kagent A2A specialists, explicit approval,
-one externally executed Argo remediation receipt, then a recheck. It now also
-has bounded retry/fallback receipts and a deterministic receipt evaluator.
-This is custom Go orchestration, not a claim that the current Microsoft Agent
-Framework Go package provides the packaged looping, evaluation, or automatic
-OpenTelemetry features available in other language examples. See
+The separate [go-coordinator/](go-coordinator/) POC proves a narrower control
+shape: fixed kagent A2A specialists, explicit approval, one externally executed
+Argo remediation receipt, then a recheck. It also has bounded retry/fallback
+receipts and a deterministic receipt evaluator. This is custom Go orchestration,
+not a claim that the current Microsoft Agent Framework Go package provides the
+packaged looping, evaluation, or automatic OpenTelemetry features available in
+the Python implementation. See
 [go-coordinator/README.md](go-coordinator/README.md) and its live evidence.
