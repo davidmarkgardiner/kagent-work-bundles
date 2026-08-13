@@ -119,6 +119,16 @@ The earlier compliance-shaped receipts remain historical evidence for the
 initial PostgreSQL connectivity exercise; the current manifests and verifier
 are the Kubernetes-inventory POC described above.
 
+## Pre-built PostgreSQL MCP image spike
+
+A separate, disposable compatibility spike proved that a pre-built third-party
+PostgreSQL MCP image can run in restricted mode, expose SSE to kagent, and be
+called by a read-only schema agent. It discovered nine tools, including a
+general `execute_sql` capability. This makes it useful for schema discovery,
+but too broad to select as the final governed data-agent interface without
+further owner-approved restrictions. See the [spike evidence](evidence/PREBUILT-POSTGRES-MCP-SPIKE-2026-08-13.md) and
+[isolated manifest](prebuilt-postgres-mcp-spike.yaml).
+
 The runtime package install in the custom adapter is a HomeLab convenience.
 For an office/Azure PostgreSQL POC, build it in approved CI, scan/sign it, pin
 the digest, and mirror it internally. Use private connectivity/TLS, a dedicated
