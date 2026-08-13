@@ -36,6 +36,8 @@ or Entra access token.
 | [direct-mcp-probe.yaml](direct-mcp-probe.yaml) | No-Agent direct MCP registration probe: isolates the MCP service before Gateway and Agent wiring. |
 | [gateway-mcp-probe.yaml](gateway-mcp-probe.yaml) | No-Agent gateway registration probe: isolates the route/policy before Agent wiring. |
 | [mcp-networkpolicy.yaml](mcp-networkpolicy.yaml) | Gateway-only steady-state ingress policy for the MCP Service. |
+| [kustomization.yaml](kustomization.yaml) | Steady-state Kustomize/GitOps entry point; deliberately excludes temporary probes. |
+| [namespace.yaml](namespace.yaml) | Managed data-MCP namespace for the default Kustomize package. |
 | [OUTSIDE-IN-VALIDATION-CHECKLIST.md](OUTSIDE-IN-VALIDATION-CHECKLIST.md) | Ordered source-first tests and expected evidence/failure ownership. |
 | [WORK-LIFT-AND-SHIFT-CRITIQUE-PROMPT.md](WORK-LIFT-AND-SHIFT-CRITIQUE-PROMPT.md) | Read-only review prompt for a second agent. |
 
@@ -47,6 +49,45 @@ scan/sign it, and mirror it as
 `{{INTERNAL_REGISTRY}}/third-party/crystaldba/postgres-mcp@{{IMAGE_DIGEST}}`.
 Do not substitute an image called `crystaldba-postgres-mcp`—that would not be
 the same repository.
+
+## Kustomize and GitOps entry point
+
+Yes—this repository uses Flux patterns for GitOps, and this folder is now a
+self-contained Kustomize unit. The normal steady-state install is:
+
+```sh
+kubectl apply -k work-agent-bundles/postgres-dab-sql-mcp-poc/work-lift-and-shift
+```
+
+It creates only non-secret deployment coordinates in
+`postgres-mcp-deployment-config`, the `postgres-data-mcp` Namespace, the MCP,
+Gateway route/policy, Gateway-only NetworkPolicy, `RemoteMCPServer`, and Agents.
+It intentionally does **not** apply either temporary direct/gateway probe.
+
+Before a work apply, make a private overlay or edit the private copy of
+`kustomization.yaml` to replace these non-secret literals together:
+
+- `postgresMcpImage` with the approved internal **digest-pinned** mirror;
+- namespace/Gateway/ModelConfig literals; and
+- the derived `postgresMcpServiceHost` and `postgresMcpGatewayUrl` values.
+
+Also patch `mcp-networkpolicy.yaml` if the installed Gateway uses a namespace
+or `app.kubernetes.io/name` label other than the documented defaults. The
+connection URI remains an externally delivered Secret; never add it to the
+Kustomization ConfigMap.
+
+For a client-side render check:
+
+```sh
+kubectl kustomize work-agent-bundles/postgres-dab-sql-mcp-poc/work-lift-and-shift
+```
+
+For server validation, target an existing non-production namespace or have the
+Namespace reconciled first. A server dry-run cannot create a Namespace for the
+following dry-run objects to use. The HomeLab rendered package was server-dry-
+run successfully against the installed kagent and Agent Gateway CRDs after
+substituting its existing data namespace; that was a schema check only and did
+not create resources.
 
 ## Inputs required before any work deployment
 

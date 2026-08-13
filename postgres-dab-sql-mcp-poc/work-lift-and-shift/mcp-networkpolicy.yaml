@@ -21,10 +21,10 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: "{{AGENTGATEWAY_NAMESPACE}}"
+              kubernetes.io/metadata.name: agentgateway-system
           podSelector:
             matchLabels:
-              "{{AGENTGATEWAY_POD_LABEL_KEY}}": "{{AGENTGATEWAY_POD_LABEL_VALUE}}"
+              app.kubernetes.io/name: ai-gateway
       ports:
         - protocol: TCP
           port: 8000

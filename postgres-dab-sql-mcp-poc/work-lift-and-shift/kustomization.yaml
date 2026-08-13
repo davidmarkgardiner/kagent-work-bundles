@@ -1,0 +1,110 @@
+# Steady-state GitOps entry point. It intentionally excludes direct-mcp-probe
+# and gateway-mcp-probe: those are temporary diagnostic resources applied only
+# through OUTSIDE-IN-VALIDATION-CHECKLIST.md.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - prebuilt-postgres-mcp.yaml
+  - agentgateway-route.yaml
+  - mcp-networkpolicy.yaml
+  - kagent-agent.yaml
+
+# This ConfigMap contains deployment coordinates only, never database
+# credentials. In a private work overlay, replace these defaults with the
+# approved namespaces, internal digest-pinned image and ModelConfig.
+configMapGenerator:
+  - name: postgres-mcp-deployment-config
+    literals:
+      - dataMcpNamespace=postgres-data-mcp
+      - agentGatewayNamespace=agentgateway-system
+      - agentGatewayName=ai-gateway
+      - agentGatewayService=ai-gateway
+      - agentGatewayPodLabelValue=ai-gateway
+      - postgresMcpServiceHost=postgres-inventory-mcp.postgres-data-mcp.svc.cluster.local
+      - postgresMcpGatewayUrl=http://ai-gateway.agentgateway-system.svc.cluster.local/mcp/postgres-inventory
+      - kagentNamespace=kagent
+      - kagentModelConfig=agentgateway-minimax
+      - postgresMcpImage=crystaldba/postgres-mcp:latest
+      - postgresMcpSecretName=postgres-mcp-reader
+generatorOptions:
+  disableNameSuffixHash: true
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: postgres-mcp-deployment-config
+      fieldPath: data.dataMcpNamespace
+    targets:
+      - select: {kind: Service, name: postgres-inventory-mcp}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: Deployment, name: postgres-inventory-mcp}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: NetworkPolicy, name: postgres-inventory-mcp-gateway-only}
+        fieldPaths: [metadata.namespace]
+  - source:
+      kind: ConfigMap
+      name: postgres-mcp-deployment-config
+      fieldPath: data.agentGatewayNamespace
+    targets:
+      - select: {kind: AgentgatewayBackend, name: postgres-inventory-mcp}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: HTTPRoute, name: postgres-inventory-mcp}
+        fieldPaths: [metadata.namespace, spec.parentRefs.0.namespace, spec.rules.0.backendRefs.0.namespace]
+      - select: {kind: AgentgatewayPolicy, name: postgres-inventory-mcp}
+        fieldPaths: [metadata.namespace]
+  - source:
+      kind: ConfigMap
+      name: postgres-mcp-deployment-config
+      fieldPath: data.agentGatewayName
+    targets:
+      - select: {kind: HTTPRoute, name: postgres-inventory-mcp}
+        fieldPaths: [spec.parentRefs.0.name]
+  - source:
+      kind: ConfigMap
+      name: postgres-mcp-deployment-config
+      fieldPath: data.postgresMcpServiceHost
+    targets:
+      - select: {kind: AgentgatewayBackend, name: postgres-inventory-mcp}
+        fieldPaths: [spec.mcp.targets.0.static.host]
+  - source:
+      kind: ConfigMap
+      name: postgres-mcp-deployment-config
+      fieldPath: data.postgresMcpGatewayUrl
+    targets:
+      - select: {kind: RemoteMCPServer, name: postgres-inventory-mcp}
+        fieldPaths: [spec.url]
+  - source:
+      kind: ConfigMap
+      name: postgres-mcp-deployment-config
+      fieldPath: data.kagentNamespace
+    targets:
+      - select: {kind: RemoteMCPServer, name: postgres-inventory-mcp}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: Agent, name: postgres-inventory-schema-agent}
+        fieldPaths: [metadata.namespace, spec.declarative.tools.0.mcpServer.namespace]
+      - select: {kind: Agent, name: postgres-inventory-query-agent}
+        fieldPaths: [metadata.namespace, spec.declarative.tools.0.mcpServer.namespace]
+  - source:
+      kind: ConfigMap
+      name: postgres-mcp-deployment-config
+      fieldPath: data.kagentModelConfig
+    targets:
+      - select: {kind: Agent, name: postgres-inventory-schema-agent}
+        fieldPaths: [spec.declarative.modelConfig]
+      - select: {kind: Agent, name: postgres-inventory-query-agent}
+        fieldPaths: [spec.declarative.modelConfig]
+  - source:
+      kind: ConfigMap
+      name: postgres-mcp-deployment-config
+      fieldPath: data.postgresMcpImage
+    targets:
+      - select: {kind: Deployment, name: postgres-inventory-mcp}
+        fieldPaths: [spec.template.spec.containers.0.image]
+  - source:
+      kind: ConfigMap
+      name: postgres-mcp-deployment-config
+      fieldPath: data.postgresMcpSecretName
+    targets:
+      - select: {kind: Deployment, name: postgres-inventory-mcp}
+        fieldPaths: [spec.template.spec.containers.0.env.0.valueFrom.secretKeyRef.name]
