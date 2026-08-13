@@ -66,6 +66,8 @@ spec:
             - name: http
               containerPort: 8000
           readinessProbe:
+            # Transport-only: this does not validate a PostgreSQL login or a
+            # query. The direct discovery and final approved query gates do.
             tcpSocket:
               port: http
             initialDelaySeconds: 10

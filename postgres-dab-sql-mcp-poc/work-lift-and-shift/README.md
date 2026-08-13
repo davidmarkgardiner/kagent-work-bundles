@@ -35,6 +35,7 @@ or Entra access token.
 | [kagent-agent.yaml](kagent-agent.yaml) | `RemoteMCPServer` pointing at the gateway and two least-privilege Agent examples. |
 | [direct-mcp-probe.yaml](direct-mcp-probe.yaml) | No-Agent direct MCP registration probe: isolates the MCP service before Gateway and Agent wiring. |
 | [gateway-mcp-probe.yaml](gateway-mcp-probe.yaml) | No-Agent gateway registration probe: isolates the route/policy before Agent wiring. |
+| [mcp-networkpolicy.yaml](mcp-networkpolicy.yaml) | Gateway-only steady-state ingress policy for the MCP Service. |
 | [OUTSIDE-IN-VALIDATION-CHECKLIST.md](OUTSIDE-IN-VALIDATION-CHECKLIST.md) | Ordered source-first tests and expected evidence/failure ownership. |
 | [WORK-LIFT-AND-SHIFT-CRITIQUE-PROMPT.md](WORK-LIFT-AND-SHIFT-CRITIQUE-PROMPT.md) | Read-only review prompt for a second agent. |
 
@@ -68,6 +69,10 @@ the work change record or approved secret store—not in Git:
    tested MCP image. `latest` is prohibited.
 6. Approved work namespace, kagent `ModelConfig`, Agent Gateway service name,
    and a non-production change window/rollback owner.
+7. Model-egress approval for the selected `ModelConfig`: provider/destination,
+   prompt and completion retention/training policy, log access, and confirmation
+   that the classification of the approved view permits query results to reach
+   that destination. An unknown model destination blocks the Agent stage.
 
 For the first proof, create views that expose only the minimum inventory facts,
 for example a namespace inventory view joining `aks_estate`, `uk8s_namespaces`,
@@ -106,6 +111,10 @@ boundary for a generic SQL tool.
    stop: use the direct internal `RemoteMCPServer` URL only for a separately
    approved limited proof, and open a gateway compatibility task. Do not
    improvise an older CRD shape.
+   Apply `mcp-networkpolicy.yaml` immediately after the direct no-Agent probe
+   is deleted and before the gateway probe. Render its Gateway pod-label
+   placeholders from the installed workload; this makes the Service reachable
+   only through Agent Gateway at steady state.
 6. **Register tools, then bind Agents.** Apply `kagent-agent.yaml`, wait for
    `RemoteMCPServer` discovery, and replace the example `toolNames` with the
    exact names in `.status.discoveredTools`. Start the schema Agent first.
@@ -186,6 +195,12 @@ the password bootstrap until an independent live test proves this complete
 chain. Agent Gateway can protect and observe MCP traffic; it does not replace
 the database authentication mechanism.
 
+The committed password-bootstrap Deployment intentionally sets
+`automountServiceAccountToken: false`. A UAMI overlay must explicitly replace
+that setting, add the federated ServiceAccount and workload label, and pass a
+separate live authentication test. Do not simply turn on token automount in the
+password deployment and call UAMI complete.
+
 ## First proof acceptance and evidence contract
 
 The initial proof passes only if all of these are true:
@@ -216,6 +231,17 @@ list, image digest/scan evidence, and cleanup or handover receipt.
 - The pre-built server exposes a generic query tool. For sustained use, choose
   either data-owner-approved curated views plus strong DB grants, or replace it
   with a thin parameterised MCP that exposes only named business functions.
+- The live spike discovered nine tools. The first route permits only
+  `list_schemas`, `list_objects`, `get_object_details`, and `execute_sql`.
+  It deliberately denies `explain_query`, `analyze_workload_indexes`,
+  `analyze_query_indexes`, `analyze_db_health`, and `get_top_queries`: the last
+  two can expose server-wide state or other tenants' query text independently
+  of table grants. The schema Agent mounts the first three only; the query
+  Agent mounts the three tools it needs, including `execute_sql`.
+- The MCP readiness probe confirms only that its HTTP listener accepts TCP. It
+  does not prove database authentication or a successful query. The no-Agent
+  MCP discovery and the final approved query in the validation checklist are
+  separate required evidence gates.
 - Do not claim row-level security, UAMI authentication, Agent Gateway policy
   enforcement, or production-data readiness until each is live-proven in work.
 

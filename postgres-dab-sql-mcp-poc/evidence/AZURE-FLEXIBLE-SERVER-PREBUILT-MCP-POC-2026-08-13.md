@@ -69,3 +69,11 @@ credential files were removed. Azure resource-group deletion was submitted;
 Azure deletion is asynchronous and should be checked for terminal completion
 before treating all billable resources as gone. Azure may retain service-managed
 recovery backup data for its documented period after server deletion.
+
+### Terminal cleanup check
+
+On 2026-08-13, a read-only Azure check returned `false` for the temporary
+resource group. This confirms the group no longer exists. Retention of any
+service-managed backup remains governed by Azure's documented service policy;
+the Azure subscription/platform owner must retain the relevant service record
+if formal deletion assurance is required.

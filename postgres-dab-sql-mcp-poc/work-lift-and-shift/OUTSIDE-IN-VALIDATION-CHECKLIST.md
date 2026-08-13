@@ -89,6 +89,14 @@ Pass criterion: `Accepted=True` and a non-empty
 proves the kagent MCP controller can reach and negotiate with the MCP service;
 it intentionally does not involve an Agent, model, or prompt.
 
+Delete this direct probe before proceeding. It is deliberately a temporary
+Gateway bypass and must not remain after the network boundary is enabled.
+
+```sh
+kubectl --context {{WORK_KUBE_CONTEXT}} -n {{KAGENT_NAMESPACE}} \
+  delete remotemcpserver postgres-inventory-mcp-direct-probe --ignore-not-found
+```
+
 If it fails after stage 2 passed, stop with the MCP transport/configuration or
 kagent RemoteMCPServer owner. Do not debug Agent YAML.
 
@@ -96,12 +104,17 @@ kagent RemoteMCPServer owner. Do not debug Agent YAML.
 
 - [ ] Server-side dry-run the rendered `agentgateway-route.yaml` against the
   installed work CRDs.
-- [ ] Apply it and then apply the rendered
+- [ ] Confirm the actual Gateway pod labels, render and apply
+  `mcp-networkpolicy.yaml`, then apply the Gateway route and rendered
   [gateway probe](gateway-mcp-probe.yaml). Do not apply either Agent yet.
 
 ```sh
 kubectl --context {{WORK_KUBE_CONTEXT}} apply --dry-run=server \
   -f {{PRIVATE_RENDERED_DIR}}/agentgateway-route.yaml
+kubectl --context {{WORK_KUBE_CONTEXT}} apply --dry-run=server \
+  -f {{PRIVATE_RENDERED_DIR}}/mcp-networkpolicy.yaml
+kubectl --context {{WORK_KUBE_CONTEXT}} apply \
+  -f {{PRIVATE_RENDERED_DIR}}/mcp-networkpolicy.yaml
 kubectl --context {{WORK_KUBE_CONTEXT}} apply \
   -f {{PRIVATE_RENDERED_DIR}}/agentgateway-route.yaml
 kubectl --context {{WORK_KUBE_CONTEXT}} apply \
@@ -117,10 +130,29 @@ Pass criterion: the gateway-fronted `RemoteMCPServer` is `Accepted=True` and
 discovers the expected tool set. Compare it with the direct-probe tool list;
 unexpected omissions/additions are a Gateway policy/routing issue.
 
+The expected first-route reconciliation is: permit `list_schemas`,
+`list_objects`, `get_object_details`, and `execute_sql`; deny
+`explain_query`, `analyze_workload_indexes`, `analyze_query_indexes`,
+`analyze_db_health`, and `get_top_queries`. Record both lists. The final Agent
+allowlists are narrower than the Gateway list by design.
+
 If it fails while stage 3 passed, stop with the Agent Gateway owner. Do not
 change database credentials or Agent prompts.
 
-## 5. Agent binding and one approved query — final integration test
+## 5. Model-egress approval — before any Agent receives a query result
+
+- [ ] Inspect the selected `{{KAGENT_MODEL_CONFIG}}` and identify its model
+  provider/destination, prompt/completion retention, training policy, and who
+  can access the relevant logs.
+- [ ] Obtain data-owner confirmation that the approved view's classification
+  permits result rows to travel to that destination.
+- [ ] Record the approval reference without copying rows, hostnames, tokens,
+  or provider credentials into this bundle.
+
+Pass criterion: the destination and handling of query result data are known and
+approved. An unknown or unapproved model-egress path blocks the query Agent.
+
+## 6. Agent binding and one approved query — final integration test
 
 Only now apply the two Agent documents. Start with the schema Agent; review the
 discovered names and tool allowlists before applying the query Agent.
@@ -142,7 +174,7 @@ tool execution through the complete route. If it fails after stages 1–4 passed
 the fault is constrained to kagent Agent configuration, model routing, prompt,
 or the approved query/view contract.
 
-## 6. Negative and handoff checks
+## 7. Negative and handoff checks
 
 - [ ] An unapproved table/view is denied by PostgreSQL grants.
 - [ ] A write request is refused; do not execute DML as a test.
@@ -151,7 +183,7 @@ or the approved query/view contract.
 - [ ] Evidence includes rendered redacted manifests, readiness/status, exact
   discovered tools, sanitised logs, one receipt, database audit/query ID, and
   image digest/scan record.
-- [ ] Delete the temporary direct probe after the final gateway route passes:
+- [ ] Delete the temporary gateway probe after the final route passes:
 
 ```sh
 kubectl --context {{WORK_KUBE_CONTEXT}} -n {{KAGENT_NAMESPACE}} \
@@ -168,4 +200,5 @@ kubectl --context {{WORK_KUBE_CONTEXT}} -n {{KAGENT_NAMESPACE}} \
 | 2 | image, Secret reference, network/DNS, TLS, database authentication | Agent/Gateway YAML |
 | 3 | MCP service/SSE or kagent RemoteMCPServer | Agent prompt/model |
 | 4 | Agent Gateway CRD/route/policy | database credentials/grants |
-| 5 | Agent allowlist, model route, prompt, approved query/view | prior passing infrastructure |
+| 5 | ModelConfig/model provider, data-owner egress approval | prior passing infrastructure |
+| 6 | Agent allowlist, model route, prompt, approved query/view | prior passing infrastructure |
