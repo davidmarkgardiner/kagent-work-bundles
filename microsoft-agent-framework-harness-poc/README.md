@@ -23,14 +23,17 @@ the raw kagent A2A, approval, retry/fallback, and Argo receipt contract. It is
 not the recommended Microsoft Agent Framework production implementation and
 should not receive new feature work unless Go parity is later verified.
 
-The Python POC already uses a real Harness Agent with bounded
-`loop_max_iterations=2`. It has an independent kagent evaluator stage, but it
-does **not** yet prove the framework's native Python evaluation API or an
-OpenTelemetry exporter. Those are the next bounded additions once we select an
-approved telemetry backend and redaction policy.
+The Python POC now wires the framework's bounded `loop_should_continue`
+predicate with `loop_max_iterations=2`, and uses its API-free `LocalEvaluator`
+for a second receipt check. These APIs are experimental in the pinned package;
+the deterministic receipt gate remains authoritative. OTLP support is present
+but disabled unless an approved collector endpoint is supplied, with sensitive
+data explicitly disabled.
 
 See [PYTHON-IMPLEMENTATION-DECISION.md](PYTHON-IMPLEMENTATION-DECISION.md) for
-the exact proof boundary and the next implementation steps.
+the exact proof boundary and the next implementation steps, and
+[DEPLOYMENT.md](DEPLOYMENT.md) for the image-pinning, short-Argo-stage, and
+evidence runbook.
 
 ## Flow
 
@@ -47,7 +50,14 @@ the exact proof boundary and the next implementation steps.
 5. State and a bounded A2A receipt remain in the PVC; Job logs are the
    verifier evidence.
 
-## SDLC factory extension
+## Retired long-chain factory experiment
+
+`factory-job.yaml` is preserved only as evidence of the earlier experiment. Do
+not deploy it as the target architecture: it keeps five controller-mediated
+A2A calls alive in one Job, and cancellation did not reliably cancel the
+underlying tasks. The replacement target is one short
+[Argo WorkflowTemplate](argo-stage-workflow.yaml) execution per approved stage,
+with a durable receipt checked before the next stage begins.
 
 After the approval receipt exists, `factory-job.yaml` starts another Harness
 Agent with exactly one tool, `run_full_sdlc_factory`. That tool delegates in

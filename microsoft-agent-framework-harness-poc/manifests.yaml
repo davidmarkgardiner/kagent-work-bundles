@@ -26,12 +26,14 @@ metadata:
   labels: {app.kubernetes.io/part-of: maf-harness-poc, maf-poc-stage: request}
 spec:
   backoffLimit: 0
+  activeDeadlineSeconds: 120
   template:
     metadata: {labels: {app.kubernetes.io/part-of: maf-harness-poc}}
     spec:
       restartPolicy: Never
+      terminationGracePeriodSeconds: 15
       serviceAccountName: maf-harness-poc
-      securityContext: {fsGroup: 65532}
+      securityContext: {fsGroup: 65532, runAsNonRoot: true, runAsUser: 65532, runAsGroup: 65532, seccompProfile: {type: RuntimeDefault}}
       containers:
         - name: harness
           image: python:3.12-slim
@@ -42,6 +44,9 @@ spec:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi, ephemeral-storage: 256Mi}
+            limits: {cpu: 500m, memory: 512Mi, ephemeral-storage: 512Mi}
           volumeMounts:
             - {name: app, mountPath: /app, readOnly: true}
             - {name: state, mountPath: /state}
@@ -49,4 +54,4 @@ spec:
       volumes:
         - {name: app, configMap: {name: maf-harness-poc-app}}
         - {name: state, persistentVolumeClaim: {claimName: maf-harness-poc-state}}
-        - {name: tmp, emptyDir: {}}
+        - {name: tmp, emptyDir: {sizeLimit: 128Mi}}

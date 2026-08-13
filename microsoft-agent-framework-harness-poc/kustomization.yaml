@@ -8,6 +8,7 @@ configMapGenerator:
   - name: maf-harness-poc-app
     files:
       - run.py
+      - harness_runtime.py
       - requirements.txt
 generatorOptions:
   disableNameSuffixHash: true
