@@ -1,0 +1,68 @@
+# TEMPLATE ONLY. Replace placeholders in a private work overlay after MCP tool
+# discovery. The direct endpoint is the fallback only if the Gateway schema gate
+# fails and a separately approved limited proof is required.
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: postgres-inventory-mcp
+  namespace: "{{KAGENT_NAMESPACE}}"
+spec:
+  description: Approved read-only PostgreSQL inventory MCP via Agent Gateway.
+  protocol: SSE
+  url: "http://{{AGENTGATEWAY_SERVICE}}.{{AGENTGATEWAY_NAMESPACE}}.svc.cluster.local/mcp/postgres-inventory"
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: postgres-inventory-schema-agent
+  namespace: "{{KAGENT_NAMESPACE}}"
+spec:
+  type: Declarative
+  description: Read-only metadata agent for the approved PostgreSQL inventory product.
+  declarative:
+    runtime: python
+    modelConfig: "{{KAGENT_MODEL_CONFIG}}"
+    systemMessage: |
+      Inspect only the approved PostgreSQL inventory schema through the mounted
+      metadata tools. Never request credentials, invoke execute_sql, write, or
+      claim access beyond returned metadata. Return concise source-backed facts.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: postgres-inventory-mcp
+          namespace: "{{KAGENT_NAMESPACE}}"
+          toolNames:
+            - list_schemas
+            - list_objects
+            - get_object_details
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: postgres-inventory-query-agent
+  namespace: "{{KAGENT_NAMESPACE}}"
+spec:
+  type: Declarative
+  description: Read-only agent for owner-approved PostgreSQL inventory views.
+  declarative:
+    runtime: python
+    modelConfig: "{{KAGENT_MODEL_CONFIG}}"
+    systemMessage: |
+      Answer approved Kubernetes-inventory questions using only the mounted
+      tools and owner-approved views. Use SELECT-only queries with a small
+      result limit. Never write, change schema, request credentials, query
+      unapproved tables, or expose personal/sensitive values. If a request is
+      outside the approved data product, say so rather than attempting it.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: postgres-inventory-mcp
+          namespace: "{{KAGENT_NAMESPACE}}"
+          toolNames:
+            - list_objects
+            - get_object_details
+            - execute_sql

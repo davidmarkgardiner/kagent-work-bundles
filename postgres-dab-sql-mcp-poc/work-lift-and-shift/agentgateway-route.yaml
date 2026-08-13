@@ -1,0 +1,70 @@
+# TEMPLATE ONLY. First run the server-side schema gate in README.md. This
+# route uses the Agent Gateway v1alpha1 MCP backend shape previously verified
+# for a different MCP route in this repository; work must validate its release.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: postgres-inventory-mcp
+  namespace: "{{AGENTGATEWAY_NAMESPACE}}"
+spec:
+  mcp:
+    failureMode: FailClosed
+    sessionRouting: Stateful
+    targets:
+      - name: postgres-inventory-mcp
+        static:
+          host: "postgres-inventory-mcp.{{DATA_MCP_NAMESPACE}}.svc.cluster.local"
+          port: 8000
+          path: /sse
+          protocol: SSE
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: postgres-inventory-mcp
+  namespace: "{{AGENTGATEWAY_NAMESPACE}}"
+spec:
+  parentRefs:
+    - name: "{{AGENTGATEWAY_NAME}}"
+      namespace: "{{AGENTGATEWAY_NAMESPACE}}"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /mcp/postgres-inventory
+      backendRefs:
+        - group: agentgateway.dev
+          kind: AgentgatewayBackend
+          name: postgres-inventory-mcp
+          namespace: "{{AGENTGATEWAY_NAMESPACE}}"
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: postgres-inventory-mcp
+  namespace: "{{AGENTGATEWAY_NAMESPACE}}"
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: postgres-inventory-mcp
+  backend:
+    mcp:
+      authorization:
+        policy:
+          matchExpressions:
+            - >-
+              mcp.tool.name in [
+                "list_schemas",
+                "list_objects",
+                "get_object_details",
+                "execute_sql"
+              ]
+  traffic:
+    rateLimit:
+      local:
+        - requests: 60
+          unit: Minutes
+          burst: 20
+    timeouts:
+      request: "60s"
