@@ -1,0 +1,60 @@
+# A single reversible remediation action for the Go coordinator POC: set the
+# synthetic health ConfigMap from unhealthy to healthy. The workflow identity
+# can update only this named ConfigMap in this namespace.
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: maf-go-remediator, namespace: test-remediation}
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: maf-go-remediator, namespace: test-remediation}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["maf-go-synthetic-health"]
+    verbs: ["get", "patch", "update"]
+  # Required only for Argo executor terminal-result bookkeeping.
+  - apiGroups: ["argoproj.io"]
+    resources: ["workflowtaskresults"]
+    verbs: ["create", "get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: maf-go-remediator, namespace: test-remediation}
+subjects: [{kind: ServiceAccount, name: maf-go-remediator, namespace: test-remediation}]
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: maf-go-remediator}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: maf-go-synthetic-health, namespace: test-remediation}
+data: {health: UNHEALTHY}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: maf-go-remediation-
+  namespace: test-remediation
+  labels: {app.kubernetes.io/part-of: maf-go-harness-poc}
+spec:
+  serviceAccountName: maf-go-remediator
+  entrypoint: remediate
+  templates:
+    - name: remediate
+      container:
+        # Cached in the HomeLab. Uses the projected service-account token to
+        # PATCH only the ConfigMap permitted by the Role above.
+        image: python:3.12-alpine
+        command: [python, -c]
+        args:
+          - |
+            import json, ssl, urllib.request
+            token = open('/var/run/secrets/kubernetes.io/serviceaccount/token').read()
+            ca = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+            request = urllib.request.Request(
+              'https://kubernetes.default.svc/api/v1/namespaces/test-remediation/configmaps/maf-go-synthetic-health',
+              data=b'{"data":{"health":"HEALTHY"}}', method='PATCH',
+              headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/merge-patch+json'})
+            print(urllib.request.urlopen(request, context=ssl.create_default_context(cafile=ca)).read().decode())
+        securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+        resources: {requests: {cpu: 10m, memory: 32Mi}, limits: {cpu: 100m, memory: 128Mi}}
