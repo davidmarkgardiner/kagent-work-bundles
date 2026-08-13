@@ -129,6 +129,15 @@ but too broad to select as the final governed data-agent interface without
 further owner-approved restrictions. See the [spike evidence](evidence/PREBUILT-POSTGRES-MCP-SPIKE-2026-08-13.md) and
 [isolated manifest](prebuilt-postgres-mcp-spike.yaml).
 
+## Azure PostgreSQL live connectivity proof
+
+A short-lived Azure Database for PostgreSQL Flexible Server proof subsequently
+used the same pre-built MCP image, synthetic lower-case estate/namespace/appdir
+tables, and a dedicated read-only database role. The Agent successfully
+retrieved two synthetic production namespace records through the MCP. The
+database and Kubernetes resources were deleted immediately after the run; see
+the [Azure live evidence](evidence/AZURE-FLEXIBLE-SERVER-PREBUILT-MCP-POC-2026-08-13.md).
+
 The runtime package install in the custom adapter is a HomeLab convenience.
 For an office/Azure PostgreSQL POC, build it in approved CI, scan/sign it, pin
 the digest, and mirror it internally. Use private connectivity/TLS, a dedicated
