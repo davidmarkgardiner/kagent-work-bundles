@@ -40,6 +40,13 @@ or Entra access token.
 | [namespace.yaml](namespace.yaml) | Managed data-MCP namespace for the default Kustomize package. |
 | [OUTSIDE-IN-VALIDATION-CHECKLIST.md](OUTSIDE-IN-VALIDATION-CHECKLIST.md) | Ordered source-first tests and expected evidence/failure ownership. |
 | [WORK-LIFT-AND-SHIFT-CRITIQUE-PROMPT.md](WORK-LIFT-AND-SHIFT-CRITIQUE-PROMPT.md) | Read-only review prompt for a second agent. |
+| [MCPG-WORK-VARIABLES.md](MCPG-WORK-VARIABLES.md) | Current MCPg image, database, kagent, and Agent Gateway variable contract, plus required template conversion. |
+
+> **Current candidate:** the verified HomeLab route is MCPg over Streamable
+> HTTP. Start with [MCPG-WORK-VARIABLES.md](MCPG-WORK-VARIABLES.md). The
+> remaining YAML and checklist below describe the earlier CrystalDBA/SSE
+> template and must be converted as one change before deployment; they are not
+> interchangeable with MCPg.
 
 The supplied Deployment deliberately references the **same source image used in
 the HomeLab and Azure proof**: `crystaldba/postgres-mcp`, with the same

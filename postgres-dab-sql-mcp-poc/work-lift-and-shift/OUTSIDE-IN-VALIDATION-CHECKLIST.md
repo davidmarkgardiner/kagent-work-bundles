@@ -8,6 +8,13 @@ All placeholders are rendered only in the private work overlay. Do not capture
 or paste the connection URI, password, token, real hostname, or returned rows
 into Git, tickets, or shared logs.
 
+> **Template version:** this checklist currently uses the older
+> CrystalDBA/SSE template names. For the current verified MCPg/Streamable HTTP
+> candidate, first apply the complete conversion in
+> [MCPG-WORK-VARIABLES.md](MCPG-WORK-VARIABLES.md), including the image,
+> `MCPG_DATABASE_URL`, `/mcp` route, protocol, and tool names. Do not use this
+> checklist unchanged with MCPg.
+
 ## 1. Secret delivery — prerequisite, not an Agent test
 
 - [ ] The approved secret system creates `{{POSTGRES_MCP_SECRET_NAME}}` in
