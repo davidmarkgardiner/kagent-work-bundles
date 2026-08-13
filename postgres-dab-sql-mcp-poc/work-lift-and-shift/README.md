@@ -33,6 +33,9 @@ or Entra access token.
 | [prebuilt-postgres-mcp.yaml](prebuilt-postgres-mcp.yaml) | MCP Deployment and internal Service. Uses a Secret reference only; no connection material is committed. |
 | [agentgateway-route.yaml](agentgateway-route.yaml) | Gateway backend, route, and exact tool policy template. Apply only after server-side schema validation. |
 | [kagent-agent.yaml](kagent-agent.yaml) | `RemoteMCPServer` pointing at the gateway and two least-privilege Agent examples. |
+| [direct-mcp-probe.yaml](direct-mcp-probe.yaml) | No-Agent direct MCP registration probe: isolates the MCP service before Gateway and Agent wiring. |
+| [gateway-mcp-probe.yaml](gateway-mcp-probe.yaml) | No-Agent gateway registration probe: isolates the route/policy before Agent wiring. |
+| [OUTSIDE-IN-VALIDATION-CHECKLIST.md](OUTSIDE-IN-VALIDATION-CHECKLIST.md) | Ordered source-first tests and expected evidence/failure ownership. |
 | [WORK-LIFT-AND-SHIFT-CRITIQUE-PROMPT.md](WORK-LIFT-AND-SHIFT-CRITIQUE-PROMPT.md) | Read-only review prompt for a second agent. |
 
 The supplied Deployment deliberately references the **same source image used in
@@ -111,6 +114,10 @@ boundary for a generic SQL tool.
 7. **Run the acceptance and negative tests.** Record the artefacts below, then
    remove temporary Agents/route and revoke temporary reader access if this is
    a one-off proof.
+
+For the safer source-first order requested for work, use the dedicated
+[outside-in validation checklist](OUTSIDE-IN-VALIDATION-CHECKLIST.md) instead
+of starting with an Agent question.
 
 ### Agent Gateway schema gate
 
