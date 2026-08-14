@@ -119,6 +119,25 @@ The earlier compliance-shaped receipts remain historical evidence for the
 initial PostgreSQL connectivity exercise; the current manifests and verifier
 are the Kubernetes-inventory POC described above.
 
+## Custom FastMCP proof — re-verified 2026-08-14
+
+This bundle also contains the custom-MCP shape suitable for the work use case:
+ordinary Python functions exposed through FastMCP, each with typed inputs,
+parameterised PostgreSQL queries, and a narrow result contract. It is not a
+generic SQL endpoint. The Agent has no database credential and no arbitrary
+query tool.
+
+The HomeLab proof was re-run on 2026-08-14 against the live synthetic
+PostgreSQL fixture. The verifier passed all eight markers and a fresh kagent
+A2A request produced a successful answer after calling the metadata and
+parameterised risk-summary tools. See the
+[FastMCP re-verification record](evidence/FASTMCP-POSTGRES-POC-REVERIFICATION-2026-08-14.md)
+and the [trimmed A2A receipt](evidence/FASTMCP-KUBERNETES-INVENTORY-A2A-RECEIPT-2026-08-14.json).
+
+For work, turn this adapter into an approved, scanned, signed, digest-pinned
+image rather than installing Python packages at container startup. Replace the
+synthetic queries only with owner-approved views and typed business questions.
+
 ## Pre-built PostgreSQL MCP image spike
 
 A separate, disposable compatibility spike proved that a pre-built third-party
