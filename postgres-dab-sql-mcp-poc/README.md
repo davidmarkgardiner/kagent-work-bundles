@@ -138,6 +138,23 @@ For work, turn this adapter into an approved, scanned, signed, digest-pinned
 image rather than installing Python packages at container startup. Replace the
 synthetic queries only with owner-approved views and typed business questions.
 
+## Packaged FastMCP image and Agent Gateway route — verified 2026-08-15
+
+The adapter is now available as a Docker build context in
+[fastmcp-postgres/](fastmcp-postgres/), with a non-root runtime and build-time
+dependency installation. A local package protocol smoke passed after exposing
+and fixing one missing direct dependency. A separate HomeLab Agent Gateway
+route server-dry-run, policy attachment, tool discovery, Agent readiness, and
+conversational A2A call also passed.
+
+The route proof uses the existing synthetic FastMCP fixture, not the local
+image; it demonstrates the installed Gateway CRD shape and four-tool policy,
+not registry delivery. The production-template Deployment is
+[fastmcp-postgres-image.yaml](fastmcp-postgres-image.yaml). See the
+[package and Gateway evidence](evidence/FASTMCP-PACKAGE-AND-AGENTGATEWAY-2026-08-15.md)
+for the exact boundaries and remaining work authentication, registry-signing,
+private-network, NetworkPolicy, and data-governance gates.
+
 ## Pre-built PostgreSQL MCP image spike
 
 A separate, disposable compatibility spike proved that a pre-built third-party

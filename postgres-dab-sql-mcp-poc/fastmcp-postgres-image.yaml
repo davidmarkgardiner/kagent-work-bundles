@@ -1,0 +1,74 @@
+# Work template. Render values in a private overlay only; do not apply the
+# placeholders directly. The lab's direct ConfigMap-based runtime remains a
+# disposable proof fixture, not this release deployment.
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastmcp-postgres
+  namespace: "{{DATA_MCP_NAMESPACE}}"
+spec:
+  selector:
+    app.kubernetes.io/name: fastmcp-postgres
+  ports:
+    - name: mcp
+      port: 8000
+      targetPort: mcp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastmcp-postgres
+  namespace: "{{DATA_MCP_NAMESPACE}}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fastmcp-postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: fastmcp-postgres
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: fastmcp-postgres
+          image: "{{INTERNAL_REGISTRY}}/platform/fastmcp-postgres@sha256:{{IMAGE_DIGEST}}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: "{{POSTGRES_MCP_SECRET_NAME}}"
+                  key: postgres-url
+          ports:
+            - name: mcp
+              containerPort: 8000
+          readinessProbe:
+            tcpSocket:
+              port: mcp
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+          resources:
+            requests:
+              cpu: 25m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
