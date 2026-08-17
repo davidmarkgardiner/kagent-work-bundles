@@ -1,6 +1,5 @@
-# TEMPLATE ONLY. First run the server-side schema gate in README.md. This
-# route uses the Agent Gateway v1alpha1 MCP backend shape previously verified
-# for a different MCP route in this repository; work must validate its release.
+# MCPg v0.7.1 Agent Gateway route. Run a server-side schema dry-run against
+# the installed work CRDs before applying.
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayBackend
 metadata:
@@ -15,8 +14,8 @@ spec:
         static:
           host: "postgres-inventory-mcp.{{DATA_MCP_NAMESPACE}}.svc.cluster.local"
           port: 8000
-          path: /sse
-          protocol: SSE
+          path: /mcp
+          protocol: StreamableHTTP
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -51,14 +50,14 @@ spec:
   backend:
     mcp:
       authorization:
+        action: Allow
         policy:
           matchExpressions:
             - >-
               mcp.tool.name in [
                 "list_schemas",
-                "list_objects",
-                "get_object_details",
-                "execute_sql"
+                "list_tables",
+                "describe_table"
               ]
   traffic:
     rateLimit:

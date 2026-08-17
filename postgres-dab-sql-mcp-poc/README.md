@@ -193,12 +193,13 @@ or access tokens in an Agent manifest.
 
 ## Work lift-and-shift bundle
 
-The [work-lift-and-shift](work-lift-and-shift/) folder is the reusable Azure/AKS
-handoff: a digest-pinned pre-built MCP deployment, a gateway-fronted kagent
-binding, the password bootstrap and later Workload Identity decision points,
-verification gates, and an independent-review prompt. It deliberately makes no
-claim that an Agent Gateway route has already been live-proven for the Azure
-PostgreSQL path; the direct path is what the Azure evidence proves.
+The [work-lift-and-shift](work-lift-and-shift/) folder is now the reusable
+MCPg v0.7.1 Azure/AKS handoff: a digest-pinned MCPg deployment, a
+Streamable-HTTP gateway-fronted kagent schema binding, password-bootstrap and
+later Workload Identity decision points, verification gates, and an
+independent-review prompt. It deliberately makes no claim that the exact work
+Agent Gateway route, work PostgreSQL authentication, or private network path
+has already been live-proven.
 
 ## Cleanup
 

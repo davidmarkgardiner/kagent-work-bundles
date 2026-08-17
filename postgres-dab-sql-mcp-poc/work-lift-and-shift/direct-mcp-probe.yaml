@@ -1,12 +1,11 @@
-# TEMPLATE ONLY. This deliberately registers the MCP service directly and has
-# no Agent. It proves the MCP transport/tool discovery independently from
-# Agent Gateway, model configuration, prompts, and Agent tool bindings.
+# MCPg v0.7.1 temporary direct discovery probe. Apply only before the
+# Gateway-only NetworkPolicy; delete immediately after it passes.
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
 metadata:
-  name: postgres-inventory-mcp-direct-probe
+  name: postgres-inventory-mcpg-direct-probe
   namespace: "{{KAGENT_NAMESPACE}}"
 spec:
-  description: Temporary no-Agent direct PostgreSQL MCP discovery probe.
-  protocol: SSE
-  url: "http://postgres-inventory-mcp.{{DATA_MCP_NAMESPACE}}.svc.cluster.local:8000/sse"
+  description: Temporary no-Agent MCPg Streamable HTTP discovery probe.
+  protocol: STREAMABLE_HTTP
+  url: "http://postgres-inventory-mcp.{{DATA_MCP_NAMESPACE}}.svc.cluster.local:8000/mcp"

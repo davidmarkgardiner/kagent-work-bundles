@@ -1,11 +1,11 @@
-# TEMPLATE ONLY. Apply after Agent Gateway routing succeeds. This has no Agent:
-# it isolates MCP discovery through the gateway from Agent/model configuration.
+# MCPg v0.7.1 temporary gateway discovery probe. It has no Agent and isolates
+# MCP discovery through Agent Gateway from model/prompt configuration.
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
 metadata:
-  name: postgres-inventory-mcp-gateway-probe
+  name: postgres-inventory-mcpg-gateway-probe
   namespace: "{{KAGENT_NAMESPACE}}"
 spec:
-  description: Temporary no-Agent PostgreSQL MCP discovery probe via Agent Gateway.
-  protocol: SSE
+  description: Temporary no-Agent MCPg Streamable HTTP discovery probe via Agent Gateway.
+  protocol: STREAMABLE_HTTP
   url: "http://{{AGENTGATEWAY_SERVICE}}.{{AGENTGATEWAY_NAMESPACE}}.svc.cluster.local/mcp/postgres-inventory"

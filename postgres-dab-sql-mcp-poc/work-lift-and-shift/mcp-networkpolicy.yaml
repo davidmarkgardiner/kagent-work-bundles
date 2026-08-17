@@ -5,7 +5,7 @@
 #
 # Validate the actual Agent Gateway pod labels before rendering. A namespace
 # selector alone is deliberately not sufficient: any pod in that namespace
-# would otherwise gain direct execute_sql access.
+# would otherwise gain direct MCPg access outside Gateway policy and telemetry.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
