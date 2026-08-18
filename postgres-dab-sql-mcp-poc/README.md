@@ -169,11 +169,17 @@ further owner-approved restrictions. See the [spike evidence](evidence/PREBUILT-
 
 The newer pre-built `ghcr.io/devopam/mcpg` image was separately proven against
 the same synthetic PostgreSQL fixture over Streamable HTTP. kagent discovered
-the server and a restricted Agent used only schema tools. This is a stronger
+the server and a schema-only Agent used only schema tools. This is a stronger
 short-term candidate than the older CrystalDBA image, but MCPg's broad
 read-only discovery surface still requires explicit agent/gateway tool
 allowlists. See the [MCPg live evidence](evidence/MCPG-GHCR-READONLY-SPIKE-2026-08-13.md)
 and [disposable manifest](mcpg-readonly-spike.yaml).
+
+MCPg read-only mode has also proved capable of a bounded `run_select` namespace
+count; ordinary inventory questions do not need database write access. The
+optional work [read-query profile](work-lift-and-shift/mcpg-read-query-profile/)
+adds only `run_select` to the Agent Gateway and Agent allowlists. See the
+[read-query evidence](evidence/MCPG-READ-QUERY-POC-2026-08-18.md).
 
 ## Azure PostgreSQL live connectivity proof
 

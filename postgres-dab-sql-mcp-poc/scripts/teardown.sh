@@ -7,6 +7,7 @@ kubectl --context "$context" -n kagent delete agent/postgres-dab-compliance-lab-
 kubectl --context "$context" -n kagent delete remotemcpserver/postgres-dab-compliance-mcp --ignore-not-found
 kubectl --context "$context" -n kagent delete agent/postgres-prebuilt-mcp-schema-spike-agent --ignore-not-found
 kubectl --context "$context" -n kagent delete remotemcpserver/postgres-prebuilt-mcp-spike --ignore-not-found
+kubectl --context "$context" -n kagent delete agent/mcpg-read-query-spike-agent --ignore-not-found
 kubectl --context "$context" -n kagent delete agent/postgres-kubernetes-inventory-lab-agent --ignore-not-found
 kubectl --context "$context" -n kagent delete remotemcpserver/postgres-kubernetes-inventory-readonly-mcp --ignore-not-found
 kubectl --context "$context" -n kagent delete agent/fastmcp-postgres-gateway-spike-agent --ignore-not-found

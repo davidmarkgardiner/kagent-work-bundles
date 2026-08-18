@@ -32,6 +32,7 @@ with older PostgreSQL MCP examples elsewhere in the repository.
 | [mcpg-postgres-mcp.yaml](mcpg-postgres-mcp.yaml) | MCPg v0.7.1 Deployment and Service. Environment variables only; no CLI arguments. |
 | [agentgateway-route.yaml](agentgateway-route.yaml) | Agent Gateway MCP backend, `/mcp` route, schema-tool allowlist, rate limit, and timeout. |
 | [kagent-agent.yaml](kagent-agent.yaml) | Streamable HTTP `RemoteMCPServer` plus schema-only kagent Agent. |
+| [mcpg-read-query-profile/](mcpg-read-query-profile/) | Optional SELECT-only extension for approved inventory views; adds MCPg `run_select`, not write access. |
 | [mcp-networkpolicy.yaml](mcp-networkpolicy.yaml) | Gateway-only steady-state ingress policy. |
 | [direct-mcp-probe.yaml](direct-mcp-probe.yaml) | Temporary direct MCPg discovery probe. |
 | [gateway-mcp-probe.yaml](gateway-mcp-probe.yaml) | Temporary Agent Gateway discovery probe. |
@@ -94,3 +95,9 @@ The Kustomize package deliberately excludes both temporary probes.
   model-egress review, and explicit negative tests are complete.
 - Run server-side dry-runs against the installed kagent and Agent Gateway CRDs
   before applying. Gateway schemas vary by release.
+
+For an approved namespace count or similar read question, use the optional
+[read-query profile](mcpg-read-query-profile/). It adds MCPg's `run_select`
+tool while retaining `MCPG_ACCESS_MODE=read-only` and a database role that can
+only `SELECT` approved views. Do not switch to MCPg `restricted` mode merely
+to run a count.
