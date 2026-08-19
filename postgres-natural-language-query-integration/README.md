@@ -4,6 +4,10 @@ This note compares two ways to answer natural-language questions from
 PostgreSQL and shows how the existing FastMCP + AKS Workload Identity/UAMI
 bundle can work with a separate retrieval-assisted query-generation system.
 
+For a shorter explanation, separate diagrams, and a copy-ready team message,
+read
+[`QUICK-COMPARISON-AND-TEAMS-MESSAGE.md`](QUICK-COMPARISON-AND-TEAMS-MESSAGE.md).
+
 The other system is described from a conversation, not from inspected source
 or runtime evidence. Confirm the questions in [Discovery checklist](#discovery-checklist)
 before treating its design as established. In particular, confirm whether the
