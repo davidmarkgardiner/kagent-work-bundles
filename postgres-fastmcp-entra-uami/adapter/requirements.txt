@@ -1,4 +1,4 @@
-# Passwordless UAMI adapter dependencies.
+# Shared password/UAMI adapter dependencies.
 azure-identity==1.25.3
 azure-postgresql-auth[psycopg3]==1.0.2
 fastmcp==2.14.3

@@ -1,4 +1,4 @@
-"""Offline contract tests for the standalone FastMCP UAMI bundle."""
+"""Offline contract tests for the dual-authentication FastMCP bundle."""
 
 import os
 import unittest
@@ -8,6 +8,9 @@ from unittest.mock import patch
 os.environ.setdefault("POSTGRES_HOST", "postgres.example.invalid")
 os.environ.setdefault("POSTGRES_DATABASE", "synthetic")
 os.environ.setdefault("APPROVED_VIEW", "work_inventory.approved_namespaces")
+os.environ.setdefault("POSTGRES_AUTH_MODE", "password")
+os.environ.setdefault("POSTGRES_USER", "synthetic_reader")
+os.environ.setdefault("POSTGRES_PASSWORD", "not-a-real-password")
 
 import server  # noqa: E402  (environment is required at import time)
 import verify_live  # noqa: E402
@@ -60,6 +63,37 @@ class ToolContractTests(unittest.TestCase):
             ):
                 with self.assertRaises(ValueError):
                     server.required_qualified_name("APPROVED_VIEW")
+
+    def test_password_connection_uses_tls_and_secret_environment(self) -> None:
+        with patch.object(server.psycopg, "connect") as connect:
+            server.connect()
+        self.assertEqual(
+            connect.call_args.kwargs,
+            {
+                "host": "postgres.example.invalid",
+                "dbname": "synthetic",
+                "sslmode": "require",
+                "connect_timeout": 10,
+                "user": "synthetic_reader",
+                "password": "not-a-real-password",
+            },
+        )
+
+    def test_entra_connection_uses_same_tls_database_coordinates(self) -> None:
+        credential = object()
+        with (
+            patch.object(server, "AUTH_MODE", "entra"),
+            patch.object(server, "CREDENTIAL", credential),
+            patch.object(server.EntraConnection, "connect") as connect,
+        ):
+            server.connect()
+        connect.assert_called_once_with(
+            host="postgres.example.invalid",
+            dbname="synthetic",
+            sslmode="require",
+            connect_timeout=10,
+            credential=credential,
+        )
 
 
 if __name__ == "__main__":

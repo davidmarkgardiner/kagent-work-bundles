@@ -1,36 +1,38 @@
 # PostgreSQL MCP workplace POC — start here
 
-There are two separate deployment paths. Do not merge their authentication
-configuration.
+The primary workplace path is one FastMCP implementation with two separate
+authentication deployments. Do not deploy the MCPg bundle for this proof.
 
 For the comparison with retrieval-assisted text-to-SQL and the recommended
 shared-backend integration, read
 [`postgres-natural-language-query-integration/`](postgres-natural-language-query-integration/).
 
-## Path A — available today: MCPg username/password
+## Path A — deploy first: FastMCP username/password
 
-Use [`postgres-mcpg-password/`](postgres-mcpg-password/) when the database team
-provides the existing TLS PostgreSQL connection string. The connection string
-is delivered through the approved Secret system as the `postgres-url` key; it
-never belongs in Git, an Agent manifest, or terminal evidence.
+Use
+[`postgres-fastmcp-entra-uami/password/`](postgres-fastmcp-entra-uami/password/)
+with the existing PostgreSQL username/password. This runs the same FastMCP
+image, tools, and approved-view queries as the later UAMI deployment.
 
-1. Copy `postgres-mcpg-password/work-values.env.template` to the ignored
-   `work-values.env`, fill it with current cluster/registry coordinates, and
-   cross-check [`MCPG-WORK-VARIABLES.md`](postgres-mcpg-password/MCPG-WORK-VARIABLES.md).
-2. Create the `postgres-url` Secret through the approved secret-delivery path.
-3. Render and check it: `kubectl kustomize
-   work-agent-bundles/postgres-mcpg-password`.
-4. Run server-side dry-run, then deploy the same Kustomize target.
-5. Follow the outside-in validation checklist.
+1. Build, scan, sign, and push the shared adapter image.
+2. Create the username/password Secret through the approved secret-delivery
+   path; never put either value in Git or `work-values.env`.
+3. Copy `password/work-values.env.template` to the ignored `work-values.env`
+   and replace every placeholder.
+4. Render and check it: `kubectl kustomize
+   work-agent-bundles/postgres-fastmcp-entra-uami/password`.
+5. Run server-side dry-run, then deploy the same Kustomize target.
+6. Run the shared database, Gateway discovery, and A2A verification gates.
 
 ## Path B — strategic target: FastMCP with UAMI
 
-Use [`postgres-fastmcp-entra-uami/`](postgres-fastmcp-entra-uami/) when the
+Use the root [`postgres-fastmcp-entra-uami/`](postgres-fastmcp-entra-uami/)
+Kustomize target when the
 identity/database teams provide the UAMI client ID, service-principal object ID,
 unique Entra role name, federated identity credential, and PostgreSQL role
 mapping.
 
-1. Build, scan, sign, and push the adapter image to the work registry.
+1. Reuse the same digest-pinned adapter image proven by Path A.
 2. Copy `work-values.env.template` to the ignored `work-values.env` and replace
    every placeholder with values verified from the current environment.
 3. Have the database team render/run the two SQL templates with the matching
@@ -41,6 +43,13 @@ mapping.
 6. Run the marker-only database verifier, Gateway discovery, and A2A receipt
    checks from the FastMCP README.
 
-Moving from Path A to Path B changes the MCP implementation and Kubernetes
-backend. It is not an in-place credential change to MCPg. Prove Path B through
-its own Gateway route and acceptance gates before removing Path A.
+Moving from Path A to Path B changes only the FastMCP Pod's database
+authentication wiring. The MCP tools, queries, Service, Gateway route,
+RemoteMCPServer, and Agent stay the same. Prove Path B through the same
+acceptance gates before removing the password Secret.
+
+## Separate legacy/reference path: MCPg
+
+[`postgres-mcpg-password/`](postgres-mcpg-password/) remains available as a
+separate MCPg v0.7.1 reference bundle. It is not one of the two FastMCP
+authentication modes and is not required for this installation.

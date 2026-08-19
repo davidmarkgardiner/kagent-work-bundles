@@ -1,5 +1,4 @@
-# Shared FastMCP front door. Render after either adapter Deployment is Ready. Validate
-# against the installed Agent Gateway and kagent CRDs before applying it.
+# Password-mode front door. Keep its tool contract identical to the UAMI path.
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayBackend
 metadata:

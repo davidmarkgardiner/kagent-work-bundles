@@ -1,45 +1,48 @@
-# FastMCP PostgreSQL Entra/UAMI adapter
+# FastMCP PostgreSQL dual-authentication adapter
 
-This is the small replacement for MCPg when Azure Database for PostgreSQL must
-be accessed using AKS Workload Identity rather than a database password.
+This one adapter supports an initial PostgreSQL username/password deployment
+and a later AKS Workload Identity/UAMI deployment without changing its MCP
+tools or query implementations.
 
-It deliberately exposes two typed, read-only tools, not arbitrary SQL:
+It deliberately exposes three bounded, read-only tools, not arbitrary SQL:
 
-1. `get_namespace_count()`
-2. `get_namespace_summary(namespace_name)`
+1. `get_inventory_data_product_details()`
+2. `get_namespace_count()`
+3. `get_namespace_summary(namespace_name)`
 
-The adapter uses `DefaultAzureCredential` and Microsoft’s
-`azure-postgresql-auth` psycopg3 connection class. The Pod gets no PostgreSQL
-password or connection-string Secret.
+Set exactly one supported `POSTGRES_AUTH_MODE`:
+
+- `password`: `psycopg.connect` receives `POSTGRES_USER` and
+  `POSTGRES_PASSWORD` from Secret-backed environment variables.
+- `entra`: `DefaultAzureCredential` and Microsoft’s
+  `azure-postgresql-auth` connection class obtain fresh UAMI tokens.
 
 ```text
-kagent -> Agent Gateway -> FastMCP adapter -> AKS workload identity
-                                           -> Azure Entra token
-                                           -> Azure Database for PostgreSQL
+kagent -> Agent Gateway -> FastMCP adapter -> password Secret -> PostgreSQL
+                                           or
+                                           -> Workload Identity/UAMI -> Entra token -> PostgreSQL
 ```
 
 ## Private deployment inputs
 
 ```text
-FASTMCP_ENTRA_IMAGE          # approved internal digest-pinned image
-UAMI_CLIENT_ID               # assigned to the ServiceAccount annotation
+FASTMCP_IMAGE                # same approved digest-pinned image for both paths
+POSTGRES_AUTH_MODE           # password or entra
 POSTGRES_HOST                # Azure Flexible Server FQDN
 POSTGRES_DATABASE            # approved database name
 APPROVED_VIEW                # lower-case schema-qualified approved view
 DENIED_BASE_TABLE            # lower-case schema-qualified denial-test table
 ```
 
-The database owner must map the UAMI to a PostgreSQL Entra role and grant only
-`CONNECT`, schema `USAGE`, and `SELECT` on the approved view.
-
-Do not add a password, `POSTGRES_CONNECTION_STRING`, `PGPASSWORD`, or generic
-query tool to this adapter. Build/push the image through the approved work
-registry and render `aks-workload-identity.yaml.template` privately.
+For password mode, inject only the separate username and password Secret keys;
+never store them in Git or a ConfigMap. For Entra mode, map the UAMI to a
+PostgreSQL role. In both modes grant only `CONNECT`, schema `USAGE`, and
+`SELECT` on the approved view. Never add a generic query tool.
 
 After the Pod is Ready, run `python /app/verify_live.py` inside it. The verifier
-prints markers only: it proves token acquisition, TLS connectivity, approved
+prints markers only: it proves authentication, TLS connectivity, approved
 view access, absence of base-table and view-write privileges, and a fresh
-second Entra-authenticated connection. It does not print tokens, rows, database
+second connection. It does not print tokens, passwords, rows, database
 identities, or environment-specific object names. Then render
 `agentgateway-kagent.yaml.template`, wait for its resources to be accepted and
 ready. Finally, retain the database and A2A gates in one durable receipt run:
