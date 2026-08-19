@@ -49,6 +49,14 @@ The image must be reachable by the cluster's kubelet. Use the existing
 workload identity/ACR or approved image-pull mechanism; a skill image does not
 need database credentials.
 
+The replacement Agent sets the current kagent distroless runtime's numeric
+non-root UID/GID (`65532`). Keep these values when `runAsNonRoot` is enforced;
+using only the named image user makes Kubernetes reject the Pod before the
+skill can initialise. Re-verify this UID if the work kagent runtime image is
+changed. The YAML also sets `skills.initContainer.env.USER=kagent`: the
+current skills-init helper otherwise fails under that numeric UID in a
+distroless runtime.
+
 ## What is deliberately not in this example
 
 - a complete work schema or actual view names;

@@ -9,6 +9,12 @@ spec:
   type: Declarative
   description: Read-only MCPg Agent with an approved PostgreSQL inventory data-contract skill.
   skills:
+    # Required with the enforced numeric runtime UID: kagent's skills-init Go
+    # helper otherwise cannot resolve its current user in the distroless image.
+    initContainer:
+      env:
+        - name: USER
+          value: kagent
     refs:
       - "{{POSTGRES_INVENTORY_SKILL_IMAGE}}"
   declarative:
@@ -25,6 +31,8 @@ spec:
           memory: 512Mi
       podSecurityContext:
         runAsNonRoot: true
+        runAsUser: 65532 # kagent v0.10 distroless runtime's numeric non-root UID.
+        runAsGroup: 65532
         seccompProfile:
           type: RuntimeDefault
       securityContext:

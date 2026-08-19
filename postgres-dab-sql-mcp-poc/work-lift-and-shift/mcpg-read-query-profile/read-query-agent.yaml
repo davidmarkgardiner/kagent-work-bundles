@@ -23,6 +23,8 @@ spec:
           memory: 512Mi
       podSecurityContext:
         runAsNonRoot: true
+        runAsUser: 65532 # kagent v0.10 distroless runtime's numeric non-root UID.
+        runAsGroup: 65532
         seccompProfile:
           type: RuntimeDefault
       securityContext:
