@@ -1,0 +1,53 @@
+# Render privately with the approved, digest-pinned skill image. This is a
+# replacement for postgres-inventory-read-query-agent from ../mcpg-read-query-profile.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: postgres-inventory-read-query-agent
+  namespace: "{{KAGENT_NAMESPACE}}"
+spec:
+  type: Declarative
+  description: Read-only MCPg Agent with an approved PostgreSQL inventory data-contract skill.
+  skills:
+    refs:
+      - "{{POSTGRES_INVENTORY_SKILL_IMAGE}}"
+  declarative:
+    runtime: python
+    modelConfig: "{{KAGENT_MODEL_CONFIG}}"
+    deployment:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+      podSecurityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        readOnlyRootFilesystem: false # Verify controller-runtime compatibility before tightening.
+    systemMessage: |
+      Use the loaded PostgreSQL inventory data-contract skill and only the
+      mounted MCPg read-only tools. The skill does not grant permissions.
+      Never write, modify schema, run DDL, query unapproved data sources,
+      request credentials, or expose sensitive values. If the data contract
+      does not authorise the requested view, column, or join, explain the gap
+      and stop.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: postgres-inventory-mcpg
+          namespace: "{{KAGENT_NAMESPACE}}"
+          toolNames:
+            - list_schemas
+            - list_tables
+            - describe_table
+            - run_select

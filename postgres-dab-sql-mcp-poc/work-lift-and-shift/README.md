@@ -33,6 +33,7 @@ with older PostgreSQL MCP examples elsewhere in the repository.
 | [agentgateway-route.yaml](agentgateway-route.yaml) | Agent Gateway MCP backend, `/mcp` route, schema-tool allowlist, rate limit, and timeout. |
 | [kagent-agent.yaml](kagent-agent.yaml) | Streamable HTTP `RemoteMCPServer` plus schema-only kagent Agent. |
 | [mcpg-read-query-profile/](mcpg-read-query-profile/) | Optional SELECT-only extension for approved inventory views; adds MCPg `run_select`, not write access. |
+| [postgres-inventory-data-contract-skill/](postgres-inventory-data-contract-skill/) | Versioned skill-image example and replacement Agent for approved PostgreSQL inventory context. |
 | [mcp-networkpolicy.yaml](mcp-networkpolicy.yaml) | Gateway-only steady-state ingress policy. |
 | [direct-mcp-probe.yaml](direct-mcp-probe.yaml) | Temporary direct MCPg discovery probe. |
 | [gateway-mcp-probe.yaml](gateway-mcp-probe.yaml) | Temporary Agent Gateway discovery probe. |
@@ -101,3 +102,10 @@ For an approved namespace count or similar read question, use the optional
 tool while retaining `MCPG_ACCESS_MODE=read-only` and a database role that can
 only `SELECT` approved views. Do not switch to MCPg `restricted` mode merely
 to run a count.
+
+The optional data-contract skill improves the Agent's understanding of
+approved views and business meanings without widening its access. Use
+[postgres-inventory-data-contract-skill/](postgres-inventory-data-contract-skill/)
+after the read-query profile has passed validation. Its workload-identity
+decision record explains why MCPg is not yet a passwordless Azure PostgreSQL
+candidate.

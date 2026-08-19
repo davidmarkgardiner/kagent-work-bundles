@@ -181,6 +181,13 @@ optional work [read-query profile](work-lift-and-shift/mcpg-read-query-profile/)
 adds only `run_select` to the Agent Gateway and Agent allowlists. See the
 [read-query evidence](evidence/MCPG-READ-QUERY-POC-2026-08-18.md).
 
+The work lift-and-shift bundle now also has a
+[PostgreSQL inventory data-contract skill image example](work-lift-and-shift/postgres-inventory-data-contract-skill/).
+It gives a read-query Agent approved-view and query guidance without widening
+tool or database permissions. Its [workload-identity decision](work-lift-and-shift/postgres-inventory-data-contract-skill/WORKLOAD-IDENTITY-DECISION.md)
+records that the current MCPg image is not a verified passwordless Entra/UAMI
+database client; use a small FastMCP adapter for that path.
+
 ## Azure PostgreSQL live connectivity proof
 
 A short-lived Azure Database for PostgreSQL Flexible Server proof subsequently
