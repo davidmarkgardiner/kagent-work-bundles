@@ -15,33 +15,67 @@ credentials, tokens, or generated work queries in this public repository.
 
 ## Executive decision
 
-The two systems do not need to be separate end-to-end solutions.
+Treat the systems as parallel answer paths first. Do not chain them merely
+because they answer similar questions.
 
-- Retrieval and a language model are useful for interpreting the question,
-  resolving business terminology, and selecting an approved operation.
-- FastMCP is useful as the shared, governed execution boundary.
-- AKS Workload Identity and the UAMI remain the database-authentication path;
-  they do not decide which query is correct.
-- Typed tools and deterministic SQL should handle common, important, or
-  sensitive questions.
-- Constrained generated SQL should be a separately governed fallback, not the
-  default path, if long-tail analysis is genuinely required.
+- The FastMCP path reads current data from an approved PostgreSQL view.
+- The reported alternative reads a copied JSON dataset or metadata snapshot
+  using pre-built or model-selected queries.
+- UAMI secures the live PostgreSQL connection. It has no role in a Pod that
+  reads only local JSON.
+- If both paths answer the same questions, nominate one authoritative result
+  and use the other only where it has a distinct freshness, availability, cost,
+  or question-coverage benefit.
+- Share the business data contract and evaluation cases even if the runtimes
+  remain separate.
 
-The preferred target is therefore:
-
-```text
-user question
-  -> chatbot or kagent
-  -> retrieve versioned business/schema context
-  -> model returns a typed operation and arguments
-  -> FastMCP validates the operation
-  -> deterministic parameterised SQL
-  -> AKS Workload Identity -> UAMI -> Microsoft Entra token
-  -> PostgreSQL role with SELECT on owner-approved views only
-  -> structured result and audit receipt
-```
+Integrate them only when the proof demonstrates a real need. The strongest
+integration is for the other chatbot to invoke bounded FastMCP tools when it
+needs current PostgreSQL data, while retaining JSON for explicitly labelled
+snapshot or reference questions.
 
 ## The two patterns
+
+```mermaid
+flowchart LR
+    U[User question]
+
+    subgraph LIVE[Path 1: live FastMCP and UAMI]
+      KA[kagent or chatbot]
+      GW[Agent Gateway]
+      MCP[Typed FastMCP tools]
+      WI[AKS Workload Identity and UAMI]
+      PG[(Approved PostgreSQL views)]
+      KA --> GW --> MCP --> WI --> PG
+    end
+
+    subgraph SNAPSHOT[Path 2: JSON query system]
+      CB[Other chatbot]
+      RET[Retrieve context and choose query]
+      JQ[Pre-built or generated query]
+      JS[(Versioned JSON snapshot)]
+      CB --> RET --> JQ --> JS
+    end
+
+    U --> KA
+    U --> CB
+    PG -. controlled export .-> JS
+
+    PG --> LR[Live result]
+    JS --> SR[Snapshot result with timestamp]
+
+    classDef live fill:#dbeafe,stroke:#2563eb,color:#172554;
+    classDef snapshot fill:#fef3c7,stroke:#d97706,color:#451a03;
+    classDef data fill:#dcfce7,stroke:#16a34a,color:#052e16;
+    class KA,GW,MCP,WI,LR live;
+    class CB,RET,JQ,SR snapshot;
+    class PG,JS data;
+```
+
+The dashed export is optional. If the JSON contains copied rows, it should be a
+controlled, versioned export from an authoritative source. If it contains only
+schema metadata or query examples, remove that export relationship and treat
+the JSON as retrieval context rather than an answer dataset.
 
 ### Pattern A: retrieval-assisted text-to-SQL
 
@@ -83,24 +117,46 @@ MCP is an interface, not an automatic safety guarantee. An MCP tool such as
 boundary is the typed tool contract, independent validation, database grants,
 and approved-view design.
 
-## Comparison
+## Security and efficiency comparison
 
-| Concern | Retrieval-assisted text-to-SQL | Typed FastMCP tools |
+| Path | Security advantages | Security disadvantages |
 |---|---|---|
-| New question coverage | High | Limited to implemented operations |
-| Predictability | Model and context dependent | High for tested tools and templates |
-| Query correctness | Requires evaluation and runtime validation | SQL construction is deterministic; intent selection still needs evaluation |
-| Schema freshness | Depends on refreshing/versioning the JSON | Depends on keeping tools and approved views compatible |
-| Security surface | Larger if model output can reach a query executor | Smaller when arbitrary SQL is not exposed |
-| Business definitions | Retrieved context can be missed or misapplied | Can be encoded in each tool and its owning view |
-| Testing | Needs question-to-query and question-to-answer evaluations | Conventional unit, contract, negative-permission, and A2A tests |
-| Explainability | Retain prompt inputs, retrieved metadata, SQL, and validator result | Retain tool name, arguments, SQL template version, and result provenance |
-| Cost and latency | Usually needs retrieval plus query-generation inference | Usually one tool-selection inference and one tool call |
-| Portability | Coupled to prompts, model behaviour, and metadata format | MCP supplies a standard client/server contract |
+| Live typed FastMCP + UAMI | No database password in the Pod; short-lived Entra tokens; typed tools can prevent arbitrary SQL; PostgreSQL grants and approved views enforce the final boundary; Gateway and tool receipts support caller-level audit | Requires protection of the MCP endpoint; UAMI authenticates the Pod to PostgreSQL but does not authenticate chatbot callers; a generic SQL tool would widen the risk; live database connectivity increases the operational blast radius |
+| JSON + pre-built queries | Can operate with no live database route or database credential; an immutable read-only snapshot limits direct database impact; pre-built query templates can be deterministic | Copied data creates another sensitive asset; Pod or image access may expose the whole snapshot; stale or unsigned JSON can silently produce wrong answers; generated queries still need validation; row-level database controls no longer protect the copied data |
+
+| Path | Efficiency advantages | Efficiency disadvantages |
+|---|---|---|
+| Live typed FastMCP + UAMI | Reads only the data required for the question; no full-dataset export or Pod memory footprint; one backend can serve multiple clients; typed tools reduce query-generation tokens and retries | Pays network, token acquisition, and database-query latency; requires PostgreSQL availability; new question shapes may require a new tool; poorly designed live queries can consume database resources |
+| JSON + pre-built queries | Local reads can be fast and survive database unavailability; predictable templates may be inexpensive; useful for stable reference data and repeated questions | Export, distribution, refresh, reconciliation, and storage consume resources; each Pod may duplicate the dataset; model-assisted query selection adds inference latency; freshness may require frequent rebuilds or restarts |
+
+### Overall pros and cons
+
+| Concern | JSON query system | Typed FastMCP/UAMI |
+|---|---|---|
+| Best fit | Stable snapshots, offline/reference use, repeated known questions | Current operational data and centrally governed access |
+| New question coverage | Potentially high if it generates queries; bounded if templates only | Limited to approved tool operations |
+| Predictability | High for fixed templates; model-dependent for generated queries | High for tested typed tools and parameterised SQL |
+| Query correctness | Requires snapshot reconciliation plus semantic evaluations | SQL construction is deterministic; tool selection and source data still require evaluation |
+| Freshness | Limited by export and deployment cadence | Reflects the live approved view at query time |
+| Data duplication | Yes, if JSON contains rows | No separate answer dataset |
+| Failure isolation | Database outage may not affect an already loaded snapshot | Database or identity outage prevents answers rather than serving an unnoticed stale copy |
+| Explainability | Retain snapshot version, selected template/query, and validator result | Retain tool name, arguments, SQL-template version, identity, and result provenance |
+| Standard integration | Application-specific unless it exposes an API or MCP tools | MCP supplies a discoverable client/server contract |
 
 ## How FastMCP/UAMI can work with the other system
 
-### Option 1: shared FastMCP backend — recommended
+### Option 1: remain parallel and share the contract — default
+
+Keep the runtimes independent, but agree the same business definitions,
+representative questions, expected answers, data classifications, and freshness
+rules. Reconcile the JSON snapshot against the approved PostgreSQL view at each
+export.
+
+Use this when the JSON path has a genuine offline, snapshot, latency, or
+availability requirement. Every answer must identify `live` or `snapshot` and,
+for a snapshot, report its extraction time and contract version.
+
+### Option 2: shared FastMCP backend for live questions
 
 Keep both user experiences but route their approved database operations through
 the same FastMCP service:
@@ -130,7 +186,7 @@ authenticate their chatbot to FastMCP. Agent Gateway or another approved front
 door must identify callers, restrict tools, rate-limit requests, and preserve
 audit context.
 
-### Option 2: shared structured query plan
+### Option 3: shared structured query plan
 
 If their retrieval logic adds material value, define a versioned intermediate
 contract such as:
@@ -155,7 +211,7 @@ them in JSON.
 This is the best meeting point when the other team has strong retrieval and
 business-language mapping but the platform team wants one execution boundary.
 
-### Option 3: separate text-to-SQL fallback
+### Option 4: separate text-to-SQL fallback
 
 Keep a generated-SQL path only for questions that cannot be expressed through
 the approved tool catalogue. It should use a distinct endpoint, tool name,
