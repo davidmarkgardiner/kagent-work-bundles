@@ -19,6 +19,26 @@ credentials, tokens, or generated work queries in this public repository.
 
 ## Executive decision
 
+The primary comparison is **an agent selecting a typed MCP tool** versus **a
+function transforming a message into a query**. The winner depends on what that
+function returns:
+
+- **Fixed-template function wins for one small chatbot:** it is the simplest,
+  fastest, and potentially most deterministic option when code maps a bounded
+  intent to a tested parameterised query.
+- **Typed MCP wins for a shared platform capability:** it provides a standard,
+  discoverable contract, central tool policy, reuse across agents and clients,
+  and consistent audit evidence.
+- **Typed MCP clearly wins over dynamically generated executable queries** for
+  security and predictability, unless the MCP tool itself accepts arbitrary
+  SQL.
+
+Therefore, this is not a blanket draw. For the current multi-agent/platform
+direction, **typed FastMCP is the recommended overall target**. Reuse the other
+team's fixed query implementation behind typed MCP tools if it is already
+tested; do not rewrite working deterministic logic merely to adopt the
+protocol.
+
 Treat the systems as parallel answer paths first. Do not chain them merely
 because they answer similar questions.
 
@@ -120,6 +140,43 @@ MCP is an interface, not an automatic safety guarantee. An MCP tool such as
 `run_sql(sql: string)` would reintroduce most text-to-SQL risks. The useful
 boundary is the typed tool contract, independent validation, database grants,
 and approved-view design.
+
+A bespoke function is not inherently less safe. If ordinary code maps an
+intent to one fixed parameterised query, it can equal or beat an agentic MCP
+path for determinism, latency, cost, and implementation simplicity. The
+critical question is whether the model selects a bounded operation or produces
+executable query text.
+
+## Winner scorecard: tool selection versus query transformation
+
+| Decision area | Fixed-template function | Typed MCP tool | Dynamic query generation | Winner |
+|---|---|---|---|---|
+| Single chatbot with a small stable query catalogue | Direct and minimal | Adds protocol and routing overhead | Unnecessary flexibility | **Fixed function** |
+| Several agents, chatbots, or workflows | Requires bespoke client integration | Standard discovery and reuse | Requires bespoke integration and validation | **Typed MCP** |
+| Raw latency and model cost | One direct classification/function call can be cheapest | Usually adds tool selection and an MCP hop | Query-generation inference and retries add cost | **Fixed function** |
+| Security and least privilege | Strong when templates and parameters are fixed | Strong with typed tools, allowlists, Gateway, and database grants | Largest attack and validation surface | **Draw: fixed function and typed MCP** |
+| Central governance and audit | Custom controls per application | Shared Gateway policy, schemas, tool receipts, and versioned interface | Custom policy plus generated-query evidence | **Typed MCP** |
+| Extensibility for novel questions | Requires another template | Requires another tool or approved operation | Can cover more questions without deployment | **Dynamic generation for coverage only** |
+| Predictability and testing | Conventional deterministic tests | Tool contract, permission, integration, and A2A tests | Needs query-policy and semantic evaluation over model outputs | **Fixed function**, then typed MCP |
+| Enterprise platform fit | Good internal implementation, weak shared contract | Designed for reusable governed capabilities | Suitable only as a constrained exception path | **Typed MCP** |
+
+### Overall verdict
+
+**Typed MCP wins for this platform use case**, provided its tools remain typed
+and do not expose arbitrary SQL. **A fixed-template function wins only when the
+scope is one application with a small stable catalogue and reuse is not a
+requirement.** The best combined design is often:
+
+```text
+multiple agents or chatbots
+  -> typed MCP operation
+  -> the other team's existing fixed query function
+  -> approved data source
+```
+
+This lets MCP own the shared contract and governance while the existing
+function owns deterministic query construction. Dynamic generated queries
+should remain a separately controlled fallback.
 
 ## Security and efficiency comparison
 
