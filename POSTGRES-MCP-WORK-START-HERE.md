@@ -3,6 +3,10 @@
 There are two separate deployment paths. Do not merge their authentication
 configuration.
 
+For the comparison with retrieval-assisted text-to-SQL and the recommended
+shared-backend integration, read
+[`postgres-natural-language-query-integration/`](postgres-natural-language-query-integration/).
+
 ## Path A — available today: MCPg username/password
 
 Use [`postgres-mcpg-password/`](postgres-mcpg-password/) when the database team
