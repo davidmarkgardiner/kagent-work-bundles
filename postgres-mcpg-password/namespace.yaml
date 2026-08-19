@@ -1,0 +1,7 @@
+# Password bundle namespace template.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: postgres-data-mcp
+  labels:
+    app.kubernetes.io/part-of: postgres-data-mcp

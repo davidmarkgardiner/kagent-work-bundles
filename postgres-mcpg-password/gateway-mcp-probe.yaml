@@ -1,0 +1,11 @@
+# Password bundle: temporary MCPg gateway probe. It has no Agent and isolates
+# MCP discovery through Agent Gateway from model/prompt configuration.
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: postgres-inventory-mcpg-gateway-probe
+  namespace: "{{KAGENT_NAMESPACE}}"
+spec:
+  description: Temporary no-Agent MCPg Streamable HTTP discovery probe via Agent Gateway.
+  protocol: STREAMABLE_HTTP
+  url: "http://{{AGENTGATEWAY_SERVICE}}.{{AGENTGATEWAY_NAMESPACE}}.svc.cluster.local/mcp/postgres-inventory"

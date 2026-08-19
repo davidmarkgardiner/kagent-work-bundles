@@ -1,0 +1,53 @@
+# Password bundle Agent. The MCPg database principal must remain
+# SELECT-only on approved views. Never change MCPG_ACCESS_MODE to restricted
+# merely to answer a read query such as a namespace count.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: postgres-inventory-read-query-agent
+  namespace: "{{KAGENT_NAMESPACE}}"
+spec:
+  type: Declarative
+  description: Read-only MCPg Agent for approved PostgreSQL inventory view queries.
+  declarative:
+    runtime: python
+    modelConfig: "{{KAGENT_MODEL_CONFIG}}"
+    deployment:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+      podSecurityContext:
+        runAsNonRoot: true
+        runAsUser: 65532 # kagent v0.10 distroless runtime's numeric non-root UID.
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        readOnlyRootFilesystem: false # Verify controller-runtime compatibility before tightening.
+    systemMessage: |
+      Answer only approved inventory questions using the mounted MCPg read-only
+      tools. Use run_select only for one SELECT against an owner-approved view,
+      with the smallest result set needed. Never write,
+      modify schema, run DDL, query unapproved tables, request credentials, or
+      expose sensitive values. For a count, use SELECT count(*) against the
+      approved view and state the exact view used.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: postgres-inventory-mcpg
+          namespace: "{{KAGENT_NAMESPACE}}"
+          toolNames:
+            - list_schemas
+            - list_tables
+            - describe_table
+            - run_select

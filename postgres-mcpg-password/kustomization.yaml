@@ -1,0 +1,71 @@
+# Password bundle steady-state GitOps entry point. Temporary direct and gateway
+# probes are deliberately excluded; use the validation checklist to apply them.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - mcpg-postgres-mcp.yaml
+  - agentgateway-route.yaml
+  - mcp-networkpolicy.yaml
+  - kagent-agent.yaml
+
+# Deployment coordinates only. A private overlay must replace every value with
+# the approved work coordinates and the scanned, signed MCPg image digest.
+configMapGenerator:
+  - name: mcpg-deployment-config
+    envs:
+      - work-values.env
+generatorOptions:
+  disableNameSuffixHash: true
+
+replacements:
+  - source: {kind: ConfigMap, name: mcpg-deployment-config, fieldPath: data.dataMcpNamespace}
+    targets:
+      - select: {kind: Service, name: postgres-inventory-mcp}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: Deployment, name: postgres-inventory-mcp}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: NetworkPolicy, name: postgres-inventory-mcp-gateway-only}
+        fieldPaths: [metadata.namespace]
+  - source: {kind: ConfigMap, name: mcpg-deployment-config, fieldPath: data.agentGatewayNamespace}
+    targets:
+      - select: {kind: AgentgatewayBackend, name: postgres-inventory-mcp}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: HTTPRoute, name: postgres-inventory-mcp}
+        fieldPaths: [metadata.namespace, spec.parentRefs.0.namespace, spec.rules.0.backendRefs.0.namespace]
+      - select: {kind: AgentgatewayPolicy, name: postgres-inventory-mcp}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: NetworkPolicy, name: postgres-inventory-mcp-gateway-only}
+        fieldPaths: ['spec.ingress.0.from.0.namespaceSelector.matchLabels.[kubernetes.io/metadata.name]']
+  - source: {kind: ConfigMap, name: mcpg-deployment-config, fieldPath: data.agentGatewayName}
+    targets:
+      - select: {kind: HTTPRoute, name: postgres-inventory-mcp}
+        fieldPaths: [spec.parentRefs.0.name]
+      - select: {kind: NetworkPolicy, name: postgres-inventory-mcp-gateway-only}
+        fieldPaths: ['spec.ingress.0.from.0.podSelector.matchLabels.[app.kubernetes.io/name]']
+  - source: {kind: ConfigMap, name: mcpg-deployment-config, fieldPath: data.postgresMcpServiceHost}
+    targets:
+      - select: {kind: AgentgatewayBackend, name: postgres-inventory-mcp}
+        fieldPaths: [spec.mcp.targets.0.static.host]
+  - source: {kind: ConfigMap, name: mcpg-deployment-config, fieldPath: data.postgresMcpGatewayUrl}
+    targets:
+      - select: {kind: RemoteMCPServer, name: postgres-inventory-mcpg}
+        fieldPaths: [spec.url]
+  - source: {kind: ConfigMap, name: mcpg-deployment-config, fieldPath: data.kagentNamespace}
+    targets:
+      - select: {kind: RemoteMCPServer, name: postgres-inventory-mcpg}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: Agent, name: postgres-inventory-schema-agent}
+        fieldPaths: [metadata.namespace, spec.declarative.tools.0.mcpServer.namespace]
+  - source: {kind: ConfigMap, name: mcpg-deployment-config, fieldPath: data.kagentModelConfig}
+    targets:
+      - select: {kind: Agent, name: postgres-inventory-schema-agent}
+        fieldPaths: [spec.declarative.modelConfig]
+  - source: {kind: ConfigMap, name: mcpg-deployment-config, fieldPath: data.mcpgImage}
+    targets:
+      - select: {kind: Deployment, name: postgres-inventory-mcp}
+        fieldPaths: [spec.template.spec.containers.0.image]
+  - source: {kind: ConfigMap, name: mcpg-deployment-config, fieldPath: data.postgresMcpSecretName}
+    targets:
+      - select: {kind: Deployment, name: postgres-inventory-mcp}
+        fieldPaths: [spec.template.spec.containers.0.env.0.valueFrom.secretKeyRef.name]

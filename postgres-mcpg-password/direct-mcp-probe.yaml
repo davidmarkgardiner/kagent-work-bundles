@@ -1,0 +1,11 @@
+# Password bundle: temporary direct MCPg discovery probe. Apply only before the
+# Gateway-only NetworkPolicy; delete immediately after it passes.
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: postgres-inventory-mcpg-direct-probe
+  namespace: "{{KAGENT_NAMESPACE}}"
+spec:
+  description: Temporary no-Agent MCPg Streamable HTTP discovery probe.
+  protocol: STREAMABLE_HTTP
+  url: "http://postgres-inventory-mcp.{{DATA_MCP_NAMESPACE}}.svc.cluster.local:8000/mcp"

@@ -1,0 +1,21 @@
+-- UAMI bundle only. Run in POSTGRES_DATABASE as the approved owner/Entra admin.
+-- The data owner creates and owns the view; this grants no base-table access.
+REVOKE ALL ON TABLE "{{APPROVED_SCHEMA}}"."{{DENIED_BASE_TABLE_NAME}}"
+  FROM "{{UAMI_ROLE_NAME}}";
+REVOKE ALL ON TABLE "{{APPROVED_SCHEMA}}"."{{APPROVED_VIEW_NAME}}"
+  FROM "{{UAMI_ROLE_NAME}}";
+GRANT USAGE ON SCHEMA "{{APPROVED_SCHEMA}}" TO "{{UAMI_ROLE_NAME}}";
+GRANT SELECT ON TABLE "{{APPROVED_SCHEMA}}"."{{APPROVED_VIEW_NAME}}"
+  TO "{{UAMI_ROLE_NAME}}";
+
+-- These must both return false before handoff.
+SELECT has_table_privilege(
+  '{{UAMI_ROLE_NAME}}',
+  '{{APPROVED_SCHEMA}}.{{DENIED_BASE_TABLE_NAME}}',
+  'SELECT'
+) AS base_table_select_allowed;
+SELECT has_table_privilege(
+  '{{UAMI_ROLE_NAME}}',
+  '{{APPROVED_SCHEMA}}.{{APPROVED_VIEW_NAME}}',
+  'INSERT,UPDATE,DELETE'
+) AS approved_view_write_allowed;

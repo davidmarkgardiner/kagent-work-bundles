@@ -32,7 +32,7 @@ It contains synthetic data only.
 ## Work configuration implication
 
 The optional
-[read-query profile](../work-lift-and-shift/mcpg-read-query-profile/) keeps
+[read-query profile](../../postgres-mcpg-password/mcpg-read-query-profile/) keeps
 `MCPG_ACCESS_MODE=read-only` and adds only MCPg `run_select` to both the Agent
 Gateway policy and the dedicated query Agent. The work database principal must
 remain SELECT-only against owner-approved views.

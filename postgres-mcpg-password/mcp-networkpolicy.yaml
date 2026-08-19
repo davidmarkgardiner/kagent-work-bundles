@@ -1,0 +1,30 @@
+# Password bundle template. Apply after the direct probe passes and is deleted.
+# steady state this permits ingress to the PostgreSQL MCP only from the gateway
+# pods selected below; it prevents cluster workloads from bypassing Gateway
+# policy/telemetry by calling the Service directly.
+#
+# Validate the actual Agent Gateway pod labels before rendering. A namespace
+# selector alone is deliberately not sufficient: any pod in that namespace
+# would otherwise gain direct MCPg access outside Gateway policy and telemetry.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-inventory-mcp-gateway-only
+  namespace: "{{DATA_MCP_NAMESPACE}}"
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: postgres-inventory-mcp
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: agentgateway-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ai-gateway
+      ports:
+        - protocol: TCP
+          port: 8000

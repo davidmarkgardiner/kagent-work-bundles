@@ -1,6 +1,6 @@
 # HomeLab-only runtime proof. It verifies the actual kagent SkillsTool path
 # against the committed public Git ref. Work uses the digest-pinned skill image
-# in work-lift-and-shift/postgres-inventory-data-contract-skill/ instead.
+# in the standalone postgres-mcpg-password bundle instead.
 apiVersion: kagent.dev/v1alpha2
 kind: Agent
 metadata:
@@ -23,7 +23,7 @@ spec:
       - name: postgres-inventory-data-contract
         url: https://github.com/davidmarkgardiner/kagent-public.git
         ref: feat/aks-fleet-azure-policy
-        path: work-agent-bundles/postgres-dab-sql-mcp-poc/work-lift-and-shift/postgres-inventory-data-contract-skill/skill
+        path: work-agent-bundles/postgres-mcpg-password/postgres-inventory-data-contract-skill/skill
   declarative:
     runtime: python
     modelConfig: agentgateway-minimax

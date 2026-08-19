@@ -177,16 +177,20 @@ and [disposable manifest](mcpg-readonly-spike.yaml).
 
 MCPg read-only mode has also proved capable of a bounded `run_select` namespace
 count; ordinary inventory questions do not need database write access. The
-optional work [read-query profile](work-lift-and-shift/mcpg-read-query-profile/)
+optional work [read-query profile](../postgres-mcpg-password/mcpg-read-query-profile/)
 adds only `run_select` to the Agent Gateway and Agent allowlists. See the
 [read-query evidence](evidence/MCPG-READ-QUERY-POC-2026-08-18.md).
 
 The work lift-and-shift bundle now also has a
-[PostgreSQL inventory data-contract skill image example](work-lift-and-shift/postgres-inventory-data-contract-skill/).
+[PostgreSQL inventory data-contract skill image example](../postgres-mcpg-password/postgres-inventory-data-contract-skill/).
 It gives a read-query Agent approved-view and query guidance without widening
-tool or database permissions. Its [workload-identity decision](work-lift-and-shift/postgres-inventory-data-contract-skill/WORKLOAD-IDENTITY-DECISION.md)
-records that the current MCPg image is not a verified passwordless Entra/UAMI
-database client; use a small FastMCP adapter for that path.
+tool or database permissions. Passwordless Entra/UAMI deployment is now isolated
+in the separate [`../postgres-fastmcp-entra-uami/`](../postgres-fastmcp-entra-uami/) bundle.
+
+The bounded UAMI replacement has been moved out of this MCPg POC into the
+separate sibling work bundle
+[`../postgres-fastmcp-entra-uami/`](../postgres-fastmcp-entra-uami/). Use that
+directory as the only deployment source for FastMCP/Entra/UAMI work.
 
 The HomeLab also live-proved the kagent skill runtime path through a Git-backed
 skill source: initialisation completed, the Agent called MCPg `run_select`, and
@@ -203,20 +207,19 @@ retrieved two synthetic production namespace records through the MCP. The
 database and Kubernetes resources were deleted immediately after the run; see
 the [Azure live evidence](evidence/AZURE-FLEXIBLE-SERVER-PREBUILT-MCP-POC-2026-08-13.md).
 
-The runtime package install in the custom adapter is a HomeLab convenience.
-For an office/Azure PostgreSQL POC, build it in approved CI, scan/sign it, pin
-the digest, and mirror it internally. Use private connectivity/TLS, a dedicated
-Microsoft Entra-backed read-only database role, AKS Workload Identity where
-approved, audit, and one synthetic/masked view. Never put database credentials
-or access tokens in an Agent manifest.
+The historical custom-adapter experiments in this directory are HomeLab
+evidence only. For an office FastMCP/Entra POC, use the separate
+[`../postgres-fastmcp-entra-uami/`](../postgres-fastmcp-entra-uami/) bundle.
+For an MCPg username/password POC, use the separate
+[`../postgres-mcpg-password/`](../postgres-mcpg-password/) bundle.
 
 ## Work lift-and-shift bundle
 
-The [work-lift-and-shift](work-lift-and-shift/) folder is now the reusable
+The [`../postgres-mcpg-password/`](../postgres-mcpg-password/) folder is now the reusable
 MCPg v0.7.1 Azure/AKS handoff: a digest-pinned MCPg deployment, a
-Streamable-HTTP gateway-fronted kagent schema binding, password-bootstrap and
-later Workload Identity decision points, verification gates, and an
-independent-review prompt. It deliberately makes no claim that the exact work
+Streamable-HTTP gateway-fronted kagent schema binding, password bootstrap,
+verification gates, and an independent-review prompt. It deliberately makes
+no claim that the exact work
 Agent Gateway route, work PostgreSQL authentication, or private network path
 has already been live-proven.
 
