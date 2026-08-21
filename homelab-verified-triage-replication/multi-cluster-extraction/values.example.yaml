@@ -1,0 +1,8 @@
+# Copy to one private values file per worker. Do not commit credentials.
+clusterName: "{{CLUSTER_NAME}}"
+environment: "{{ENVIRONMENT}}"
+namespaces: ["{{NAMESPACE_NAME}}"]
+signalProfile: critical-only
+managementVectorOtlpHttpUrl: "https://{{MANAGEMENT_VECTOR_HOST}}"
+managementVectorAuthSecretRef: "{{PER_CLUSTER_AUTH_SECRET}}"
+managementAgentUrl: "https://{{MANAGEMENT_AGENT_HOST}}/{{AGENT_PATH}}"

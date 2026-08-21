@@ -1,0 +1,80 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: kubernetes-manifest-validation
+  namespace: argo
+  labels:
+    app.kubernetes.io/part-of: kubernetes-delivery-harness
+    platform.com/team: platform
+    platform.com/type: validation
+spec:
+  entrypoint: validate
+  serviceAccountName: k8s-delivery-validator
+  activeDeadlineSeconds: 600
+  parallelism: 1
+  ttlStrategy:
+    secondsAfterCompletion: 86400
+    secondsAfterSuccess: 86400
+    secondsAfterFailure: 86400
+  arguments:
+    parameters:
+      - name: manifest
+        description: Rendered Kubernetes YAML to validate; never interpolated into a shell program.
+      - name: source_ref
+        value: unknown
+        description: PR, commit, or repository reference recorded in workflow logs.
+      - name: server_validation
+        value: "false"
+        enum: ["false", "true"]
+        description: Requires an explicitly approved, narrow RoleBinding; false is the default.
+  templates:
+    - name: validate
+      dag:
+        tasks:
+          - name: client-parse
+            template: client-parse
+          - name: server-dry-run
+            template: server-dry-run
+            dependencies: [client-parse]
+            when: "{{workflow.parameters.server_validation}} == true"
+    - name: client-parse
+      script:
+        image: registry.k8s.io/kubectl:v1.32.0
+        command: [sh]
+        env:
+          - name: MANIFEST
+            value: "{{inputs.parameters.manifest}}"
+          - name: SOURCE_REF
+            value: "{{inputs.parameters.source_ref}}"
+        source: |
+          set -eu
+          printf '%s\n' "$MANIFEST" > /tmp/manifest.yaml
+          test -s /tmp/manifest.yaml
+          kubectl apply --dry-run=client --validate=true -f /tmp/manifest.yaml
+          printf 'VALIDATION: client-dry-run passed; source_ref=%s\n' "$SOURCE_REF"
+      inputs:
+        parameters:
+          - name: manifest
+            value: "{{workflow.parameters.manifest}}"
+          - name: source_ref
+            value: "{{workflow.parameters.source_ref}}"
+    - name: server-dry-run
+      script:
+        image: registry.k8s.io/kubectl:v1.32.0
+        command: [sh]
+        env:
+          - name: MANIFEST
+            value: "{{inputs.parameters.manifest}}"
+          - name: SOURCE_REF
+            value: "{{inputs.parameters.source_ref}}"
+        source: |
+          set -eu
+          printf '%s\n' "$MANIFEST" > /tmp/manifest.yaml
+          kubectl apply --dry-run=server --validate=true -f /tmp/manifest.yaml
+          printf 'VALIDATION: server-dry-run passed; source_ref=%s\n' "$SOURCE_REF"
+      inputs:
+        parameters:
+          - name: manifest
+            value: "{{workflow.parameters.manifest}}"
+          - name: source_ref
+            value: "{{workflow.parameters.source_ref}}"

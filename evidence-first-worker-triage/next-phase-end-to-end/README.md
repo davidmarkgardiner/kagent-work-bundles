@@ -72,6 +72,18 @@ identical JSON through Kafka after approval. It keeps the direct-Argo and
 Kafka-backed proofs distinct, so a working workflow parameter is not mistaken
 for confirmed broker delivery.
 
+## Component-by-component work-cluster verification
+
+[`component-verification/`](component-verification/README.md) is the operator
+pack for proving the work-cluster channel one boundary at a time before fleet
+rollout: Alloy -> Vector -> Confluent Kafka -> Argo -> read-only kagent/AKS MCP
+-> GitLab. It includes a mandatory live-discovery/adaptation gate, independent
+component checks, controlled application-log and Kubernetes-event smoke tests,
+deduplication/retry tests, and a namespace-to-fleet rollout plan. It is not a
+second deployment path: the work agent must render the parameterised pilot
+overlay against discovered live namespaces, images, identities and CRDs rather
+than copy proof YAML verbatim.
+
 ## Working config included
 
 `reference-config/` holds the **actual verified-working manifests** from the

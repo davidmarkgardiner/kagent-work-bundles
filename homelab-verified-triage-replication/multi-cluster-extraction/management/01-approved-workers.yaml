@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: triage-approved-workers
+  namespace: argo-events
+data:
+  workers.yaml: |
+    workers:
+      - cluster: "{{CLUSTER_NAME}}"
+        namespaces: ["{{NAMESPACE_NAME}}"]
+        profile: critical-only
+        credentialRef: "{{PER_CLUSTER_AUTH_SECRET}}"

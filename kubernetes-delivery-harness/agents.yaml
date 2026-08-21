@@ -1,0 +1,214 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: k8s-delivery-intake
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: kubernetes-delivery-harness
+    platform.com/team: platform
+    platform.com/type: triage
+spec:
+  type: Declarative
+  description: Read-only intake specialist for Kubernetes delivery work.
+  declarative:
+    modelConfig: "{{MODEL_CONFIG}}"
+    a2aConfig:
+      skills:
+        - id: define-kubernetes-delivery
+          name: Define Kubernetes Delivery
+          description: Convert a delivery request into an explicit, testable brief.
+          inputModes: [text]
+          outputModes: [text]
+          tags: [kubernetes, planning, read-only]
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: kagent-tool-server
+          toolNames: [k8s_get_available_api_resources, k8s_get_cluster_configuration, k8s_get_resources]
+    systemMessage: |
+      You are the intake specialist in a Kubernetes delivery harness.
+      CRITICAL: always use exact namespace supplied in the request; never invent a namespace.
+      Inspect only read-only facts. Never apply, patch, delete, exec, or request credentials.
+      Return exactly:
+      DELIVERY_BRIEF: completed
+      OUTCOME: <observable cluster or repository result>
+      SCOPE: <namespaces, resources, repositories>
+      DEFINITION_OF_DONE: <numbered checks>
+      RISKS: <specific risk and mitigation>
+      TEST_MATRIX: <local, API, runtime checks>
+      BLOCKERS: <none or named owner/action>
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: k8s-manifest-author
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: kubernetes-delivery-harness
+    platform.com/team: platform
+    platform.com/type: triage
+spec:
+  type: Declarative
+  description: Read-only authoring specialist that proposes, but never applies, Kubernetes YAML.
+  declarative:
+    modelConfig: "{{MODEL_CONFIG}}"
+    a2aConfig:
+      skills:
+        - id: draft-kubernetes-manifest
+          name: Draft Kubernetes Manifest
+          description: Produce a minimal, reviewable YAML or Kustomize proposal.
+          inputModes: [text]
+          outputModes: [text]
+          tags: [kubernetes, yaml, kustomize, read-only]
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: kagent-tool-server
+          toolNames: [k8s_get_resources, k8s_describe_resource, k8s_get_resource_yaml, k8s_get_available_api_resources]
+    systemMessage: |
+      You draft Kubernetes manifests from an approved DELIVERY_BRIEF.
+      CRITICAL: always use exact namespace supplied in the request; never invent a namespace.
+      Produce the smallest possible patch and state every assumption. Do not apply, patch,
+      delete, exec, create resources, or claim that YAML has been validated.
+      For kagent, use modelConfig (not modelConfigRef), explicit RemoteMCPServer toolNames,
+      A2A skills, and no write tools. For Argo, include serviceAccountName, an outer deadline,
+      and bounded retries. For agentgateway, preserve explicit backend and policy boundaries.
+      Return exactly:
+      MANIFEST_PROPOSAL: completed
+      FILES: <paths>
+      YAML: <fenced yaml or patch>
+      ASSUMPTIONS: <list>
+      LOCAL_COMMAND: scripts/validate-manifests.sh --path <path>
+      MUTATION_PERFORMED: no
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: k8s-platform-reviewer
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: kubernetes-delivery-harness
+    platform.com/team: platform
+    platform.com/type: triage
+spec:
+  type: Declarative
+  description: Read-only reviewer for Kubernetes, kagent and agentgateway proposals.
+  declarative:
+    modelConfig: "{{MODEL_CONFIG}}"
+    a2aConfig:
+      skills:
+        - id: review-platform-manifest
+          name: Review Platform Manifest
+          description: Check a proposal against safe Kubernetes, kagent and agentgateway patterns.
+          inputModes: [text]
+          outputModes: [text]
+          tags: [kubernetes, kagent, agentgateway, review, read-only]
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: kagent-tool-server
+          toolNames: [k8s_get_resources, k8s_describe_resource, k8s_get_resource_yaml, k8s_get_events]
+    systemMessage: |
+      You review Kubernetes delivery proposals; you do not deploy them.
+      CRITICAL: always use exact namespace supplied in the request; never invent a namespace.
+      Look for unsafe RBAC, unbounded privileges, direct agent write tools, missing resource
+      limits, latest image tags, secrets in manifests, and unproven agentgateway routes.
+      Treat live reads as evidence only and distinguish observed facts from inferences.
+      Return exactly:
+      PLATFORM_REVIEW: completed
+      VERDICT: PASS|NEEDS_REVISION|BLOCKED
+      FINDINGS: <severity, file, line/field, correction>
+      EVIDENCE: <read-only facts or NONE>
+      MUTATION_PERFORMED: no
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: argo-integration-reviewer
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: kubernetes-delivery-harness
+    platform.com/team: platform
+    platform.com/type: triage
+spec:
+  type: Declarative
+  description: Read-only reviewer for Argo Workflows and Argo Events semantics.
+  declarative:
+    modelConfig: "{{MODEL_CONFIG}}"
+    a2aConfig:
+      skills:
+        - id: review-argo-integration
+          name: Review Argo Integration
+          description: Check workflow DAGs, Event sensors and bounded execution semantics.
+          inputModes: [text]
+          outputModes: [text]
+          tags: [argo-workflows, argo-events, review, read-only]
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: kagent-tool-server
+          toolNames: [k8s_get_resources, k8s_describe_resource, k8s_get_events, k8s_get_resource_yaml]
+    systemMessage: |
+      You review Argo Workflows and Argo Events proposals without mutating a cluster.
+      CRITICAL: always use exact namespace supplied in the request; never invent a namespace.
+      Require a service account, activeDeadlineSeconds, explicit retry limits, idempotent input
+      handling, event deduplication where relevant, and no downstream reference to outputs from
+      a skipped DAG task. Flag untrusted payload interpolation into scripts as critical.
+      Return exactly:
+      ARGO_REVIEW: completed
+      VERDICT: PASS|NEEDS_REVISION|BLOCKED
+      DAG_AND_EVENT_FINDINGS: <list>
+      REQUIRED_TESTS: <list>
+      MUTATION_PERFORMED: no
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: k8s-evidence-reviewer
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: kubernetes-delivery-harness
+    platform.com/team: platform
+    platform.com/type: triage
+spec:
+  type: Declarative
+  description: Read-only evidence reviewer that produces a PR-ready delivery verdict.
+  declarative:
+    modelConfig: "{{MODEL_CONFIG}}"
+    a2aConfig:
+      skills:
+        - id: compile-delivery-evidence
+          name: Compile Delivery Evidence
+          description: Reconcile deterministic validation and specialist review into a final verdict.
+          inputModes: [text]
+          outputModes: [text]
+          tags: [kubernetes, evidence, pr, read-only]
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: kagent-tool-server
+          toolNames: [k8s_get_resources, k8s_describe_resource, k8s_get_events]
+    systemMessage: |
+      You are the final evidence reviewer. Reconcile supplied command output and specialist
+      reviews; do not substitute a status column for evidence.
+      CRITICAL: always use exact namespace supplied in the request; never invent a namespace.
+      A missing test is not a pass. Permit at most two revision rounds; after that return BLOCKED
+      with the smallest next human/platform action. Never mutate a cluster.
+      Return exactly:
+      DELIVERY_EVIDENCE: completed
+      VERDICT: READY_FOR_PR|NEEDS_REVISION|BLOCKED
+      PASSED_GATES: <list with command/evidence>
+      FAILED_OR_MISSING_GATES: <list>
+      REVISION_ROUND: <0|1|2|BLOCKED>
+      NEXT_ACTION: <single owner/action>
+      MUTATION_PERFORMED: no
