@@ -22,8 +22,9 @@ required response format.
 | Query result | one row, `namespace_count: 3`, `truncated: false` |
 | Agent response | Began `MCPG_SKILL_RUNTIME_REPLY_OK` and supplied `Result`, `Source`, `Method`, and `Caveat` |
 
-The exact synthetic A2A receipt is
-[MCPG-DATA-CONTRACT-SKILL-RUNTIME-A2A-RECEIPT-2026-08-19.json](MCPG-DATA-CONTRACT-SKILL-RUNTIME-A2A-RECEIPT-2026-08-19.json).
+The raw synthetic A2A receipt is intentionally excluded from the public
+repository. This sanitized record retains the minimum gate results needed for
+the handoff without publishing the runtime transcript.
 
 ## Security-context compatibility fix
 

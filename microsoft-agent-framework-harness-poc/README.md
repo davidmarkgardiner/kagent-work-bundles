@@ -78,20 +78,32 @@ GitLab issues, branches, MRs, or cluster resources.
 
 ## Run
 
+Render `argo-stage-workflow.yaml` with the approved image digest, A2A URL,
+collector setting, and model Secret name before applying it. Then submit the
+request and approval as separate short workflows with the same immutable run
+ID and request:
+
 ```bash
-kubectl --context red apply -k .
-kubectl --context red -n kagent wait --for=condition=complete job/maf-harness-request --timeout=60s
-kubectl --context red apply -f approve-job.yaml
-sh ./scripts/verify.sh red
-kubectl --context red apply -f factory-job.yaml
-sh ./scripts/verify-factory.sh red
+kubectl --context red apply -f argo-stage-workflow.yaml
+RUN_ID="$(uuidgen | tr '[:upper:]' '[:lower:]')"
+REQUEST='Create a short educational PRD. No financial advice.'
+
+argo submit --context red -n kagent \
+  --from workflowtemplate/maf-python-harness-stage \
+  --parameter mode=request --parameter run-id="$RUN_ID" \
+  --parameter request="$REQUEST" --watch
+
+# After reviewing the recorded request, this is the explicit approval action.
+argo submit --context red -n kagent \
+  --from workflowtemplate/maf-python-harness-stage \
+  --parameter mode=approve --parameter run-id="$RUN_ID" \
+  --parameter request="$REQUEST" --watch
 ```
 
 ## Cleanup
 
 ```bash
-kubectl --context red -n kagent delete -f approve-job.yaml --ignore-not-found
-kubectl --context red -n kagent delete -f factory-job.yaml --ignore-not-found
+kubectl --context red -n kagent delete -f argo-stage-workflow.yaml --ignore-not-found
 kubectl --context red -n kagent delete -f manifests.yaml --ignore-not-found
 kubectl --context red -n kagent delete -f sdlc-specialists.yaml --ignore-not-found
 ```

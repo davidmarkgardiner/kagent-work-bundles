@@ -11,6 +11,7 @@ from harness_runtime import (
     evaluate_receipts,
     framework_local_evaluation,
     invoke_a2a_once,
+    record_request,
     request_receipt,
 )
 
@@ -28,6 +29,23 @@ def test_request_and_deny_never_create_a2a_receipt(tmp_path):
     assert receipt["request_digest"] == denied["request_digest"]
     assert denied["status"] == "DENIED"
     assert not store.path("run-1", "a2a-prd-attempt-1.json").exists()
+
+
+def test_denied_request_cannot_be_approved(tmp_path):
+    store = ReceiptStore(tmp_path)
+    request(store)
+    deny_request(store, "run-1", "safe request")
+    with pytest.raises(RuntimeError, match="terminal"):
+        approve_request(store, "run-1", "safe request")
+    assert not store.path("run-1", "approval.json").exists()
+
+
+def test_run_id_cannot_be_reused(tmp_path):
+    store = ReceiptStore(tmp_path)
+    record_request(store, "first request", "run-1")
+    with pytest.raises(RuntimeError, match="already exists"):
+        record_request(store, "replacement request", "run-1")
+    assert store.read("run-1", "request.json")["request_digest"] == request_receipt("first request", "run-1")["request_digest"]
 
 
 def test_approval_requires_exact_recorded_request(tmp_path):

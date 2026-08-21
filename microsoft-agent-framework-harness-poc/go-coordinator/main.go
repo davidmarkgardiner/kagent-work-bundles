@@ -9,6 +9,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -48,7 +49,7 @@ func run(ctx context.Context) error {
 	mode := getenv("MODE", "request")
 	request := getenv("POC_REQUEST", "Synthetic healthcheck POC only.")
 	if mode == "request" {
-		return write(state, "go-harness-run.json", map[string]any{"status": "awaiting-approval", "request": request, "tool_invoked": false, "timestamp": now()})
+		return write(state, "go-harness-run.json", map[string]any{"status": "awaiting-approval", "request": request, "request_digest": requestDigest(request), "tool_invoked": false, "timestamp": now()})
 	}
 	if mode == "deny" {
 		return write(state, "go-harness-run.json", map[string]any{"status": "DENIED", "request": request, "remediation_started": false, "timestamp": now()})
@@ -72,6 +73,12 @@ func run(ctx context.Context) error {
 	if prior["status"] != "awaiting-approval" {
 		return errors.New("refusing approval: no awaiting request")
 	}
+	recordedRequest, requestOK := prior["request"].(string)
+	recordedDigest, digestOK := prior["request_digest"].(string)
+	if !requestOK || !digestOK || requestDigest(recordedRequest) != recordedDigest || requestDigest(request) != recordedDigest {
+		return errors.New("refusing approval: request does not match recorded digest")
+	}
+	request = recordedRequest
 
 	base := strings.TrimSuffix(os.Getenv("KAGENT_A2A_BASE_URL"), "/")
 	if base == "" {
@@ -188,7 +195,8 @@ func terminal(state, status string, err error) error {
 	_ = write(state, "go-harness-run.json", map[string]any{"status": status, "error": err.Error(), "timestamp": now()})
 	return err
 }
-func now() string { return time.Now().UTC().Format(time.RFC3339) }
+func now() string                         { return time.Now().UTC().Format(time.RFC3339) }
+func requestDigest(request string) string { return fmt.Sprintf("%x", sha256.Sum256([]byte(request))) }
 func getenv(k, d string) string {
 	if v := os.Getenv(k); v != "" {
 		return v

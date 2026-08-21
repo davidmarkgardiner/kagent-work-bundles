@@ -5,7 +5,7 @@ context=red
 require() { command -v "$1" >/dev/null || { echo "MISSING_COMMAND $1"; exit 2; }; }
 require kubectl
 require jq
-repo_root="$(CDPATH= cd -- "$(dirname "$0")/../../.." && pwd)"
+repo_root="$(CDPATH='' cd -- "$(dirname "$0")/../../.." && pwd)"
 receipt="$(mktemp)"
 result="$(mktemp)"
 trap 'rm -f "$receipt" "$result"' EXIT

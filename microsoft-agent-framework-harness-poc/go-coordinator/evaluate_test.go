@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"context"
+	"strings"
+	"testing"
+)
 
 func TestEvaluateRunPassesCompleteBoundedReceiptSet(t *testing.T) {
 	dir := t.TempDir()
@@ -39,5 +43,21 @@ func TestResponseExcerptIsOptIn(t *testing.T) {
 	t.Setenv("RECORD_RESPONSE_EXCERPT", "true")
 	if got := responseExcerpt("diagnostic result"); got != "diagnostic result" {
 		t.Fatalf("expected opted-in excerpt, got %q", got)
+	}
+}
+
+func TestApproveRejectsRequestNotMatchingRecordedDigest(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("STATE_DIR", dir)
+	t.Setenv("MODE", "request")
+	t.Setenv("POC_REQUEST", "approved request")
+	if err := run(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Setenv("MODE", "approve")
+	t.Setenv("POC_REQUEST", "different request")
+	if err := run(context.Background()); err == nil || !strings.Contains(err.Error(), "recorded digest") {
+		t.Fatalf("expected digest rejection, got %v", err)
 	}
 }

@@ -77,6 +77,11 @@ class ReceiptStore:
         tmp.replace(path)
         return path
 
+    def create(self, run_id: str, name: str, value: dict[str, Any]) -> Path:
+        path = self.path(run_id, name)
+        path.parent.mkdir(mode=0o700, parents=True, exist_ok=False)
+        return self.write(run_id, name, value)
+
     def read(self, run_id: str, name: str) -> dict[str, Any]:
         return json.loads(self.path(run_id, name).read_text())
 
@@ -93,21 +98,37 @@ def request_receipt(request: str, run_id: str | None = None) -> dict[str, Any]:
     }
 
 
-def approve_request(store: ReceiptStore, run_id: str, request: str) -> dict[str, Any]:
+def record_request(store: ReceiptStore, request: str, run_id: str | None = None) -> dict[str, Any]:
+    receipt = request_receipt(request, run_id)
+    try:
+        store.create(str(receipt["run_id"]), "request.json", receipt)
+    except FileExistsError as exc:
+        raise RuntimeError("run ID already exists") from exc
+    return receipt
+
+
+def awaiting_request(store: ReceiptStore, run_id: str, request: str) -> dict[str, Any]:
+    if store.path(run_id, "terminal.json").exists():
+        raise RuntimeError("run is already terminal")
+    if store.path(run_id, "approval.json").exists():
+        raise RuntimeError("run is already approved")
     prior = store.read(run_id, "request.json")
     if prior.get("status") != "awaiting-approval":
-        raise RuntimeError("approval requires an awaiting request")
+        raise RuntimeError("transition requires an awaiting request")
     if prior.get("request_digest") != canonical_digest(request):
-        raise RuntimeError("approval request digest does not match the recorded request")
+        raise RuntimeError("transition request digest does not match the recorded request")
+    return prior
+
+
+def approve_request(store: ReceiptStore, run_id: str, request: str) -> dict[str, Any]:
+    prior = awaiting_request(store, run_id, request)
     approved = {**prior, "status": "approved", "approved_at": now()}
     store.write(run_id, "approval.json", approved)
     return approved
 
 
 def deny_request(store: ReceiptStore, run_id: str, request: str) -> dict[str, Any]:
-    prior = store.read(run_id, "request.json")
-    if prior.get("status") != "awaiting-approval" or prior.get("request_digest") != canonical_digest(request):
-        raise RuntimeError("deny requires the matching awaiting request")
+    prior = awaiting_request(store, run_id, request)
     denied = {**prior, "status": "DENIED", "tool_invoked": False, "denied_at": now()}
     store.write(run_id, "terminal.json", denied)
     return denied

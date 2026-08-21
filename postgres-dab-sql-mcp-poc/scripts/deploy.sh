@@ -3,7 +3,7 @@ set -eu
 
 context=red
 [ "$#" -gt 0 ] && context="$1"
-root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+root="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 require() { command -v "$1" >/dev/null || { echo "MISSING_COMMAND $1" >&2; exit 2; }; }
 require kubectl
 require base64

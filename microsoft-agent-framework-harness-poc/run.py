@@ -23,7 +23,7 @@ from harness_runtime import (
     evaluate_receipts,
     framework_local_evaluation,
     invoke_a2a_once,
-    request_receipt,
+    record_request,
 )
 
 
@@ -87,8 +87,7 @@ async def main() -> None:
     run_id = getenv("RUN_ID")
 
     if mode == "request":
-        receipt = request_receipt(request, run_id or None)
-        store.write(str(receipt["run_id"]), "request.json", receipt)
+        receipt = record_request(store, request, run_id or None)
         print(f"HARNESS_REQUEST_RECORDED run_id={receipt['run_id']} status=awaiting-approval tool_invoked=false")
         return
     if not run_id:

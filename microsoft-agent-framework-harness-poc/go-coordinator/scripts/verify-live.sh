@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 set -eu
 ctx=${1:-red}
-script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-coordinator_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+coordinator_dir=$(CDPATH='' cd -- "$script_dir/.." && pwd)
 (
   cd "$coordinator_dir"
   go test .
