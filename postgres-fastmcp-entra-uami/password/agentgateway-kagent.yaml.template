@@ -1,0 +1,104 @@
+# Password-mode front door. Keep its tool contract identical to the UAMI path.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: fastmcp-postgres-entra
+  namespace: agentgateway-system
+spec:
+  mcp:
+    failureMode: FailClosed
+    sessionRouting: Stateful
+    targets:
+      - name: fastmcp-postgres-entra
+        static:
+          host: fastmcp-postgres-entra.fastmcp-entra-poc.svc.cluster.local
+          port: 8000
+          path: /mcp
+          protocol: StreamableHTTP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: fastmcp-postgres-entra
+  namespace: agentgateway-system
+spec:
+  parentRefs:
+    - name: ai-gateway
+      namespace: agentgateway-system
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /mcp/fastmcp-postgres-entra
+      backendRefs:
+        - group: agentgateway.dev
+          kind: AgentgatewayBackend
+          name: fastmcp-postgres-entra
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: fastmcp-postgres-entra
+  namespace: agentgateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: fastmcp-postgres-entra
+  backend:
+    mcp:
+      authorization:
+        action: Allow
+        policy:
+          matchExpressions:
+            - >-
+              mcp.tool.name in [
+                "get_inventory_data_product_details",
+                "get_namespace_count",
+                "get_namespace_summary"
+              ]
+  traffic:
+    rateLimit:
+      local:
+        - requests: 30
+          unit: Minutes
+          burst: 10
+    timeouts:
+      request: 60s
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: fastmcp-postgres-entra
+  namespace: kagent
+spec:
+  description: Bounded PostgreSQL inventory tools through Agent Gateway.
+  protocol: STREAMABLE_HTTP
+  url: http://ai-gateway.agentgateway-system.svc.cluster.local/mcp/fastmcp-postgres-entra
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: fastmcp-postgres-entra
+  namespace: kagent
+spec:
+  type: Declarative
+  description: Read-only namespace inventory agent backed by bounded FastMCP tools.
+  declarative:
+    runtime: python
+    modelConfig: "{{MODEL_CONFIG}}"
+    systemMessage: |
+      Use only the approved FastMCP inventory tools. Begin by calling the
+      product-details tool. Never request raw SQL, write data, or infer facts
+      not returned by a tool. State the approved-view scope in every answer.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: fastmcp-postgres-entra
+          namespace: kagent
+          toolNames:
+            - get_inventory_data_product_details
+            - get_namespace_count
+            - get_namespace_summary

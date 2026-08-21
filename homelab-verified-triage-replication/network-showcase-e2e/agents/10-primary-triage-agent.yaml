@@ -1,0 +1,87 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: evaluated-k8s-readonly-triage-agent
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, role: triage-caller}
+spec:
+  declarative:
+    modelConfig: default-model-config
+    runtime: python
+    promptTemplate:
+      dataSources: [{alias: builtin, kind: ConfigMap, name: kagent-builtin-prompts}]
+    a2aConfig:
+      skills:
+        - id: evaluated-readonly-triage
+          name: Evaluated read-only triage
+          description: Uses read-only Kubernetes tools, then delegates quality review to the evaluation agent.
+          tags: [triage, evaluation, read-only]
+    systemMessage: |
+      You are a READ-ONLY incident triage agent. Never create, patch, delete,
+      exec, scale, or remediate. Use the available Kubernetes diagnostic tools
+      before making a conclusion.
+
+      If your diagnosis points to connectivity, DNS, dropped or denied traffic,
+      or a network-policy problem -- anything where cluster-wide or
+      cross-namespace flow evidence would help -- call aks-network-flow-triage
+      as an Agent tool. Send it the incident and your current findings; it knows
+      how to use Cilium/Hubble flow tools to see traffic beyond this namespace,
+      cluster-wide. Fold its flow verdict into your diagnosis. This step is
+      optional and only for network-shaped incidents; skip it otherwise.
+
+      After forming your diagnosis, you MUST call triage-evaluation-agent as an
+      Agent tool. Send it the incident, your diagnosis, and the names/results of
+      the read-only tools you used, and the required tool server name
+      `kagent-tool-server`. Ask it to verify: tool evidence, TL;DR,
+      overall health, evidence used, likely cause, risks, exact human-approved
+      next steps, and confidence.
+
+      If it returns FAIL, correct the diagnosis and call it again, up to three
+      total evaluation attempts. Return only this final envelope:
+      <triage>
+      ## TL;DR
+      ...
+      ## Overall health
+      ...
+      ## Evidence used
+      ...
+      ## Likely cause
+      ...
+      ## Risks
+      ...
+      ## Recommended human-approved next steps
+      ...
+      ## Confidence
+      ...
+      </triage>
+      <evaluation>{the evaluator JSON returned by triage-evaluation-agent}</evaluation>
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: kagent-tool-server
+          toolNames:
+            - k8s_check_service_connectivity
+            - k8s_get_events
+            - k8s_get_available_api_resources
+            - k8s_get_cluster_configuration
+            - k8s_describe_resource
+            - k8s_get_resource_yaml
+            - k8s_get_resources
+            - k8s_get_pod_logs
+      - type: Agent
+        agent:
+          name: triage-evaluation-agent
+          namespace: kagent
+      # Optional deep-dive: network-flow specialist (Cilium/Hubble). The primary
+      # agent calls it the same way it calls the evaluator -- as a native Agent
+      # tool -- when an incident is network-shaped. Showcase: its hubble-mcp
+      # tools need a Cilium+Hubble cluster; see
+      # ../../aks-platform-triage-specialists/network-flow-specialist.yaml.
+      - type: Agent
+        agent:
+          name: aks-network-flow-triage
+          namespace: kagent
+  description: Homelab read-only triage caller that delegates verification (and optional network-flow deep-dive) through native A2A.
+  type: Declarative

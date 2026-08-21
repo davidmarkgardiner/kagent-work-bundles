@@ -1,0 +1,66 @@
+# Production-shaped execution: one short, idempotent Python Harness action per
+# Workflow. The image must be built from this directory and pinned to a digest
+# by the environment overlay. An operator supplies the same request and RUN_ID
+# for each allowed state transition.
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: maf-python-harness-stage
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: maf-harness-poc
+spec:
+  entrypoint: stage
+  podMetadata:
+    labels:
+      app.kubernetes.io/component: python-harness-stage
+  arguments:
+    parameters:
+      - {name: mode, value: request}
+      - {name: run-id, value: ""}
+      - {name: request, value: "Create a short educational PRD. No financial advice."}
+  templates:
+    - name: stage
+      inputs:
+        parameters:
+          - {name: mode}
+          - {name: run-id}
+          - {name: request}
+      container:
+        image: "{{HARNESS_IMAGE_DIGEST}}"
+        imagePullPolicy: IfNotPresent
+        command: [python, /app/run.py]
+        env:
+          - {name: MODE, value: "{{inputs.parameters.mode}}"}
+          - {name: RUN_ID, value: "{{inputs.parameters.run-id}}"}
+          - {name: POC_REQUEST, value: "{{inputs.parameters.request}}"}
+          - {name: STATE_DIR, value: /state}
+          - {name: KAGENT_A2A_URL, value: "{{KAGENT_A2A_URL}}"}
+          # Empty by default: telemetry is enabled only when an approved OTLP
+          # collector endpoint is set by the environment overlay.
+          - {name: OTEL_EXPORTER_OTLP_ENDPOINT, value: "{{OTEL_EXPORTER_OTLP_ENDPOINT}}"}
+          - name: MODEL
+            valueFrom: {secretKeyRef: {name: "{{MODEL_SECRET_NAME}}", key: model}}
+          - name: OPENAI_BASE_URL
+            valueFrom: {secretKeyRef: {name: "{{MODEL_SECRET_NAME}}", key: base-url}}
+          - name: OPENAI_API_KEY
+            valueFrom: {secretKeyRef: {name: "{{MODEL_SECRET_NAME}}", key: api-key}}
+        resources:
+          requests: {cpu: 100m, memory: 256Mi, ephemeral-storage: 256Mi}
+          limits: {cpu: 500m, memory: 512Mi, ephemeral-storage: 512Mi}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65532
+          runAsGroup: 65532
+          capabilities: {drop: [ALL]}
+          seccompProfile: {type: RuntimeDefault}
+        volumeMounts:
+          - {name: state, mountPath: /state}
+          - {name: tmp, mountPath: /tmp}
+      activeDeadlineSeconds: 180
+      serviceAccountName: maf-harness-poc
+      volumes:
+        - {name: state, persistentVolumeClaim: {claimName: maf-harness-poc-state}}
+        - {name: tmp, emptyDir: {sizeLimit: 128Mi}}

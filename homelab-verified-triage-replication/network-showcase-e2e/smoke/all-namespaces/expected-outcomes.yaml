@@ -1,0 +1,47 @@
+# Full-coverage smoke: one log + one event per Alloy-watched namespace.
+# Five signals in per namespace pair -> two tickets out; eval gate scores each.
+expected:
+  - {namespace: aks-istio-ingress, pod: smoke-log-aks-istio-ingress, signal: pod-log}
+  - {namespace: aks-istio-ingress, pod: smoke-evt-aks-istio-ingress, signal: kubernetes-event, reason: OOMKilled}
+  - {namespace: aks-istio-egress, pod: smoke-log-aks-istio-egress, signal: pod-log}
+  - {namespace: aks-istio-egress, pod: smoke-evt-aks-istio-egress, signal: kubernetes-event, reason: FailedMount}
+  - {namespace: aks-istio-system, pod: smoke-log-aks-istio-system, signal: pod-log}
+  - {namespace: aks-istio-system, pod: smoke-evt-aks-istio-system, signal: kubernetes-event, reason: FailedScheduling}
+  - {namespace: alloy, pod: smoke-log-alloy, signal: pod-log}
+  - {namespace: alloy, pod: smoke-evt-alloy, signal: kubernetes-event, reason: NetworkNotReady}
+  - {namespace: flux-system, pod: smoke-log-flux-system, signal: pod-log}
+  - {namespace: flux-system, pod: smoke-evt-flux-system, signal: kubernetes-event, reason: BackOff}
+  - {namespace: gatekeeper-system, pod: smoke-log-gatekeeper-system, signal: pod-log}
+  - {namespace: gatekeeper-system, pod: smoke-evt-gatekeeper-system, signal: kubernetes-event, reason: Unhealthy}
+  - {namespace: kube-system, pod: smoke-log-kube-system, signal: pod-log}
+  - {namespace: kube-system, pod: smoke-evt-kube-system, signal: kubernetes-event, reason: Evicted}
+  - {namespace: kyverno, pod: smoke-log-kyverno, signal: pod-log}
+  - {namespace: kyverno, pod: smoke-evt-kyverno, signal: kubernetes-event, reason: ImagePullBackOff}
+  - {namespace: logging, pod: smoke-log-logging, signal: pod-log}
+  - {namespace: logging, pod: smoke-evt-logging, signal: kubernetes-event, reason: OOMKilled}
+  - {namespace: monitoring, pod: smoke-log-monitoring, signal: pod-log}
+  - {namespace: monitoring, pod: smoke-evt-monitoring, signal: kubernetes-event, reason: FailedMount}
+  - {namespace: xxx-system, pod: smoke-log-xxx-system, signal: pod-log}
+  - {namespace: xxx-system, pod: smoke-evt-xxx-system, signal: kubernetes-event, reason: FailedScheduling}
+  - {namespace: uk8s-config, pod: smoke-log-uk8s-config, signal: pod-log}
+  - {namespace: uk8s-config, pod: smoke-evt-uk8s-config, signal: kubernetes-event, reason: NetworkNotReady}
+  - {namespace: uk8s-core, pod: smoke-log-uk8s-core, signal: pod-log}
+  - {namespace: uk8s-core, pod: smoke-evt-uk8s-core, signal: kubernetes-event, reason: BackOff}
+  - {namespace: external-dns, pod: smoke-log-external-dns, signal: pod-log}
+  - {namespace: external-dns, pod: smoke-evt-external-dns, signal: kubernetes-event, reason: Unhealthy}
+  - {namespace: cert-manager, pod: smoke-log-cert-manager, signal: pod-log}
+  - {namespace: cert-manager, pod: smoke-evt-cert-manager, signal: kubernetes-event, reason: Evicted}
+  - {namespace: external-secrets, pod: smoke-log-external-secrets, signal: pod-log}
+  - {namespace: external-secrets, pod: smoke-evt-external-secrets, signal: kubernetes-event, reason: ImagePullBackOff}
+  - {namespace: informer, pod: smoke-log-informer, signal: pod-log}
+  - {namespace: informer, pod: smoke-evt-informer, signal: kubernetes-event, reason: OOMKilled}
+  - {namespace: kro-system, pod: smoke-log-kro-system, signal: pod-log}
+  - {namespace: kro-system, pod: smoke-evt-kro-system, signal: kubernetes-event, reason: FailedMount}
+  - {namespace: platform-test-app, pod: smoke-log-platform-test-app, signal: pod-log}
+  - {namespace: platform-test-app, pod: smoke-evt-platform-test-app, signal: kubernetes-event, reason: FailedScheduling}
+  - {namespace: xxx-issuer-system, pod: smoke-log-xxx-issuer-system, signal: pod-log}
+  - {namespace: xxx-issuer-system, pod: smoke-evt-xxx-issuer-system, signal: kubernetes-event, reason: NetworkNotReady}
+  - {namespace: agentic-triage-proof, pod: smoke-log-agentic-triage-proof, signal: pod-log}
+  - {namespace: agentic-triage-proof, pod: smoke-evt-agentic-triage-proof, signal: kubernetes-event, reason: BackOff}
+  - {namespace: aks-platform-triage-smoke, pod: smoke-log-aks-platform-triage-smoke, signal: pod-log}
+  - {namespace: aks-platform-triage-smoke, pod: smoke-evt-aks-platform-triage-smoke, signal: kubernetes-event, reason: Unhealthy}

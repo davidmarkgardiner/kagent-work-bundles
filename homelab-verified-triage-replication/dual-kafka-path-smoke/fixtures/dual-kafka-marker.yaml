@@ -8,6 +8,12 @@ metadata:
     app.kubernetes.io/part-of: dual-kafka-path-smoke
 spec:
   restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    seccompProfile: {type: RuntimeDefault}
   containers:
   - name: marker
     image: dual-kafka-smoke-image
@@ -17,3 +23,7 @@ spec:
     resources:
       requests: {cpu: 10m, memory: 16Mi}
       limits: {cpu: 50m, memory: 32Mi}
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities: {drop: [ALL]}

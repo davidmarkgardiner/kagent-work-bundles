@@ -1,0 +1,125 @@
+# HomeLab-only Agent Gateway route. It deliberately targets the existing
+# synthetic FastMCP Service while the packaged image is smoke-tested locally.
+# It does not claim that Gateway is an enforced network boundary: that requires
+# an additional NetworkPolicy after the direct registration probe is removed.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: fastmcp-postgres-poc
+  namespace: agentgateway-system
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  mcp:
+    failureMode: FailClosed
+    sessionRouting: Stateful
+    targets:
+      - name: fastmcp-postgres-poc
+        static:
+          host: postgres-compliance-mcp.postgres-dab-mcp-poc.svc.cluster.local
+          port: 8000
+          path: /mcp
+          protocol: StreamableHTTP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: fastmcp-postgres-poc
+  namespace: agentgateway-system
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  parentRefs:
+    - name: ai-gateway
+      namespace: agentgateway-system
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /mcp/fastmcp-postgres-poc
+      backendRefs:
+        - group: agentgateway.dev
+          kind: AgentgatewayBackend
+          name: fastmcp-postgres-poc
+          namespace: agentgateway-system
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: fastmcp-postgres-poc
+  namespace: agentgateway-system
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: fastmcp-postgres-poc
+  backend:
+    mcp:
+      authorization:
+        action: Allow
+        policy:
+          matchExpressions:
+            - >-
+              mcp.tool.name in [
+                "get_kubernetes_inventory_data_product_details",
+                "get_namespace_workload_summary",
+                "get_namespace_container_images",
+                "get_image_risk_summary"
+              ]
+  traffic:
+    rateLimit:
+      local:
+        - requests: 30
+          unit: Minutes
+          burst: 10
+    timeouts:
+      request: 60s
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: fastmcp-postgres-gateway-spike
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  description: HomeLab route test for the bounded synthetic FastMCP service through Agent Gateway.
+  protocol: STREAMABLE_HTTP
+  url: http://ai-gateway.agentgateway-system.svc.cluster.local/mcp/fastmcp-postgres-poc
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: fastmcp-postgres-gateway-spike-agent
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  type: Declarative
+  description: HomeLab-only Agent Gateway route test for bounded FastMCP PostgreSQL tools.
+  declarative:
+    runtime: python
+    modelConfig: agentgateway-minimax
+    systemMessage: |
+      You answer questions only from the synthetic Kubernetes inventory FastMCP
+      tools. Begin by calling the product-details tool. Never request raw SQL,
+      write data, or claim that this is a real cluster or production data.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: fastmcp-postgres-gateway-spike
+          namespace: kagent
+          toolNames:
+            - get_kubernetes_inventory_data_product_details
+            - get_namespace_workload_summary
+            - get_namespace_container_images
+            - get_image_risk_summary

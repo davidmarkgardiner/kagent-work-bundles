@@ -1,0 +1,26 @@
+# Enable only after confirming the environment's DNS label/port and gateway
+# listener. This allows the Python coordinator to reach DNS, kagent A2A, and
+# the model gateway; it denies every other egress route.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: maf-python-harness-stage-egress
+  namespace: kagent
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: python-harness-stage
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: kube-system}
+      ports: [{protocol: UDP, port: 53}, {protocol: TCP, port: 53}]
+    - to:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: kagent}
+      ports: [{protocol: TCP, port: 8083}]
+    - to:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: agentgateway-system}
+      ports: [{protocol: TCP, port: 80}]

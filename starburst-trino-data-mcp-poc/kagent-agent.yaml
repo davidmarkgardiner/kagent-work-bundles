@@ -1,0 +1,45 @@
+# This uses HTTP only inside the disposable lab namespace. Production must use HTTPS and the Starburst native MCP endpoint.
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: trino-readonly-data-mcp
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: starburst-trino-data-mcp-poc
+spec:
+  description: Lab-only synthetic Trino fallback MCP. It exposes no write or arbitrary-SQL tool.
+  protocol: STREAMABLE_HTTP
+  url: http://trino-readonly-mcp.data-mcp-poc.svc.cluster.local:8000/mcp
+  timeout: 45s
+  sseReadTimeout: 2m
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: trino-data-product-lab-agent
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: starburst-trino-data-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  type: Declarative
+  description: Read-only agent for one synthetic Trino data product.
+  declarative:
+    runtime: python
+    modelConfig: agentgateway-minimax
+    systemMessage: |
+      You analyse one synthetic lab data product. First discover the data product,
+      then inspect its metadata, then use the bounded aggregate tool. Never claim
+      access to production, Starburst Enterprise, other data products, credentials,
+      raw SQL, or write operations. Keep returned values concise.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: trino-readonly-data-mcp
+          namespace: kagent
+          toolNames:
+            - search_data_products
+            - get_data_product_details
+            - get_overdue_risk_summary

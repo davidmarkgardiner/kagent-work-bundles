@@ -1,0 +1,140 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-compliance-mcp-code
+  namespace: postgres-dab-mcp-poc
+data:
+  server.py: |
+    import os
+    from fastmcp import FastMCP
+    import psycopg
+
+    mcp = FastMCP("postgres-kubernetes-inventory-readonly")
+    DATABASE_URL = os.environ["POSTGRES_CONNECTION_STRING"]
+
+    def query(sql, params=()):
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, params)
+                columns = [item.name for item in cur.description]
+                return [dict(zip(columns, row)) for row in cur.fetchall()]
+
+    @mcp.tool()
+    def get_kubernetes_inventory_data_product_details() -> dict:
+        """Describe the synthetic Kubernetes namespace and image inventory product."""
+        return {
+            "data_product": "synthetic-kubernetes-namespace-image-inventory-v1",
+            "functions": [
+                "get_namespace_workload_summary",
+                "get_namespace_container_images",
+                "get_image_risk_summary",
+            ],
+            "allowed_namespaces": ["payments", "catalogue", "developer-tools"],
+            "writes_supported": False,
+            "arbitrary_sql_supported": False,
+            "vector_search_exposed": False,
+        }
+
+    @mcp.tool()
+    def get_namespace_workload_summary(namespace_name: str) -> list[dict]:
+        """Return the synthetic workload and running-pod summary for one approved namespace."""
+        return query("""SELECT DISTINCT namespace_name, environment, owner_team, workload_count,
+                       running_pod_count, namespace_observed_at
+                       FROM public.v_namespace_image_summary WHERE namespace_name = %s""", (namespace_name,))
+
+    @mcp.tool()
+    def get_namespace_container_images(namespace_name: str, limit: int = 20) -> list[dict]:
+        """Return up to 20 synthetic container-image records for one approved namespace."""
+        if limit < 1 or limit > 20:
+            raise ValueError("limit must be between 1 and 20")
+        return query("""SELECT namespace_name, workload_name, image_repository, image_tag,
+                       image_digest, critical_findings, high_findings, scanned_at
+                       FROM public.v_namespace_image_summary WHERE namespace_name = %s
+                       ORDER BY workload_name LIMIT %s""", (namespace_name, limit))
+
+    @mcp.tool()
+    def get_image_risk_summary(namespace_name: str, severity_min: str = "high") -> list[dict]:
+        """Return synthetic image-risk rows for one namespace at high or critical severity."""
+        if severity_min not in ("high", "critical"):
+            raise ValueError("severity_min must be high or critical")
+        predicate = "critical_findings > 0" if severity_min == "critical" else "critical_findings > 0 OR high_findings > 0"
+        return query(f"""SELECT namespace_name, workload_name, image_repository, image_tag,
+                       critical_findings, high_findings, scanned_at
+                       FROM public.v_namespace_image_summary WHERE namespace_name = %s
+                       AND ({predicate}) ORDER BY workload_name""", (namespace_name,))
+
+    if __name__ == "__main__":
+        mcp.run(transport="streamable-http", host="0.0.0.0", port=8000, path="/mcp", show_banner=False)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-compliance-mcp
+  namespace: postgres-dab-mcp-poc
+spec:
+  selector:
+    app.kubernetes.io/name: postgres-compliance-mcp
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-compliance-mcp
+  namespace: postgres-dab-mcp-poc
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres-compliance-mcp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres-compliance-mcp
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: adapter
+          image: python:3.12-slim
+          command: ["sh", "-ec"]
+          args:
+            - |
+              pip install --no-cache-dir --target /tmp/site fastmcp==2.14.3 'psycopg[binary]==3.2.12' packaging==25.0
+              exec env PYTHONPATH=/tmp/site python /app/server.py
+          env:
+            - name: POSTGRES_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-dab-poc-reader
+                  key: postgres-url
+          ports:
+            - name: http
+              containerPort: 8000
+          volumeMounts:
+            - name: code
+              mountPath: /app/server.py
+              subPath: server.py
+              readOnly: true
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 1m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: code
+          configMap:
+            name: postgres-compliance-mcp-code

@@ -1,0 +1,86 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - fastmcp-password.yaml.template
+  - agentgateway-kagent.yaml.template
+
+configMapGenerator:
+  - name: fastmcp-password-work-values
+    envs:
+      - work-values.env
+generatorOptions:
+  disableNameSuffixHash: true
+
+replacements:
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.FASTMCP_NAMESPACE}
+    targets:
+      - select: {kind: Namespace, name: fastmcp-entra-poc}
+        fieldPaths: [metadata.name]
+      - select: {kind: Deployment, name: fastmcp-postgres-entra}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: Service, name: fastmcp-postgres-entra}
+        fieldPaths: [metadata.namespace]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.FASTMCP_IMAGE}
+    targets:
+      - select: {kind: Deployment, name: fastmcp-postgres-entra}
+        fieldPaths: [spec.template.spec.containers.0.image]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.POSTGRES_HOST}
+    targets:
+      - select: {kind: Deployment, name: fastmcp-postgres-entra}
+        fieldPaths: [spec.template.spec.containers.0.env.1.value]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.POSTGRES_DATABASE}
+    targets:
+      - select: {kind: Deployment, name: fastmcp-postgres-entra}
+        fieldPaths: [spec.template.spec.containers.0.env.2.value]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.APPROVED_VIEW}
+    targets:
+      - select: {kind: Deployment, name: fastmcp-postgres-entra}
+        fieldPaths: [spec.template.spec.containers.0.env.3.value]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.DENIED_BASE_TABLE}
+    targets:
+      - select: {kind: Deployment, name: fastmcp-postgres-entra}
+        fieldPaths: [spec.template.spec.containers.0.env.4.value]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.POSTGRES_SECRET_NAME}
+    targets:
+      - select: {kind: Deployment, name: fastmcp-postgres-entra}
+        fieldPaths:
+          - spec.template.spec.containers.0.env.5.valueFrom.secretKeyRef.name
+          - spec.template.spec.containers.0.env.6.valueFrom.secretKeyRef.name
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.POSTGRES_USERNAME_KEY}
+    targets:
+      - select: {kind: Deployment, name: fastmcp-postgres-entra}
+        fieldPaths: [spec.template.spec.containers.0.env.5.valueFrom.secretKeyRef.key]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.POSTGRES_PASSWORD_KEY}
+    targets:
+      - select: {kind: Deployment, name: fastmcp-postgres-entra}
+        fieldPaths: [spec.template.spec.containers.0.env.6.valueFrom.secretKeyRef.key]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.AGENTGATEWAY_NAMESPACE}
+    targets:
+      - select: {kind: AgentgatewayBackend, name: fastmcp-postgres-entra}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: HTTPRoute, name: fastmcp-postgres-entra}
+        fieldPaths: [metadata.namespace, spec.parentRefs.0.namespace]
+      - select: {kind: AgentgatewayPolicy, name: fastmcp-postgres-entra}
+        fieldPaths: [metadata.namespace]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.AGENTGATEWAY_NAME}
+    targets:
+      - select: {kind: HTTPRoute, name: fastmcp-postgres-entra}
+        fieldPaths: [spec.parentRefs.0.name]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.FASTMCP_SERVICE_HOST}
+    targets:
+      - select: {kind: AgentgatewayBackend, name: fastmcp-postgres-entra}
+        fieldPaths: [spec.mcp.targets.0.static.host]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.KAGENT_NAMESPACE}
+    targets:
+      - select: {kind: RemoteMCPServer, name: fastmcp-postgres-entra}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: Agent, name: fastmcp-postgres-entra}
+        fieldPaths: [metadata.namespace, spec.declarative.tools.0.mcpServer.namespace]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.MODEL_CONFIG}
+    targets:
+      - select: {kind: Agent, name: fastmcp-postgres-entra}
+        fieldPaths: [spec.declarative.modelConfig]
+  - source: {kind: ConfigMap, name: fastmcp-password-work-values, fieldPath: data.AGENTGATEWAY_MCP_URL}
+    targets:
+      - select: {kind: RemoteMCPServer, name: fastmcp-postgres-entra}
+        fieldPaths: [spec.url]

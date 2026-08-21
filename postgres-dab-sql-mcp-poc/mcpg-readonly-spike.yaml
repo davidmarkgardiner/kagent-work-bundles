@@ -1,0 +1,121 @@
+# Disposable HomeLab spike for MCPg. It proves the pre-built GHCR image can
+# expose PostgreSQL over Streamable HTTP to kagent. It is not a work deployment:
+# resolve a version/digest, mirror it internally, and restrict discovered tools
+# before promoting it beyond this spike.
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcpg-readonly-spike
+  namespace: postgres-dab-mcp-poc
+  labels: {app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc, example.kagent.dev/scope: lab-only}
+spec:
+  selector: {app.kubernetes.io/name: mcpg-readonly-spike}
+  ports: [{name: http, port: 8000, targetPort: http}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcpg-readonly-spike
+  namespace: postgres-dab-mcp-poc
+  labels: {app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc, example.kagent.dev/scope: lab-only}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app.kubernetes.io/name: mcpg-readonly-spike}}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: mcpg-readonly-spike}
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: mcpg
+          # Lab pull only. The work overlay must replace this with an internal
+          # immutable digest after image/SBOM/vulnerability review.
+          image: ghcr.io/devopam/mcpg@sha256:f16f97f667832b79ca496f9cbae8a0485ab1fb59beb32a158db4af3da4ada1d9
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MCPG_DATABASE_URL
+              valueFrom: {secretKeyRef: {name: postgres-dab-poc-reader, key: postgres-url}}
+            - {name: MCPG_ACCESS_MODE, value: read-only}
+            - {name: MCPG_TRANSPORT, value: streamable-http}
+            - {name: MCPG_HTTP_HOST, value: 0.0.0.0}
+            - {name: MCPG_HTTP_PORT, value: "8000"}
+            # The existing synthetic in-cluster PostgreSQL fixture is not TLS
+            # enabled. This exception is lab-only; a work DSN must use
+            # sslmode=require or stronger and omit this variable.
+            - {name: MCPG_ALLOW_INSECURE_TLS, value: "true"}
+            - {name: MCPG_ENABLE_ANALYTICAL_QUERIES, value: "false"}
+            - {name: MCPG_STATEMENT_TIMEOUT_MS, value: "10000"}
+            - {name: MCPG_LOCK_TIMEOUT_MS, value: "3000"}
+            - {name: MCPG_LOG_LEVEL, value: WARNING}
+          ports: [{name: http, containerPort: 8000}]
+          readinessProbe: {tcpSocket: {port: http}, initialDelaySeconds: 10, periodSeconds: 5}
+          livenessProbe: {tcpSocket: {port: http}, initialDelaySeconds: 20, periodSeconds: 10}
+          resources:
+            requests: {cpu: 50m, memory: 128Mi, ephemeral-storage: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi, ephemeral-storage: 256Mi}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mcpg-readonly-spike
+  namespace: postgres-dab-mcp-poc
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: mcpg-readonly-spike}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kagent}}
+      ports: [{protocol: TCP, port: 8000}]
+  egress:
+    - to:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}
+      ports: [{protocol: UDP, port: 53}, {protocol: TCP, port: 53}]
+    - to:
+        - podSelector: {matchLabels: {app.kubernetes.io/name: postgres-dab-poc}}
+      ports: [{protocol: TCP, port: 5432}]
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: mcpg-readonly-spike
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc, example.kagent.dev/scope: lab-only}
+spec:
+  description: Disposable MCPg Streamable HTTP read-only PostgreSQL spike; synthetic data only.
+  protocol: STREAMABLE_HTTP
+  url: http://mcpg-readonly-spike.postgres-dab-mcp-poc.svc.cluster.local:8000/mcp
+---
+# The server discovers a very broad read-only catalogue. This Agent is the
+# deliberate POC boundary: it receives only schema/navigation tools, never
+# generic SELECT, role/lock, diagnostics, vector, or DBA tools.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: mcpg-readonly-schema-spike-agent
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc, example.kagent.dev/scope: lab-only}
+spec:
+  type: Declarative
+  description: Disposable schema-only kagent agent backed by MCPg and synthetic PostgreSQL data.
+  declarative:
+    runtime: python
+    modelConfig: agentgateway-minimax
+    deployment:
+      resources:
+        requests: {cpu: 10m, memory: 128Mi}
+        limits: {cpu: 500m, memory: 512Mi}
+    systemMessage: |
+      You inspect only synthetic PostgreSQL schema metadata through the three
+      permitted MCP tools. Never use or claim access to other tools, arbitrary
+      SQL, data rows, Azure, or a real Kubernetes cluster. Return concise facts
+      and begin the final answer with MCPG_SCHEMA_SPIKE_REPLY_OK.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: mcpg-readonly-spike
+          namespace: kagent
+          toolNames: [list_schemas, list_tables, describe_table]

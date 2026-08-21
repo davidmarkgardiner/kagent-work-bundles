@@ -1,0 +1,232 @@
+# WORKER cluster: read-only log + Kubernetes-event collection.
+#
+# Verified running on `red` (homelab) 2026-07-24. Base is
+# next-phase-end-to-end/reference-config/01-alloy.yaml with two additions:
+#   - the Alloy HTTP server binds 0.0.0.0 so kubelet can probe it (upstream
+#     default is 127.0.0.1, which makes any readiness probe unusable);
+#   - readiness/liveness probes, so a wedged collector is visible as NotReady
+#     instead of silently delivering nothing.
+#
+# SCOPE (read this before copying):
+# This collects from ONE namespace (`agentic-triage-proof`). That is deliberate
+# for a pilot. To widen, see `## Fleet scope` at the bottom of this file and
+# work-agent-bundles/homelab-verified-triage-replication/FINDINGS-AND-FIXES.md
+# finding F5 — widening without also raising Vector's filter selectivity will
+# multiply Kafka volume and ticket volume.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-vector-triage-red-config
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage
+data:
+  TRIAGE_CLUSTER_NAME: red
+  TRIAGE_ENVIRONMENT: lab
+  config.alloy: |
+    logging {
+      level = "error"
+      format = "logfmt"
+    }
+
+    discovery.kubernetes "pods" {
+      role = "pod"
+    }
+    discovery.relabel "pod_logs" {
+      targets = discovery.kubernetes.pods.targets
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        target_label = "namespace"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_pod_name"]
+        target_label = "pod"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_pod_container_name"]
+        target_label = "container"
+      }
+      // Node the pod runs on. On a management cluster the triage agent cannot
+      // live-inspect the worker, so the node name must travel in the envelope
+      // for a human/agent to reach back to the right worker node.
+      rule {
+        source_labels = ["__meta_kubernetes_pod_node_name"]
+        target_label = "node"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+        target_label = "service"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        // System: Istio add-ons, Alloy, Flux, Gatekeeper and kube-system.
+        // Application: the explicit engineering workloads below. Names are
+        // lowercase because Kubernetes Namespace names are lowercase.
+        regex = "aks-istio-ingress|aks-istio-egress|aks-istio-system|alloy|flux-system|gatekeeper-system|kube-system|kyverno|logging|monitoring|xxx-system|uk8s-config|uk8s-core|external-dns|cert-manager|external-secrets|informer|kro-system|platform-test-app|xxx-issuer-system|agentic-triage-proof|aks-platform-triage-smoke"
+        action = "keep"
+      }
+      // Monitoring is in scope, but never collect this collector's own logs.
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app"]
+        regex = "alloy-vector-triage"
+        action = "drop"
+      }
+    }
+    loki.source.kubernetes "pod_logs" {
+      targets = discovery.relabel.pod_logs.output
+      forward_to = [loki.process.pod_logs.receiver]
+    }
+    loki.source.kubernetes_events "events" {
+      namespaces = ["aks-istio-ingress", "aks-istio-egress", "aks-istio-system", "alloy", "flux-system", "gatekeeper-system", "kube-system", "kyverno", "logging", "monitoring", "xxx-system", "uk8s-config", "uk8s-core", "external-dns", "cert-manager", "external-secrets", "informer", "kro-system", "platform-test-app", "xxx-issuer-system", "agentic-triage-proof", "aks-platform-triage-smoke"]
+      job_name = "kubernetes-events"
+      log_format = "json"
+      forward_to = [loki.process.events.receiver]
+    }
+    loki.process "pod_logs" {
+      // Drop routine application log noise before it reaches Vector/Kafka.
+      // Keep ERROR, CRITICAL, and Kubernetes Warning events for triage.
+      stage.drop {
+        expression = "(?i)\\b(info|information)\\b"
+      }
+      stage.static_labels {
+        values = {
+          cluster = sys.env("TRIAGE_CLUSTER_NAME"),
+          environment = sys.env("TRIAGE_ENVIRONMENT"),
+          source_type = "pod-log",
+        }
+      }
+      forward_to = [otelcol.receiver.loki.vector.receiver]
+    }
+    loki.process "events" {
+      // loki.source.kubernetes_events with log_format="json" emits a FLATTENED
+      // event body. Top-level keys: count, kind, msg, name, reason, type,
+      // reportingcontroller, sourcehost, ... There is NO `involvedObject`
+      // object and NO `container` field (re-confirmed on red 2026-07-24; see
+      // evidence/ENVELOPE-SAMPLES-2026-07-24.md for a live capture).
+      // Extract only what is really present in the body:
+      //   - `reason` -> event_reason (top-level key).
+      //   - `name`   -> pod (top-level key = the involved object's name).
+      // `namespace` is NOT in the body; it is labelled by this source's own
+      // namespace watch (see loki.source.kubernetes_events namespaces=[...]),
+      // so no extraction is needed for it here.
+      // `container` is not recoverable at this stage; for events that name it,
+      // it lives only inside `msg` text and is parsed downstream in Vector.
+      // `type` (Normal/Warning) is likewise read downstream, from the body.
+      stage.json {
+        expressions = {
+          event_reason = "reason",
+          pod = "name",
+        }
+      }
+      stage.labels {
+        values = {
+          event_reason = "",
+          pod = "",
+        }
+      }
+      stage.static_labels {
+        values = {
+          cluster = sys.env("TRIAGE_CLUSTER_NAME"),
+          environment = sys.env("TRIAGE_ENVIRONMENT"),
+          source_type = "kubernetes-event",
+        }
+      }
+      forward_to = [otelcol.receiver.loki.vector.receiver]
+    }
+    otelcol.receiver.loki "vector" {
+      output {
+        logs = [otelcol.processor.batch.vector.input]
+      }
+    }
+    otelcol.processor.batch "vector" {
+      timeout = "2s"
+      send_batch_size = 100
+      output {
+        logs = [otelcol.exporter.otlphttp.vector.input]
+      }
+    }
+    otelcol.exporter.otlphttp "vector" {
+      client {
+        endpoint = "http://vector-telemetry-triage.argo-events.svc.cluster.local:4318"
+      }
+      sending_queue {
+        enabled = true
+        queue_size = 1000
+      }
+      retry_on_failure {
+        enabled = true
+        initial_interval = "1s"
+        max_interval = "30s"
+        max_elapsed_time = "5m"
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alloy-vector-triage
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: alloy-vector-triage}
+  template:
+    metadata:
+      labels: {app: alloy-vector-triage}
+    spec:
+      serviceAccountName: alloy
+      containers:
+        - name: alloy
+          image: grafana/alloy:v1.18.0
+          # --server.http.listen-addr: upstream default is 127.0.0.1:12345,
+          # which is unreachable from kubelet, so probes below would never pass.
+          args:
+            - run
+            - /etc/alloy/config.alloy
+            - --storage.path=/var/lib/alloy/data
+            - --server.http.listen-addr=0.0.0.0:12345
+          ports:
+            - {name: http, containerPort: 12345}
+          readinessProbe:
+            httpGet: {path: /-/ready, port: http}
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet: {path: /-/ready, port: http}
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 4
+          resources:
+            requests: {cpu: 50m, memory: 256Mi}
+            limits: {cpu: 300m, memory: 512Mi}
+          env:
+            - name: TRIAGE_CLUSTER_NAME
+              valueFrom: {configMapKeyRef: {name: alloy-vector-triage-red-config, key: TRIAGE_CLUSTER_NAME}}
+            - name: TRIAGE_ENVIRONMENT
+              valueFrom: {configMapKeyRef: {name: alloy-vector-triage-red-config, key: TRIAGE_ENVIRONMENT}}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/alloy
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/alloy/data
+      volumes:
+        - name: config
+          configMap: {name: alloy-vector-triage-red-config}
+        - name: data
+          emptyDir: {}
+---
+# Needed by loki.source.kubernetes (pod logs) and loki.source.kubernetes_events.
+# Applied only if a suitable `alloy` ServiceAccount + ClusterRole does not
+# already exist — scripts/deploy.sh checks first and skips this file if it does.
+## Fleet scope
+#
+# To collect from every namespace instead of one, in the ConfigMap above:
+#   1. delete the final `rule { ... regex = "agentic-triage-proof" ... }` block
+#      in discovery.relabel.pod_logs;
+#   2. set `namespaces = []` in loki.source.kubernetes_events (empty = all).
+# Then re-read Vector's `incident_signals` filter in 02-vector.yaml: at fleet
+# scope the log-side regex is broad enough to match routine INFO lines that
+# merely contain the word "error", and ticket volume follows Kafka volume.

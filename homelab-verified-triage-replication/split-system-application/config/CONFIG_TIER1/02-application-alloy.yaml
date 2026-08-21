@@ -49,6 +49,12 @@ data:
       forward_to = [loki.process.events.receiver]
     }
     loki.process "pod_logs" {
+      // Keep routine informational entries out of the triage transport.
+      // This inspects the raw log line; use structured severity extraction if
+      // the source workloads standardise on a JSON severity field.
+      stage.drop {
+        expression = "(?i)\\b(info|information)\\b"
+      }
       stage.static_labels { values = {
         cluster = sys.env("TRIAGE_CLUSTER_NAME"),
         environment = sys.env("TRIAGE_ENVIRONMENT"),

@@ -1,0 +1,116 @@
+# Experimental only: third-party pre-built image, isolated from the bounded
+# adapter POC. The PostgreSQL role remains read-only, but this server exposes a
+# general read-query capability; do not use it as the production data-agent
+# contract without data-owner approval.
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-prebuilt-mcp-spike
+  namespace: postgres-dab-mcp-poc
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  selector:
+    app.kubernetes.io/name: postgres-prebuilt-mcp-spike
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-prebuilt-mcp-spike
+  namespace: postgres-dab-mcp-poc
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres-prebuilt-mcp-spike
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres-prebuilt-mcp-spike
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: postgres-mcp
+          image: crystaldba/postgres-mcp:latest
+          args: ["--access-mode=restricted", "--transport=sse"]
+          env:
+            - name: DATABASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-dab-poc-reader
+                  key: postgres-url
+          ports:
+            - name: http
+              containerPort: 8000
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 1m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: postgres-prebuilt-mcp-spike
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  description: Experimental third-party PostgreSQL MCP in restricted mode; synthetic data only.
+  protocol: SSE
+  url: http://postgres-prebuilt-mcp-spike.postgres-dab-mcp-poc.svc.cluster.local:8000/sse
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: postgres-prebuilt-mcp-schema-spike-agent
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  type: Declarative
+  description: Experimental read-only schema-discovery agent for a pre-built PostgreSQL MCP image.
+  declarative:
+    runtime: python
+    modelConfig: agentgateway-minimax
+    deployment:
+      resources:
+        requests:
+          cpu: 1m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+    systemMessage: |
+      You inspect only the synthetic PostgreSQL schema through the permitted
+      metadata tools. Do not call execute_sql, do not write, and do not claim
+      access to a real Kubernetes cluster or Azure PostgreSQL. Return only
+      concise schema facts from the tools.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: postgres-prebuilt-mcp-spike
+          namespace: kagent
+          toolNames:
+            - list_schemas
+            - list_objects
+            - get_object_details

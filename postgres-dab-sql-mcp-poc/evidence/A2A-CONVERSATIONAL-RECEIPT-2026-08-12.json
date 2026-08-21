@@ -1,0 +1,19 @@
+{
+  "evidence_type": "trimmed_live_a2a_receipt",
+  "date": "2026-08-12",
+  "scope": "Synthetic PostgreSQL 17 plus pgvector HomeLab data only",
+  "agent": "postgres-compliance-lab-agent",
+  "result": "pass",
+  "reply_source": "artifact",
+  "tool_responses": [
+    {
+      "name": "get_compliance_data_product_details",
+      "isError": false
+    },
+    {
+      "name": "get_open_high_severity_compliance_findings",
+      "isError": false
+    }
+  ],
+  "final_text": "POSTGRES_MCP_REPLY_OK. Count: 2 open compliance findings at high severity or above."
+}

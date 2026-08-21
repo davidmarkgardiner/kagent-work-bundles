@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+set -eu
+context=red
+[ "$#" -gt 0 ] && context="$1"
+kubectl --context "$context" delete namespace postgres-dab-mcp-poc --ignore-not-found
+kubectl --context "$context" -n kagent delete agent/postgres-dab-compliance-lab-agent --ignore-not-found
+kubectl --context "$context" -n kagent delete remotemcpserver/postgres-dab-compliance-mcp --ignore-not-found
+kubectl --context "$context" -n kagent delete agent/postgres-prebuilt-mcp-schema-spike-agent --ignore-not-found
+kubectl --context "$context" -n kagent delete remotemcpserver/postgres-prebuilt-mcp-spike --ignore-not-found
+kubectl --context "$context" -n kagent delete agent/mcpg-read-query-spike-agent --ignore-not-found
+kubectl --context "$context" -n kagent delete agent/mcpg-data-contract-skill-gitref-spike-agent --ignore-not-found
+kubectl --context "$context" -n kagent delete agent/postgres-kubernetes-inventory-lab-agent --ignore-not-found
+kubectl --context "$context" -n kagent delete remotemcpserver/postgres-kubernetes-inventory-readonly-mcp --ignore-not-found
+kubectl --context "$context" -n kagent delete agent/fastmcp-postgres-gateway-spike-agent --ignore-not-found
+kubectl --context "$context" -n kagent delete remotemcpserver/fastmcp-postgres-gateway-spike --ignore-not-found
+kubectl --context "$context" -n agentgateway-system delete agentgatewaypolicy/fastmcp-postgres-poc --ignore-not-found
+kubectl --context "$context" -n agentgateway-system delete httproute/fastmcp-postgres-poc --ignore-not-found
+kubectl --context "$context" -n agentgateway-system delete agentgatewaybackend/fastmcp-postgres-poc --ignore-not-found

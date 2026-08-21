@@ -1,0 +1,275 @@
+# Five-namespace smoke corpus for the Alloy -> Vector -> Kafka -> Argo -> kagent
+# triage path. One distinct, NON-DESTRUCTIVE signal per namespace so the test is
+# a clean 1:1 -> five signals in, five GitLab tickets out. It deliberately does
+# NOT repeat logs/events (no duplicate-ticket storm) and creates no real memory
+# pressure, mount failure, scheduling failure or network outage: the Events are
+# synthetic Warning records and the Pods only hold or echo one line.
+#
+# Namespaces are REAL, allow-listed platform namespaces (2 application-tier,
+# 3 system-tier) so routing is realistic:
+#   platform-test-app     (app)    -> FailedScheduling  -> scheduling-placement
+#   agentic-triage-proof  (app)    -> ERROR pod log     -> platform-health
+#   cert-manager          (system) -> FailedMount       -> identity-certificate
+#   external-dns          (system) -> NetworkNotReady   -> infrastructure-outage (network)
+#   monitoring            (system) -> OOMKilled         -> platform-health
+#
+# Every Pod carries BOTH the v2 (`app.kubernetes.io/part-of`) and v3
+# (`sre.platform.io/triage`) selection labels so the same corpus works whichever
+# backend path is live. A suite label makes cleanup a single selector delete.
+#
+# Every Pod is hardened to pass the `restricted` Pod Security Standard:
+# non-root, no privilege escalation, all capabilities dropped, read-only root
+# filesystem, RuntimeDefault seccomp. CPU/memory requests AND limits are set on
+# every container.
+#
+# Kubernetes requires an Event's involvedObject.namespace to equal the Event's
+# own namespace, so both are set explicitly on every Event (no kustomize
+# namespace transformer is used here because the corpus spans five namespaces).
+---
+# 1) platform-test-app (application) -- FailedScheduling event
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-scheduling-platform-test-app
+  namespace: platform-test-app
+  labels:
+    app.kubernetes.io/name: smoke-scheduling-platform-test-app
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage
+    sre.platform.io/triage: "true"
+    sre.platform.io/workload-identity: smoke-scheduling-platform-test-app
+    smoke.sre.platform.io/suite: five-namespace-smoke-eval
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    fsGroup: 65534
+    seccompProfile: {type: RuntimeDefault}
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      resources:
+        requests: {cpu: 10m, memory: 16Mi}
+        limits: {cpu: 50m, memory: 32Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: {drop: [ALL]}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-scheduling-platform-test-app
+  namespace: platform-test-app
+  labels:
+    smoke.sre.platform.io/suite: five-namespace-smoke-eval
+type: Warning
+reason: FailedScheduling
+message: "Synthetic smoke event: no eligible nodes satisfied pod placement constraints. No real scheduling failure was induced."
+source: {component: five-namespace-smoke-eval}
+involvedObject:
+  apiVersion: v1
+  kind: Pod
+  name: smoke-scheduling-platform-test-app
+  namespace: platform-test-app
+# No hardcoded first/last timestamps: the API server stamps these to "now" on
+# create so collectors treat the event as fresh (a stale timestamp risks being
+# skipped as old).
+count: 1
+---
+# 2) agentic-triage-proof (application) -- ERROR pod log
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-log-agentic-triage-proof
+  namespace: agentic-triage-proof
+  labels:
+    app.kubernetes.io/name: smoke-log-agentic-triage-proof
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage
+    sre.platform.io/triage: "true"
+    sre.platform.io/workload-identity: smoke-log-agentic-triage-proof
+    smoke.sre.platform.io/suite: five-namespace-smoke-eval
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    fsGroup: 65534
+    seccompProfile: {type: RuntimeDefault}
+  containers:
+    - name: emitter
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['echo "ERROR platform component health probe failed: control-plane dependency unavailable request_id=smoke-5ns-20260804"; sleep 1800']
+      resources:
+        requests: {cpu: 10m, memory: 16Mi}
+        limits: {cpu: 50m, memory: 32Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: {drop: [ALL]}
+---
+# 3) cert-manager (system) -- FailedMount event
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-identity-cert-manager
+  namespace: cert-manager
+  labels:
+    app.kubernetes.io/name: smoke-identity-cert-manager
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage
+    sre.platform.io/triage: "true"
+    sre.platform.io/workload-identity: smoke-identity-cert-manager
+    smoke.sre.platform.io/suite: five-namespace-smoke-eval
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    fsGroup: 65534
+    seccompProfile: {type: RuntimeDefault}
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      resources:
+        requests: {cpu: 10m, memory: 16Mi}
+        limits: {cpu: 50m, memory: 32Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: {drop: [ALL]}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-identity-cert-manager
+  namespace: cert-manager
+  labels:
+    smoke.sre.platform.io/suite: five-namespace-smoke-eval
+type: Warning
+reason: FailedMount
+message: "Synthetic smoke event: secret not found while mounting workload volume. No Secret was removed and no mount was actually attempted."
+source: {component: five-namespace-smoke-eval}
+involvedObject:
+  apiVersion: v1
+  kind: Pod
+  name: smoke-identity-cert-manager
+  namespace: cert-manager
+# No hardcoded first/last timestamps (see note on the first event). count: 1
+count: 1
+---
+# 4) external-dns (system) -- NetworkNotReady event
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-network-external-dns
+  namespace: external-dns
+  labels:
+    app.kubernetes.io/name: smoke-network-external-dns
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage
+    sre.platform.io/triage: "true"
+    sre.platform.io/workload-identity: smoke-network-external-dns
+    smoke.sre.platform.io/suite: five-namespace-smoke-eval
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    fsGroup: 65534
+    seccompProfile: {type: RuntimeDefault}
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      resources:
+        requests: {cpu: 10m, memory: 16Mi}
+        limits: {cpu: 50m, memory: 32Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: {drop: [ALL]}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-network-external-dns
+  namespace: external-dns
+  labels:
+    smoke.sre.platform.io/suite: five-namespace-smoke-eval
+type: Warning
+reason: NetworkNotReady
+message: "Synthetic smoke event: node networking unavailable; transport and routing classification test only. No networking was disrupted."
+source: {component: five-namespace-smoke-eval}
+involvedObject:
+  apiVersion: v1
+  kind: Pod
+  name: smoke-network-external-dns
+  namespace: external-dns
+# No hardcoded first/last timestamps (see note on the first event). count: 1
+count: 1
+---
+# 5) monitoring (system) -- OOMKilled event
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-oom-monitoring
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: smoke-oom-monitoring
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage
+    sre.platform.io/triage: "true"
+    sre.platform.io/workload-identity: smoke-oom-monitoring
+    smoke.sre.platform.io/suite: five-namespace-smoke-eval
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    fsGroup: 65534
+    seccompProfile: {type: RuntimeDefault}
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      resources:
+        requests: {cpu: 10m, memory: 16Mi}
+        limits: {cpu: 50m, memory: 32Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: {drop: [ALL]}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-oom-monitoring
+  namespace: monitoring
+  labels:
+    smoke.sre.platform.io/suite: five-namespace-smoke-eval
+type: Warning
+reason: OOMKilled
+message: "Synthetic smoke event: container was OOM killed. No actual memory pressure was created."
+source: {component: five-namespace-smoke-eval}
+involvedObject:
+  apiVersion: v1
+  kind: Pod
+  name: smoke-oom-monitoring
+  namespace: monitoring
+# No hardcoded first/last timestamps (see note on the first event). count: 1
+count: 1

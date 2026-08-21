@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kagent
+resources:
+  - manifests.yaml
+  - sdlc-specialists.yaml
+configMapGenerator:
+  - name: maf-harness-poc-app
+    files:
+      - run.py
+      - harness_runtime.py
+      - requirements.txt
+generatorOptions:
+  disableNameSuffixHash: true

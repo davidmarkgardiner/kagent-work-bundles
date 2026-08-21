@@ -1,0 +1,35 @@
+# HomeLab-only proof that MCPg's read-only mode can execute a bounded SELECT.
+# It reuses the existing synthetic MCPg RemoteMCPServer and has no database
+# credential. Delete this disposable Agent with scripts/teardown.sh.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: mcpg-read-query-spike-agent
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  type: Declarative
+  description: HomeLab read-only MCPg run_select proof over synthetic PostgreSQL data.
+  declarative:
+    runtime: python
+    modelConfig: agentgateway-minimax
+    systemMessage: |
+      Answer only synthetic PostgreSQL inventory questions. Use the mounted
+      MCPg tools. For a namespace count, use run_select with a SELECT count(*)
+      query against public.v_namespace_image_summary and count distinct
+      namespace_name values. Never write, modify schema, request credentials,
+      or claim access to real data. Begin the final answer with
+      MCPG_READ_QUERY_REPLY_OK.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: mcpg-readonly-spike
+          namespace: kagent
+          toolNames:
+            - list_tables
+            - describe_table
+            - run_select

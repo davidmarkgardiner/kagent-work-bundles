@@ -1,0 +1,86 @@
+# Standalone UAMI path. Render privately; no password or DSN is required.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fastmcp-entra-poc
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fastmcp-postgres-entra
+  namespace: fastmcp-entra-poc
+  annotations:
+    azure.workload.identity/client-id: "{{UAMI_CLIENT_ID}}"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastmcp-postgres-entra
+  namespace: fastmcp-entra-poc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fastmcp-postgres-entra
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: fastmcp-postgres-entra
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: fastmcp-postgres-entra
+      automountServiceAccountToken: true # Required for federated workload identity.
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: fastmcp
+          image: "{{FASTMCP_IMAGE}}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: mcp
+              containerPort: 8000
+          env:
+            - name: POSTGRES_AUTH_MODE
+              value: entra
+            - name: POSTGRES_HOST
+              value: "{{POSTGRES_HOST}}"
+            - name: POSTGRES_DATABASE
+              value: "{{POSTGRES_DATABASE}}"
+            - name: APPROVED_VIEW
+              value: "{{APPROVED_VIEW}}"
+            - name: DENIED_BASE_TABLE
+              value: "{{DENIED_BASE_TABLE}}"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+          readinessProbe:
+            tcpSocket:
+              port: mcp
+            initialDelaySeconds: 5
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastmcp-postgres-entra
+  namespace: fastmcp-entra-poc
+spec:
+  selector:
+    app.kubernetes.io/name: fastmcp-postgres-entra
+  ports:
+    - name: mcp
+      port: 8000
+      targetPort: mcp

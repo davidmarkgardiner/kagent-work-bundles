@@ -1,0 +1,9 @@
+# Full-coverage smoke: one looping log + one Warning event per Alloy-watched
+# namespace. Regenerate for your cluster with ./generate.sh <ns...>.
+# Apply AFTER agents/ + pipeline/ are deployed and GitLab creds exist.
+# Expect two GitLab tickets per namespace, each scored by the evaluation gate.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - log-signals.yaml
+  - event-signals.yaml

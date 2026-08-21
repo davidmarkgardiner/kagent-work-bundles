@@ -1,0 +1,38 @@
+# Expected result of ONE `kubectl apply -k overlays/<path>` run of this corpus.
+# The verifier checks for exactly one open, labelled GitLab issue per listed
+# pod. It never remediates and never deletes issues.
+#
+# Five signals in -> five tickets out. `v3_domain` is the specialist the v3
+# path should route to; the v2 path routes every signal to its single
+# read-only triage agent (optionally behind the a2a-evaluation-gate), so the v2
+# expectation is simply "one ticket per pod".
+expected:
+  - pod: smoke-scheduling-platform-test-app
+    namespace: platform-test-app
+    tier: application
+    signal: kubernetes-event
+    reason: FailedScheduling
+    v3_domain: scheduling-placement
+  - pod: smoke-log-agentic-triage-proof
+    namespace: agentic-triage-proof
+    tier: application
+    signal: pod-log
+    v3_domain: platform-health
+  - pod: smoke-identity-cert-manager
+    namespace: cert-manager
+    tier: system
+    signal: kubernetes-event
+    reason: FailedMount
+    v3_domain: identity-certificate
+  - pod: smoke-network-external-dns
+    namespace: external-dns
+    tier: system
+    signal: kubernetes-event
+    reason: NetworkNotReady
+    v3_domain: infrastructure-outage
+  - pod: smoke-oom-monitoring
+    namespace: monitoring
+    tier: system
+    signal: kubernetes-event
+    reason: OOMKilled
+    v3_domain: platform-health

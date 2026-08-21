@@ -1,0 +1,12 @@
+-- UAMI bundle only. Run in postgres as an approved Microsoft Entra admin.
+-- Render privately. UAMI_ROLE_NAME must be the unique Entra display name and
+-- UAMI_OBJECT_ID must be the service principal object ID, not the client ID.
+SELECT pg_catalog.pgaadauth_create_principal_with_oid(
+  '{{UAMI_ROLE_NAME}}',
+  '{{UAMI_OBJECT_ID}}',
+  'service',
+  false,
+  false
+);
+
+GRANT CONNECT ON DATABASE "{{POSTGRES_DATABASE}}" TO "{{UAMI_ROLE_NAME}}";

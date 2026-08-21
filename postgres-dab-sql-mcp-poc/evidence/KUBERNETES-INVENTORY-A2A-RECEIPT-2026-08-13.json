@@ -1,0 +1,23 @@
+{
+  "evidence_type": "trimmed_live_a2a_receipt",
+  "date": "2026-08-13",
+  "scope": "Synthetic Kubernetes namespace and container-image inventory only",
+  "agent": "postgres-kubernetes-inventory-lab-agent",
+  "result": "pass",
+  "reply_source": "artifact",
+  "tool_responses": [
+    {
+      "name": "get_kubernetes_inventory_data_product_details",
+      "isError": false
+    },
+    {
+      "name": "get_image_risk_summary",
+      "arguments": {
+        "namespace_name": "payments",
+        "severity_min": "high"
+      },
+      "isError": false
+    }
+  ],
+  "result_summary": "2 images returned: payments-api had 0 critical and 2 high findings; payments-worker had 1 critical and 3 high findings."
+}

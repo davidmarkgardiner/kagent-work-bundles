@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-dab-sql-mcp-config
+  namespace: postgres-dab-mcp-poc
+data:
+  dab-config.json: |
+    {
+      "$schema": "https://github.com/Azure/data-api-builder/releases/download/v2.0.9/dab.draft.schema.json",
+      "data-source": {
+        "database-type": "postgresql",
+        "connection-string": "@env('POSTGRES_CONNECTION_STRING')"
+      },
+      "runtime": {
+        "host": {
+          "mode": "production",
+          "max-response-size-mb": 1,
+          "authentication": { "provider": "Unauthenticated" }
+        },
+        "rest": { "enabled": false },
+        "graphql": { "enabled": false },
+        "mcp": {
+          "enabled": true,
+          "path": "/mcp",
+          "description": "Read-only synthetic Kubernetes namespace and image inventory. No writes, arbitrary SQL, embeddings, raw tables, or server-side aggregate tool.",
+          "dml-tools": {
+            "describe-entities": true,
+            "create-record": false,
+            "read-records": true,
+            "update-record": false,
+            "delete-record": false,
+            "execute-entity": false,
+            "aggregate-records": false
+          }
+        }
+      },
+      "entities": {
+        "NamespaceImageSummary": {
+          "source": { "object": "public.v_namespace_image_summary", "type": "view" },
+          "description": "Synthetic Kubernetes namespace and container-image inventory. Use small read-only results only.",
+          "fields": [
+            { "name": "namespace_name", "description": "Synthetic Kubernetes namespace.", "primary-key": true },
+            { "name": "workload_name", "description": "Synthetic workload name.", "primary-key": true },
+            { "name": "environment", "description": "Synthetic environment." },
+            { "name": "image_repository", "description": "Synthetic container image repository." },
+            { "name": "image_tag", "description": "Synthetic image tag." },
+            { "name": "critical_findings", "description": "Synthetic critical finding count." },
+            { "name": "high_findings", "description": "Synthetic high finding count." },
+            { "name": "scanned_at", "description": "Synthetic image scan date." }
+          ],
+          "permissions": [{ "role": "anonymous", "actions": ["read"] }],
+          "mcp": { "dml-tools": true }
+        }
+      }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-dab-sql-mcp
+  namespace: postgres-dab-mcp-poc
+spec:
+  selector:
+    app.kubernetes.io/name: postgres-dab-sql-mcp
+  ports:
+    - name: http
+      port: 5000
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-dab-sql-mcp
+  namespace: postgres-dab-mcp-poc
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres-dab-sql-mcp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres-dab-sql-mcp
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: dab
+          image: mcr.microsoft.com/azure-databases/data-api-builder:2.0.9@sha256:ad5ac1793049f95fdd4210ca50d3c913855553139b64992046a071cd63eeead0
+          args: ["--ConfigFileName", "/App/dab-config.json"]
+          ports:
+            - name: http
+              containerPort: 5000
+          env:
+            - name: POSTGRES_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-dab-poc-reader
+                  key: connection-string
+          volumeMounts:
+            - name: config
+              mountPath: /App/dab-config.json
+              subPath: dab-config.json
+              readOnly: true
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: config
+          configMap:
+            name: postgres-dab-sql-mcp-config

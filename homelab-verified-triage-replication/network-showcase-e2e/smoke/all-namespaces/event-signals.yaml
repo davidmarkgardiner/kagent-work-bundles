@@ -1,0 +1,682 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-aks-istio-ingress
+  namespace: aks-istio-ingress
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-aks-istio-ingress
+  namespace: aks-istio-ingress
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: OOMKilled
+message: "Synthetic smoke event: container OOM killed. No real memory pressure was created. token=smk0"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-aks-istio-ingress, namespace: aks-istio-ingress}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-aks-istio-egress
+  namespace: aks-istio-egress
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-aks-istio-egress
+  namespace: aks-istio-egress
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: FailedMount
+message: "Synthetic smoke event: secret not found while mounting volume. No Secret was removed. token=smk1"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-aks-istio-egress, namespace: aks-istio-egress}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-aks-istio-system
+  namespace: aks-istio-system
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-aks-istio-system
+  namespace: aks-istio-system
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: FailedScheduling
+message: "Synthetic smoke event: no eligible nodes satisfied placement constraints. token=smk2"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-aks-istio-system, namespace: aks-istio-system}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-alloy
+  namespace: alloy
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-alloy
+  namespace: alloy
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: NetworkNotReady
+message: "Synthetic smoke event: node networking unavailable; classification test only. token=smk3"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-alloy, namespace: alloy}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-flux-system
+  namespace: flux-system
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-flux-system
+  namespace: flux-system
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: BackOff
+message: "Synthetic smoke event: back-off restarting failed container; no real crash. token=smk4"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-flux-system, namespace: flux-system}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-gatekeeper-system
+  namespace: gatekeeper-system
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-gatekeeper-system
+  namespace: gatekeeper-system
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: Unhealthy
+message: "Synthetic smoke event: readiness probe failed; workload untouched. token=smk5"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-gatekeeper-system, namespace: gatekeeper-system}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-kube-system
+  namespace: kube-system
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-kube-system
+  namespace: kube-system
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: Evicted
+message: "Synthetic smoke event: pod evicted for review; nothing was actually evicted. token=smk6"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-kube-system, namespace: kube-system}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-kyverno
+  namespace: kyverno
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-kyverno
+  namespace: kyverno
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: ImagePullBackOff
+message: "Synthetic smoke event: image pull back-off; no real image was pulled. token=smk7"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-kyverno, namespace: kyverno}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-logging
+  namespace: logging
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-logging
+  namespace: logging
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: OOMKilled
+message: "Synthetic smoke event: container OOM killed. No real memory pressure was created. token=smk8"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-logging, namespace: logging}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-monitoring
+  namespace: monitoring
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-monitoring
+  namespace: monitoring
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: FailedMount
+message: "Synthetic smoke event: secret not found while mounting volume. No Secret was removed. token=smk9"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-monitoring, namespace: monitoring}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-xxx-system
+  namespace: xxx-system
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-xxx-system
+  namespace: xxx-system
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: FailedScheduling
+message: "Synthetic smoke event: no eligible nodes satisfied placement constraints. token=smk10"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-xxx-system, namespace: xxx-system}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-uk8s-config
+  namespace: uk8s-config
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-uk8s-config
+  namespace: uk8s-config
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: NetworkNotReady
+message: "Synthetic smoke event: node networking unavailable; classification test only. token=smk11"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-uk8s-config, namespace: uk8s-config}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-uk8s-core
+  namespace: uk8s-core
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-uk8s-core
+  namespace: uk8s-core
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: BackOff
+message: "Synthetic smoke event: back-off restarting failed container; no real crash. token=smk12"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-uk8s-core, namespace: uk8s-core}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-external-dns
+  namespace: external-dns
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-external-dns
+  namespace: external-dns
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: Unhealthy
+message: "Synthetic smoke event: readiness probe failed; workload untouched. token=smk13"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-external-dns, namespace: external-dns}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-cert-manager
+  namespace: cert-manager
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-cert-manager
+  namespace: cert-manager
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: Evicted
+message: "Synthetic smoke event: pod evicted for review; nothing was actually evicted. token=smk14"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-cert-manager, namespace: cert-manager}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-external-secrets
+  namespace: external-secrets
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-external-secrets
+  namespace: external-secrets
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: ImagePullBackOff
+message: "Synthetic smoke event: image pull back-off; no real image was pulled. token=smk15"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-external-secrets, namespace: external-secrets}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-informer
+  namespace: informer
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-informer
+  namespace: informer
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: OOMKilled
+message: "Synthetic smoke event: container OOM killed. No real memory pressure was created. token=smk16"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-informer, namespace: informer}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-kro-system
+  namespace: kro-system
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-kro-system
+  namespace: kro-system
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: FailedMount
+message: "Synthetic smoke event: secret not found while mounting volume. No Secret was removed. token=smk17"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-kro-system, namespace: kro-system}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-platform-test-app
+  namespace: platform-test-app
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-platform-test-app
+  namespace: platform-test-app
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: FailedScheduling
+message: "Synthetic smoke event: no eligible nodes satisfied placement constraints. token=smk18"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-platform-test-app, namespace: platform-test-app}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-xxx-issuer-system
+  namespace: xxx-issuer-system
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-xxx-issuer-system
+  namespace: xxx-issuer-system
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: NetworkNotReady
+message: "Synthetic smoke event: node networking unavailable; classification test only. token=smk19"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-xxx-issuer-system, namespace: xxx-issuer-system}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-agentic-triage-proof
+  namespace: agentic-triage-proof
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-agentic-triage-proof
+  namespace: agentic-triage-proof
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: BackOff
+message: "Synthetic smoke event: back-off restarting failed container; no real crash. token=smk20"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-agentic-triage-proof, namespace: agentic-triage-proof}
+count: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smoke-evt-aks-platform-triage-smoke
+  namespace: aks-platform-triage-smoke
+  labels: {app.kubernetes.io/part-of: alloy-vector-kafka-triage, sre.platform.io/triage: "true", smoke.sre.platform.io/suite: all-namespaces}
+spec:
+  restartPolicy: Never
+  securityContext: {runAsNonRoot: true, runAsUser: 65534, runAsGroup: 65534, seccompProfile: {type: RuntimeDefault}}
+  automountServiceAccountToken: false
+  containers:
+    - name: hold
+      image: busybox:1.36
+      command: [sh, -c]
+      args: ['sleep 1800']
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata:
+  name: smoke-evt-aks-platform-triage-smoke
+  namespace: aks-platform-triage-smoke
+  labels: {smoke.sre.platform.io/suite: all-namespaces}
+type: Warning
+reason: Unhealthy
+message: "Synthetic smoke event: readiness probe failed; workload untouched. token=smk21"
+source: {component: all-namespaces-smoke}
+involvedObject: {apiVersion: v1, kind: Pod, name: smoke-evt-aks-platform-triage-smoke, namespace: aks-platform-triage-smoke}
+count: 1

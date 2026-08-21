@@ -16,6 +16,10 @@ GitLab project values, approval routes, and demo targets needed across bundles.
 
 ## Bundle Map
 
+Start PostgreSQL MCP workplace work with
+[`POSTGRES-MCP-WORK-START-HERE.md`](POSTGRES-MCP-WORK-START-HERE.md). It gives
+the deploy-now MCPg connection-string path and the strategic FastMCP/UAMI path.
+
 Each bundle now has the same human handover layer:
 
 ```text
@@ -26,6 +30,9 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 
 | Bundle | Capability | Primary outcome |
 |---|---|---|
+| `postgres-natural-language-query-integration/` | Natural-language PostgreSQL query architecture | Compares retrieval-assisted text-to-SQL with typed MCP tools and defines how both chat front doors can share the FastMCP/UAMI execution boundary |
+| `postgres-mcpg-password/` | PostgreSQL MCPg username/password path | Deploys MCPg v0.7.1 with an approved TLS DSN Secret and SELECT-only database role; contains no UAMI/FastMCP deployment assets |
+| `postgres-fastmcp-entra-uami/` | PostgreSQL FastMCP password-to-UAMI path | Builds one bounded FastMCP image; deploys it first with a username/password Secret and later swaps only the database authentication wiring to AKS Workload Identity/UAMI |
 | `team-handover-pack/` | Human handover, tickets, Teams messages, game-day planning | Provides GitLab ticket templates, Teams messages, game-day plan, and an HTML presentation for SRE/stakeholder handover |
 | `runtime-model-gateway-readiness/` | Runtime, model, Agent Gateway, A2A, and MCP preflight | Proves model backend, Agent Gateway, A2A, and required MCP servers are live before downstream demos |
 | `sre-grafana-mcp-observability/` | Grafana MCP observability | SRE asks a kagent front door to build/verify dashboards, alerts, logs, metrics, and GitOps observability changes |

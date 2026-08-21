@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# v2 home-replication path.
+#
+# Prerequisites (already true in the proven homelab config):
+#   - The worker Alloy allow-list in ../../../config/01-alloy.yaml already
+#     includes all five namespaces (platform-test-app, agentic-triage-proof,
+#     cert-manager, external-dns, monitoring). NO allow-list change is needed.
+#   - The Alloy/Vector/Kafka/Argo flow from ../../../config is deployed.
+#   - OPTIONAL evaluation: also apply ../../../a2a-evaluation-gate to route the
+#     single triage caller through the read-only evaluation gate before
+#     ticketing (PASS -> normal ticket; 3x FAIL -> triage::evaluation-failed).
+#
+# Apply:  kubectl apply -k overlays/v2-home-replication
+# Expect: five open GitLab tickets, one per pod in expected-outcomes.yaml.
+resources:
+  - ../../base

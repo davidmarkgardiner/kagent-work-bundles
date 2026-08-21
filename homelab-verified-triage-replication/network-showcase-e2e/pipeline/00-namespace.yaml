@@ -1,0 +1,9 @@
+# Proof/pilot namespace that Alloy is scoped to.
+# At work: replace with your approved non-production namespace and update the
+# two `agentic-triage-proof` references in 01-alloy.yaml to match.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentic-triage-proof
+  labels:
+    app.kubernetes.io/part-of: alloy-vector-kafka-triage

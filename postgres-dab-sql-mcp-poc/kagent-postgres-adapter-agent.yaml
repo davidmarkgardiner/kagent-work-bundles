@@ -1,0 +1,45 @@
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: postgres-kubernetes-inventory-readonly-mcp
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  description: Bounded read-only PostgreSQL Kubernetes inventory MCP; synthetic data only.
+  protocol: STREAMABLE_HTTP
+  url: http://postgres-compliance-mcp.postgres-dab-mcp-poc.svc.cluster.local:8000/mcp
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: postgres-kubernetes-inventory-lab-agent
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  type: Declarative
+  description: Read-only agent for one synthetic PostgreSQL Kubernetes inventory product.
+  declarative:
+    runtime: python
+    modelConfig: agentgateway-minimax
+    systemMessage: |
+      You answer synthetic Kubernetes namespace and container-image inventory
+      questions only. First call get_kubernetes_inventory_data_product_details,
+      then call the applicable bounded read-only tools. Never request, generate,
+      or execute raw SQL; never write, query embeddings, or claim access to
+      Azure PostgreSQL, production, or real cluster data. State concise returned facts.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: postgres-kubernetes-inventory-readonly-mcp
+          namespace: kagent
+          toolNames:
+            - get_kubernetes_inventory_data_product_details
+            - get_namespace_workload_summary
+            - get_namespace_container_images
+            - get_image_risk_summary

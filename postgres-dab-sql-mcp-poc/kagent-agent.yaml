@@ -1,0 +1,45 @@
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: postgres-dab-kubernetes-inventory-mcp
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  description: Official Microsoft DAB SQL MCP for one synthetic read-only PostgreSQL view.
+  protocol: STREAMABLE_HTTP
+  url: http://postgres-dab-sql-mcp.postgres-dab-mcp-poc.svc.cluster.local:5000/mcp
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: postgres-dab-kubernetes-inventory-lab-agent
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: postgres-dab-sql-mcp-poc
+    example.kagent.dev/scope: lab-only
+spec:
+  type: Declarative
+  description: Read-only agent for a synthetic PostgreSQL Kubernetes inventory through official DAB SQL MCP.
+  declarative:
+    runtime: python
+    modelConfig: agentgateway-minimax
+    systemMessage: |
+      You answer questions only from the synthetic NamespaceImageSummary
+      entity using the approved read-only SQL MCP tools. Discover the entity
+      before reading it. To answer a count, request the small matching record
+      set and count it yourself; no aggregate tool is available. Never request, generate, or execute raw
+      SQL; never write, change schema, query embeddings, or claim access to
+      Azure PostgreSQL, production, or real cluster data. Return a concise result and
+      state when the requested data is out of scope.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: postgres-dab-kubernetes-inventory-mcp
+          namespace: kagent
+          toolNames:
+            - describe_entities
+            - read_records
