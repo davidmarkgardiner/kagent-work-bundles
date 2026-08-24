@@ -1,0 +1,51 @@
+# Values for platform/aks-mcp/chart. AKS-MCP v0.0.20 is stdio-only, so the
+# HTTP deployment remains on the last verified compatibility line until an
+# HTTP bridge or a newer supported remote transport is adopted.
+image:
+  repository: ghcr.io/azure/aks-mcp
+  tag: v0.0.19
+  pullPolicy: IfNotPresent
+
+fullnameOverride: "aks-mcp-{{CLUSTER_ALIAS}}"
+replicaCount: 3
+
+app:
+  transport: streamable-http
+  accessLevel: readonly
+  cache: false
+  allowedHosts:
+    - "aks-mcp-{{CLUSTER_ALIAS}}.aks-mcp.svc.cluster.local"
+
+config:
+  enabledComponents:
+    - kubectl
+
+kubeconfig:
+  enabled: true
+  secretName: aks-mcp-fleet-kubeconfig
+  key: "{{CLUSTER_ALIAS}}.config"
+
+extraEnv:
+  - name: KUBECONFIG
+    value: /home/mcp/.kube/config
+
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+# Change to keda only after replacing both placeholders with a tested query
+# endpoint and an in-flight request or request-rate query.
+autoscaling:
+  mode: disabled
+  minReplicas: 3
+  maxReplicas: 10
+  keda:
+    prometheus:
+      serverAddress: "{{PROMETHEUS_QUERY_ENDPOINT}}"
+      query: "{{AKS_MCP_LOAD_QUERY}}"

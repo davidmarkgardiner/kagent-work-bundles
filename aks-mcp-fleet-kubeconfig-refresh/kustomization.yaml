@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - manifests/00-core.yaml
+  - manifests/01-cronworkflow.yaml
+  - manifests/02-agent.yaml
+  - manifests/03-argo-agent-router.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+  - name: aks-mcp-fleet-kubeconfig-refresh-script
+    namespace: aks-mcp
+    files:
+      - refresh-fleet-kubeconfig.sh=scripts/refresh-fleet-kubeconfig.sh

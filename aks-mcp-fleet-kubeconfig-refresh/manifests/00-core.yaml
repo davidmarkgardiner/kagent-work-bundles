@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aks-mcp
+  labels:
+    app.kubernetes.io/part-of: aks-mcp-fleet-kubeconfig
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fleet-kubeconfig-refresher
+  namespace: aks-mcp
+  annotations:
+    azure.workload.identity/client-id: "{{AZURE_CLIENT_ID}}"
+  labels:
+    azure.workload.identity/use: "true"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: fleet-kubeconfig-refresher
+  namespace: aks-mcp
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["aks-mcp-fleet-kubeconfig"]
+    verbs: ["get", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    # Generate one entry per approved alias.
+    resourceNames: ["aks-mcp-{{CLUSTER_ALIAS}}"]
+    verbs: ["get", "watch", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: fleet-kubeconfig-refresher
+  namespace: aks-mcp
+subjects:
+  - kind: ServiceAccount
+    name: fleet-kubeconfig-refresher
+    namespace: aks-mcp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: fleet-kubeconfig-refresher
+---
+# The workflow updates this object in place. GitOps must ignore /data and
+# the platform.example.com/kubeconfig-sha256 annotation after bootstrap.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aks-mcp-fleet-kubeconfig
+  namespace: aks-mcp
+  labels:
+    app.kubernetes.io/part-of: aks-mcp-fleet-kubeconfig
+  annotations:
+    platform.example.com/kubeconfig-sha256: bootstrap
+type: Opaque
+stringData:
+  "{{CLUSTER_ALIAS}}.config": |
+    apiVersion: v1
+    kind: Config
+    clusters: []
+    users: []
+    contexts: []
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aks-fleet-registry
+  namespace: aks-mcp
+data:
+  clusters.json: |
+    {
+      "clusters": [
+        {
+          "alias": "{{CLUSTER_ALIAS}}",
+          "provider": "aks",
+          "subscriptionId": "{{AZURE_SUBSCRIPTION_ID}}",
+          "resourceGroup": "{{AZURE_RESOURCE_GROUP}}",
+          "clusterName": "{{AKS_CLUSTER_NAME}}",
+          "smokeNamespace": "kube-system"
+        }
+      ]
+    }
+---
+# This sanitized routing copy is safe for Argo and the agent prompt. Do not include
+# subscription IDs, API endpoints, credentials, or source filenames here.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aks-fleet-agent-routing
+  namespace: kagent
+data:
+  clusters.json: |
+    {
+      "clusters": [
+        {
+          "alias": "{{CLUSTER_ALIAS}}",
+          "agentName": "aks-{{CLUSTER_ALIAS}}-agent",
+          "environment": "{{ENVIRONMENT}}",
+          "allowedNamespaces": ["{{ALLOWED_NAMESPACE}}"]
+        }
+      ]
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aks-fleet-argo-routing
+  namespace: argo
+data:
+  clusters.json: |
+    {
+      "clusters": [
+        {
+          "alias": "{{CLUSTER_ALIAS}}",
+          "agentName": "aks-{{CLUSTER_ALIAS}}-agent"
+        }
+      ]
+    }

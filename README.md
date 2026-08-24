@@ -53,6 +53,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 | `incident-evidence-trace-log-metrics/` | Trace, log, and metric evidence packs | Builds source-backed incident evidence from Grafana MCP metrics, logs, traces or trace fallback, dashboards, and triage synthesis |
 | `aks-fleet-reporting-day2/` | AKS fleet reporting and day-2 ops | Platform gets repeatable fleet inventory, health, dashboards, and day-to-day reporting |
 | `cluster-health-baseline-sentinel/` | Cluster-scope baseline detection and generic triage | Catches cluster-wide problems namespace routing structurally cannot: periodic whole-cluster snapshot, baseline drift detection, and a generic orchestrator agent that investigates. Proven end-to-end on RED. Includes `REVERSE-PROMPT.md` for an independent team to design their own answer. |
+| `aks-mcp-fleet-kubeconfig-refresh/` | Central AKS credential refresh with fixed-target MCP/Agent routing | Builds and validates one morning fleet candidate, atomically publishes one single-context Secret key per alias, and routes Argo payloads to fixed-target AKS-MCP/Agent pairs; two-cluster homelab A2A proof included |
 
 ## Recommended Work Order
 
@@ -73,6 +74,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 15. `memory-mcp-shared-context/`
 16. `byo-kagent-onboarding/`
 17. `aks-fleet-reporting-day2/`
+18. `aks-mcp-fleet-kubeconfig-refresh/`
 
 ## Future Bundle Ideas
 
@@ -83,7 +85,6 @@ handoff packages.
 | Idea | Why it matters | Likely source material |
 |---|---|---|
 | Alert ingestion and dedup | Proves Alertmanager or Grafana alert ingestion through Argo Events into smart triage, including duplicate suppression and replay safety. | `a2a/smart-triage-fanout-demo/sensors/`, `SMART-TRIAGE-FANOUT-LIVE-EVIDENCE.md` |
-| AKS-MCP and Kubernetes day-to-day operations | Separates normal cluster/workload debugging through AKS-MCP or Kubernetes tools from fleet reporting and chaos workflows. | `platform/aks-mcp/`, `agents/kagent-triage/` |
 | Deployment-state and GitOps context | Maps workload to Helm/Flux/GitLab release context, recent MRs, rollout history, and safe rollback or config PR proposals. | `a2a/smart-triage-fanout-demo/mapping/`, GitLab MCP bundles |
 | Agentgateway/model capacity and failover | Covers Qwen capacity sweeps, workflow-level rate limiting, retry/failover policy, and model saturation alerting. | `platform/agentgateway/work-qwen-primary-gpt4-failover-handoff/` |
 | Ticket/report closure workflow | Updates GitLab/Jira/issues with evidence, attaches eval output, and blocks closure when lifecycle score or hard gates fail. | GitLab MCP bundle, lifecycle evaluation bundle |
