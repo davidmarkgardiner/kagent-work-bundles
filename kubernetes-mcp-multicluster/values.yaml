@@ -61,7 +61,9 @@ config:
   list_output: table
   toolsets:
     - core
-  # Populated from TOOL_ALLOWLIST by deploy.sh/verify-bundle.sh.
+  # Populated from TOOL_ALLOWLIST by deploy.sh/verify-bundle.sh. Do not run
+  # Helm manually with this empty list: upstream interprets it as no filter,
+  # which exposes every tool in the selected toolsets.
   enabled_tools: []
 
 extraVolumes:

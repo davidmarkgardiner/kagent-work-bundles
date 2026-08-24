@@ -9,9 +9,13 @@ data. Runtime aliases are redacted below as `management-proof` and
 
 ## Build and deployment
 
-- Original home-lab-only image input: mutable, unpinned `latest`; this is not
-  the shipped `v0.0.66` coordinate.
-- Chart: local `charts/kubernetes-mcp-server` directory, version `0.1.0`
+- Tested image: `quay.io/containers/kubernetes_mcp_server:v0.0.66`
+- Registry index digest and runtime `imageID`:
+  `sha256:6d650f4bd6ac303ad82713c997e73a2d001602f9bf17392c9b9a0e30e29c6423`
+- Linux/amd64 manifest digest:
+  `sha256:3a4bee3f07c1c81458f9810b160d9123d9edd91a6602d2b3c91baf7c24277090`
+- Chart: local directory from the upstream `v0.0.66` source tag, chart version
+  `0.1.0`
 - Helm release: `kubernetes-mcp-fleet`
 - Namespace: `kubernetes-mcp-poc`
 - Deployment: Ready `1/1`; service-account token automount disabled
@@ -21,8 +25,11 @@ data. Runtime aliases are redacted below as `management-proof` and
   `pods_list`, `pods_list_in_namespace`, `pods_log`, `resources_get`,
   `resources_list`
 
-The running pod resolved to the expected image artifact. The proof used one
-replica because the management node had limited spare requested capacity.
+The running pod's runtime `imageID` exactly matched the immutable registry
+index digest above. The proof used one replica because the management node had
+limited spare requested capacity. The exact-tag rollout required a controlled
+`maxSurge: 0` / `maxUnavailable: 1` update and therefore a brief MCP
+interruption on this single-node lab.
 
 ## Authorization and network boundary
 
@@ -51,9 +58,8 @@ replica because the management node had limited spare requested capacity.
   direct/gateway 20-request smoke successfully. The revised smoke uses direct
   MCP JSON-RPC over `curl`; it does not download an npm inspector package.
 - The release-matched `v0.0.66` image tag was confirmed in both official
-  registries, and the local `v0.0.66` source chart rendered that tag correctly.
-  The running pod receipt above remains the separately pinned image artifact
-  used for the live behavior proof.
+  registries, deployed with the local `v0.0.66` source chart, and tied to the
+  runtime digest before the corrected behavior smoke was repeated.
 - The corrected crossover assertion uses `any(...)` across every MCP content
   entry. A multi-entry fixture proved both positive and negative marker cases,
   followed by the live direct/gateway two-context and 20-request gateway smoke.
@@ -67,10 +73,10 @@ replica because the management node had limited spare requested capacity.
 - The live namespace contained one active bundle credential revision and no
   inactive revisions to prune. The active revision is now ownership-labelled
   and annotated with its earliest JWT expiry; future successful deployments
-  prune every inactive labelled revision automatically.
+  retain N-1 for rollback and prune labelled revisions older than N-1.
 
-The repository A2A helper invoked the gateway-backed Agent twice. Sanitized
-responses were:
+The repository A2A helper originally invoked the gateway-backed Agent twice.
+Sanitized responses were:
 
 ```text
 Context: worker-proof
@@ -86,6 +92,12 @@ These calls proved:
 kagent Agent -> kagent RemoteMCPServer -> agentgateway -> Kubernetes MCP
              -> selected kubeconfig context -> target Kubernetes API
 ```
+
+After the pinned `v0.0.66` rollout, the gateway-backed Agent repeated the
+three-node target successfully. A repeat of the one-node target stopped at the
+configured LLM provider's quota boundary before MCP invocation; the pinned
+runtime's direct and gateway MCP smoke nevertheless exercised both contexts,
+including all 20 alternating requests.
 
 ## Boundary of this receipt
 

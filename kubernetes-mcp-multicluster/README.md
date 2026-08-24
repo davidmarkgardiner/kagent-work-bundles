@@ -111,6 +111,11 @@ DNS plus TCP 443/6443 to those CIDRs. Set `APPROVED_IMAGE_PREFIX` to the
 internal registry or project prefix; production image coordinates must match
 it exactly unless the explicit home-lab escape hatch is enabled.
 
+For AKS, prefer stable private-endpoint or approved private-network CIDRs.
+Public AKS API FQDN addresses can change: resolve and revalidate every target
+CIDR whenever fleet inventory, networking, private endpoints, or DNS changes,
+and before every rollout that changes `TARGET_API_CIDRS`.
+
 Kustomize reads the same file through `configMapGenerator` and replacements.
 The resulting non-secret ConfigMap is stored in the POC namespace so the
 applied customization is inspectable. Do not place credentials or sensitive
@@ -192,8 +197,9 @@ secret_name=$(./scripts/refresh-kubeconfig.sh)
 The script creates a new immutable Secret revision and rolls the Deployment. It
 never edits a kubeconfig inside a running MCP pod. Every revision is labelled,
 annotated with the earliest token expiry, and retained until the new rollout
-succeeds. After success, inactive labelled revisions are deleted. If
-validation or rollout fails, the previous revision remains active.
+succeeds. After success, the active and immediately previous revisions are
+retained and older labelled revisions are deleted. If validation or rollout
+fails, the previous revision remains active.
 
 The included TokenRequest flow defaults to 24 hours and is a portable proof,
 not the final AKS authentication implementation. It decodes each returned JWT
@@ -256,7 +262,13 @@ Start with one replica. After capacity checks, exercise the production rollout:
 ./scripts/deploy.sh "$secret_name"
 ```
 
-Roll back by pointing the Deployment at the previous immutable Secret revision.
+The deploy script retains exactly the active and immediately previous
+credential revisions. Before rolling back, verify that the previous Secret's
+`kubernetes-mcp-fleet/token-expires-at` annotation is still in the future,
+then use `helm rollback` to the preceding release revision. If that Secret is
+expired or no previous revision exists, run `refresh-kubeconfig.sh` and
+`deploy.sh` instead of attempting rollback.
+
 Remove only this bundle's named resources with:
 
 ```bash

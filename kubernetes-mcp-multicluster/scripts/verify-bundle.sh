@@ -44,6 +44,11 @@ jwt_payload=$(printf '%s' '{"exp":4102444800}' | openssl base64 -A | tr '/+' '_-
 test "$(jwt_expiry_epoch "header.$jwt_payload.signature")" = "4102444800"
 unset jwt_payload
 
+# shellcheck source=secret-utils.sh
+source "$BUNDLE_DIR/scripts/secret-utils.sh"
+secret_fixture='{"items":[{"metadata":{"name":"active"}},{"metadata":{"name":"previous"}},{"metadata":{"name":"older"}}]}'
+test "$(printf '%s' "$secret_fixture" | credential_secrets_to_prune active previous)" = "older"
+
 tmp_dir=$(mktemp -d "${TMPDIR:-/tmp}/kubernetes-mcp-chart.XXXXXX")
 cleanup() {
   rm -rf "$tmp_dir"
@@ -189,6 +194,7 @@ if test "$LIVE_VALIDATE" = "1"; then
 fi
 
 "$REPO_ROOT/scripts/public-safe-scan.sh" "$BUNDLE_DIR"
-git -C "$REPO_ROOT" diff --check
+bundle_path=${BUNDLE_DIR#"$REPO_ROOT"/}
+git -C "$REPO_ROOT" diff --check -- "$bundle_path"
 
 echo "VERIFY_BUNDLE_OK chart=$CHART_VERSION image=$IMAGE_VERSION live_validate=$LIVE_VALIDATE"

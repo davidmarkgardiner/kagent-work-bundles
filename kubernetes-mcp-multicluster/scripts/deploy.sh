@@ -5,6 +5,8 @@ BUNDLE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 # shellcheck source=load-config.sh
 source "$BUNDLE_DIR/scripts/load-config.sh"
 load_bundle_config "$BUNDLE_DIR"
+# shellcheck source=secret-utils.sh
+source "$BUNDLE_DIR/scripts/secret-utils.sh"
 RELEASE_NAME=${RELEASE_NAME:-kubernetes-mcp-fleet}
 SECRET_NAME=${1:-${SECRET_NAME:-}}
 
@@ -26,6 +28,14 @@ kubectl --context "$HOST_CONTEXT" apply -k "$BUNDLE_DIR" >/dev/null
 kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" get secret "$SECRET_NAME" >/dev/null
 test "$(kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" get secret "$SECRET_NAME" -o jsonpath='{.immutable}')" = "true"
 test "$(kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" get secret "$SECRET_NAME" -o json | jq -r '.metadata.labels["kubernetes-mcp-fleet/credential"] // ""')" = "true"
+
+previous_secret=$(kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" \
+  get deployment kubernetes-mcp-fleet \
+  -o jsonpath='{.spec.template.spec.volumes[?(@.name=="fleet-kubeconfig")].secret.secretName}' \
+  2>/dev/null || true)
+if test "$previous_secret" = "$SECRET_NAME"; then
+  previous_secret=""
+fi
 
 # shellcheck disable=SC2206
 tools=( $TOOL_ALLOWLIST_LIST )
@@ -69,9 +79,14 @@ test "$(kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" get deployment ku
 
 old_secrets=$(kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" get secrets \
   -l kubernetes-mcp-fleet/credential=true -o json | \
-  jq -r --arg active "$SECRET_NAME" '.items[].metadata.name | select(. != $active)')
+  credential_secrets_to_prune "$SECRET_NAME" "$previous_secret")
 for old_secret in $old_secrets; do
   kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" delete secret "$old_secret" >/dev/null
 done
 
-echo "DEPLOY_OK release=$RELEASE_NAME namespace=$HOST_NAMESPACE secret=$SECRET_NAME replicas=$REPLICA_COUNT cpu_request=$RESOURCE_REQUEST_CPU tools=$TOOL_COUNT old_secrets_pruned=$(printf '%s\n' "$old_secrets" | sed '/^$/d' | wc -l | tr -d ' ')"
+if test -z "$previous_secret"; then
+  retained_previous=no
+else
+  retained_previous=yes
+fi
+echo "DEPLOY_OK release=$RELEASE_NAME namespace=$HOST_NAMESPACE secret=$SECRET_NAME replicas=$REPLICA_COUNT cpu_request=$RESOURCE_REQUEST_CPU tools=$TOOL_COUNT previous_revision_retained=$retained_previous old_secrets_pruned=$(printf '%s\n' "$old_secrets" | sed '/^$/d' | wc -l | tr -d ' ')"

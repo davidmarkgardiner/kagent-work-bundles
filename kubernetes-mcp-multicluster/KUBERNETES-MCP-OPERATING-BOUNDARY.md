@@ -60,8 +60,9 @@ revision running.
 
 Proof TokenRequest credentials are checked against their returned JWT expiry.
 The proof rotation SLA is refresh at least every 12 hours with an alert at six
-hours remaining. Successful rollouts prune inactive labelled Secret revisions;
-teardown explicitly deletes every labelled revision before namespace removal.
+hours remaining. Successful rollouts retain the active and immediately
+previous labelled Secret revisions and prune anything older; teardown
+explicitly deletes every labelled revision before namespace removal.
 
 For AKS, prefer `kubelogin -l workloadidentity` exec entries and a derived MCP
 image containing a pinned `kubelogin`. The included TokenRequest workflow is a
