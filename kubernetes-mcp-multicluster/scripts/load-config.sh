@@ -6,10 +6,12 @@ load_bundle_config() {
   local required_variables=(
     HOST_CONTEXT SOURCE_CONTEXTS SMOKE_CONTEXTS HOST_NAMESPACE
     KAGENT_NAMESPACE AGENTGATEWAY_NAMESPACE AGENTGATEWAY_NAME
-    AGENTGATEWAY_SERVICE MODEL_CONFIG MCP_SERVICE_HOST DIRECT_MCP_URL
-    AGENTGATEWAY_MCP_URL IMAGE_REGISTRY IMAGE_REPOSITORY
+    AGENTGATEWAY_SERVICE MODEL_CONFIG AGENTGATEWAY_MCP_URL
+    IMAGE_REGISTRY IMAGE_REPOSITORY
     IMAGE_VERSION CHART_REF CHART_VERSION REPLICA_COUNT
-    RESOURCE_REQUEST_CPU TOKEN_DURATION ALLOW_PUBLIC_IMAGE_FOR_TEST
+    RESOURCE_REQUEST_CPU TOKEN_DURATION MIN_TOKEN_VALIDITY_SECONDS
+    ALLOW_PUBLIC_IMAGE_FOR_TEST APPROVED_IMAGE_PREFIX TOOL_ALLOWLIST
+    TARGET_API_CIDRS
   )
 
   WORK_VALUES_FILE="$bundle_dir/work-values.env"
@@ -46,10 +48,61 @@ load_bundle_config() {
       ;;
   esac
 
+  local expected_gateway_url image_path
+  expected_gateway_url="http://$AGENTGATEWAY_SERVICE.$AGENTGATEWAY_NAMESPACE.svc.cluster.local/mcp/kubernetes-mcp-fleet"
+  test "$AGENTGATEWAY_MCP_URL" = "$expected_gateway_url" || {
+    echo "AGENTGATEWAY_MCP_URL must equal $expected_gateway_url" >&2
+    return 1
+  }
+
+  image_path="$IMAGE_REGISTRY/$IMAGE_REPOSITORY"
+  if test "$ALLOW_PUBLIC_IMAGE_FOR_TEST" != "1"; then
+    case "$image_path" in
+      "$APPROVED_IMAGE_PREFIX"/*) ;;
+      *)
+        echo "image $image_path is outside APPROVED_IMAGE_PREFIX=$APPROVED_IMAGE_PREFIX" >&2
+        return 1
+        ;;
+    esac
+  fi
+
+  case "$MIN_TOKEN_VALIDITY_SECONDS" in
+    *[!0-9]*|'')
+      echo "MIN_TOKEN_VALIDITY_SECONDS must be a positive integer" >&2
+      return 1
+      ;;
+  esac
+  test "$MIN_TOKEN_VALIDITY_SECONDS" -gt 0 || {
+    echo "MIN_TOKEN_VALIDITY_SECONDS must be greater than zero" >&2
+    return 1
+  }
+
   SOURCE_CONTEXTS_LIST=${SOURCE_CONTEXTS//,/ }
   SMOKE_CONTEXTS_LIST=${SMOKE_CONTEXTS//,/ }
-  export SOURCE_CONTEXTS_LIST SMOKE_CONTEXTS_LIST
+  TOOL_ALLOWLIST_LIST=${TOOL_ALLOWLIST//,/ }
+  TARGET_API_CIDRS_LIST=${TARGET_API_CIDRS//,/ }
+  # shellcheck disable=SC2206
+  local tools=( $TOOL_ALLOWLIST_LIST )
+  # shellcheck disable=SC2206
+  local target_cidrs=( $TARGET_API_CIDRS_LIST )
+  TOOL_COUNT=${#tools[@]}
+  test "$TOOL_COUNT" -eq 8 || {
+    echo "TOOL_ALLOWLIST must contain exactly eight entries" >&2
+    return 1
+  }
+  test "${#target_cidrs[@]}" -eq 12 || {
+    echo "TARGET_API_CIDRS must contain exactly twelve entries; pad unused slots with 0.0.0.0/32" >&2
+    return 1
+  }
+  case ",$TARGET_API_CIDRS," in
+    *,0.0.0.0/0,*|*,::/0,*)
+      echo "TARGET_API_CIDRS must not contain a default route" >&2
+      return 1
+      ;;
+  esac
+  EXPECTED_TOOLS_JSON=$(printf '%s\n' "${tools[@]}" | jq -Rsc 'split("\n") | map(select(length > 0)) | sort')
+  export SOURCE_CONTEXTS_LIST SMOKE_CONTEXTS_LIST TOOL_ALLOWLIST_LIST
+  export TARGET_API_CIDRS_LIST TOOL_COUNT EXPECTED_TOOLS_JSON
 
-  RENDER_DIR=${RENDER_DIR:-"$bundle_dir/rendered"}
-  export WORK_VALUES_FILE RENDER_DIR
+  export WORK_VALUES_FILE
 }

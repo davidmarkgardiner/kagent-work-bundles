@@ -8,6 +8,10 @@ load_bundle_config "$BUNDLE_DIR"
 
 helm --kube-context "$HOST_CONTEXT" uninstall kubernetes-mcp-fleet \
   --namespace "$HOST_NAMESPACE" --ignore-not-found >/dev/null
+kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" delete secret \
+  -l kubernetes-mcp-fleet/credential=true --ignore-not-found >/dev/null
+kubectl --context "$HOST_CONTEXT" -n "$KAGENT_NAMESPACE" delete remotemcpserver \
+  kubernetes-mcp-fleet-direct --ignore-not-found >/dev/null
 kubectl --context "$HOST_CONTEXT" delete -k "$BUNDLE_DIR" --ignore-not-found >/dev/null
 
 for mapping in $SOURCE_CONTEXTS_LIST; do

@@ -59,17 +59,7 @@ spec:
         action: Allow
         policy:
           matchExpressions:
-            - >-
-              mcp.tool.name in [
-                "events_list",
-                "namespaces_list",
-                "pods_get",
-                "pods_list",
-                "pods_list_in_namespace",
-                "pods_log",
-                "resources_get",
-                "resources_list"
-              ]
+            - 'mcp.tool.name in ["TOOL_0_REPLACE","TOOL_1_REPLACE","TOOL_2_REPLACE","TOOL_3_REPLACE","TOOL_4_REPLACE","TOOL_5_REPLACE","TOOL_6_REPLACE","TOOL_7_REPLACE"]'
   traffic:
     rateLimit:
       local:
@@ -78,19 +68,6 @@ spec:
           burst: 80
     timeouts:
       request: 60s
----
-apiVersion: kagent.dev/v1alpha2
-kind: RemoteMCPServer
-metadata:
-  name: kubernetes-mcp-fleet-direct
-  namespace: "KAGENT_NAMESPACE_REPLACE"
-  labels:
-    app.kubernetes.io/part-of: kubernetes-mcp-fleet-poc
-spec:
-  description: Direct, private discovery proof for the read-only multi-cluster Kubernetes MCP.
-  protocol: STREAMABLE_HTTP
-  timeout: 30s
-  url: "http://kubernetes-mcp-fleet.HOST_NAMESPACE_REPLACE.svc.cluster.local:8080/mcp"
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer

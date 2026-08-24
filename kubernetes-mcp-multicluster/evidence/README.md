@@ -8,7 +8,7 @@ Retain only sanitized receipts:
 - generated context aliases and count, never server URLs or auth information;
 - immutable Secret name, never Secret data;
 - pod readiness, resolved image ID and mounted Secret name;
-- direct and gateway discovered tool names;
+- direct endpoint and gateway-discovered tool names;
 - per-context node-count fingerprints;
 - 20-request crossover summary;
 - kagent Agent Accepted/Ready conditions and a redacted A2A response; and

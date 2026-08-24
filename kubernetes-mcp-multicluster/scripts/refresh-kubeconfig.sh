@@ -6,6 +6,8 @@ BUNDLE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 # shellcheck source=load-config.sh
 source "$BUNDLE_DIR/scripts/load-config.sh"
 load_bundle_config "$BUNDLE_DIR"
+# shellcheck source=token-utils.sh
+source "$BUNDLE_DIR/scripts/token-utils.sh"
 SECRET_PREFIX=${SECRET_PREFIX:-kubernetes-mcp-fleet-kubeconfig}
 READER_NAMESPACE=${READER_NAMESPACE:-kubernetes-mcp-reader}
 READER_SERVICE_ACCOUNT=${READER_SERVICE_ACCOUNT:-kubernetes-mcp-reader}
@@ -16,15 +18,13 @@ fleet_kubeconfig=$(mktemp "$tmp_dir/kubeconfig.XXXXXX")
 chmod 600 "$fleet_kubeconfig"
 
 cleanup() {
-  if test -f "$fleet_kubeconfig"; then
-    unlink "$fleet_kubeconfig"
-  fi
-  rmdir "$tmp_dir" 2>/dev/null || true
+  rm -rf "$tmp_dir"
 }
 trap cleanup EXIT
 
 first_alias=""
 expected_aliases=""
+earliest_exp=0
 
 for mapping in $SOURCE_CONTEXTS_LIST; do
   source_context=${mapping%%=*}
@@ -53,7 +53,20 @@ for mapping in $SOURCE_CONTEXTS_LIST; do
   curl --fail --silent --cacert "$ca_file" "$server/readyz" >/dev/null
   token=$(kubectl --context "$source_context" -n "$READER_NAMESPACE" \
     create token "$READER_SERVICE_ACCOUNT" --duration "$TOKEN_DURATION")
-  echo "CREDENTIAL_TOKEN_ISSUED alias=$alias_name duration=$TOKEN_DURATION" >&2
+  token_exp=$(jwt_expiry_epoch "$token") || {
+    echo "unable to read JWT expiry for alias=$alias_name" >&2
+    exit 1
+  }
+  now_epoch=$(date +%s)
+  remaining_seconds=$((token_exp - now_epoch))
+  test "$remaining_seconds" -ge "$MIN_TOKEN_VALIDITY_SECONDS" || {
+    echo "token lifetime below minimum: alias=$alias_name remaining_seconds=$remaining_seconds minimum_seconds=$MIN_TOKEN_VALIDITY_SECONDS" >&2
+    exit 1
+  }
+  if test "$earliest_exp" -eq 0 || test "$token_exp" -lt "$earliest_exp"; then
+    earliest_exp=$token_exp
+  fi
+  echo "CREDENTIAL_TOKEN_ISSUED alias=$alias_name remaining_seconds=$remaining_seconds" >&2
 
   kubectl --kubeconfig /dev/null --server "$server" --certificate-authority "$ca_file" \
     --token "$token" get --raw=/readyz >/dev/null
@@ -106,6 +119,17 @@ secret_resource=$(kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" \
   --from-file=kubeconfig="$fleet_kubeconfig" -o name)
 secret_name=${secret_resource#secret/}
 
+# Adopt revisions from the earlier POC format so the first successful rollout
+# can prune them by the same ownership label as all new revisions.
+legacy_secrets=$(kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" get secrets -o json | \
+  jq -r --arg prefix "$SECRET_PREFIX-" '.items[].metadata.name | select(startswith($prefix))')
+for legacy_secret in $legacy_secrets; do
+  kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" label secret "$legacy_secret" \
+    app.kubernetes.io/managed-by=kubernetes-mcp-fleet \
+    kubernetes-mcp-fleet/credential=true \
+    --overwrite >/dev/null
+done
+
 if ! kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" get secret "$secret_name" >/dev/null 2>&1; then
   kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" \
     create secret generic "$SECRET_PREFIX" --append-hash \
@@ -114,9 +138,23 @@ if ! kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" get secret "$secret_
     --type merge -p '{"immutable":true}' >/dev/null
 fi
 
+expires_at=$(python3 - "$earliest_exp" <<'PY'
+import datetime
+import sys
+
+print(datetime.datetime.fromtimestamp(int(sys.argv[1]), datetime.timezone.utc).isoformat().replace("+00:00", "Z"))
+PY
+)
+
+kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" label secret "$secret_name" \
+  app.kubernetes.io/managed-by=kubernetes-mcp-fleet \
+  kubernetes-mcp-fleet/credential=true \
+  --overwrite >/dev/null
+
 kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" annotate secret "$secret_name" \
   kubernetes-mcp-fleet/context-count="$(printf '%s\n' "$actual_aliases" | wc -l | tr -d ' ')" \
   kubernetes-mcp-fleet/validated-at="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  kubernetes-mcp-fleet/token-expires-at="$expires_at" \
   --overwrite >/dev/null
 
 echo "$secret_name"

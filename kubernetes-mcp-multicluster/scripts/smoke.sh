@@ -5,7 +5,8 @@ BUNDLE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 # shellcheck source=load-config.sh
 source "$BUNDLE_DIR/scripts/load-config.sh"
 load_bundle_config "$BUNDLE_DIR"
-EXPECTED_TOOLS='["events_list","namespaces_list","pods_get","pods_list","pods_list_in_namespace","pods_log","resources_get","resources_list"]'
+# shellcheck source=mcp-json.sh
+source "$BUNDLE_DIR/scripts/mcp-json.sh"
 DIRECT_PORT=${DIRECT_PORT:-18080}
 GATEWAY_PORT=${GATEWAY_PORT:-18081}
 
@@ -96,8 +97,7 @@ request() {
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json, text/event-stream' \
     --request POST "$target" --data "$payload")
-  printf '%s\n' "$response" | sed -n 's/^data: //p' | \
-    jq -ce 'select(.jsonrpc == "2.0" and .id == 1)'
+  mcp_extract_jsonrpc_response "$response"
 }
 
 check_context() {
@@ -112,16 +112,20 @@ check_context() {
   params=$(jq -cn --argjson args "$args" \
     '{name:"resources_list",arguments:$args}')
   result=$(request "$target" tools/call "$params")
-  test "$(printf '%s' "$result" | jq -r '.result.isError // false')" = "false"
-  printf '%s' "$result" | jq -er --arg marker "$expected_marker" \
-    '.result.content[].text | contains($marker)' >/dev/null
+  test "$(printf '%s' "$result" | jq -r '.result.isError // false')" = "false" || {
+    echo "MCP tool returned an error: path=$label context=$selected" >&2
+    return 1
+  }
+  printf '%s' "$result" | mcp_response_contains_marker "$expected_marker" >/dev/null || {
+    echo "expected marker absent: path=$label context=$selected" >&2
+    return 1
+  }
 
   for other in "${mappings[@]}"; do
     other_alias=${other%%=*}
     test "$other_alias" = "$selected" && continue
     other_marker=${other#*=}
-    if printf '%s' "$result" | jq -er --arg marker "$other_marker" \
-      '.result.content[].text | contains($marker)' >/dev/null; then
+    if printf '%s' "$result" | mcp_response_contains_marker "$other_marker" >/dev/null; then
       echo "crossover detected: path=$label context=$selected" >&2
       exit 1
     fi
@@ -135,11 +139,14 @@ check_path() {
 
   listed=$(request "$target" tools/list '{}')
   actual=$(printf '%s' "$listed" | jq -c '.result.tools | map(.name) | sort')
-  test "$actual" = "$EXPECTED_TOOLS" || {
+  test "$actual" = "$EXPECTED_TOOLS_JSON" || {
     echo "$label tool allowlist mismatch" >&2
     exit 1
   }
-  test "$(printf '%s' "$listed" | jq '[.result.tools[] | select(.inputSchema.properties.context != null)] | length')" -eq 8
+  test "$(printf '%s' "$listed" | jq '[.result.tools[] | select(.inputSchema.properties.context != null)] | length')" -eq "$TOOL_COUNT" || {
+    echo "$label context-parameter coverage mismatch" >&2
+    return 1
+  }
 
   for mapping in "${mappings[@]}"; do
     alias_name=${mapping%%=*}
@@ -147,7 +154,7 @@ check_path() {
     check_context "$label" "$target" "$alias_name" "$marker"
   done
 
-  echo "MCP_PATH_OK path=$label tools=8 contexts=${#mappings[@]} crossover=0"
+  echo "MCP_PATH_OK path=$label tools=$TOOL_COUNT contexts=${#mappings[@]} crossover=0"
 }
 
 check_path direct "http://127.0.0.1:$DIRECT_PORT/mcp"

@@ -7,6 +7,8 @@ source "$BUNDLE_DIR/scripts/load-config.sh"
 load_bundle_config "$BUNDLE_DIR"
 
 kubectl --context "$HOST_CONTEXT" apply -k "$BUNDLE_DIR" >/dev/null
+kubectl --context "$HOST_CONTEXT" -n "$KAGENT_NAMESPACE" delete remotemcpserver \
+  kubernetes-mcp-fleet-direct --ignore-not-found >/dev/null
 
 for attempt in $(seq 1 60); do
   backend=$(kubectl --context "$HOST_CONTEXT" -n "$AGENTGATEWAY_NAMESPACE" get \
@@ -15,17 +17,15 @@ for attempt in $(seq 1 60); do
   route=$(kubectl --context "$HOST_CONTEXT" -n "$AGENTGATEWAY_NAMESPACE" get \
     httproute kubernetes-mcp-fleet \
     -o jsonpath='{.status.parents[0].conditions[?(@.type=="Accepted")].status}' 2>/dev/null || true)
-  direct_tools=$(kubectl --context "$HOST_CONTEXT" -n "$KAGENT_NAMESPACE" get \
-    remotemcpserver kubernetes-mcp-fleet-direct \
-    -o jsonpath='{.status.discoveredTools[*].name}' 2>/dev/null || true)
   gateway_tools=$(kubectl --context "$HOST_CONTEXT" -n "$KAGENT_NAMESPACE" get \
     remotemcpserver kubernetes-mcp-fleet-gateway \
     -o jsonpath='{.status.discoveredTools[*].name}' 2>/dev/null || true)
-  direct_count=$(printf '%s\n' "$direct_tools" | wc -w | tr -d ' ')
   gateway_count=$(printf '%s\n' "$gateway_tools" | wc -w | tr -d ' ')
+  gateway_tools_json=$(printf '%s' "$gateway_tools" | tr ' ' '\n' | \
+    jq -Rsc 'split("\n") | map(select(length > 0)) | sort')
   if test "$backend" = "True" && test "$route" = "True" \
-    && test "$direct_count" -eq 8 \
-    && test "$gateway_count" -eq 8; then
+    && test "$gateway_count" -eq "$TOOL_COUNT" \
+    && test "$gateway_tools_json" = "$EXPECTED_TOOLS_JSON"; then
     break
   fi
   if test "$attempt" -eq 60; then
@@ -43,7 +43,7 @@ for attempt in $(seq 1 90); do
     kubernetes-mcp-fleet-agent \
     -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || true)
   if test "$accepted" = "True" && test "$ready" = "True"; then
-    echo "REGISTER_OK direct_tools=8 gateway_tools=8 agent=Accepted,Ready"
+    echo "REGISTER_OK gateway_tools=$TOOL_COUNT agent=Accepted,Ready direct_registration=absent"
     exit 0
   fi
   sleep 2

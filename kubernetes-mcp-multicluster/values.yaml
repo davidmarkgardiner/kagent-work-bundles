@@ -61,15 +61,8 @@ config:
   list_output: table
   toolsets:
     - core
-  enabled_tools:
-    - events_list
-    - namespaces_list
-    - pods_get
-    - pods_list
-    - pods_list_in_namespace
-    - pods_log
-    - resources_get
-    - resources_list
+  # Populated from TOOL_ALLOWLIST by deploy.sh/verify-bundle.sh.
+  enabled_tools: []
 
 extraVolumes:
   - name: fleet-kubeconfig

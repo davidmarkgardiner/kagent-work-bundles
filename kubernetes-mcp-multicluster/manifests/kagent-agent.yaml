@@ -37,11 +37,11 @@ spec:
           name: kubernetes-mcp-fleet-gateway
           namespace: "KAGENT_NAMESPACE_REPLACE"
           toolNames:
-            - events_list
-            - namespaces_list
-            - pods_get
-            - pods_list
-            - pods_list_in_namespace
-            - pods_log
-            - resources_get
-            - resources_list
+            - "TOOL_0_REPLACE"
+            - "TOOL_1_REPLACE"
+            - "TOOL_2_REPLACE"
+            - "TOOL_3_REPLACE"
+            - "TOOL_4_REPLACE"
+            - "TOOL_5_REPLACE"
+            - "TOOL_6_REPLACE"
+            - "TOOL_7_REPLACE"

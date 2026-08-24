@@ -13,7 +13,7 @@ Use both deployment mechanisms through the supplied scripts:
 - **Helm** installs and upgrades the upstream Kubernetes MCP server from the
   chart directory extracted from the approved GitHub ZIP.
 - **Kustomize-rendered YAML** installs this bundle's NetworkPolicies,
-  agentgateway backend/route/policy, kagent `RemoteMCPServer` objects, and the
+  agentgateway backend/route/policy, the gateway kagent `RemoteMCPServer`, and the
   kagent Agent. The reader RBAC is applied separately to every target context.
 
 Do not manually coordinate those pieces. `run-poc.sh` owns the order and uses
@@ -75,7 +75,6 @@ credential refresh
   -> validated multi-context kubeconfig
   -> immutable Secret revision
   -> rolling kubernetes-mcp-server Deployment
-       -> direct kagent RemoteMCPServer
        -> agentgateway fail-closed MCP backend and tool allowlist
             -> gateway kagent RemoteMCPServer
                  -> one context-explicit diagnostic Agent
@@ -97,12 +96,20 @@ cp work-values.env.template work-values.env
 `work-values.env` controls the management context, target context-to-alias
 mappings, smoke markers, namespaces, existing Gateway, ModelConfig, internal
 image location, local extracted chart directory, expected chart version,
-replicas, CPU request, and proof-token duration.
+approved image prefix, canonical tool allowlist, target API egress CIDRs,
+replicas, CPU request, proof-token duration, and minimum accepted JWT lifetime.
 It is excluded by `.gitignore`; never add credentials or kubeconfig content to
 it.
 
 Use unquoted values with no spaces. `SOURCE_CONTEXTS` and `SMOKE_CONTEXTS` are
 comma-separated mappings. Use a local chart path without spaces.
+
+`TARGET_API_CIDRS` has twelve deterministic slots for this fleet size. Supply
+approved Kubernetes API IPs or aggregate network CIDRs and pad unused slots
+with `0.0.0.0/32`. Default routes are rejected. The NetworkPolicy permits only
+DNS plus TCP 443/6443 to those CIDRs. Set `APPROVED_IMAGE_PREFIX` to the
+internal registry or project prefix; production image coordinates must match
+it exactly unless the explicit home-lab escape hatch is enabled.
 
 Kustomize reads the same file through `configMapGenerator` and replacements.
 The resulting non-secret ConfigMap is stored in the POC namespace so the
@@ -151,10 +158,10 @@ Every executable deployment script automatically loads the same ignored
 5. builds and validates one purpose-specific kubeconfig;
 6. publishes it as a content-hashed immutable Secret;
 7. deploys the internally hosted MCP image with the extracted local chart;
-8. registers direct and agentgateway paths with kagent;
+8. registers only the agentgateway path with kagent;
 9. creates the gateway-backed read-only Agent; and
-10. proves exact tool discovery and 20 alternating context calls with no
-    crossover.
+10. tests the MCP endpoint directly by port-forward and through agentgateway,
+    then proves 20 alternating context calls with no crossover.
 
 The server exposes exactly:
 
@@ -183,11 +190,21 @@ secret_name=$(./scripts/refresh-kubeconfig.sh)
 ```
 
 The script creates a new immutable Secret revision and rolls the Deployment. It
-never edits a kubeconfig inside a running MCP pod. If validation fails, the
-previous revision remains active.
+never edits a kubeconfig inside a running MCP pod. Every revision is labelled,
+annotated with the earliest token expiry, and retained until the new rollout
+succeeds. After success, inactive labelled revisions are deleted. If
+validation or rollout fails, the previous revision remains active.
 
 The included TokenRequest flow defaults to 24 hours and is a portable proof,
-not the final AKS authentication implementation.
+not the final AKS authentication implementation. It decodes each returned JWT
+`exp` and rejects tokens with less than `MIN_TOKEN_VALIDITY_SECONDS` remaining,
+so an API-server lifetime cap cannot pass silently.
+
+For this proof flow, run the full refresh and deployment at least every 12
+hours, alert when the active Secret's
+`kubernetes-mcp-fleet/token-expires-at` annotation is less than six hours away,
+and treat a missed refresh as an operational failure. A production CronJob must
+implement that same SLA before this is used unattended.
 
 ## Production AKS refresh contract
 
@@ -226,7 +243,9 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 
 The Agent is attached to the gateway `RemoteMCPServer`; it is not one Agent
 per cluster. The selected alias is passed as the MCP tool's `context`
-argument.
+argument. There is deliberately no direct kagent `RemoteMCPServer`; the direct
+path exists only as a local port-forward smoke test and cannot bypass the
+agentgateway policy.
 
 ## Scale and rollback
 

@@ -32,13 +32,7 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: "KAGENT_NAMESPACE_REPLACE"
-        - namespaceSelector:
-            matchLabels:
               kubernetes.io/metadata.name: "AGENTGATEWAY_NAMESPACE_REPLACE"
-        - podSelector:
-            matchLabels:
-              kubernetes-mcp-fleet/access: smoke-client
       ports:
         - protocol: TCP
           port: 8080
@@ -52,9 +46,20 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
-    # Environment-neutral initial rule. Production overlays should constrain
-    # destination CIDRs as well as these Kubernetes API ports.
-    - ports:
+    - to:
+        - ipBlock: {cidr: "TARGET_API_CIDR_0_REPLACE"}
+        - ipBlock: {cidr: "TARGET_API_CIDR_1_REPLACE"}
+        - ipBlock: {cidr: "TARGET_API_CIDR_2_REPLACE"}
+        - ipBlock: {cidr: "TARGET_API_CIDR_3_REPLACE"}
+        - ipBlock: {cidr: "TARGET_API_CIDR_4_REPLACE"}
+        - ipBlock: {cidr: "TARGET_API_CIDR_5_REPLACE"}
+        - ipBlock: {cidr: "TARGET_API_CIDR_6_REPLACE"}
+        - ipBlock: {cidr: "TARGET_API_CIDR_7_REPLACE"}
+        - ipBlock: {cidr: "TARGET_API_CIDR_8_REPLACE"}
+        - ipBlock: {cidr: "TARGET_API_CIDR_9_REPLACE"}
+        - ipBlock: {cidr: "TARGET_API_CIDR_10_REPLACE"}
+        - ipBlock: {cidr: "TARGET_API_CIDR_11_REPLACE"}
+      ports:
         - protocol: TCP
           port: 443
         - protocol: TCP
