@@ -12,13 +12,13 @@ kubectl --context "$HOST_CONTEXT" -n "$KAGENT_NAMESPACE" delete remotemcpserver 
 
 for attempt in $(seq 1 60); do
   backend=$(kubectl --context "$HOST_CONTEXT" -n "$AGENTGATEWAY_NAMESPACE" get \
-    agentgatewaybackend kubernetes-mcp-fleet \
+    agentgatewaybackend "$MCP_NAME" \
     -o jsonpath='{.status.conditions[?(@.type=="Accepted")].status}' 2>/dev/null || true)
   route=$(kubectl --context "$HOST_CONTEXT" -n "$AGENTGATEWAY_NAMESPACE" get \
-    httproute kubernetes-mcp-fleet \
+    httproute "$MCP_NAME" \
     -o jsonpath='{.status.parents[0].conditions[?(@.type=="Accepted")].status}' 2>/dev/null || true)
   gateway_tools=$(kubectl --context "$HOST_CONTEXT" -n "$KAGENT_NAMESPACE" get \
-    remotemcpserver kubernetes-mcp-fleet-gateway \
+    remotemcpserver "$REMOTE_MCP_NAME" \
     -o jsonpath='{.status.discoveredTools[*].name}' 2>/dev/null || true)
   gateway_count=$(printf '%s\n' "$gateway_tools" | wc -w | tr -d ' ')
   gateway_tools_json=$(printf '%s' "$gateway_tools" | tr ' ' '\n' | \
@@ -37,10 +37,10 @@ done
 
 for attempt in $(seq 1 90); do
   accepted=$(kubectl --context "$HOST_CONTEXT" -n "$KAGENT_NAMESPACE" get agent \
-    kubernetes-mcp-fleet-agent \
+    "$KAGENT_AGENT_NAME" \
     -o jsonpath='{.status.conditions[?(@.type=="Accepted")].status}' 2>/dev/null || true)
   ready=$(kubectl --context "$HOST_CONTEXT" -n "$KAGENT_NAMESPACE" get agent \
-    kubernetes-mcp-fleet-agent \
+    "$KAGENT_AGENT_NAME" \
     -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || true)
   if test "$accepted" = "True" && test "$ready" = "True"; then
     echo "REGISTER_OK gateway_tools=$TOOL_COUNT agent=Accepted,Ready direct_registration=absent"

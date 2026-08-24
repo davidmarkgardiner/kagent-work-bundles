@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - manifests/namespace-networkpolicy.yaml
+  - manifests/aks-credential-refresh.yaml
   - manifests/agentgateway-kagent.yaml
   - manifests/kagent-agent.yaml
 
@@ -10,6 +11,12 @@ configMapGenerator:
   - name: kubernetes-mcp-work-values
     envs:
       - work-values.env
+  - name: kubernetes-mcp-credential-refresh-values
+    envs:
+      - work-values.env
+  - name: kubernetes-mcp-credential-refresh-script
+    files:
+      - refresh-aks-kubeconfig.sh=scripts/refresh-aks-kubeconfig-job.sh
 
 generatorOptions:
   disableNameSuffixHash: true
@@ -35,6 +42,14 @@ replacements:
         fieldPaths: [metadata.namespace]
         options:
           create: true
+      - select: {kind: Secret, name: kubernetes-mcp-fleet-kubeconfig}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: ServiceAccount, name: kubernetes-mcp-fleet-workload-identity}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: Role, name: kubernetes-mcp-credential-publisher}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: RoleBinding, name: kubernetes-mcp-credential-publisher}
+        fieldPaths: [metadata.namespace]
       - select:
           kind: AgentgatewayBackend
           name: kubernetes-mcp-fleet
@@ -42,6 +57,107 @@ replacements:
         options:
           delimiter: "."
           index: 1
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.AKS_MCP_WORKLOAD_NAMESPACE
+    targets:
+      - select: {kind: CronJob, name: kubernetes-mcp-credential-refresh}
+        fieldPaths: [metadata.namespace]
+      - select: {kind: ConfigMap, name: kubernetes-mcp-credential-refresh-values}
+        fieldPaths: [metadata.namespace]
+        options: {create: true}
+      - select: {kind: ConfigMap, name: kubernetes-mcp-credential-refresh-script}
+        fieldPaths: [metadata.namespace]
+        options: {create: true}
+      - select: {kind: RoleBinding, name: kubernetes-mcp-credential-publisher}
+        fieldPaths: [subjects.0.namespace]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.AKS_MCP_SERVICE_ACCOUNT
+    targets:
+      - select: {kind: CronJob, name: kubernetes-mcp-credential-refresh}
+        fieldPaths: [spec.jobTemplate.spec.template.spec.serviceAccountName]
+      - select: {kind: RoleBinding, name: kubernetes-mcp-credential-publisher}
+        fieldPaths: [subjects.0.name]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.AKS_MCP_UAMI_CLIENT_ID
+    targets:
+      - select: {kind: ServiceAccount, name: kubernetes-mcp-fleet-workload-identity}
+        fieldPaths: ['metadata.annotations.[azure.workload.identity/client-id]']
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.MCP_WORKLOAD_IDENTITY_SERVICE_ACCOUNT
+    targets:
+      - select: {kind: ServiceAccount, name: kubernetes-mcp-fleet-workload-identity}
+        fieldPaths: [metadata.name]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.KUBECONFIG_SECRET_NAME
+    targets:
+      - select: {kind: Secret, name: kubernetes-mcp-fleet-kubeconfig}
+        fieldPaths: [metadata.name]
+      - select: {kind: Role, name: kubernetes-mcp-credential-publisher}
+        fieldPaths: [rules.0.resourceNames.0]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.CREDENTIAL_REFRESH_IMAGE
+    targets:
+      - select: {kind: CronJob, name: kubernetes-mcp-credential-refresh}
+        fieldPaths: [spec.jobTemplate.spec.template.spec.containers.0.image]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.CREDENTIAL_REFRESH_SUSPEND
+    targets:
+      - select: {kind: CronJob, name: kubernetes-mcp-credential-refresh}
+        fieldPaths: [spec.suspend]
+
+  - source: &cronMinute
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.CREDENTIAL_REFRESH_CRON_MINUTE
+    targets:
+      - select: {kind: CronJob, name: kubernetes-mcp-credential-refresh}
+        fieldPaths: [spec.schedule]
+        options: {delimiter: " ", index: 0}
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.CREDENTIAL_REFRESH_CRON_HOUR
+    targets:
+      - select: {kind: CronJob, name: kubernetes-mcp-credential-refresh}
+        fieldPaths: [spec.schedule]
+        options: {delimiter: " ", index: 1}
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.CREDENTIAL_REFRESH_CONFIG_NAME
+    targets:
+      - select: {kind: CronJob, name: kubernetes-mcp-credential-refresh}
+        fieldPaths: [spec.jobTemplate.spec.template.spec.containers.0.envFrom.0.configMapRef.name]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.CREDENTIAL_REFRESH_SCRIPT_CONFIG_NAME
+    targets:
+      - select: {kind: CronJob, name: kubernetes-mcp-credential-refresh}
+        fieldPaths: [spec.jobTemplate.spec.template.spec.volumes.0.configMap.name]
 
   - source:
       kind: ConfigMap
@@ -240,3 +356,100 @@ replacements:
     targets:
       - select: *networkPolicy
         fieldPaths: [spec.egress.1.to.11.ipBlock.cidr]
+
+  - source: &identityCidr0
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.AZURE_IDENTITY_EGRESS_CIDRS
+      options: {delimiter: ",", index: 0}
+    targets:
+      - select: *networkPolicy
+        fieldPaths: [spec.egress.2.to.0.ipBlock.cidr]
+  - source: {<<: *identityCidr0, options: {delimiter: ",", index: 1}}
+    targets:
+      - select: *networkPolicy
+        fieldPaths: [spec.egress.2.to.1.ipBlock.cidr]
+  - source: {<<: *identityCidr0, options: {delimiter: ",", index: 2}}
+    targets:
+      - select: *networkPolicy
+        fieldPaths: [spec.egress.2.to.2.ipBlock.cidr]
+  - source: {<<: *identityCidr0, options: {delimiter: ",", index: 3}}
+    targets:
+      - select: *networkPolicy
+        fieldPaths: [spec.egress.2.to.3.ipBlock.cidr]
+
+  # Name replacements run last because the earlier transformations select the
+  # portable base names. Distinct values allow Engineering and Dev instances
+  # to coexist in the shared kagent and agentgateway namespaces.
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.MCP_NAME
+    targets:
+      - select: {kind: AgentgatewayBackend, name: kubernetes-mcp-fleet}
+        fieldPaths: [spec.mcp.targets.0.static.host]
+        options: {delimiter: ".", index: 0}
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.AGENTGATEWAY_MCP_PATH
+    targets:
+      - select: {kind: HTTPRoute, name: kubernetes-mcp-fleet}
+        fieldPaths: [spec.rules.0.matches.0.path.value]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.MCP_NAME
+    targets:
+      - select: {kind: AgentgatewayBackend, name: kubernetes-mcp-fleet}
+        fieldPaths: [metadata.name, spec.mcp.targets.0.name]
+      - select: {kind: HTTPRoute, name: kubernetes-mcp-fleet}
+        fieldPaths: [metadata.name, spec.rules.0.backendRefs.0.name]
+      - select: {kind: AgentgatewayPolicy, name: kubernetes-mcp-fleet}
+        fieldPaths: [metadata.name, spec.targetRefs.0.name]
+      - select: {kind: Role, name: kubernetes-mcp-credential-publisher}
+        fieldPaths: [rules.1.resourceNames.0]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.REMOTE_MCP_NAME
+    targets:
+      - select: {kind: RemoteMCPServer, name: kubernetes-mcp-fleet-gateway}
+        fieldPaths: [metadata.name]
+      - select: {kind: Agent, name: kubernetes-mcp-fleet-agent}
+        fieldPaths: [spec.declarative.tools.0.mcpServer.name]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.KAGENT_AGENT_NAME
+    targets:
+      - select: {kind: Agent, name: kubernetes-mcp-fleet-agent}
+        fieldPaths: [metadata.name]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.CREDENTIAL_REFRESH_NAME
+    targets:
+      - select: {kind: CronJob, name: kubernetes-mcp-credential-refresh}
+        fieldPaths: [metadata.name]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.CREDENTIAL_REFRESH_CONFIG_NAME
+    targets:
+      - select: {kind: ConfigMap, name: kubernetes-mcp-credential-refresh-values}
+        fieldPaths: [metadata.name]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.CREDENTIAL_REFRESH_SCRIPT_CONFIG_NAME
+    targets:
+      - select: {kind: ConfigMap, name: kubernetes-mcp-credential-refresh-script}
+        fieldPaths: [metadata.name]

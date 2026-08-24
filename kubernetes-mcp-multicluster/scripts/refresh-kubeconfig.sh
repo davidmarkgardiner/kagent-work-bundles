@@ -6,9 +6,14 @@ BUNDLE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 # shellcheck source=load-config.sh
 source "$BUNDLE_DIR/scripts/load-config.sh"
 load_bundle_config "$BUNDLE_DIR"
+
+test "$AKS_CREDENTIAL_REFRESH_ENABLED" = "0" || {
+  echo "refresh-kubeconfig.sh is homelab-only; run the Kubernetes credential Job for AKS" >&2
+  exit 1
+}
 # shellcheck source=token-utils.sh
 source "$BUNDLE_DIR/scripts/token-utils.sh"
-SECRET_PREFIX=${SECRET_PREFIX:-kubernetes-mcp-fleet-kubeconfig}
+SECRET_PREFIX=${SECRET_PREFIX:-$KUBECONFIG_SECRET_NAME}
 READER_NAMESPACE=${READER_NAMESPACE:-kubernetes-mcp-reader}
 READER_SERVICE_ACCOUNT=${READER_SERVICE_ACCOUNT:-kubernetes-mcp-reader}
 

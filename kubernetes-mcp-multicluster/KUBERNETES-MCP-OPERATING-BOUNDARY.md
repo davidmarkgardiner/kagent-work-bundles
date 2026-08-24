@@ -32,8 +32,10 @@ subscription, resource group, API endpoint or certificate in its payload.
 - `read_only=true`, `disable_destructive=true`, and Kubernetes RBAC deny writes.
 - `cluster_auth_mode=kubeconfig` prevents caller Authorization headers from
   replacing the mounted target identity.
-- Mounted kubeconfig is read-only and the pod ServiceAccount token is absent.
-- Immutable Secret revisions and rolling updates replace in-pod file writes.
+- Mounted kubeconfig is read-only. In AKS mode the pod ServiceAccount token is
+  projected only for Azure Workload Identity exchange; homelab mode disables it.
+- The AKS Job atomically updates a named Secret and rolls the Deployment;
+  homelab mode uses immutable Secret revisions. Neither writes inside the pod.
 - Stateless mode supports ordinary service load balancing; start with one
   replica for verification and use three after production capacity checks.
 - Only the gateway kagent registration exists. The direct endpoint is tested
@@ -54,9 +56,9 @@ that risk is not acceptable.
 ## Credential ownership
 
 The credential job owns target discovery, context generation, validation,
-Secret publication and rollout initiation. Kubernetes MCP only reads the
-completed file. A bad or incomplete refresh must leave the prior immutable
-revision running.
+Secret publication and rollout verification. Kubernetes MCP only reads the
+completed file. A bad or incomplete refresh leaves the current Secret
+unchanged; a failed MCP rollout restores the preceding validated value.
 
 Proof TokenRequest credentials are checked against their returned JWT expiry.
 The proof rotation SLA is refresh at least every 12 hours with an alert at six
@@ -64,9 +66,10 @@ hours remaining. Successful rollouts retain the active and immediately
 previous labelled Secret revisions and prune anything older; teardown
 explicitly deletes every labelled revision before namespace removal.
 
-For AKS, prefer `kubelogin -l workloadidentity` exec entries and a derived MCP
-image containing a pinned `kubelogin`. The included TokenRequest workflow is a
-portable proof mechanism and must not be treated as durable production
+For AKS, the Job emits `kubelogin -l workloadidentity` exec entries and the MCP
+uses the same UAMI through its own federated ServiceAccount. The Job reuses the
+existing AKS-MCP ServiceAccount federation. The included TokenRequest workflow
+is a portable proof mechanism and must not be treated as durable production
 authentication.
 
 ## Escalation rule

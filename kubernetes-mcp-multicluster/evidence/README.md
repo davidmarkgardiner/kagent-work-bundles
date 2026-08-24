@@ -6,7 +6,7 @@ Retain only sanitized receipts:
 - Helm lint/template results;
 - reader positive and negative RBAC summary;
 - generated context aliases and count, never server URLs or auth information;
-- immutable Secret name, never Secret data;
+- Secret name and content hash, never Secret data;
 - pod readiness, resolved image ID and mounted Secret name;
 - direct endpoint and gateway-discovered tool names;
 - per-context node-count fingerprints;
@@ -22,3 +22,5 @@ any additional evidence directory before sharing it.
 
 The sanitized live receipt is
 [live-homelab-2026-08-24.md](live-homelab-2026-08-24.md).
+The Kubernetes-native AKS render and current acceptance boundary are in
+[aks-credential-job-render-2026-08-24.md](aks-credential-job-render-2026-08-24.md).

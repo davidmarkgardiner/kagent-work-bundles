@@ -22,6 +22,23 @@ for script in "$BUNDLE_DIR"/scripts/*.sh; do
   bash -n "$script"
 done
 
+refresh_script="$BUNDLE_DIR/scripts/refresh-aks-kubeconfig-job.sh"
+if rg -n --fixed-strings -- '--admin' "$refresh_script" >/dev/null; then
+  echo "AKS credential Job must never request admin credentials" >&2
+  exit 1
+fi
+for required_fragment in \
+  'az aks list' \
+  'az aks get-credentials' \
+  'kubelogin convert-kubeconfig -l workloadidentity' \
+  'kubectl replace -f -' \
+  'auth can-i get secrets'; do
+  rg -q --fixed-strings "$required_fragment" "$refresh_script" || {
+    echo "AKS credential Job contract is missing: $required_fragment" >&2
+    exit 1
+  }
+done
+
 if command -v shellcheck >/dev/null; then
   shellcheck -x -P "$BUNDLE_DIR/scripts" "$BUNDLE_DIR"/scripts/*.sh
 fi
@@ -78,13 +95,15 @@ done
 
 chart_dir=$CHART_REF
 helm lint "$chart_dir" -f "$BUNDLE_DIR/values.yaml" \
+  --set-string fullnameOverride="$MCP_NAME" \
   --set-string kubeconfigSecretName=kubernetes-mcp-fleet-kubeconfig-example \
   --set-string image.registry="$IMAGE_REGISTRY" \
   --set-string image.repository="$IMAGE_REPOSITORY" \
   --set-string image.version="$IMAGE_VERSION" \
   "${tool_set_args[@]}" >/dev/null
-helm template kubernetes-mcp-fleet "$chart_dir" \
+helm template "$MCP_NAME" "$chart_dir" \
   --namespace "$HOST_NAMESPACE" -f "$BUNDLE_DIR/values.yaml" \
+  --set-string fullnameOverride="$MCP_NAME" \
   --set-string kubeconfigSecretName=kubernetes-mcp-fleet-kubeconfig-example \
   --set-string image.registry="$IMAGE_REGISTRY" \
   --set-string image.repository="$IMAGE_REPOSITORY" \
@@ -94,7 +113,15 @@ helm template kubernetes-mcp-fleet "$chart_dir" \
 expected_image="$IMAGE_REGISTRY/$IMAGE_REPOSITORY:$IMAGE_VERSION"
 python3 - "$tmp_dir/helm-rendered.yaml" "$tmp_dir/kustomize-rendered.yaml" \
   "$expected_image" "$TOOL_ALLOWLIST" "$TARGET_API_CIDRS" \
-  "$AGENTGATEWAY_MCP_URL" "$AGENTGATEWAY_NAMESPACE" <<'PY'
+  "$AGENTGATEWAY_MCP_URL" "$AGENTGATEWAY_NAMESPACE" \
+  "$MCP_NAME" "$KAGENT_AGENT_NAME" "$REMOTE_MCP_NAME" \
+  "$AGENTGATEWAY_MCP_PATH" "$KUBECONFIG_SECRET_NAME" \
+  "$CREDENTIAL_REFRESH_NAME" "$CREDENTIAL_REFRESH_CONFIG_NAME" \
+  "$CREDENTIAL_REFRESH_SCRIPT_CONFIG_NAME" "$CREDENTIAL_REFRESH_IMAGE" \
+  "$CREDENTIAL_REFRESH_SUSPEND" "$AKS_MCP_WORKLOAD_NAMESPACE" \
+  "$AKS_MCP_SERVICE_ACCOUNT" "$MCP_WORKLOAD_IDENTITY_SERVICE_ACCOUNT" \
+  "$AKS_MCP_UAMI_CLIENT_ID" "$CREDENTIAL_REFRESH_CRON_MINUTE" \
+  "$CREDENTIAL_REFRESH_CRON_HOUR" "$AZURE_IDENTITY_EGRESS_CIDRS" <<'PY'
 import ipaddress
 import json
 import re
@@ -110,6 +137,27 @@ expected_tools = sys.argv[4].split(",")
 expected_cidrs = sys.argv[5].split(",")
 expected_gateway_url = sys.argv[6]
 expected_gateway_namespace = sys.argv[7]
+expected_mcp_name = sys.argv[8]
+expected_agent_name = sys.argv[9]
+expected_remote_name = sys.argv[10]
+expected_gateway_path = sys.argv[11]
+expected_secret_name = sys.argv[12]
+expected_refresh_name = sys.argv[13]
+expected_refresh_config = sys.argv[14]
+expected_refresh_script = sys.argv[15]
+expected_refresh_image = sys.argv[16]
+expected_refresh_suspend = sys.argv[17] == "true"
+expected_refresh_namespace = sys.argv[18]
+expected_refresh_sa = sys.argv[19]
+expected_mcp_sa = sys.argv[20]
+expected_uami_client_id = sys.argv[21]
+expected_cron_minute = sys.argv[22]
+expected_cron_hour = sys.argv[23]
+expected_identity_cidrs = sys.argv[24].split(",")
+
+rendered_text = open(sys.argv[2], encoding="utf-8").read()
+if "REPLACE" in rendered_text or "{{" in rendered_text:
+    raise SystemExit("Kustomize output contains an unresolved placeholder")
 
 images = [
     container["image"]
@@ -131,8 +179,17 @@ annotation = deployment["spec"]["template"]["metadata"]["annotations"].get(
 )
 if annotation != "kubernetes-mcp-fleet-kubeconfig-example":
     raise SystemExit(f"credential revision annotation did not render: {annotation}")
+if deployment["metadata"]["name"] != expected_mcp_name:
+    raise SystemExit(f"Helm workload name mismatch: {deployment['metadata']['name']}")
+if deployment["spec"]["template"]["metadata"]["labels"].get("azure.workload.identity/use") != "true":
+    raise SystemExit("MCP pod is missing the Azure Workload Identity label")
+secret_volume = next(v for v in deployment["spec"]["template"]["spec"]["volumes"] if v["name"] == "fleet-kubeconfig")
+if secret_volume["secret"].get("items") != [{"key": "kubeconfig", "path": "kubeconfig"}]:
+    raise SystemExit("MCP volume must mount only the active kubeconfig key")
 
 agent = next(document for document in kustomize_documents if document and document.get("kind") == "Agent")
+if agent["metadata"]["name"] != expected_agent_name:
+    raise SystemExit(f"Agent name mismatch: {agent['metadata']['name']}")
 agent_tools = agent["spec"]["declarative"]["tools"][0]["mcpServer"]["toolNames"]
 if agent_tools != expected_tools:
     raise SystemExit(f"Agent tool allowlist mismatch: {agent_tools}")
@@ -144,10 +201,61 @@ if policy_tools != expected_tools:
     raise SystemExit(f"agentgateway tool allowlist mismatch: {policy_tools}")
 
 remote_servers = [document for document in kustomize_documents if document and document.get("kind") == "RemoteMCPServer"]
-if len(remote_servers) != 1 or remote_servers[0]["metadata"]["name"] != "kubernetes-mcp-fleet-gateway":
+if len(remote_servers) != 1 or remote_servers[0]["metadata"]["name"] != expected_remote_name:
     raise SystemExit("direct kagent RemoteMCPServer must be absent")
 if remote_servers[0]["spec"]["url"] != expected_gateway_url:
     raise SystemExit(f"gateway URL mismatch: {remote_servers[0]['spec']['url']}")
+if agent["spec"]["declarative"]["tools"][0]["mcpServer"]["name"] != expected_remote_name:
+    raise SystemExit("Agent does not reference the rendered RemoteMCPServer name")
+
+backend = next(document for document in kustomize_documents if document and document.get("kind") == "AgentgatewayBackend")
+route = next(document for document in kustomize_documents if document and document.get("kind") == "HTTPRoute")
+gateway_policy = next(document for document in kustomize_documents if document and document.get("kind") == "AgentgatewayPolicy")
+if backend["metadata"]["name"] != expected_mcp_name or backend["spec"]["mcp"]["targets"][0]["name"] != expected_mcp_name:
+    raise SystemExit("Agentgateway backend name mismatch")
+if backend["spec"]["mcp"]["targets"][0]["static"]["host"].split(".", 1)[0] != expected_mcp_name:
+    raise SystemExit("Agentgateway backend host is not derived from MCP_NAME")
+if route["metadata"]["name"] != expected_mcp_name or route["spec"]["rules"][0]["matches"][0]["path"]["value"] != expected_gateway_path:
+    raise SystemExit("HTTPRoute name or path mismatch")
+if gateway_policy["metadata"]["name"] != expected_mcp_name or gateway_policy["spec"]["targetRefs"][0]["name"] != expected_mcp_name:
+    raise SystemExit("Agentgateway policy target mismatch")
+
+credential_secret = next(document for document in kustomize_documents if document and document.get("kind") == "Secret")
+if credential_secret["metadata"]["name"] != expected_secret_name or credential_secret.get("data"):
+    raise SystemExit("credential Secret must be a named, initially empty publisher target")
+mcp_service_account = next(document for document in kustomize_documents if document and document.get("kind") == "ServiceAccount")
+if mcp_service_account["metadata"]["name"] != expected_mcp_sa:
+    raise SystemExit("MCP Workload Identity ServiceAccount name mismatch")
+if mcp_service_account["metadata"]["annotations"].get("azure.workload.identity/client-id") != expected_uami_client_id:
+    raise SystemExit("MCP ServiceAccount UAMI annotation mismatch")
+
+refresh = next(document for document in kustomize_documents if document and document.get("kind") == "CronJob")
+refresh_pod = refresh["spec"]["jobTemplate"]["spec"]["template"]
+refresh_container = refresh_pod["spec"]["containers"][0]
+if refresh["metadata"]["name"] != expected_refresh_name or refresh["metadata"]["namespace"] != expected_refresh_namespace:
+    raise SystemExit("credential CronJob name or namespace mismatch")
+if refresh["spec"]["schedule"] != f"{expected_cron_minute} {expected_cron_hour} * * *" or refresh["spec"]["suspend"] is not expected_refresh_suspend:
+    raise SystemExit("credential CronJob schedule or suspend state mismatch")
+if refresh_pod["spec"]["serviceAccountName"] != expected_refresh_sa:
+    raise SystemExit("credential CronJob does not reuse the configured AKS-MCP ServiceAccount")
+if refresh_pod["metadata"]["labels"].get("azure.workload.identity/use") != "true":
+    raise SystemExit("credential CronJob is missing the Workload Identity label")
+if refresh_container["image"] != expected_refresh_image:
+    raise SystemExit("credential CronJob image mismatch")
+if refresh_container["envFrom"][0]["configMapRef"]["name"] != expected_refresh_config:
+    raise SystemExit("credential CronJob values ConfigMap mismatch")
+if refresh_pod["spec"]["volumes"][0]["configMap"]["name"] != expected_refresh_script:
+    raise SystemExit("credential CronJob script ConfigMap mismatch")
+
+publisher_role = next(document for document in kustomize_documents if document and document.get("kind") == "Role")
+publisher_binding = next(document for document in kustomize_documents if document and document.get("kind") == "RoleBinding")
+if publisher_role["rules"][0] != {"apiGroups": [""], "resourceNames": [expected_secret_name], "resources": ["secrets"], "verbs": ["get", "update"]}:
+    raise SystemExit("credential publisher Secret RBAC widened or drifted")
+if publisher_role["rules"][1]["resourceNames"] != [expected_mcp_name] or publisher_role["rules"][1]["verbs"] != ["get", "patch"]:
+    raise SystemExit("credential publisher Deployment RBAC widened or drifted")
+subject = publisher_binding["subjects"][0]
+if subject["name"] != expected_refresh_sa or subject["namespace"] != expected_refresh_namespace:
+    raise SystemExit("credential publisher binding subject mismatch")
 
 network_policy = next(
     document for document in kustomize_documents
@@ -161,6 +269,12 @@ for cidr in cidrs:
     network = ipaddress.ip_network(cidr, strict=False)
     if network.prefixlen == 0:
         raise SystemExit(f"default-route egress CIDR is forbidden: {cidr}")
+identity_cidrs = [entry["ipBlock"]["cidr"] for entry in network_policy["spec"]["egress"][2]["to"]]
+if identity_cidrs != expected_identity_cidrs:
+    raise SystemExit(f"identity egress CIDR mismatch: {identity_cidrs}")
+for cidr in identity_cidrs:
+    if ipaddress.ip_network(cidr, strict=False).prefixlen == 0:
+        raise SystemExit(f"default-route identity egress CIDR is forbidden: {cidr}")
 ingress_namespaces = [
     entry["namespaceSelector"]["matchLabels"]["kubernetes.io/metadata.name"]
     for entry in network_policy["spec"]["ingress"][0]["from"]

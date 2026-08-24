@@ -27,6 +27,7 @@ rbac:
 podLabels:
   app.kubernetes.io/part-of: kubernetes-mcp-fleet-poc
   kubernetes-mcp-fleet/access: server
+  azure.workload.identity/use: "true"
 
 podAnnotations:
   kubernetes-mcp-fleet/credential-revision: "{{ .Values.kubeconfigSecretName }}"
@@ -71,6 +72,9 @@ extraVolumes:
     secret:
       secretName: "{{ .Values.kubeconfigSecretName }}"
       optional: false
+      items:
+        - key: kubeconfig
+          path: kubeconfig
       # Secret volumes are owned by root; 0444 lets the non-root process read
       # the credential file while the read-only mount prevents modification.
       defaultMode: 292

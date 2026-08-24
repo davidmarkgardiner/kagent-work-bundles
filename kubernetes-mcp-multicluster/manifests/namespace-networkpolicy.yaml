@@ -64,3 +64,13 @@ spec:
           port: 443
         - protocol: TCP
           port: 6443
+    # Workload Identity token exchange. Prefer a controlled egress proxy or
+    # Azure Firewall CIDR; standard NetworkPolicy cannot express FQDN rules.
+    - to:
+        - ipBlock: {cidr: "AZURE_IDENTITY_EGRESS_CIDR_0_REPLACE"}
+        - ipBlock: {cidr: "AZURE_IDENTITY_EGRESS_CIDR_1_REPLACE"}
+        - ipBlock: {cidr: "AZURE_IDENTITY_EGRESS_CIDR_2_REPLACE"}
+        - ipBlock: {cidr: "AZURE_IDENTITY_EGRESS_CIDR_3_REPLACE"}
+      ports:
+        - protocol: TCP
+          port: 443

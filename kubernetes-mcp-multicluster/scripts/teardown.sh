@@ -6,7 +6,7 @@ BUNDLE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 source "$BUNDLE_DIR/scripts/load-config.sh"
 load_bundle_config "$BUNDLE_DIR"
 
-helm --kube-context "$HOST_CONTEXT" uninstall kubernetes-mcp-fleet \
+helm --kube-context "$HOST_CONTEXT" uninstall "$MCP_NAME" \
   --namespace "$HOST_NAMESPACE" --ignore-not-found >/dev/null
 kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" delete secret \
   -l kubernetes-mcp-fleet/credential=true --ignore-not-found >/dev/null

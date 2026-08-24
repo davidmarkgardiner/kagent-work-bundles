@@ -57,7 +57,7 @@ cleanup() {
 trap cleanup EXIT
 
 kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" port-forward \
-  service/kubernetes-mcp-fleet "$DIRECT_PORT:8080" >"$direct_log" 2>&1 &
+  service/"$MCP_NAME" "$DIRECT_PORT:8080" >"$direct_log" 2>&1 &
 direct_pid=$!
 kubectl --context "$HOST_CONTEXT" -n "$AGENTGATEWAY_NAMESPACE" port-forward \
   service/"$AGENTGATEWAY_SERVICE" "$GATEWAY_PORT:80" >"$gateway_log" 2>&1 &
@@ -66,7 +66,7 @@ gateway_pid=$!
 for attempt in $(seq 1 30); do
   if curl --fail --silent "http://127.0.0.1:$DIRECT_PORT/healthz" >/dev/null \
     && curl --silent --output /dev/null \
-      "http://127.0.0.1:$GATEWAY_PORT/mcp/kubernetes-mcp-fleet"; then
+      "http://127.0.0.1:$GATEWAY_PORT$AGENTGATEWAY_MCP_PATH"; then
     break
   fi
   test "$attempt" -lt 30 || {
@@ -158,7 +158,7 @@ check_path() {
 }
 
 check_path direct "http://127.0.0.1:$DIRECT_PORT/mcp"
-check_path agentgateway "http://127.0.0.1:$GATEWAY_PORT/mcp/kubernetes-mcp-fleet"
+check_path agentgateway "http://127.0.0.1:$GATEWAY_PORT$AGENTGATEWAY_MCP_PATH"
 
 # Twenty alternating fresh sessions exercise the gateway path and context
 # selection. They are sequential so every result can be checked independently.
@@ -167,7 +167,7 @@ for request_number in $(seq 1 20); do
   alias_name=${mapping%%=*}
   marker=${mapping#*=}
   check_context agentgateway \
-    "http://127.0.0.1:$GATEWAY_PORT/mcp/kubernetes-mcp-fleet" \
+    "http://127.0.0.1:$GATEWAY_PORT$AGENTGATEWAY_MCP_PATH" \
     "$alias_name" "$marker"
 done
 
