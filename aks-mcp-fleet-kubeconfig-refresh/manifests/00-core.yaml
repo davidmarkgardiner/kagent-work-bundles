@@ -116,7 +116,8 @@ data:
       "clusters": [
         {
           "alias": "{{CLUSTER_ALIAS}}",
-          "agentName": "aks-{{CLUSTER_ALIAS}}-agent"
+          "agentName": "aks-{{CLUSTER_ALIAS}}-agent",
+          "allowedNamespaces": ["{{ALLOWED_NAMESPACE}}"]
         }
       ]
     }

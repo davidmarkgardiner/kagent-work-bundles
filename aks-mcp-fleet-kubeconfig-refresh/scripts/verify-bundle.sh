@@ -13,6 +13,7 @@ required=(
   manifests/01-cronworkflow.yaml
   manifests/02-agent.yaml
   manifests/03-argo-agent-router.yaml
+  manifests/04-agentgateway.yaml
   kustomization.yaml
   scripts/refresh-fleet-kubeconfig.sh
   scripts/homelab-smoke.sh
@@ -37,6 +38,9 @@ grep -q 'name: validate-kubeconfig' <<<"$rendered_chart"
 grep -q 'optional: false' <<<"$rendered_chart"
 grep -q 'azure.workload.identity/use: "true"' <<<"$rendered_chart"
 grep -q 'automountServiceAccountToken: false' <<<"$rendered_chart"
+grep -q -- '--allow-namespaces' <<<"$rendered_chart"
+grep -q '^kind: NetworkPolicy$' <<<"$rendered_chart"
+grep -q 'appProtocol: "agentgateway.dev/mcp"' <<<"$rendered_chart"
 if grep -q '^kind: ClusterRole$' <<<"$rendered_chart"; then
   echo "fleet shard values unexpectedly rendered management-cluster RBAC" >&2
   exit 1
@@ -45,6 +49,12 @@ fi
 
 grep -q 'concurrencyPolicy: Forbid' "$BUNDLE_DIR/manifests/01-cronworkflow.yaml"
 grep -q 'BLOCKED_UNKNOWN_CLUSTER' "$BUNDLE_DIR/manifests/03-argo-agent-router.yaml"
+grep -q 'BLOCKED_UNKNOWN_NAMESPACE' "$BUNDLE_DIR/manifests/03-argo-agent-router.yaml"
+grep -q 'allowedNamespaces' "$BUNDLE_DIR/manifests/00-core.yaml"
+grep -q 'apiKeyAuthentication' "$BUNDLE_DIR/manifests/04-agentgateway.yaml"
+grep -q 'mcp.tool.name == "call_kubectl"' "$BUNDLE_DIR/manifests/04-agentgateway.yaml"
+grep -q 'headersFrom' "$BUNDLE_DIR/manifests/02-agent.yaml"
+grep -q 'ai-gateway.agentgateway-system.svc.cluster.local' "$BUNDLE_DIR/manifests/02-agent.yaml"
 grep -q -- '--context, --kubeconfig' "$BUNDLE_DIR/manifests/02-agent.yaml"
 grep -q 'SHARD_DIR' "$BUNDLE_DIR/scripts/refresh-fleet-kubeconfig.sh"
 grep -q 'replace -f' "$BUNDLE_DIR/scripts/refresh-fleet-kubeconfig.sh"

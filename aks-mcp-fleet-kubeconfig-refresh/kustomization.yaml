@@ -5,6 +5,7 @@ resources:
   - manifests/01-cronworkflow.yaml
   - manifests/02-agent.yaml
   - manifests/03-argo-agent-router.yaml
+  - manifests/04-agentgateway.yaml
 generatorOptions:
   disableNameSuffixHash: true
 configMapGenerator:

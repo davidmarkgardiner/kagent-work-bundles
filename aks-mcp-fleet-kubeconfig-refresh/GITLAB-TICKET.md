@@ -17,6 +17,8 @@ that alias's single-context key.
 - Install the morning Argo CronWorkflow and one read-only AKS-MCP shard per alias.
 - Configure Flux field-level ignore for workflow-owned Secret data/hash.
 - Install one RemoteMCPServer/Agent pair per alias and the Argo routing template.
+- Install one strict API-key-authenticated Agent Gateway MCP route/policy per
+  alias and deny direct shard ingress with NetworkPolicy.
 - Add workflow, Secret-age, and rollout alerts.
 - Run one manual refresh and one A2A request against every approved alias.
 
@@ -35,13 +37,22 @@ that alias's single-context key.
       data-plane authorization; Azure RBAC-enabled targets use Azure Kubernetes
       Service RBAC Reader or an approved narrower equivalent.
 - [ ] A failed cluster check preserves the previous Secret and pods.
-- [ ] An unchanged hash performs no Secret update and no rollout.
+- [ ] An unchanged hash with matching shard markers performs no Secret update
+      and no rollout.
 - [ ] A changed hash atomically updates the named Secret and completes a
       zero-unavailable rollout of every named AKS-MCP shard.
 - [ ] An interrupted rollout is resumed on the next unchanged-hash run by
       reconciling the candidate hash on every shard pod template.
 - [ ] Unknown or conflicting aliases return `BLOCKED_UNKNOWN_CLUSTER` without
       an MCP call.
+- [ ] Missing or disallowed namespaces return `BLOCKED_UNKNOWN_NAMESPACE`
+      without an Agent or MCP call; the shard also has the same namespace in
+      `config.allowNamespaces`.
+- [ ] Kagent reaches every shard through Agent Gateway with a per-shard key;
+      missing/wrong keys are rejected and MCP authorization exposes only
+      `call_kubectl` for the matching agent/alias.
+- [ ] NetworkPolicy permits shard ingress only from the `ai-gateway` dataplane;
+      a direct request from another pod is denied.
 - [ ] AKS-MCP tool calls never contain context, kubeconfig, server, token, or
       certificate redirection flags.
 - [ ] Each successful A2A result records the routed alias and fixed Agent/MCP
@@ -65,4 +76,7 @@ transcript. Verify one context at a time before re-enabling the schedule.
 - Unchanged-candidate drill showing no new ReplicaSet.
 - Changed-candidate drill showing rolling rollout completion.
 - RemoteMCPServer Accepted/discovered-tool status.
+- AgentgatewayBackend/HTTPRoute/AgentgatewayPolicy Accepted status plus missing
+  key, wrong key, and direct-Service denial receipts.
+- Argo router rejection receipts for unknown alias and disallowed namespace.
 - One sanitized A2A receipt per cluster alias and one rejected unknown alias.

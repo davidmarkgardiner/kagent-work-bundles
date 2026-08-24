@@ -15,10 +15,13 @@ app:
   cache: false
   allowedHosts:
     - "aks-mcp-{{CLUSTER_ALIAS}}.aks-mcp.svc.cluster.local"
+    - "ai-gateway.agentgateway-system.svc.cluster.local"
 
 config:
   enabledComponents:
     - kubectl
+  allowNamespaces:
+    - "{{ALLOWED_NAMESPACE}}"
 
 azure:
   tenantId: "{{AZURE_TENANT_ID}}"
@@ -40,6 +43,9 @@ serviceAccount:
 
 rbac:
   create: false
+
+service:
+  appProtocol: agentgateway.dev/mcp
 
 extraEnv:
   - name: KUBECONFIG
@@ -65,3 +71,19 @@ autoscaling:
     prometheus:
       serverAddress: "{{PROMETHEUS_QUERY_ENDPOINT}}"
       query: "{{AKS_MCP_LOAD_QUERY}}"
+
+# Direct calls to the shard Service are denied. Only the authenticated
+# Agent Gateway dataplane may reach port 8000.
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: agentgateway-system
+          podSelector:
+            matchLabels:
+              gateway.networking.k8s.io/gateway-name: ai-gateway
+      ports:
+        - protocol: TCP
+          port: 8000

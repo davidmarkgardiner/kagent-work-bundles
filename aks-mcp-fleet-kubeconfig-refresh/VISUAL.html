@@ -23,11 +23,11 @@
     <article class="card"><div class="num">02 · BUILD</div><h3>Fresh candidate</h3><p>Argo uses Workload Identity and an ephemeral volume. No existing file is merged in.</p></article>
     <article class="card"><div class="num">03 · PROVE</div><h3>Every context</h3><p>Exact aliases, exec auth, size, namespace reachability, and read-only access must all pass.</p></article>
     <article class="card"><div class="num">04 · PUBLISH</div><h3>One Secret</h3><p>Each alias becomes one single-context key. Changed hash triggers atomic replacement and shard rollouts.</p></article>
-    <article class="card"><div class="num">05 · ROUTE</div><h3>Fixed target</h3><p>Argo maps clusterAlias to the Agent and MCP pair that mounts only that alias's key.</p></article>
+    <article class="card"><div class="num">05 · ROUTE</div><h3>Authenticated target</h3><p>Argo validates alias + namespace. Agent Gateway authenticates the agent, then routes to the MCP shard mounting only that alias's key.</p></article>
   </section>
   <section class="decision">
     <div class="box good"><strong>All clusters pass</strong><span>Publish every single-context key, then restart one pod at a time across the named MCP shards.</span></div>
     <div class="box fail"><strong>Any cluster fails</strong><span>Keep the last-known-good Secret and pods. Fail the Workflow and alert; never publish a partial fleet.</span></div>
   </section>
-  <div class="footer"><div class="pill"><b>Read-only</b> call_kubectl only</div><div class="pill"><b>Race-safe</b> no context switching</div><div class="pill"><b>Central</b> one refresh + Secret</div><div class="pill"><b>Isolated</b> one pair per target</div></div>
+  <div class="footer"><div class="pill"><b>Read-only</b> call_kubectl only</div><div class="pill"><b>Authenticated</b> per-shard gateway key</div><div class="pill"><b>Bounded</b> namespace at router + MCP</div><div class="pill"><b>Isolated</b> one pair per target</div></div>
 </main></body></html>

@@ -22,21 +22,22 @@ run-scoped cleanup.
 | Candidate build | Two sources merged and validated as exactly two approved aliases |
 | Secret publication | One existing Secret was atomically replaced with two single-context keys |
 | AKS-MCP startup | Two v0.0.19 HTTP shards became Ready with read-only Secret mounts |
+| Namespace boundary | Both shards started with only the run-scoped smoke namespace in `--allow-namespaces` |
 | MCP discovery | Both RemoteMCPServers were Accepted and each discovered exactly `call_kubectl` |
 | Agent readiness | Two fixed-target declarative Agents became Ready |
 | A2A management route | Completed with one successful marker-bearing `call_kubectl` function response |
 | A2A worker route | Completed with one successful marker-bearing `call_kubectl` function response |
-| Installed CRD schemas | Placeholder-substituted bundle passed server-side dry-run for CronWorkflow, WorkflowTemplate, Agent, RemoteMCPServer, RBAC, ConfigMaps, and Secret |
+| Installed CRD schemas | 18 placeholder-substituted resources passed server-side dry-run, including CronWorkflow, WorkflowTemplate, Agent, RemoteMCPServer, AgentgatewayBackend, HTTPRoute, AgentgatewayPolicy, RBAC, ConfigMaps, and Secrets |
 | Cleanup | Test namespaces, bindings, Helm releases, RemoteMCPServers, Agents, tokens, and Secrets were absent after the helper exited |
 
 ## Redacted receipts
 
 - [`management-smoke-receipt.json`](management-smoke-receipt.json) summarizes
-  the 3,464-byte owner-only raw receipt, SHA-256
-  `b469be3a5bf4515b7115d9a1a5b1e6d2d974b1d6a837166c53db1c229f8c2108`.
+  the 3,598-byte owner-only raw receipt, SHA-256
+  `c19696afd7d7636f4edf8f7530106d108a29c68a07713a67284dc02a54156249`.
 - [`worker-smoke-receipt.json`](worker-smoke-receipt.json) summarizes the
-  3,414-byte owner-only raw receipt, SHA-256
-  `eee35cc427aa0e3e720dad30d426980bc8dcedcdd0c633b19829beebd7d26b04`.
+  3,549-byte owner-only raw receipt, SHA-256
+  `6ea7bd07955f847a05f1f67a10fc9b72822165b3e7ff5a4a0d9938c34ca6eaef`.
 
 Both terminal tasks reported `completed`; each history contained exactly one
 `call_kubectl` function response with an `output` payload, no explicit error,
@@ -67,6 +68,9 @@ in this test. Work deployment must independently approve and pin its digest.
 - Azure Workload Identity, Azure RBAC, `az aks get-credentials`, or kubelogin.
 - The approved production builder/router images.
 - A live scheduled CronWorkflow or Flux field-ignore configuration.
+- Live Agent Gateway authentication/authorization and NetworkPolicy denial;
+  their rendered resources passed server-side validation against the installed
+  homelab CRDs, but production keys were intentionally not created.
 - KEDA load-based scaling and production alert delivery.
 - All 10–12 work fleet targets.
 

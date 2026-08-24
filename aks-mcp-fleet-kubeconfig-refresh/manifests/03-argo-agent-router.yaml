@@ -26,13 +26,27 @@ spec:
         args:
           - |
             alias_name="$(jq -er '.clusterAlias' <<<"$INCIDENT_PAYLOAD")"
+            namespace_name="$(jq -er '.namespace' <<<"$INCIDENT_PAYLOAD")"
+            question="$(jq -er '.question | select(type == "string" and length > 0 and length <= 4000)' <<<"$INCIDENT_PAYLOAD")"
+            [[ "$namespace_name" =~ ^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$ ]] || {
+              echo "BLOCKED_UNKNOWN_NAMESPACE" >&2
+              exit 1
+            }
             match_count="$(jq --arg alias "$alias_name" '[.clusters[] | select(.alias == $alias)] | length' /routing/clusters.json)"
             [[ "$match_count" == "1" ]] || {
               echo "BLOCKED_UNKNOWN_CLUSTER" >&2
               exit 1
             }
             agent_name="$(jq -er --arg alias "$alias_name" '.clusters[] | select(.alias == $alias) | .agentName' /routing/clusters.json)"
+            namespace_allowed="$(jq -er --arg alias "$alias_name" --arg namespace "$namespace_name" \
+              '[.clusters[] | select(.alias == $alias) | .allowedNamespaces[] | select(. == $namespace)] | length' \
+              /routing/clusters.json)"
+            [[ "$namespace_allowed" == "1" ]] || {
+              echo "BLOCKED_UNKNOWN_NAMESPACE" >&2
+              exit 1
+            }
             [[ "$agent_name" =~ ^[a-z0-9][a-z0-9-]{0,62}$ ]] || exit 1
+            [[ -n "$question" ]] || exit 1
             request_id="argo-${HOSTNAME}"
             request_body="$(jq -cn \
               --arg id "$request_id" \

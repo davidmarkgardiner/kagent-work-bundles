@@ -55,15 +55,15 @@ fi
 
 delete_resources() {
   kubectl --context "$MANAGEMENT_CONTEXT" -n kagent delete agent \
-    "$MANAGEMENT_AGENT_NAME" "$WORKER_AGENT_NAME" --ignore-not-found >/dev/null 2>&1 || true
+    "$MANAGEMENT_AGENT_NAME" "$WORKER_AGENT_NAME" --ignore-not-found --wait=false >/dev/null 2>&1 || true
   kubectl --context "$MANAGEMENT_CONTEXT" -n kagent delete remotemcpserver \
-    "$MANAGEMENT_REMOTE_NAME" "$WORKER_REMOTE_NAME" --ignore-not-found >/dev/null 2>&1 || true
+    "$MANAGEMENT_REMOTE_NAME" "$WORKER_REMOTE_NAME" --ignore-not-found --wait=false >/dev/null 2>&1 || true
   helm --kube-context "$MANAGEMENT_CONTEXT" uninstall "$MANAGEMENT_RELEASE" -n "$MCP_NAMESPACE" >/dev/null 2>&1 || true
   helm --kube-context "$MANAGEMENT_CONTEXT" uninstall "$WORKER_RELEASE" -n "$MCP_NAMESPACE" >/dev/null 2>&1 || true
-  kubectl --context "$MANAGEMENT_CONTEXT" delete namespace "$MCP_NAMESPACE" --ignore-not-found >/dev/null 2>&1 || true
+  kubectl --context "$MANAGEMENT_CONTEXT" delete namespace "$MCP_NAMESPACE" --ignore-not-found --wait=false >/dev/null 2>&1 || true
   for context_name in "$MANAGEMENT_CONTEXT" "$WORKER_CONTEXT"; do
-    kubectl --context "$context_name" delete clusterrolebinding "$TARGET_BINDING" --ignore-not-found >/dev/null 2>&1 || true
-    kubectl --context "$context_name" delete namespace "$TARGET_NAMESPACE" --ignore-not-found >/dev/null 2>&1 || true
+    kubectl --context "$context_name" delete clusterrolebinding "$TARGET_BINDING" --ignore-not-found --wait=false >/dev/null 2>&1 || true
+    kubectl --context "$context_name" delete namespace "$TARGET_NAMESPACE" --ignore-not-found --wait=false >/dev/null 2>&1 || true
   done
 }
 
@@ -198,6 +198,7 @@ install_mcp_shard() {
     --set app.cache=false \
     --set "app.allowedHosts[0]=$mcp_name.$MCP_NAMESPACE.svc.cluster.local" \
     --set-json 'config.enabledComponents=["kubectl"]' \
+    --set "config.allowNamespaces[0]=$TARGET_NAMESPACE" \
     --set kubeconfig.enabled=true \
     --set kubeconfig.secretName=aks-mcp-fleet-kubeconfig \
     --set kubeconfig.key="$secret_key" \
@@ -226,6 +227,8 @@ spec:
   description: Ephemeral management-target AKS-MCP homelab smoke.
   protocol: STREAMABLE_HTTP
   url: http://$MANAGEMENT_MCP_NAME.$MCP_NAMESPACE.svc.cluster.local:8000/mcp
+  allowedNamespaces:
+    from: Same
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
@@ -235,6 +238,8 @@ spec:
   description: Ephemeral worker-target AKS-MCP homelab smoke.
   protocol: STREAMABLE_HTTP
   url: http://$WORKER_MCP_NAME.$MCP_NAMESPACE.svc.cluster.local:8000/mcp
+  allowedNamespaces:
+    from: Same
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: Agent
@@ -342,7 +347,7 @@ for pair in "management-smoke:$MANAGEMENT_AGENT_NAME:$MANAGEMENT_MARKER" "worker
       --context "$MANAGEMENT_CONTEXT" --local-port "$((18080 + RANDOM % 1000))" \
       --agent "$agent_name" --timeout 120 \
       --receipt-file "$receipt_file" \
-      --text "{\"clusterAlias\":\"$alias_name\",\"question\":\"Read and return the isolated proof marker.\"}")"
+      --text "{\"clusterAlias\":\"$alias_name\",\"namespace\":\"$TARGET_NAMESPACE\",\"question\":\"Read and return the isolated proof marker.\"}")"
     invoke_rc=$?
     set -e
     [[ "$invoke_rc" == "0" ]] && grep -q 'TARGET_OK' <<<"$response" && break

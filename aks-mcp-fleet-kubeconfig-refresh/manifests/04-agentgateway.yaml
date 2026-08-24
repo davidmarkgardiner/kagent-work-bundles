@@ -1,0 +1,85 @@
+# Render one copy per cluster alias. Supply the same generated API key to both
+# placeholder Secrets through the approved secret-delivery mechanism; never
+# commit the real value.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "aks-mcp-{{CLUSTER_ALIAS}}-gateway-keys"
+  namespace: agentgateway-system
+type: Opaque
+stringData:
+  aks-agent: |
+    {"key":"{{AKS_MCP_GATEWAY_API_KEY}}","metadata":{"clusterAlias":"{{CLUSTER_ALIAS}}","agent":"aks-{{CLUSTER_ALIAS}}-agent","namespace":"kagent"}}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "aks-mcp-{{CLUSTER_ALIAS}}-gateway-client"
+  namespace: kagent
+type: Opaque
+stringData:
+  authorization: "Bearer {{AKS_MCP_GATEWAY_API_KEY}}"
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: "aks-mcp-{{CLUSTER_ALIAS}}"
+  namespace: agentgateway-system
+spec:
+  mcp:
+    sessionRouting: Stateful
+    failureMode: FailClosed
+    targets:
+      - name: "aks-{{CLUSTER_ALIAS}}"
+        selector:
+          namespaces:
+            matchLabels:
+              kubernetes.io/metadata.name: aks-mcp
+          services:
+            matchLabels:
+              app.kubernetes.io/instance: "aks-mcp-{{CLUSTER_ALIAS}}"
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: "aks-mcp-{{CLUSTER_ALIAS}}"
+  namespace: agentgateway-system
+spec:
+  parentRefs:
+    - name: ai-gateway
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: "/mcp/aks/{{CLUSTER_ALIAS}}"
+      backendRefs:
+        - group: agentgateway.dev
+          kind: AgentgatewayBackend
+          name: "aks-mcp-{{CLUSTER_ALIAS}}"
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: "aks-mcp-{{CLUSTER_ALIAS}}"
+  namespace: agentgateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: "aks-mcp-{{CLUSTER_ALIAS}}"
+  traffic:
+    apiKeyAuthentication:
+      mode: Strict
+      secretRef:
+        name: "aks-mcp-{{CLUSTER_ALIAS}}-gateway-keys"
+  backend:
+    mcp:
+      authorization:
+        action: Require
+        policy:
+          matchExpressions:
+            - >-
+              apiKey.clusterAlias == "{{CLUSTER_ALIAS}}" &&
+              apiKey.agent == "aks-{{CLUSTER_ALIAS}}-agent" &&
+              mcp.tool.target == "aks-{{CLUSTER_ALIAS}}" &&
+              mcp.tool.name == "call_kubectl"
