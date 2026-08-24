@@ -55,7 +55,25 @@ grep -q 'ROLLOUT_MAX_PARALLEL' "$BUNDLE_DIR/scripts/refresh-fleet-kubeconfig.sh"
 grep -q 'platform.example.com/kubeconfig-sha256' "$BUNDLE_DIR/scripts/refresh-fleet-kubeconfig.sh"
 grep -q 'reconcile_rollout' "$BUNDLE_DIR/scripts/refresh-fleet-kubeconfig.sh"
 grep -q 'function_response' "$BUNDLE_DIR/scripts/homelab-smoke.sh"
-jq -e '.task_state == "completed" and .function_responses == [{"name":"call_kubectl","explicit_error":false,"response_keys":["output"],"target_only_marker_matched":true}] and .final_artifact_marker_matched == true and .cleanup_verified == true' \
+grep -q 'cleanup=\$cleanup_status' "$BUNDLE_DIR/scripts/homelab-smoke.sh"
+jq -se '
+  length == 2
+  and ([.[].alias] | sort == ["management-smoke", "worker-smoke"])
+  and ([.[].raw_receipt_sha256] | unique | length == 2)
+  and all(.[];
+    .remote_mcp_accepted == true
+    and .discovered_tools == ["call_kubectl"]
+    and .agent_ready == true
+    and .task_state == "completed"
+    and .function_responses == [{"name":"call_kubectl","explicit_error":false,"response_keys":["output"],"target_only_marker_matched":true}]
+    and .final_artifact_marker_matched == true
+    and .cleanup_verified == true
+    and ((.raw_receipt_bytes | type) == "number")
+    and .raw_receipt_bytes > 0
+    and ((.raw_receipt_sha256 | type) == "string")
+    and (.raw_receipt_sha256 | test("^[0-9a-f]{64}$"))
+  )
+' \
   "$BUNDLE_DIR/evidence/management-smoke-receipt.json" \
   "$BUNDLE_DIR/evidence/worker-smoke-receipt.json" >/dev/null
 

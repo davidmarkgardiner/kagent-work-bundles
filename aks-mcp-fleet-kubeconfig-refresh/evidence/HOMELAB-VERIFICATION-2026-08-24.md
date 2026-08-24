@@ -3,7 +3,7 @@
 ## Result
 
 ```text
-HOMELAB_SMOKE_OK contexts=2 secrets=1 mcp_shards=2 agents=2 a2a=2
+HOMELAB_SMOKE_OK contexts=2 secrets=1 mcp_shards=2 agents=2 a2a=2 cleanup=verified
 ```
 
 The repeatable `scripts/homelab-smoke.sh` helper passed against the selected

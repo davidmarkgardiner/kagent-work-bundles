@@ -142,7 +142,8 @@ A2A call per alias. Each call must return a random target-only marker and retain
 exactly one successful marker-bearing `call_kubectl` function response. The
 helper also requires each RemoteMCPServer to discover exactly that one tool.
 All namespaces, bindings, Helm releases, Agents, and RemoteMCPServers are
-run-scoped, and the helper removes them by default.
+run-scoped. A default run prints `HOMELAB_SMOKE_OK` only after confirming they
+are absent; `--keep` deliberately reports `cleanup=retained` instead.
 
 ```bash
 scripts/homelab-smoke.sh \

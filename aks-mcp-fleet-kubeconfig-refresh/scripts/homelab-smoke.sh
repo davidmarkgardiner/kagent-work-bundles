@@ -53,12 +53,7 @@ if [[ -z "$RECEIPT_DIR" ]]; then
 fi
 [[ -d "$RECEIPT_DIR" ]] || { echo "receipt directory does not exist: $RECEIPT_DIR" >&2; exit 2; }
 
-cleanup() {
-  rm -rf "$TEST_DIR"
-  if [[ "$KEEP" == "true" ]]; then
-    echo "KEEP=true: live smoke resources retained"
-    return
-  fi
+delete_resources() {
   kubectl --context "$MANAGEMENT_CONTEXT" -n kagent delete agent \
     "$MANAGEMENT_AGENT_NAME" "$WORKER_AGENT_NAME" --ignore-not-found >/dev/null 2>&1 || true
   kubectl --context "$MANAGEMENT_CONTEXT" -n kagent delete remotemcpserver \
@@ -71,7 +66,59 @@ cleanup() {
     kubectl --context "$context_name" delete namespace "$TARGET_NAMESPACE" --ignore-not-found >/dev/null 2>&1 || true
   done
 }
-trap cleanup EXIT
+
+kubectl_resource_absent() {
+  local context_name="$1" namespace_name="$2" resource_name="$3" output
+  local command=(kubectl --context "$context_name")
+  if [[ "$namespace_name" != "-" ]]; then
+    command+=(-n "$namespace_name")
+  fi
+  output="$("${command[@]}" get "$resource_name" --ignore-not-found -o name 2>/dev/null)" \
+    || return 1
+  [[ -z "$output" ]]
+}
+
+helm_release_absent() {
+  local release_name="$1" output
+  output="$(helm --kube-context "$MANAGEMENT_CONTEXT" list -n "$MCP_NAMESPACE" \
+    --filter "^${release_name}$" --short 2>/dev/null)" || return 1
+  [[ -z "$output" ]]
+}
+
+all_resources_absent() {
+  kubectl_resource_absent "$MANAGEMENT_CONTEXT" kagent "agent/$MANAGEMENT_AGENT_NAME" &&
+    kubectl_resource_absent "$MANAGEMENT_CONTEXT" kagent "agent/$WORKER_AGENT_NAME" &&
+    kubectl_resource_absent "$MANAGEMENT_CONTEXT" kagent "remotemcpserver/$MANAGEMENT_REMOTE_NAME" &&
+    kubectl_resource_absent "$MANAGEMENT_CONTEXT" kagent "remotemcpserver/$WORKER_REMOTE_NAME" &&
+    helm_release_absent "$MANAGEMENT_RELEASE" &&
+    helm_release_absent "$WORKER_RELEASE" &&
+    kubectl_resource_absent "$MANAGEMENT_CONTEXT" - "namespace/$MCP_NAMESPACE" &&
+    kubectl_resource_absent "$MANAGEMENT_CONTEXT" - "namespace/$TARGET_NAMESPACE" &&
+    kubectl_resource_absent "$WORKER_CONTEXT" - "namespace/$TARGET_NAMESPACE" &&
+    kubectl_resource_absent "$MANAGEMENT_CONTEXT" - "clusterrolebinding/$TARGET_BINDING" &&
+    kubectl_resource_absent "$WORKER_CONTEXT" - "clusterrolebinding/$TARGET_BINDING"
+}
+
+verify_cleanup() {
+  for _ in $(seq 1 90); do
+    if all_resources_absent; then
+      return 0
+    fi
+    sleep 2
+  done
+  echo "run-scoped smoke resources remain after cleanup: $RUN_ID" >&2
+  return 1
+}
+
+cleanup_on_exit() {
+  local original_rc=$?
+  rm -rf "$TEST_DIR"
+  if [[ "$KEEP" == "false" ]]; then
+    delete_resources
+  fi
+  return "$original_rc"
+}
+trap cleanup_on_exit EXIT
 
 create_readonly_kubeconfig() {
   local context_name="$1" alias_name="$2" output_path="$3" marker="$4"
@@ -323,4 +370,15 @@ for pair in "management-smoke:$MANAGEMENT_AGENT_NAME:$MANAGEMENT_MARKER" "worker
   echo "PASS Argo-style alias routing reached $alias_name through its AKS-MCP shard"
 done
 
-echo "HOMELAB_SMOKE_OK contexts=2 secrets=1 mcp_shards=2 agents=2 a2a=2"
+cleanup_status=retained
+if [[ "$KEEP" == "false" ]]; then
+  delete_resources
+  verify_cleanup
+  cleanup_status=verified
+else
+  echo "KEEP=true: live smoke resources retained"
+fi
+rm -rf "$TEST_DIR"
+trap - EXIT
+
+echo "HOMELAB_SMOKE_OK contexts=2 secrets=1 mcp_shards=2 agents=2 a2a=2 cleanup=$cleanup_status"
