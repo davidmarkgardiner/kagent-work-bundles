@@ -20,10 +20,26 @@ config:
   enabledComponents:
     - kubectl
 
+azure:
+  tenantId: "{{AZURE_TENANT_ID}}"
+  clientId: "{{AZURE_CLIENT_ID}}"
+
+workloadIdentity:
+  enabled: true
+
 kubeconfig:
   enabled: true
   secretName: aks-mcp-fleet-kubeconfig
   key: "{{CLUSTER_ALIAS}}.config"
+  optional: false
+  expectedCurrentContext: "{{CLUSTER_ALIAS}}"
+
+serviceAccount:
+  create: true
+  automount: false
+
+rbac:
+  create: false
 
 extraEnv:
   - name: KUBECONFIG

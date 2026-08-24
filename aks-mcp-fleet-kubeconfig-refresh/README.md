@@ -17,15 +17,17 @@ rollout after a verified credential change cover separate lifecycle concerns.
 1. `aks-fleet-registry` holds approved AKS aliases and Azure lookup fields.
 2. At 05:00 Europe/London, Argo starts one refresh because concurrency is
    `Forbid`.
-3. The workflow uses Azure Workload Identity and an approved builder image to
-   run `az aks get-credentials --format exec` for each cluster into a new file.
+3. The workflow uses Azure Workload Identity to establish an ephemeral Azure
+   CLI session in `/work/.azure`, verifies the active account, and uses an
+   approved builder image to run `az aks get-credentials --format exec` for
+   each cluster into a new file.
 4. The script converts authentication to `kubelogin` workload identity, removes
    the candidate's `current-context`, rejects aliases outside the registry and
    embedded static credentials, and checks namespace plus read-only pod access
    on every context.
 5. If the SHA-256 is unchanged, the workflow exits without touching the Secret
-   or pods. If changed, it uses an API-level Secret replacement, then performs
-   a zero-unavailable rolling restart of every named AKS-MCP shard.
+   or pods. If changed, it server-validates and replaces the Secret, restarts
+   every named AKS-MCP shard, and waits for rollouts in bounded parallel batches.
 6. `aks-fleet-agent-router` maps the payload alias to `aks-<alias>-agent`. That
    Agent has exactly one AKS-MCP tool source, and its MCP pod sees exactly one
    current context.
@@ -73,7 +75,14 @@ would be a new component rather than stock AKS-MCP.
    `02-agent.yaml` plus `aks-mcp-values.yaml` instance per cluster. Context
    aliases must be unique DNS-style lowercase names.
 3. Configure Azure Workload Identity. The identity needs AKS cluster-user
-   credential read access on the approved fleet; never use `--admin`.
+   credential read access on the approved fleet; never use `--admin`. Create a
+   federated credential for the refresh subject
+   `system:serviceaccount:aks-mcp:fleet-kubeconfig-refresher` and one for every
+   shard subject `system:serviceaccount:aks-mcp:aks-mcp-{{CLUSTER_ALIAS}}`, all
+   using the management cluster OIDC issuer and audience
+   `api://AzureADTokenExchange`. Each shard ServiceAccount is annotated with
+   `{{AZURE_CLIENT_ID}}`; its management-cluster token automount and chart RBAC
+   are disabled because kubelogin uses the projected workload-identity token.
 4. Bootstrap `manifests/00-core.yaml`, then configure Flux to ignore only
    `/data` and the kubeconfig hash annotation on the named Secret. Do not
    make the whole Secret unmanaged.
@@ -120,7 +129,11 @@ The smoke helper never copies administrator kubeconfigs into AKS-MCP. It creates
 one-hour ServiceAccount tokens bound to Kubernetes' built-in `view` role in an
 isolated namespace on two explicit contexts, builds one candidate and one
 two-key Secret, starts two fixed-target AKS-MCP/Agent pairs, and performs one
-A2A call per alias. It removes all test resources by default.
+A2A call per alias. Each call must return a random target-only marker and retain
+exactly one successful marker-bearing `call_kubectl` function response. The
+helper also requires each RemoteMCPServer to discover exactly that one tool.
+All namespaces, bindings, Helm releases, Agents, and RemoteMCPServers are
+run-scoped, and the helper removes them by default.
 
 ```bash
 scripts/homelab-smoke.sh \

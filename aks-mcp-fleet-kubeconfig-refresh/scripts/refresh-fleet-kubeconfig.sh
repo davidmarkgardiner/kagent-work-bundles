@@ -14,6 +14,7 @@ ALLOW_STATIC_CREDENTIALS="${ALLOW_STATIC_CREDENTIALS:-false}"
 SKIP_CONNECTIVITY="${SKIP_CONNECTIVITY:-false}"
 VALIDATE_ONLY="${VALIDATE_ONLY:-false}"
 ROLLOUT_ON_CHANGE="${ROLLOUT_ON_CHANGE:-true}"
+ROLLOUT_MAX_PARALLEL="${ROLLOUT_MAX_PARALLEL:-4}"
 CONTROL_CONTEXT="${CONTROL_CONTEXT:-}"
 
 CONTROL_KUBECTL=(kubectl)
@@ -62,6 +63,32 @@ done <<<"$alias_lines"
 unique_count="$(printf '%s\n' "$alias_lines" | sort -u | wc -l | tr -d ' ')"
 [[ "$unique_count" == "$cluster_count" ]] || fail "cluster aliases must be unique"
 
+aks_count="$(jq '[.clusters[] | select(.provider == "aks")] | length' "$REGISTRY_PATH")"
+has_aks=false
+if [[ "$aks_count" -gt 0 ]]; then
+  has_aks=true
+  require_command az
+  require_command kubelogin
+  : "${AZURE_CLIENT_ID:?AZURE_CLIENT_ID is required for AKS workload identity}"
+  : "${AZURE_TENANT_ID:?AZURE_TENANT_ID is required for AKS workload identity}"
+  : "${AZURE_FEDERATED_TOKEN_FILE:?AZURE_FEDERATED_TOKEN_FILE is required for AKS workload identity}"
+  [[ -r "$AZURE_FEDERATED_TOKEN_FILE" ]] \
+    || fail "Azure federated token file is not readable"
+  export AZURE_CONFIG_DIR="${AZURE_CONFIG_DIR:-$WORK_DIR/.azure}"
+  mkdir -p "$AZURE_CONFIG_DIR"
+  federated_token="$(<"$AZURE_FEDERATED_TOKEN_FILE")"
+  [[ -n "$federated_token" ]] || fail "Azure federated token file is empty"
+  az login --service-principal \
+    --username "$AZURE_CLIENT_ID" \
+    --tenant "$AZURE_TENANT_ID" \
+    --federated-token "$federated_token" \
+    --only-show-errors --output none \
+    || fail "Azure workload identity login failed"
+  unset federated_token
+  az account show --only-show-errors --output none \
+    || fail "Azure CLI has no active subscription after login"
+fi
+
 merge_normalized() {
   local source_file="$1"
   local alias_name="$2"
@@ -87,16 +114,12 @@ merge_normalized() {
   fi
 }
 
-has_aks=false
 for index in $(seq 0 $((cluster_count - 1))); do
   alias_name="$(jq -er ".clusters[$index].alias" "$REGISTRY_PATH")"
   provider="$(jq -er ".clusters[$index].provider" "$REGISTRY_PATH")"
 
   case "$provider" in
     aks)
-      has_aks=true
-      require_command az
-      require_command kubelogin
       subscription_id="$(jq -er ".clusters[$index].subscriptionId" "$REGISTRY_PATH")"
       resource_group="$(jq -er ".clusters[$index].resourceGroup" "$REGISTRY_PATH")"
       cluster_name="$(jq -er ".clusters[$index].clusterName" "$REGISTRY_PATH")"
@@ -128,8 +151,6 @@ done
 
 [[ -s "$CANDIDATE_PATH" ]] || fail "candidate kubeconfig was not created"
 if [[ "$has_aks" == "true" ]]; then
-  : "${AZURE_CLIENT_ID:?AZURE_CLIENT_ID is required for AKS workload identity kubeconfigs}"
-  : "${AZURE_TENANT_ID:?AZURE_TENANT_ID is required for AKS workload identity kubeconfigs}"
   kubelogin convert-kubeconfig \
     --login workloadidentity \
     --client-id "$AZURE_CLIENT_ID" \
@@ -224,15 +245,47 @@ jq --arg hash "$candidate_hash" --slurp '
     })
   | del(.metadata.managedFields)
 ' "$LIVE_SECRET_PATH" "$NEW_SECRET_PATH" >"$REPLACEMENT_PATH"
+"${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" replace \
+  --dry-run=server -f "$REPLACEMENT_PATH" >/dev/null \
+  || fail "replacement Secret failed API validation"
 "${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" replace -f "$REPLACEMENT_PATH" >/dev/null
 
 if [[ "$ROLLOUT_ON_CHANGE" == "true" ]]; then
+  [[ "$ROLLOUT_MAX_PARALLEL" =~ ^[1-9][0-9]*$ ]] \
+    || fail "ROLLOUT_MAX_PARALLEL must be a positive integer"
   while IFS= read -r alias_name; do
     deployment_name="$MCP_DEPLOYMENT_PREFIX$alias_name"
     "${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" rollout restart deployment "$deployment_name"
-    "${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" rollout status deployment "$deployment_name" \
-      --timeout=5m
   done <<<"$alias_lines"
+
+  rollout_pids=()
+  rollout_names=()
+  wait_for_rollout_batch() {
+    local index batch_failed=false
+    for index in "${!rollout_pids[@]}"; do
+      if ! wait "${rollout_pids[$index]}"; then
+        printf 'rollout failed for deployment %s\n' "${rollout_names[$index]}" >&2
+        batch_failed=true
+      fi
+    done
+    rollout_pids=()
+    rollout_names=()
+    [[ "$batch_failed" == "false" ]] || fail "one or more AKS-MCP shard rollouts failed"
+  }
+
+  while IFS= read -r alias_name; do
+    deployment_name="$MCP_DEPLOYMENT_PREFIX$alias_name"
+    "${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" rollout status deployment "$deployment_name" \
+      --timeout=5m &
+    rollout_pids+=("$!")
+    rollout_names+=("$deployment_name")
+    if [[ "${#rollout_pids[@]}" -ge "$ROLLOUT_MAX_PARALLEL" ]]; then
+      wait_for_rollout_batch
+    fi
+  done <<<"$alias_lines"
+  if [[ "${#rollout_pids[@]}" -gt 0 ]]; then
+    wait_for_rollout_batch
+  fi
 fi
 
 printf 'PUBLISHED contexts=%s sha256=%s rollout=%s\n' \

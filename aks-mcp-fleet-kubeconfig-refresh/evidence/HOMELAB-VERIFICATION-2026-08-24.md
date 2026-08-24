@@ -9,6 +9,9 @@ HOMELAB_SMOKE_OK contexts=2 secrets=1 mcp_shards=2 agents=2 a2a=2
 The repeatable `scripts/homelab-smoke.sh` helper passed against the selected
 management context and a separate Proxmox-hosted Kubernetes context. Endpoint,
 certificate, token, node-address, and kubeconfig data are intentionally omitted.
+This run predates the helper's exact discovered-tool and raw function-response
+gates, so its terminal marker is retained as historical evidence rather than a
+complete trace-backed A2A receipt. Repeat the hardened helper before work use.
 
 ## Proven live
 
@@ -19,10 +22,10 @@ certificate, token, node-address, and kubeconfig data are intentionally omitted.
 | Candidate build | Two sources merged and validated as exactly two approved aliases |
 | Secret publication | One existing Secret was atomically replaced with two single-context keys |
 | AKS-MCP startup | Two v0.0.19 HTTP shards became Ready with read-only Secret mounts |
-| MCP discovery | Both RemoteMCPServers were Accepted and each exposed exactly `call_kubectl` |
+| MCP discovery | Both RemoteMCPServers were Accepted; exact discovery JSON was not retained by this run |
 | Agent readiness | Two fixed-target declarative Agents became Ready |
-| A2A management route | Alias-routed request returned `TARGET_OK` after a real MCP kubectl read |
-| A2A worker route | Alias-routed request returned `TARGET_OK` after a real MCP kubectl read |
+| A2A management route | Alias-routed request returned `TARGET_OK`; no raw tool-call trace was retained |
+| A2A worker route | Alias-routed request returned `TARGET_OK`; no raw tool-call trace was retained |
 | Installed CRD schemas | Placeholder-substituted bundle passed server-side dry-run for CronWorkflow, WorkflowTemplate, Agent, RemoteMCPServer, RBAC, ConfigMaps, and Secret |
 | Cleanup | Test namespaces, bindings, Helm releases, RemoteMCPServers, Agents, tokens, and Secrets were absent after the helper exited |
 
@@ -52,6 +55,8 @@ in this test. Work deployment must independently approve and pin its digest.
 - A live scheduled CronWorkflow or Flux field-ignore configuration.
 - KEDA load-based scaling and production alert delivery.
 - All 10–12 work fleet targets.
+- Exact `call_kubectl` discovery and marker-bearing function-response traces for
+  the historical A2A calls.
 
 Those remain explicit work-environment acceptance checks in
 `GITLAB-TICKET.md`; this receipt must not be used to claim them complete.

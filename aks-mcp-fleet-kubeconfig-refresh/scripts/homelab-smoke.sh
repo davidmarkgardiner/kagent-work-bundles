@@ -7,9 +7,14 @@ MANAGEMENT_CONTEXT=""
 WORKER_CONTEXT=""
 MODEL_CONFIG="default-model-config"
 KEEP=false
-RUN_ID="$(date +%s)"
-TARGET_NAMESPACE="fleet-mcp-smoke-target"
-MCP_NAMESPACE="aks-mcp-fleet-smoke"
+RUN_ID="$(date +%s)-$$-$RANDOM"
+TARGET_NAMESPACE="fleet-mcp-smoke-${RUN_ID}"
+MCP_NAMESPACE="aks-mcp-smoke-${RUN_ID}"
+TARGET_SERVICE_ACCOUNT="fleet-mcp-smoke-${RUN_ID}"
+TARGET_BINDING="fleet-mcp-view-${RUN_ID}"
+PROOF_CONFIGMAP="fleet-mcp-proof"
+MANAGEMENT_RELEASE="fleet-mgmt-${RUN_ID}"
+WORKER_RELEASE="fleet-worker-${RUN_ID}"
 MANAGEMENT_MCP_NAME="aks-mcp-management-smoke"
 WORKER_MCP_NAME="aks-mcp-worker-smoke"
 MANAGEMENT_AGENT_NAME="aks-management-smoke-agent-${RUN_ID}"
@@ -17,6 +22,8 @@ WORKER_AGENT_NAME="aks-worker-smoke-agent-${RUN_ID}"
 MANAGEMENT_REMOTE_NAME="aks-mcp-management-smoke-${RUN_ID}"
 WORKER_REMOTE_NAME="aks-mcp-worker-smoke-${RUN_ID}"
 TEST_DIR="$(mktemp -d)"
+MANAGEMENT_MARKER=""
+WORKER_MARKER=""
 
 usage() {
   echo "usage: $0 --management-context CONTEXT --worker-context CONTEXT [--model-config NAME] [--keep]"
@@ -34,9 +41,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 [[ -n "$MANAGEMENT_CONTEXT" && -n "$WORKER_CONTEXT" ]] || { usage >&2; exit 2; }
-for command_name in kubectl helm jq base64; do
+for command_name in kubectl helm jq base64 od; do
   command -v "$command_name" >/dev/null 2>&1 || { echo "missing command: $command_name" >&2; exit 2; }
 done
+MANAGEMENT_MARKER="mcp-$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+WORKER_MARKER="mcp-$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
 
 cleanup() {
   rm -rf "$TEST_DIR"
@@ -48,31 +57,31 @@ cleanup() {
     "$MANAGEMENT_AGENT_NAME" "$WORKER_AGENT_NAME" --ignore-not-found >/dev/null 2>&1 || true
   kubectl --context "$MANAGEMENT_CONTEXT" -n kagent delete remotemcpserver \
     "$MANAGEMENT_REMOTE_NAME" "$WORKER_REMOTE_NAME" --ignore-not-found >/dev/null 2>&1 || true
-  helm --kube-context "$MANAGEMENT_CONTEXT" uninstall fleet-management-smoke -n "$MCP_NAMESPACE" >/dev/null 2>&1 || true
-  helm --kube-context "$MANAGEMENT_CONTEXT" uninstall fleet-worker-smoke -n "$MCP_NAMESPACE" >/dev/null 2>&1 || true
+  helm --kube-context "$MANAGEMENT_CONTEXT" uninstall "$MANAGEMENT_RELEASE" -n "$MCP_NAMESPACE" >/dev/null 2>&1 || true
+  helm --kube-context "$MANAGEMENT_CONTEXT" uninstall "$WORKER_RELEASE" -n "$MCP_NAMESPACE" >/dev/null 2>&1 || true
   kubectl --context "$MANAGEMENT_CONTEXT" delete namespace "$MCP_NAMESPACE" --ignore-not-found >/dev/null 2>&1 || true
   for context_name in "$MANAGEMENT_CONTEXT" "$WORKER_CONTEXT"; do
-    kubectl --context "$context_name" delete clusterrolebinding fleet-mcp-smoke-view --ignore-not-found >/dev/null 2>&1 || true
+    kubectl --context "$context_name" delete clusterrolebinding "$TARGET_BINDING" --ignore-not-found >/dev/null 2>&1 || true
     kubectl --context "$context_name" delete namespace "$TARGET_NAMESPACE" --ignore-not-found >/dev/null 2>&1 || true
   done
 }
 trap cleanup EXIT
 
 create_readonly_kubeconfig() {
-  local context_name="$1" alias_name="$2" output_path="$3"
+  local context_name="$1" alias_name="$2" output_path="$3" marker="$4"
   local server ca_data token
 
-  kubectl --context "$context_name" create namespace "$TARGET_NAMESPACE" --dry-run=client -o yaml \
-    | kubectl --context "$context_name" apply -f - >/dev/null
-  kubectl --context "$context_name" -n "$TARGET_NAMESPACE" create serviceaccount fleet-mcp-smoke \
-    --dry-run=client -o yaml | kubectl --context "$context_name" apply -f - >/dev/null
-  kubectl --context "$context_name" create clusterrolebinding fleet-mcp-smoke-view \
-    --clusterrole=view --serviceaccount="$TARGET_NAMESPACE:fleet-mcp-smoke" \
-    --dry-run=client -o yaml | kubectl --context "$context_name" apply -f - >/dev/null
+  kubectl --context "$context_name" create namespace "$TARGET_NAMESPACE" >/dev/null
+  kubectl --context "$context_name" -n "$TARGET_NAMESPACE" \
+    create serviceaccount "$TARGET_SERVICE_ACCOUNT" >/dev/null
+  kubectl --context "$context_name" create clusterrolebinding "$TARGET_BINDING" \
+    --clusterrole=view --serviceaccount="$TARGET_NAMESPACE:$TARGET_SERVICE_ACCOUNT" >/dev/null
+  kubectl --context "$context_name" -n "$TARGET_NAMESPACE" create configmap "$PROOF_CONFIGMAP" \
+    --from-literal=marker="$marker" >/dev/null
 
   server="$(kubectl --context "$context_name" config view --minify --raw -o jsonpath='{.clusters[0].cluster.server}')"
   ca_data="$(kubectl --context "$context_name" config view --minify --raw -o jsonpath='{.clusters[0].cluster.certificate-authority-data}')"
-  token="$(kubectl --context "$context_name" -n "$TARGET_NAMESPACE" create token fleet-mcp-smoke --duration=1h)"
+  token="$(kubectl --context "$context_name" -n "$TARGET_NAMESPACE" create token "$TARGET_SERVICE_ACCOUNT" --duration=1h)"
   [[ -n "$server" && -n "$token" ]] || { echo "could not generate source kubeconfig" >&2; exit 1; }
 
   if [[ -n "$ca_data" ]]; then
@@ -92,15 +101,14 @@ create_readonly_kubeconfig() {
 }
 
 echo "Creating one-hour read-only test identities in two explicitly selected clusters"
-create_readonly_kubeconfig "$MANAGEMENT_CONTEXT" management-smoke "$TEST_DIR/management.config"
-create_readonly_kubeconfig "$WORKER_CONTEXT" worker-smoke "$TEST_DIR/worker.config"
+create_readonly_kubeconfig "$MANAGEMENT_CONTEXT" management-smoke "$TEST_DIR/management.config" "$MANAGEMENT_MARKER"
+create_readonly_kubeconfig "$WORKER_CONTEXT" worker-smoke "$TEST_DIR/worker.config" "$WORKER_MARKER"
 
 kubectl --kubeconfig "$TEST_DIR/management.config" get namespace "$TARGET_NAMESPACE" -o name >/dev/null
 kubectl --kubeconfig "$TEST_DIR/worker.config" get namespace "$TARGET_NAMESPACE" -o name >/dev/null
 echo "PASS source credentials and direct connectivity"
 
-kubectl --context "$MANAGEMENT_CONTEXT" create namespace "$MCP_NAMESPACE" --dry-run=client -o yaml \
-  | kubectl --context "$MANAGEMENT_CONTEXT" apply -f - >/dev/null
+kubectl --context "$MANAGEMENT_CONTEXT" create namespace "$MCP_NAMESPACE" >/dev/null
 kubectl --context "$MANAGEMENT_CONTEXT" -n "$MCP_NAMESPACE" create secret generic fleet-static-sources \
   --from-file=management.config="$TEST_DIR/management.config" \
   --from-file=worker.config="$TEST_DIR/worker.config" \
@@ -109,9 +117,9 @@ kubectl --context "$MANAGEMENT_CONTEXT" -n "$MCP_NAMESPACE" create secret generi
   --from-literal=bootstrap='' --dry-run=client -o yaml \
   | kubectl --context "$MANAGEMENT_CONTEXT" apply -f - >/dev/null
 
-jq -n '{clusters:[
-  {alias:"management-smoke",provider:"static",sourceFile:"management.config",smokeNamespace:"fleet-mcp-smoke-target"},
-  {alias:"worker-smoke",provider:"static",sourceFile:"worker.config",smokeNamespace:"fleet-mcp-smoke-target"}
+jq -n --arg namespace "$TARGET_NAMESPACE" '{clusters:[
+  {alias:"management-smoke",provider:"static",sourceFile:"management.config",smokeNamespace:$namespace},
+  {alias:"worker-smoke",provider:"static",sourceFile:"worker.config",smokeNamespace:$namespace}
 ]}' >"$TEST_DIR/registry.json"
 
 REGISTRY_PATH="$TEST_DIR/registry.json" \
@@ -140,6 +148,8 @@ install_mcp_shard() {
     --set kubeconfig.enabled=true \
     --set kubeconfig.secretName=aks-mcp-fleet-kubeconfig \
     --set kubeconfig.key="$secret_key" \
+    --set kubeconfig.optional=false \
+    --set kubeconfig.expectedCurrentContext="${secret_key%.config}" \
     --set rbac.create=false \
     --set serviceAccount.automount=false \
     --set resources.requests.cpu=1m \
@@ -150,8 +160,8 @@ install_mcp_shard() {
     --wait --timeout 5m >/dev/null
 }
 
-install_mcp_shard fleet-management-smoke "$MANAGEMENT_MCP_NAME" management-smoke.config
-install_mcp_shard fleet-worker-smoke "$WORKER_MCP_NAME" worker-smoke.config
+install_mcp_shard "$MANAGEMENT_RELEASE" "$MANAGEMENT_MCP_NAME" management-smoke.config
+install_mcp_shard "$WORKER_RELEASE" "$WORKER_MCP_NAME" worker-smoke.config
 echo "PASS two AKS-MCP shards started from separate keys in one read-only Secret"
 
 kubectl --context "$MANAGEMENT_CONTEXT" -n kagent apply -f - >/dev/null <<EOF
@@ -195,11 +205,12 @@ spec:
     systemMessage: |
       You are the read-only verifier for fixed alias management-smoke. Reject
       every other alias. Use call_kubectl exactly once with command:
-      kubectl get namespace fleet-mcp-smoke-target -o name
+      kubectl get configmap $PROOF_CONFIGMAP --namespace $TARGET_NAMESPACE -o jsonpath='{.data.marker}'
       Never pass context, kubeconfig, server, token, or certificate flags.
       Never mutate anything and never
       print credentials, kubeconfig contents, certificates, tokens, or endpoints.
-      Return TARGET_OK management-smoke only when the namespace is proven present.
+      Return TARGET_OK management-smoke followed by the exact marker returned by
+      the tool. Do not invent or transform the marker.
     tools:
       - type: McpServer
         mcpServer:
@@ -231,11 +242,11 @@ spec:
     systemMessage: |
       You are the read-only verifier for fixed alias worker-smoke. Reject every
       other alias. Use call_kubectl exactly once with command:
-      kubectl get namespace fleet-mcp-smoke-target -o name
+      kubectl get configmap $PROOF_CONFIGMAP --namespace $TARGET_NAMESPACE -o jsonpath='{.data.marker}'
       Never pass context, kubeconfig, server, token, or certificate flags.
       Never mutate anything and never print credentials, kubeconfig contents,
-      certificates, tokens, or endpoints. Return TARGET_OK worker-smoke only
-      when the namespace is proven present.
+      certificates, tokens, or endpoints. Return TARGET_OK worker-smoke followed
+      by the exact marker returned by the tool. Do not invent or transform it.
     tools:
       - type: McpServer
         mcpServer:
@@ -247,11 +258,16 @@ spec:
 EOF
 
 wait_for_pair() {
-  local remote_name="$1" agent_name="$2" accepted="" ready=""
+  local remote_name="$1" agent_name="$2" remote_json="" ready=""
   for _ in $(seq 1 60); do
-    accepted="$(kubectl --context "$MANAGEMENT_CONTEXT" -n kagent get remotemcpserver "$remote_name" -o jsonpath='{.status.conditions[?(@.type=="Accepted")].status}' 2>/dev/null || true)"
+    remote_json="$(kubectl --context "$MANAGEMENT_CONTEXT" -n kagent get remotemcpserver "$remote_name" -o json 2>/dev/null || true)"
     ready="$(kubectl --context "$MANAGEMENT_CONTEXT" -n kagent get agent "$agent_name" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || true)"
-    case "$accepted:$ready" in True:True) return 0 ;; esac
+    if [[ "$ready" == "True" ]] && jq -e '
+      (.status.conditions[]? | select(.type == "Accepted" and .status == "True"))
+      and ([.status.discoveredTools[]?.name] | sort == ["call_kubectl"])
+    ' <<<"$remote_json" >/dev/null 2>&1; then
+      return 0
+    fi
     sleep 2
   done
   echo "MCP/Agent pair was not ready: $remote_name / $agent_name" >&2
@@ -262,17 +278,18 @@ wait_for_pair "$MANAGEMENT_REMOTE_NAME" "$MANAGEMENT_AGENT_NAME"
 wait_for_pair "$WORKER_REMOTE_NAME" "$WORKER_AGENT_NAME"
 echo "PASS two RemoteMCPServers Accepted and two fixed-target Agents Ready"
 
-for pair in "management-smoke:$MANAGEMENT_AGENT_NAME" "worker-smoke:$WORKER_AGENT_NAME"; do
-  alias_name="${pair%%:*}"
-  agent_name="${pair#*:}"
+for pair in "management-smoke:$MANAGEMENT_AGENT_NAME:$MANAGEMENT_MARKER" "worker-smoke:$WORKER_AGENT_NAME:$WORKER_MARKER"; do
+  IFS=: read -r alias_name agent_name expected_marker <<<"$pair"
   response=""
+  receipt_file="$TEST_DIR/$alias_name-receipt.json"
   invoke_rc=1
   for attempt in 1 2; do
     set +e
     response="$($REPO_ROOT/scripts/kagent-a2a-invoke.sh \
       --context "$MANAGEMENT_CONTEXT" --local-port "$((18080 + RANDOM % 1000))" \
       --agent "$agent_name" --timeout 120 \
-      --text "{\"clusterAlias\":\"$alias_name\",\"question\":\"Confirm the isolated smoke namespace exists.\"}")"
+      --receipt-file "$receipt_file" \
+      --text "{\"clusterAlias\":\"$alias_name\",\"question\":\"Read and return the isolated proof marker.\"}")"
     invoke_rc=$?
     set -e
     [[ "$invoke_rc" == "0" ]] && grep -q 'TARGET_OK' <<<"$response" && break
@@ -285,6 +302,17 @@ for pair in "management-smoke:$MANAGEMENT_AGENT_NAME" "worker-smoke:$WORKER_AGEN
     exit 1
   }
   grep -q "$alias_name" <<<"$response" || { echo "agent did not identify $alias_name" >&2; exit 1; }
+  grep -Fq "$expected_marker" <<<"$response" \
+    || { echo "agent did not return the target marker for $alias_name" >&2; exit 1; }
+  jq -e --arg marker "$expected_marker" '
+    [.result.history[]?.parts[]?
+      | select(.metadata.kagent_type == "function_response"
+        and .data.name == "call_kubectl")] as $calls
+    | ($calls | length) == 1
+      and ($calls[0].data.response.isError == false)
+      and any($calls[0]..; type == "string" and contains($marker))
+  ' "$receipt_file" >/dev/null \
+    || { echo "A2A receipt lacks one successful marker-bearing call_kubectl trace for $alias_name" >&2; exit 1; }
   echo "PASS Argo-style alias routing reached $alias_name through its AKS-MCP shard"
 done
 

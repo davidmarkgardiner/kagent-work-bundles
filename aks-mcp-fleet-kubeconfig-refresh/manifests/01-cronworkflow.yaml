@@ -35,6 +35,8 @@ spec:
               value: "{{AZURE_CLIENT_ID}}"
             - name: AZURE_TENANT_ID
               value: "{{AZURE_TENANT_ID}}"
+            - name: AZURE_CONFIG_DIR
+              value: /work/.azure
             - name: REGISTRY_PATH
               value: /etc/fleet-registry/clusters.json
             - name: TARGET_NAMESPACE
@@ -45,6 +47,8 @@ spec:
               value: aks-mcp-
             - name: ROLLOUT_ON_CHANGE
               value: "true"
+            - name: ROLLOUT_MAX_PARALLEL
+              value: "4"
           resources:
             requests:
               cpu: 100m
