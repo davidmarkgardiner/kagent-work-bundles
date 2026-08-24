@@ -30,6 +30,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 
 | Bundle | Capability | Primary outcome |
 |---|---|---|
+| `kubernetes-mcp-multicluster/` | One Kubernetes MCP across approved AKS/Kubernetes contexts | Builds an immutable multi-context kubeconfig, deploys the read-only MCP server, and proves direct kagent plus agentgateway routing without one Agent per cluster |
 | `postgres-natural-language-query-integration/` | Natural-language PostgreSQL query architecture | Compares retrieval-assisted text-to-SQL with typed MCP tools and defines how both chat front doors can share the FastMCP/UAMI execution boundary |
 | `postgres-mcpg-password/` | PostgreSQL MCPg username/password path | Deploys MCPg v0.7.1 with an approved TLS DSN Secret and SELECT-only database role; contains no UAMI/FastMCP deployment assets |
 | `postgres-fastmcp-entra-uami/` | PostgreSQL FastMCP password-to-UAMI path | Builds one bounded FastMCP image; deploys it first with a username/password Secret and later swaps only the database authentication wiring to AKS Workload Identity/UAMI |
@@ -73,6 +74,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 15. `memory-mcp-shared-context/`
 16. `byo-kagent-onboarding/`
 17. `aks-fleet-reporting-day2/`
+18. `kubernetes-mcp-multicluster/`
 
 ## Future Bundle Ideas
 

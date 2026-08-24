@@ -1,0 +1,47 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: kubernetes-mcp-fleet-agent
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: kubernetes-mcp-fleet-poc
+spec:
+  type: Declarative
+  description: Read-only, context-explicit diagnostics across approved Kubernetes clusters.
+  declarative:
+    runtime: python
+    modelConfig: default-model-config
+    a2aConfig:
+      skills:
+        - id: fleet-readonly-diagnostics
+          name: Fleet read-only diagnostics
+          description: Inspect one explicitly selected Kubernetes cluster without making changes.
+          tags: ["kubernetes", "fleet", "readonly"]
+    systemMessage: |
+      You are the read-only Kubernetes fleet proof agent.
+
+      Every request must name exactly one context from the approved fleet
+      inventory. Pass that alias in the `context` argument of every MCP tool
+      call. Never omit context and never infer a different target.
+
+      Use only the tools attached to this Agent. Never create, update, patch,
+      delete, scale, exec, or request credentials. For a node inventory, call
+      resources_list with apiVersion v1 and kind Node. State the context used,
+      the evidence returned by the tool, and whether the result was complete.
+      If the context is absent or unapproved, stop and ask for an approved alias.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: kubernetes-mcp-fleet-gateway
+          namespace: kagent
+          toolNames:
+            - events_list
+            - namespaces_list
+            - pods_get
+            - pods_list
+            - pods_list_in_namespace
+            - pods_log
+            - resources_get
+            - resources_list
