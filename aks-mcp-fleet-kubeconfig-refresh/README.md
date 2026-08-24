@@ -83,6 +83,13 @@ would be a new component rather than stock AKS-MCP.
    `api://AzureADTokenExchange`. Each shard ServiceAccount is annotated with
    `{{AZURE_CLIENT_ID}}`; its management-cluster token automount and chart RBAC
    are disabled because kubelogin uses the projected workload-identity token.
+   Credential retrieval does not grant Kubernetes data-plane access. For an
+   Azure RBAC-enabled AKS cluster, assign `Azure Kubernetes Service RBAC Reader`
+   to the UAMI at the narrowest approved cluster or namespace scope. For a
+   Kubernetes RBAC cluster, create an equivalent read-only RoleBinding or
+   ClusterRoleBinding for the exact Entra principal or group represented by the
+   kubeconfig. Prove both the configured smoke-namespace read and
+   `auth can-i get pods` before enabling the schedule.
 4. Bootstrap `manifests/00-core.yaml`, then configure Flux to ignore only
    `/data` and the kubeconfig hash annotation on the named Secret. Do not
    make the whole Secret unmanaged.
@@ -117,7 +124,9 @@ the resulting API context, so a rebuilt cluster is picked up automatically when
 its registry identity is unchanged. If the cluster name/resource group changes,
 update the registry through GitOps first. If one target is unavailable, alert on
 the failed Workflow; do not replace the valid fleet Secret. An operator can
-rerun the CronWorkflow after the cluster is restored.
+rerun the CronWorkflow after the cluster is restored. Every run reconciles the
+candidate hash onto each shard's pod template and waits for availability, even
+when the Secret hash is unchanged, so an interrupted rollout resumes safely.
 
 Suggested alerts are: last successful refresh older than 30 hours, any failed
 refresh, Secret hash unchanged for an unexpectedly long fleet migration, or an
@@ -138,8 +147,13 @@ run-scoped, and the helper removes them by default.
 ```bash
 scripts/homelab-smoke.sh \
   --management-context "{{MANAGEMENT_CONTEXT}}" \
-  --worker-context "{{WORKER_CONTEXT}}"
+  --worker-context "{{WORKER_CONTEXT}}" \
+  --receipt-dir "{{OWNER_ONLY_RECEIPT_DIRECTORY}}"
 ```
+
+The optional receipt directory must already exist. It receives owner-only raw
+A2A responses for trace review; keep it outside Git and sanitize any derived
+evidence before publication. Without the option, receipts remain ephemeral.
 
 Static sources and embedded tokens are test-only escape hatches requiring both
 `ALLOW_STATIC_SOURCES=true` and `ALLOW_STATIC_CREDENTIALS=true`. They are not

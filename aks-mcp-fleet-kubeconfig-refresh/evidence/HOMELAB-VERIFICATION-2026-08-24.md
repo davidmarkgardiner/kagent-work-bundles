@@ -1,4 +1,4 @@
-# Homelab verification — 2026-08-24
+# Hardened homelab verification — 2026-08-24
 
 ## Result
 
@@ -9,9 +9,9 @@ HOMELAB_SMOKE_OK contexts=2 secrets=1 mcp_shards=2 agents=2 a2a=2
 The repeatable `scripts/homelab-smoke.sh` helper passed against the selected
 management context and a separate Proxmox-hosted Kubernetes context. Endpoint,
 certificate, token, node-address, and kubeconfig data are intentionally omitted.
-This run predates the helper's exact discovered-tool and raw function-response
-gates, so its terminal marker is retained as historical evidence rather than a
-complete trace-backed A2A receipt. Repeat the hardened helper before work use.
+The hardened run required exact discovered-tool sets, random target-only
+markers, one successful marker-bearing function response per Agent, and
+run-scoped cleanup.
 
 ## Proven live
 
@@ -22,12 +22,26 @@ complete trace-backed A2A receipt. Repeat the hardened helper before work use.
 | Candidate build | Two sources merged and validated as exactly two approved aliases |
 | Secret publication | One existing Secret was atomically replaced with two single-context keys |
 | AKS-MCP startup | Two v0.0.19 HTTP shards became Ready with read-only Secret mounts |
-| MCP discovery | Both RemoteMCPServers were Accepted; exact discovery JSON was not retained by this run |
+| MCP discovery | Both RemoteMCPServers were Accepted and each discovered exactly `call_kubectl` |
 | Agent readiness | Two fixed-target declarative Agents became Ready |
-| A2A management route | Alias-routed request returned `TARGET_OK`; no raw tool-call trace was retained |
-| A2A worker route | Alias-routed request returned `TARGET_OK`; no raw tool-call trace was retained |
+| A2A management route | Completed with one successful marker-bearing `call_kubectl` function response |
+| A2A worker route | Completed with one successful marker-bearing `call_kubectl` function response |
 | Installed CRD schemas | Placeholder-substituted bundle passed server-side dry-run for CronWorkflow, WorkflowTemplate, Agent, RemoteMCPServer, RBAC, ConfigMaps, and Secret |
 | Cleanup | Test namespaces, bindings, Helm releases, RemoteMCPServers, Agents, tokens, and Secrets were absent after the helper exited |
+
+## Redacted receipts
+
+- [`management-smoke-receipt.json`](management-smoke-receipt.json) summarizes
+  the 3,464-byte owner-only raw receipt, SHA-256
+  `b469be3a5bf4515b7115d9a1a5b1e6d2d974b1d6a837166c53db1c229f8c2108`.
+- [`worker-smoke-receipt.json`](worker-smoke-receipt.json) summarizes the
+  3,414-byte owner-only raw receipt, SHA-256
+  `eee35cc427aa0e3e720dad30d426980bc8dcedcdd0c633b19829beebd7d26b04`.
+
+Both terminal tasks reported `completed`; each history contained exactly one
+`call_kubectl` function response with an `output` payload, no explicit error,
+and the random marker that also appeared in the final Agent artifact. Raw
+prompts, markers, and controller metadata are not committed.
 
 The pulled AKS-MCP v0.0.19 image resolved to digest
 `sha256:f6ee94b45dbb5a3e5e5bfd6cc80d96389527459c2940c5dc9cb2976ed3c26072`
@@ -55,8 +69,6 @@ in this test. Work deployment must independently approve and pin its digest.
 - A live scheduled CronWorkflow or Flux field-ignore configuration.
 - KEDA load-based scaling and production alert delivery.
 - All 10–12 work fleet targets.
-- Exact `call_kubectl` discovery and marker-bearing function-response traces for
-  the historical A2A calls.
 
 Those remain explicit work-environment acceptance checks in
 `GITLAB-TICKET.md`; this receipt must not be used to claim them complete.

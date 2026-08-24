@@ -17,6 +17,8 @@ required=(
   scripts/refresh-fleet-kubeconfig.sh
   scripts/homelab-smoke.sh
   tests/test-refresh-script.sh
+  evidence/management-smoke-receipt.json
+  evidence/worker-smoke-receipt.json
 )
 for file_name in "${required[@]}"; do
   [[ -s "$BUNDLE_DIR/$file_name" ]] || { echo "missing required file: $file_name" >&2; exit 1; }
@@ -50,6 +52,11 @@ grep -q 'UNCHANGED' "$BUNDLE_DIR/scripts/refresh-fleet-kubeconfig.sh"
 grep -q 'az login --service-principal' "$BUNDLE_DIR/scripts/refresh-fleet-kubeconfig.sh"
 grep -q -- '--dry-run=server' "$BUNDLE_DIR/scripts/refresh-fleet-kubeconfig.sh"
 grep -q 'ROLLOUT_MAX_PARALLEL' "$BUNDLE_DIR/scripts/refresh-fleet-kubeconfig.sh"
+grep -q 'platform.example.com/kubeconfig-sha256' "$BUNDLE_DIR/scripts/refresh-fleet-kubeconfig.sh"
+grep -q 'reconcile_rollout' "$BUNDLE_DIR/scripts/refresh-fleet-kubeconfig.sh"
 grep -q 'function_response' "$BUNDLE_DIR/scripts/homelab-smoke.sh"
+jq -e '.task_state == "completed" and .function_responses == [{"name":"call_kubectl","explicit_error":false,"response_keys":["output"],"target_only_marker_matched":true}] and .final_artifact_marker_matched == true and .cleanup_verified == true' \
+  "$BUNDLE_DIR/evidence/management-smoke-receipt.json" \
+  "$BUNDLE_DIR/evidence/worker-smoke-receipt.json" >/dev/null
 
 echo "PASS aks-mcp-fleet-kubeconfig-refresh bundle"

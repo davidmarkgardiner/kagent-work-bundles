@@ -88,4 +88,118 @@ if REGISTRY_PATH="$TEST_DIR/token-registry.json" STATIC_SOURCE_DIR="$TEST_DIR" \
   exit 1
 fi
 
+REAL_KUBECTL_BIN="$(command -v kubectl)"
+export REAL_KUBECTL_BIN
+export MOCK_CONTROL_DIR="$TEST_DIR/mock-control"
+mkdir -p "$TEST_DIR/bin" "$MOCK_CONTROL_DIR/deployments"
+cat >"$TEST_DIR/bin/kubectl" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${1:-}" != "--context" || "${2:-}" != "mock-control" ]]; then
+  exec "$REAL_KUBECTL_BIN" "$@"
+fi
+shift 2
+[[ "${1:-}" == "--namespace" ]] || exit 2
+shift 2
+
+if [[ "${1:-}" == "get" && "${2:-}" == "secret" ]]; then
+  cat "$MOCK_CONTROL_DIR/live-secret.json"
+  exit 0
+fi
+if [[ "${1:-}" == "create" && "${2:-}" == "secret" && "${3:-}" == "generic" ]]; then
+  printf '%s\n' '{"apiVersion":"v1","kind":"Secret","metadata":{"name":"aks-mcp-fleet-kubeconfig","namespace":"mock-target"},"type":"Opaque","data":{"candidate":"Y2FuZGlkYXRl"}}'
+  exit 0
+fi
+if [[ "${1:-}" == "replace" ]]; then
+  manifest=""
+  server_dry_run=false
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --dry-run=server) server_dry_run=true; shift ;;
+      -f) manifest="$2"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  [[ -n "$manifest" ]] || exit 2
+  if [[ "$server_dry_run" == "false" ]]; then
+    cp "$manifest" "$MOCK_CONTROL_DIR/live-secret.json"
+    printf 'replace secret\n' >>"$MOCK_CONTROL_DIR/operations.log"
+  fi
+  exit 0
+fi
+if [[ "${1:-}" == "get" && "${2:-}" == "deployment" ]]; then
+  deployment_name="$3"
+  marker_file="$MOCK_CONTROL_DIR/deployments/$deployment_name"
+  marker=""
+  [[ ! -f "$marker_file" ]] || marker="$(<"$marker_file")"
+  jq -cn --arg marker "$marker" '{spec:{template:{metadata:{annotations:(if $marker == "" then {} else {"platform.example.com/kubeconfig-sha256":$marker} end)}}}}'
+  exit 0
+fi
+if [[ "${1:-}" == "patch" && "${2:-}" == "deployment" ]]; then
+  deployment_name="$3"
+  patch_body=""
+  shift 3
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -p) patch_body="$2"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  printf 'patch %s\n' "$deployment_name" >>"$MOCK_CONTROL_DIR/operations.log"
+  if [[ "$deployment_name" == "aks-mcp-cluster-two" && ! -f "$MOCK_CONTROL_DIR/failure-used" ]]; then
+    touch "$MOCK_CONTROL_DIR/failure-used"
+    exit 1
+  fi
+  jq -r '.spec.template.metadata.annotations["platform.example.com/kubeconfig-sha256"]' \
+    <<<"$patch_body" >"$MOCK_CONTROL_DIR/deployments/$deployment_name"
+  exit 0
+fi
+if [[ "${1:-}" == "rollout" && "${2:-}" == "status" && "${3:-}" == "deployment" ]]; then
+  printf 'status %s\n' "$4" >>"$MOCK_CONTROL_DIR/operations.log"
+  exit 0
+fi
+
+exit 2
+EOF
+chmod +x "$TEST_DIR/bin/kubectl"
+
+cat >"$MOCK_CONTROL_DIR/live-secret.json" <<'EOF'
+{"apiVersion":"v1","kind":"Secret","metadata":{"name":"aks-mcp-fleet-kubeconfig","namespace":"mock-target","resourceVersion":"1","annotations":{"platform.example.com/kubeconfig-sha256":"bootstrap"}},"type":"Opaque","data":{"bootstrap":""}}
+EOF
+
+if PATH="$TEST_DIR/bin:$PATH" REGISTRY_PATH="$TEST_DIR/registry.json" \
+  STATIC_SOURCE_DIR="$TEST_DIR" WORK_DIR="$TEST_DIR/work-reconcile" \
+  ALLOW_STATIC_SOURCES=true SKIP_CONNECTIVITY=true CONTROL_CONTEXT=mock-control \
+  TARGET_NAMESPACE=mock-target ROLLOUT_MAX_PARALLEL=1 \
+  "$REFRESH_SCRIPT" >"$TEST_DIR/first-reconcile.out" 2>"$TEST_DIR/first-reconcile.err"; then
+  echo "expected first rollout reconciliation to fail" >&2
+  exit 1
+fi
+
+candidate_hash="$(jq -r '.metadata.annotations["platform.example.com/kubeconfig-sha256"]' \
+  "$MOCK_CONTROL_DIR/live-secret.json")"
+[[ "$candidate_hash" != "bootstrap" && -n "$candidate_hash" ]]
+[[ "$(<"$MOCK_CONTROL_DIR/deployments/aks-mcp-cluster-one")" == "$candidate_hash" ]]
+[[ ! -f "$MOCK_CONTROL_DIR/deployments/aks-mcp-cluster-two" ]]
+grep -E '^(patch|status) ' "$MOCK_CONTROL_DIR/operations.log" | head -n 3 \
+  >"$TEST_DIR/first-rollout-order"
+diff -u - "$TEST_DIR/first-rollout-order" <<'EOF'
+patch aks-mcp-cluster-one
+status aks-mcp-cluster-one
+patch aks-mcp-cluster-two
+EOF
+
+second_output="$(
+  PATH="$TEST_DIR/bin:$PATH" REGISTRY_PATH="$TEST_DIR/registry.json" \
+  STATIC_SOURCE_DIR="$TEST_DIR" WORK_DIR="$TEST_DIR/work-reconcile" \
+  ALLOW_STATIC_SOURCES=true SKIP_CONNECTIVITY=true CONTROL_CONTEXT=mock-control \
+  TARGET_NAMESPACE=mock-target ROLLOUT_MAX_PARALLEL=1 \
+  "$REFRESH_SCRIPT"
+)"
+grep -q '^UNCHANGED contexts=2 sha256=' <<<"$second_output"
+[[ "$(<"$MOCK_CONTROL_DIR/deployments/aks-mcp-cluster-one")" == "$candidate_hash" ]]
+[[ "$(<"$MOCK_CONTROL_DIR/deployments/aks-mcp-cluster-two")" == "$candidate_hash" ]]
+[[ "$(grep -c '^replace secret$' "$MOCK_CONTROL_DIR/operations.log")" == "1" ]]
+
 printf 'PASS test-refresh-script\n'

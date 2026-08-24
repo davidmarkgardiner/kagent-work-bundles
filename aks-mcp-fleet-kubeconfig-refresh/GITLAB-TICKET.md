@@ -31,10 +31,15 @@ that alias's single-context key.
       client certificate, or password is embedded.
 - [ ] Every context passes the bounded namespace and `auth can-i get pods`
       checks before publication.
+- [ ] Each UAMI has separate least-privilege credential-retrieval and Kubernetes
+      data-plane authorization; Azure RBAC-enabled targets use Azure Kubernetes
+      Service RBAC Reader or an approved narrower equivalent.
 - [ ] A failed cluster check preserves the previous Secret and pods.
 - [ ] An unchanged hash performs no Secret update and no rollout.
 - [ ] A changed hash atomically updates the named Secret and completes a
       zero-unavailable rollout of every named AKS-MCP shard.
+- [ ] An interrupted rollout is resumed on the next unchanged-hash run by
+      reconciling the candidate hash on every shard pod template.
 - [ ] Unknown or conflicting aliases return `BLOCKED_UNKNOWN_CLUSTER` without
       an MCP call.
 - [ ] AKS-MCP tool calls never contain context, kubeconfig, server, token, or

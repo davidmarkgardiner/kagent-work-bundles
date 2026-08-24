@@ -221,42 +221,58 @@ fi
   >"$LIVE_SECRET_PATH" \
   || fail "destination Secret must be pre-created"
 existing_hash="$(jq -r '.metadata.annotations["platform.example.com/kubeconfig-sha256"] // ""' "$LIVE_SECRET_PATH")"
-if [[ "$existing_hash" == "$candidate_hash" ]]; then
-  printf 'UNCHANGED contexts=%s sha256=%s\n' "$cluster_count" "$candidate_hash"
-  exit 0
+secret_changed=false
+if [[ "$existing_hash" != "$candidate_hash" ]]; then
+  secret_create_args=(--namespace "$TARGET_NAMESPACE" create secret generic "$FLEET_SECRET_NAME")
+  while IFS= read -r alias_name; do
+    secret_create_args+=(--from-file="$alias_name.config=$SHARD_DIR/$alias_name.config")
+  done <<<"$alias_lines"
+  "${CONTROL_KUBECTL[@]}" "${secret_create_args[@]}" \
+    --dry-run=client -o json >"$NEW_SECRET_PATH"
+  jq --arg hash "$candidate_hash" --slurp '
+    .[0] as $live | .[1] as $new |
+    $live
+    | .type = $new.type
+    | .data = $new.data
+    | .metadata.labels = ((.metadata.labels // {}) + {
+        "app.kubernetes.io/part-of": "aks-mcp-fleet-kubeconfig"
+      })
+    | .metadata.annotations = ((.metadata.annotations // {}) + {
+        "platform.example.com/kubeconfig-sha256": $hash
+      })
+    | del(.metadata.managedFields)
+  ' "$LIVE_SECRET_PATH" "$NEW_SECRET_PATH" >"$REPLACEMENT_PATH"
+  "${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" replace \
+    --dry-run=server -f "$REPLACEMENT_PATH" >/dev/null \
+    || fail "replacement Secret failed API validation"
+  "${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" replace -f "$REPLACEMENT_PATH" >/dev/null
+  secret_changed=true
 fi
-
-secret_create_args=(--namespace "$TARGET_NAMESPACE" create secret generic "$FLEET_SECRET_NAME")
-while IFS= read -r alias_name; do
-  secret_create_args+=(--from-file="$alias_name.config=$SHARD_DIR/$alias_name.config")
-done <<<"$alias_lines"
-"${CONTROL_KUBECTL[@]}" "${secret_create_args[@]}" \
-  --dry-run=client -o json >"$NEW_SECRET_PATH"
-jq --arg hash "$candidate_hash" --slurp '
-  .[0] as $live | .[1] as $new |
-  $live
-  | .type = $new.type
-  | .data = $new.data
-  | .metadata.labels = ((.metadata.labels // {}) + {
-      "app.kubernetes.io/part-of": "aks-mcp-fleet-kubeconfig"
-    })
-  | .metadata.annotations = ((.metadata.annotations // {}) + {
-      "platform.example.com/kubeconfig-sha256": $hash
-    })
-  | del(.metadata.managedFields)
-' "$LIVE_SECRET_PATH" "$NEW_SECRET_PATH" >"$REPLACEMENT_PATH"
-"${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" replace \
-  --dry-run=server -f "$REPLACEMENT_PATH" >/dev/null \
-  || fail "replacement Secret failed API validation"
-"${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" replace -f "$REPLACEMENT_PATH" >/dev/null
 
 if [[ "$ROLLOUT_ON_CHANGE" == "true" ]]; then
   [[ "$ROLLOUT_MAX_PARALLEL" =~ ^[1-9][0-9]*$ ]] \
     || fail "ROLLOUT_MAX_PARALLEL must be a positive integer"
-  while IFS= read -r alias_name; do
-    deployment_name="$MCP_DEPLOYMENT_PREFIX$alias_name"
-    "${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" rollout restart deployment "$deployment_name"
-  done <<<"$alias_lines"
+  rollout_patch="$(jq -cn --arg hash "$candidate_hash" \
+    '{spec:{template:{metadata:{annotations:{"platform.example.com/kubeconfig-sha256":$hash}}}}}')"
+
+  reconcile_rollout() {
+    local deployment_name="$1" deployment_json applied_hash
+    deployment_json="$("${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" \
+      get deployment "$deployment_name" -o json)" || return 1
+    applied_hash="$(jq -r '.spec.template.metadata.annotations["platform.example.com/kubeconfig-sha256"] // ""' \
+      <<<"$deployment_json")"
+    if [[ "$applied_hash" != "$candidate_hash" ]]; then
+      "${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" patch deployment \
+        "$deployment_name" --type=merge -p "$rollout_patch" >/dev/null || return 1
+    fi
+    "${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" rollout status deployment \
+      "$deployment_name" --timeout=5m >/dev/null || return 1
+    deployment_json="$("${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" \
+      get deployment "$deployment_name" -o json)" || return 1
+    applied_hash="$(jq -r '.spec.template.metadata.annotations["platform.example.com/kubeconfig-sha256"] // ""' \
+      <<<"$deployment_json")"
+    [[ "$applied_hash" == "$candidate_hash" ]]
+  }
 
   rollout_pids=()
   rollout_names=()
@@ -275,8 +291,7 @@ if [[ "$ROLLOUT_ON_CHANGE" == "true" ]]; then
 
   while IFS= read -r alias_name; do
     deployment_name="$MCP_DEPLOYMENT_PREFIX$alias_name"
-    "${CONTROL_KUBECTL[@]}" --namespace "$TARGET_NAMESPACE" rollout status deployment "$deployment_name" \
-      --timeout=5m &
+    reconcile_rollout "$deployment_name" &
     rollout_pids+=("$!")
     rollout_names+=("$deployment_name")
     if [[ "${#rollout_pids[@]}" -ge "$ROLLOUT_MAX_PARALLEL" ]]; then
@@ -286,6 +301,11 @@ if [[ "$ROLLOUT_ON_CHANGE" == "true" ]]; then
   if [[ "${#rollout_pids[@]}" -gt 0 ]]; then
     wait_for_rollout_batch
   fi
+fi
+
+if [[ "$secret_changed" == "false" ]]; then
+  printf 'UNCHANGED contexts=%s sha256=%s\n' "$cluster_count" "$candidate_hash"
+  exit 0
 fi
 
 printf 'PUBLISHED contexts=%s sha256=%s rollout=%s\n' \

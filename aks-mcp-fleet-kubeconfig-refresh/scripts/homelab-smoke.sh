@@ -7,6 +7,7 @@ MANAGEMENT_CONTEXT=""
 WORKER_CONTEXT=""
 MODEL_CONFIG="default-model-config"
 KEEP=false
+RECEIPT_DIR=""
 RUN_ID="$(date +%s)-$$-$RANDOM"
 TARGET_NAMESPACE="fleet-mcp-smoke-${RUN_ID}"
 MCP_NAMESPACE="aks-mcp-smoke-${RUN_ID}"
@@ -26,7 +27,7 @@ MANAGEMENT_MARKER=""
 WORKER_MARKER=""
 
 usage() {
-  echo "usage: $0 --management-context CONTEXT --worker-context CONTEXT [--model-config NAME] [--keep]"
+  echo "usage: $0 --management-context CONTEXT --worker-context CONTEXT [--model-config NAME] [--receipt-dir DIR] [--keep]"
 }
 
 while [[ $# -gt 0 ]]; do
@@ -34,6 +35,7 @@ while [[ $# -gt 0 ]]; do
     --management-context) MANAGEMENT_CONTEXT="$2"; shift 2 ;;
     --worker-context) WORKER_CONTEXT="$2"; shift 2 ;;
     --model-config) MODEL_CONFIG="$2"; shift 2 ;;
+    --receipt-dir) RECEIPT_DIR="$2"; shift 2 ;;
     --keep) KEEP=true; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "unknown option: $1" >&2; usage >&2; exit 2 ;;
@@ -46,6 +48,10 @@ for command_name in kubectl helm jq base64 od; do
 done
 MANAGEMENT_MARKER="mcp-$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
 WORKER_MARKER="mcp-$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+if [[ -z "$RECEIPT_DIR" ]]; then
+  RECEIPT_DIR="$TEST_DIR"
+fi
+[[ -d "$RECEIPT_DIR" ]] || { echo "receipt directory does not exist: $RECEIPT_DIR" >&2; exit 2; }
 
 cleanup() {
   rm -rf "$TEST_DIR"
@@ -281,7 +287,7 @@ echo "PASS two RemoteMCPServers Accepted and two fixed-target Agents Ready"
 for pair in "management-smoke:$MANAGEMENT_AGENT_NAME:$MANAGEMENT_MARKER" "worker-smoke:$WORKER_AGENT_NAME:$WORKER_MARKER"; do
   IFS=: read -r alias_name agent_name expected_marker <<<"$pair"
   response=""
-  receipt_file="$TEST_DIR/$alias_name-receipt.json"
+  receipt_file="$RECEIPT_DIR/$alias_name-receipt.json"
   invoke_rc=1
   for attempt in 1 2; do
     set +e
@@ -306,11 +312,12 @@ for pair in "management-smoke:$MANAGEMENT_AGENT_NAME:$MANAGEMENT_MARKER" "worker
     || { echo "agent did not return the target marker for $alias_name" >&2; exit 1; }
   jq -e --arg marker "$expected_marker" '
     [.result.history[]?.parts[]?
-      | select(.metadata.kagent_type == "function_response"
-        and .data.name == "call_kubectl")] as $calls
+      | select((.metadata.kagent_type // .metadata.adk_type) == "function_response"
+        and ((.data.name // "")
+          | . == "call_kubectl" or endswith("__call_kubectl")))] as $calls
     | ($calls | length) == 1
-      and ($calls[0].data.response.isError == false)
-      and any($calls[0]..; type == "string" and contains($marker))
+      and (($calls[0].data.response.isError // false) == false)
+      and ([$calls[0] | .. | strings | select(contains($marker))] | length > 0)
   ' "$receipt_file" >/dev/null \
     || { echo "A2A receipt lacks one successful marker-bearing call_kubectl trace for $alias_name" >&2; exit 1; }
   echo "PASS Argo-style alias routing reached $alias_name through its AKS-MCP shard"
