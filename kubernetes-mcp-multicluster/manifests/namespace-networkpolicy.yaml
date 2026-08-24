@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: kubernetes-mcp-poc
+  name: "HOST_NAMESPACE_REPLACE"
   labels:
     app.kubernetes.io/part-of: kubernetes-mcp-fleet-poc
 ---
@@ -9,7 +9,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: default-deny
-  namespace: kubernetes-mcp-poc
+  namespace: "HOST_NAMESPACE_REPLACE"
 spec:
   podSelector: {}
   policyTypes:
@@ -20,7 +20,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: kubernetes-mcp-fleet-allow
-  namespace: kubernetes-mcp-poc
+  namespace: "HOST_NAMESPACE_REPLACE"
 spec:
   podSelector:
     matchLabels:
@@ -32,10 +32,10 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: kagent
+              kubernetes.io/metadata.name: "KAGENT_NAMESPACE_REPLACE"
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: agentgateway-system
+              kubernetes.io/metadata.name: "AGENTGATEWAY_NAMESPACE_REPLACE"
         - podSelector:
             matchLabels:
               kubernetes-mcp-fleet/access: smoke-client
@@ -52,7 +52,7 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
-    # Environment-neutral POC rule. Production overlays should constrain
+    # Environment-neutral initial rule. Production overlays should constrain
     # destination CIDRs as well as these Kubernetes API ports.
     - ports:
         - protocol: TCP

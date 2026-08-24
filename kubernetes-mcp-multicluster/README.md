@@ -6,6 +6,19 @@ agentgateway, and registers it with kagent. A single Agent and MCP server can
 then address any approved AKS or Kubernetes cluster by passing its stable
 `context` alias on each tool call.
 
+## Deployment model
+
+Use both deployment mechanisms through the supplied scripts:
+
+- **Helm** installs and upgrades the upstream Kubernetes MCP server from the
+  chart directory extracted from the approved GitHub ZIP.
+- **Kustomize-rendered YAML** installs this bundle's NetworkPolicies,
+  agentgateway backend/route/policy, kagent `RemoteMCPServer` objects, and the
+  kagent Agent. The reader RBAC is applied separately to every target context.
+
+Do not manually coordinate those pieces. `run-poc.sh` owns the order and uses
+one customization file for the whole bundle.
+
 Use this as the replacement for routine AKS workload and Kubernetes API
 inspection. Keep AKS-MCP only for separately approved Azure managed-plane
 operations. The exact boundary is documented in:
@@ -13,24 +26,46 @@ operations. The exact boundary is documented in:
 - [Kubernetes MCP operating boundary](KUBERNETES-MCP-OPERATING-BOUNDARY.md)
 - [AKS-MCP operating boundary](AKS-MCP-OPERATING-BOUNDARY.md)
 
-## Pull coordinates
+## Air-gapped inputs
 
-The tested image tag is:
+On a connected staging machine, download the two source archives:
 
-```text
-quay.io/containers/kubernetes_mcp_server:latest
+```bash
+curl -fL -o kagent-public-kubernetes-mcp-bundle.zip \
+  'https://github.com/davidmarkgardiner/kagent-public/archive/refs/heads/feat/kubernetes-mcp-multicluster-bundle.zip'
+curl -fL -o kubernetes-mcp-server-v0.0.66.zip \
+  'https://github.com/containers/kubernetes-mcp-server/archive/refs/tags/v0.0.66.zip'
 ```
 
-The deployment uses the published Helm chart:
+The upstream archive contains the local chart at:
 
 ```text
-oci://ghcr.io/containers/charts/kubernetes-mcp-server
-chart version: 0.1.0
+kubernetes-mcp-server-0.0.66/charts/kubernetes-mcp-server
 ```
 
-`latest` is mutable. Import it into the approved internal registry, complete
-the work-side validation, and then pin the resulting internal digest or
-immutable internal tag.
+Also stage the release-matched public image tag:
+
+```bash
+docker pull quay.io/containers/kubernetes_mcp_server:v0.0.66
+docker save --output kubernetes_mcp_server-v0.0.66.tar \
+  quay.io/containers/kubernetes_mcp_server:v0.0.66
+```
+
+Transfer the two ZIP files and image archive through the approved air-gap
+process. Inside the work environment:
+
+1. extract both ZIP files;
+2. load, scan, retag, and push the image into the internal registry;
+3. set `CHART_REF` in `work-values.env` to the extracted local chart directory;
+4. set `IMAGE_REGISTRY`, `IMAGE_REPOSITORY`, and `IMAGE_VERSION` to the
+   internal image; and
+5. retain the approved artifact checksums in the work-side receipt.
+
+No deployment or verification script pulls a chart from the internet. Helm is
+always given the local `CHART_REF`, and `deploy.sh` overrides every image value
+from `work-values.env`. The checked-in `values.yaml` contains deliberately
+invalid image placeholders so an uncustomized deployment fails instead of
+pulling from a public registry.
 
 ## Proven topology
 
@@ -49,24 +84,42 @@ credential refresh
 The Agent request contains only a stable alias. Credentials never pass through
 Argo Events, Agent prompts, or MCP tool arguments.
 
-## Configuration
+## One customization file
 
-Replace every placeholder locally; do not commit the resolved values:
+Create the one ignored workplace file:
 
 ```bash
-export HOST_CONTEXT='{{MANAGEMENT_KUBECONFIG_CONTEXT}}'
-export SOURCE_CONTEXTS='{{SOURCE_CONTEXT_1}}={{STABLE_ALIAS_1}} {{SOURCE_CONTEXT_2}}={{STABLE_ALIAS_2}}'
-export SMOKE_CONTEXTS='{{STABLE_ALIAS_1}}={{UNIQUE_NODE_MARKER_1}} {{STABLE_ALIAS_2}}={{UNIQUE_NODE_MARKER_2}}'
+cd work-agent-bundles/kubernetes-mcp-multicluster
+cp work-values.env.template work-values.env
+# Edit work-values.env once for the target environment.
 ```
 
-Each `SOURCE_CONTEXTS` entry maps an administrator/bootstrap kubeconfig
-context to the stable alias exposed to the Agent. Each `SMOKE_CONTEXTS`
-marker must be a non-secret node-name fragment unique to that target; it is
-used only at runtime to prove there is no context crossover.
+`work-values.env` controls the management context, target context-to-alias
+mappings, smoke markers, namespaces, existing Gateway, ModelConfig, internal
+image location, local extracted chart directory, expected chart version,
+replicas, CPU request, and proof-token duration.
+It is excluded by `.gitignore`; never add credentials or kubeconfig content to
+it.
+
+Use unquoted values with no spaces. `SOURCE_CONTEXTS` and `SMOKE_CONTEXTS` are
+comma-separated mappings. Use a local chart path without spaces.
+
+Kustomize reads the same file through `configMapGenerator` and replacements.
+The resulting non-secret ConfigMap is stored in the POC namespace so the
+applied customization is inspectable. Do not place credentials or sensitive
+data in `work-values.env`.
+
+Each `SOURCE_CONTEXTS` value maps an administrator/bootstrap kubeconfig context
+to the stable alias exposed to the Agent. Each `SMOKE_CONTEXTS` marker must be
+a non-secret node-name fragment unique to that target; it is used only at
+runtime to prove there is no context crossover.
 
 Prerequisites:
 
-- `kubectl`, `helm`, `jq`, `openssl`, `curl`, Node.js and `npx`;
+- `kubectl`, `helm`, `jq`, `openssl`, and `curl`;
+- Python 3 and PyYAML for local manifest rendering and validation;
+- the extracted Kubernetes MCP chart directory from the approved upstream ZIP;
+- the Kubernetes MCP image already imported into the internal registry;
 - bootstrap access to create the dedicated reader identity in every target;
 - kagent `Agent` and `RemoteMCPServer` CRDs;
 - agentgateway `AgentgatewayBackend` and `AgentgatewayPolicy` CRDs;
@@ -76,23 +129,28 @@ Prerequisites:
 
 ## Run
 
-From the repository root:
+After editing `work-values.env`:
 
 ```bash
-cd work-agent-bundles/kubernetes-mcp-multicluster
 ./scripts/verify-bundle.sh
+mkdir -p rendered
+kubectl kustomize . > rendered/all.yaml  # optional review
 ./scripts/run-poc.sh
 ```
+
+Every executable deployment script automatically loads the same ignored
+`work-values.env` that Kustomize reads.
 
 `run-poc.sh`:
 
 1. verifies all source contexts and the installed kagent/agentgateway APIs;
-2. applies an isolated namespace and default-deny NetworkPolicies;
+2. runs `kubectl apply -k` for the customized namespace, default-deny
+   NetworkPolicies, agentgateway resources, and kagent resources;
 3. creates and verifies the same narrow reader identity in each target;
 4. requests temporary reader tokens without logging them;
 5. builds and validates one purpose-specific kubeconfig;
 6. publishes it as a content-hashed immutable Secret;
-7. deploys the MCP server from the public OCI chart;
+7. deploys the internally hosted MCP image with the extracted local chart;
 8. registers direct and agentgateway paths with kagent;
 9. creates the gateway-backed read-only Agent; and
 10. proves exact tool discovery and 20 alternating context calls with no
@@ -159,7 +217,8 @@ equivalent reviewed credential helper arrangement.
 After registration, invoke the Agent through the repository A2A helper:
 
 ```bash
-scripts/kagent-a2a-invoke.sh \
+REPO_ROOT=$(git rev-parse --show-toplevel)
+"$REPO_ROOT/scripts/kagent-a2a-invoke.sh" \
   --context "$HOST_CONTEXT" \
   --agent kubernetes-mcp-fleet-agent \
   --text 'Use context {{STABLE_ALIAS_1}}. List v1 Node resources and report the node count. Do not use another context.'
@@ -174,7 +233,8 @@ argument.
 Start with one replica. After capacity checks, exercise the production rollout:
 
 ```bash
-REPLICA_COUNT=3 ./scripts/deploy.sh "$secret_name"
+# Change REPLICA_COUNT=3 in work-values.env, then run:
+./scripts/deploy.sh "$secret_name"
 ```
 
 Roll back by pointing the Deployment at the previous immutable Secret revision.

@@ -2,10 +2,12 @@
 set -euo pipefail
 
 BUNDLE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-: "${SOURCE_CONTEXTS:?set SOURCE_CONTEXTS to space-separated source-context=stable-alias mappings}"
+# shellcheck source=load-config.sh
+source "$BUNDLE_DIR/scripts/load-config.sh"
+load_bundle_config "$BUNDLE_DIR"
 READER_SUBJECT=system:serviceaccount:kubernetes-mcp-reader:kubernetes-mcp-reader
 
-for mapping in $SOURCE_CONTEXTS; do
+for mapping in $SOURCE_CONTEXTS_LIST; do
   source_context=${mapping%%=*}
   kubectl --context "$source_context" apply -f "$BUNDLE_DIR/manifests/reader-rbac.yaml" >/dev/null
 

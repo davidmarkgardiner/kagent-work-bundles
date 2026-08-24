@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-: "${HOST_CONTEXT:?set HOST_CONTEXT to the management-cluster kubeconfig context}"
-: "${SOURCE_CONTEXTS:?set SOURCE_CONTEXTS to space-separated source-context=stable-alias mappings}"
+BUNDLE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+# shellcheck source=load-config.sh
+source "$BUNDLE_DIR/scripts/load-config.sh"
+load_bundle_config "$BUNDLE_DIR"
 
-for command_name in kubectl helm jq openssl curl npx; do
+for command_name in kubectl helm jq openssl curl python3; do
   command -v "$command_name" >/dev/null || {
     echo "missing required command: $command_name" >&2
     exit 1
   }
 done
 
-for mapping in $SOURCE_CONTEXTS; do
+for mapping in $SOURCE_CONTEXTS_LIST; do
   source_context=${mapping%%=*}
   alias_name=${mapping#*=}
   test "$source_context" != "$alias_name" || {
@@ -31,8 +33,8 @@ kubectl --context "$HOST_CONTEXT" get crd \
   agentgatewaypolicies.agentgateway.dev \
   httproutes.gateway.networking.k8s.io >/dev/null
 
-gateway_programmed=$(kubectl --context "$HOST_CONTEXT" -n agentgateway-system \
-  get gateway ai-gateway -o jsonpath='{.status.conditions[?(@.type=="Programmed")].status}')
+gateway_programmed=$(kubectl --context "$HOST_CONTEXT" -n "$AGENTGATEWAY_NAMESPACE" \
+  get gateway "$AGENTGATEWAY_NAME" -o jsonpath='{.status.conditions[?(@.type=="Programmed")].status}')
 test "$gateway_programmed" = "True"
 
 if kubectl --context "$HOST_CONTEXT" -n default get deployment kubectl-mcp >/dev/null 2>&1; then
@@ -43,4 +45,4 @@ else
   echo "UNRELATED_BASELINE deployment=default/kubectl-mcp absent"
 fi
 
-echo "PREFLIGHT_OK host=$HOST_CONTEXT gateway=agentgateway-system/ai-gateway"
+echo "PREFLIGHT_OK host=$HOST_CONTEXT gateway=$AGENTGATEWAY_NAMESPACE/$AGENTGATEWAY_NAME"

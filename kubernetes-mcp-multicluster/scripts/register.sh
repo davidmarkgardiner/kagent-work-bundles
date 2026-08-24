@@ -2,16 +2,17 @@
 set -euo pipefail
 
 BUNDLE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-: "${HOST_CONTEXT:?set HOST_CONTEXT to the management-cluster kubeconfig context}"
-KAGENT_NAMESPACE=${KAGENT_NAMESPACE:-kagent}
+# shellcheck source=load-config.sh
+source "$BUNDLE_DIR/scripts/load-config.sh"
+load_bundle_config "$BUNDLE_DIR"
 
-kubectl --context "$HOST_CONTEXT" apply -f "$BUNDLE_DIR/manifests/agentgateway-kagent.yaml" >/dev/null
+kubectl --context "$HOST_CONTEXT" apply -k "$BUNDLE_DIR" >/dev/null
 
 for attempt in $(seq 1 60); do
-  backend=$(kubectl --context "$HOST_CONTEXT" -n agentgateway-system get \
+  backend=$(kubectl --context "$HOST_CONTEXT" -n "$AGENTGATEWAY_NAMESPACE" get \
     agentgatewaybackend kubernetes-mcp-fleet \
     -o jsonpath='{.status.conditions[?(@.type=="Accepted")].status}' 2>/dev/null || true)
-  route=$(kubectl --context "$HOST_CONTEXT" -n agentgateway-system get \
+  route=$(kubectl --context "$HOST_CONTEXT" -n "$AGENTGATEWAY_NAMESPACE" get \
     httproute kubernetes-mcp-fleet \
     -o jsonpath='{.status.parents[0].conditions[?(@.type=="Accepted")].status}' 2>/dev/null || true)
   direct_tools=$(kubectl --context "$HOST_CONTEXT" -n "$KAGENT_NAMESPACE" get \
@@ -33,8 +34,6 @@ for attempt in $(seq 1 60); do
   fi
   sleep 2
 done
-
-kubectl --context "$HOST_CONTEXT" apply -f "$BUNDLE_DIR/manifests/kagent-agent.yaml" >/dev/null
 
 for attempt in $(seq 1 90); do
   accepted=$(kubectl --context "$HOST_CONTEXT" -n "$KAGENT_NAMESPACE" get agent \

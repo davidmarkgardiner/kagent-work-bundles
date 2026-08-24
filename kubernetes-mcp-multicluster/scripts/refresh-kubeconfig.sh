@@ -2,10 +2,10 @@
 set -euo pipefail
 set +x
 
-: "${HOST_CONTEXT:?set HOST_CONTEXT to the management-cluster kubeconfig context}"
-HOST_NAMESPACE=${HOST_NAMESPACE:-kubernetes-mcp-poc}
-: "${SOURCE_CONTEXTS:?set SOURCE_CONTEXTS to space-separated source-context=stable-alias mappings}"
-TOKEN_DURATION=${TOKEN_DURATION:-24h}
+BUNDLE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+# shellcheck source=load-config.sh
+source "$BUNDLE_DIR/scripts/load-config.sh"
+load_bundle_config "$BUNDLE_DIR"
 SECRET_PREFIX=${SECRET_PREFIX:-kubernetes-mcp-fleet-kubeconfig}
 READER_NAMESPACE=${READER_NAMESPACE:-kubernetes-mcp-reader}
 READER_SERVICE_ACCOUNT=${READER_SERVICE_ACCOUNT:-kubernetes-mcp-reader}
@@ -26,7 +26,7 @@ trap cleanup EXIT
 first_alias=""
 expected_aliases=""
 
-for mapping in $SOURCE_CONTEXTS; do
+for mapping in $SOURCE_CONTEXTS_LIST; do
   source_context=${mapping%%=*}
   alias_name=${mapping#*=}
   echo "CREDENTIAL_BUILD_START source=$source_context alias=$alias_name" >&2

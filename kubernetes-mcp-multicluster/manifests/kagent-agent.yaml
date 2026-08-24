@@ -2,7 +2,7 @@ apiVersion: kagent.dev/v1alpha2
 kind: Agent
 metadata:
   name: kubernetes-mcp-fleet-agent
-  namespace: kagent
+  namespace: "KAGENT_NAMESPACE_REPLACE"
   labels:
     app.kubernetes.io/part-of: kubernetes-mcp-fleet-poc
 spec:
@@ -10,7 +10,7 @@ spec:
   description: Read-only, context-explicit diagnostics across approved Kubernetes clusters.
   declarative:
     runtime: python
-    modelConfig: default-model-config
+    modelConfig: "MODEL_CONFIG_REPLACE"
     a2aConfig:
       skills:
         - id: fleet-readonly-diagnostics
@@ -35,7 +35,7 @@ spec:
           apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: kubernetes-mcp-fleet-gateway
-          namespace: kagent
+          namespace: "KAGENT_NAMESPACE_REPLACE"
           toolNames:
             - events_list
             - namespaces_list

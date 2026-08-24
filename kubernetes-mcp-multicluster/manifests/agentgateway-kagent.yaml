@@ -2,7 +2,7 @@ apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayBackend
 metadata:
   name: kubernetes-mcp-fleet
-  namespace: agentgateway-system
+  namespace: "AGENTGATEWAY_NAMESPACE_REPLACE"
   labels:
     app.kubernetes.io/part-of: kubernetes-mcp-fleet-poc
 spec:
@@ -12,7 +12,7 @@ spec:
     targets:
       - name: kubernetes-mcp-fleet
         static:
-          host: kubernetes-mcp-fleet.kubernetes-mcp-poc.svc.cluster.local
+          host: "kubernetes-mcp-fleet.HOST_NAMESPACE_REPLACE.svc.cluster.local"
           port: 8080
           path: /mcp
           protocol: StreamableHTTP
@@ -21,15 +21,15 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: kubernetes-mcp-fleet
-  namespace: agentgateway-system
+  namespace: "AGENTGATEWAY_NAMESPACE_REPLACE"
   labels:
     app.kubernetes.io/part-of: kubernetes-mcp-fleet-poc
 spec:
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway
-      name: ai-gateway
-      namespace: agentgateway-system
+      name: "AGENTGATEWAY_NAME_REPLACE"
+      namespace: "AGENTGATEWAY_NAMESPACE_REPLACE"
   rules:
     - matches:
         - path:
@@ -39,13 +39,13 @@ spec:
         - group: agentgateway.dev
           kind: AgentgatewayBackend
           name: kubernetes-mcp-fleet
-          namespace: agentgateway-system
+          namespace: "AGENTGATEWAY_NAMESPACE_REPLACE"
 ---
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayPolicy
 metadata:
   name: kubernetes-mcp-fleet
-  namespace: agentgateway-system
+  namespace: "AGENTGATEWAY_NAMESPACE_REPLACE"
   labels:
     app.kubernetes.io/part-of: kubernetes-mcp-fleet-poc
 spec:
@@ -73,8 +73,6 @@ spec:
   traffic:
     rateLimit:
       local:
-        # One-shot Inspector calls include session setup as well as the tool
-        # request, so the deterministic 20-call smoke needs headroom.
         - requests: 240
           unit: Minutes
           burst: 80
@@ -85,24 +83,24 @@ apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
 metadata:
   name: kubernetes-mcp-fleet-direct
-  namespace: kagent
+  namespace: "KAGENT_NAMESPACE_REPLACE"
   labels:
     app.kubernetes.io/part-of: kubernetes-mcp-fleet-poc
 spec:
   description: Direct, private discovery proof for the read-only multi-cluster Kubernetes MCP.
   protocol: STREAMABLE_HTTP
   timeout: 30s
-  url: http://kubernetes-mcp-fleet.kubernetes-mcp-poc.svc.cluster.local:8080/mcp
+  url: "http://kubernetes-mcp-fleet.HOST_NAMESPACE_REPLACE.svc.cluster.local:8080/mcp"
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
 metadata:
   name: kubernetes-mcp-fleet-gateway
-  namespace: kagent
+  namespace: "KAGENT_NAMESPACE_REPLACE"
   labels:
     app.kubernetes.io/part-of: kubernetes-mcp-fleet-poc
 spec:
   description: Read-only multi-cluster Kubernetes MCP routed through agentgateway.
   protocol: STREAMABLE_HTTP
   timeout: 30s
-  url: http://ai-gateway.agentgateway-system.svc.cluster.local/mcp/kubernetes-mcp-fleet
+  url: "http://AGENTGATEWAY_SERVICE_REPLACE.AGENTGATEWAY_NAMESPACE_REPLACE.svc.cluster.local/mcp/kubernetes-mcp-fleet"

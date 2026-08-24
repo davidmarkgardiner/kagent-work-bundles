@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-: "${HOST_CONTEXT:?set HOST_CONTEXT to the management-cluster kubeconfig context}"
-: "${SMOKE_CONTEXTS:?set SMOKE_CONTEXTS to space-separated stable-alias=unique-node-marker mappings}"
-
-HOST_NAMESPACE=${HOST_NAMESPACE:-kubernetes-mcp-poc}
+BUNDLE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+# shellcheck source=load-config.sh
+source "$BUNDLE_DIR/scripts/load-config.sh"
+load_bundle_config "$BUNDLE_DIR"
 EXPECTED_TOOLS='["events_list","namespaces_list","pods_get","pods_list","pods_list_in_namespace","pods_log","resources_get","resources_list"]'
 DIRECT_PORT=${DIRECT_PORT:-18080}
 GATEWAY_PORT=${GATEWAY_PORT:-18081}
 
-IFS=' ' read -r -a mappings <<< "$SMOKE_CONTEXTS"
+IFS=' ' read -r -a mappings <<< "$SMOKE_CONTEXTS_LIST"
 test "${#mappings[@]}" -ge 2 || {
   echo "SMOKE_CONTEXTS must contain at least two alias=marker mappings" >&2
   exit 1
@@ -58,8 +58,8 @@ trap cleanup EXIT
 kubectl --context "$HOST_CONTEXT" -n "$HOST_NAMESPACE" port-forward \
   service/kubernetes-mcp-fleet "$DIRECT_PORT:8080" >"$direct_log" 2>&1 &
 direct_pid=$!
-kubectl --context "$HOST_CONTEXT" -n agentgateway-system port-forward \
-  service/ai-gateway "$GATEWAY_PORT:80" >"$gateway_log" 2>&1 &
+kubectl --context "$HOST_CONTEXT" -n "$AGENTGATEWAY_NAMESPACE" port-forward \
+  service/"$AGENTGATEWAY_SERVICE" "$GATEWAY_PORT:80" >"$gateway_log" 2>&1 &
 gateway_pid=$!
 
 for attempt in $(seq 1 30); do
@@ -75,9 +75,13 @@ for attempt in $(seq 1 30); do
   sleep 1
 done
 
-inspect() {
+request() {
   local target=$1
+  local method=$2
   shift
+  shift
+  local params=${1:-'{}'}
+  local payload response
   kill -0 "$direct_pid" 2>/dev/null || {
     echo "direct port-forward exited unexpectedly" >&2
     return 1
@@ -86,8 +90,14 @@ inspect() {
     echo "agentgateway port-forward exited unexpectedly" >&2
     return 1
   }
-  npx -y @modelcontextprotocol/inspector --cli "$target" -- \
-    --transport http "$@" --format json
+  payload=$(jq -cn --arg method "$method" --argjson params "$params" \
+    '{jsonrpc:"2.0",id:1,method:$method,params:$params}')
+  response=$(curl --fail --silent --show-error \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json, text/event-stream' \
+    --request POST "$target" --data "$payload")
+  printf '%s\n' "$response" | sed -n 's/^data: //p' | \
+    jq -ce 'select(.jsonrpc == "2.0" and .id == 1)'
 }
 
 check_context() {
@@ -95,12 +105,13 @@ check_context() {
   local target=$2
   local selected=$3
   local expected_marker=$4
-  local args result other other_alias other_marker
+  local args params result other other_alias other_marker
 
   args=$(jq -cn --arg context "$selected" \
     '{apiVersion:"v1",kind:"Node",context:$context}')
-  result=$(inspect "$target" --method tools/call --tool-name resources_list \
-    --tool-args-json "$args")
+  params=$(jq -cn --argjson args "$args" \
+    '{name:"resources_list",arguments:$args}')
+  result=$(request "$target" tools/call "$params")
   test "$(printf '%s' "$result" | jq -r '.result.isError // false')" = "false"
   printf '%s' "$result" | jq -er --arg marker "$expected_marker" \
     '.result.content[].text | contains($marker)' >/dev/null
@@ -122,7 +133,7 @@ check_path() {
   local target=$2
   local listed actual mapping alias_name marker
 
-  listed=$(inspect "$target" --method tools/list)
+  listed=$(request "$target" tools/list '{}')
   actual=$(printf '%s' "$listed" | jq -c '.result.tools | map(.name) | sort')
   test "$actual" = "$EXPECTED_TOOLS" || {
     echo "$label tool allowlist mismatch" >&2

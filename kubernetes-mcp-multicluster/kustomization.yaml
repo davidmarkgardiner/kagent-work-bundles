@@ -1,0 +1,129 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - manifests/namespace-networkpolicy.yaml
+  - manifests/agentgateway-kagent.yaml
+  - manifests/kagent-agent.yaml
+
+configMapGenerator:
+  - name: kubernetes-mcp-work-values
+    envs:
+      - work-values.env
+
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    app.kubernetes.io/part-of: kubernetes-mcp-fleet-poc
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.HOST_NAMESPACE
+    targets:
+      - select:
+          kind: Namespace
+          name: HOST_NAMESPACE_REPLACE
+        fieldPaths: [metadata.name]
+      - select:
+          kind: NetworkPolicy
+        fieldPaths: [metadata.namespace]
+      - select:
+          kind: ConfigMap
+          name: kubernetes-mcp-work-values
+        fieldPaths: [metadata.namespace]
+        options:
+          create: true
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.KAGENT_NAMESPACE
+    targets:
+      - select:
+          kind: RemoteMCPServer
+        fieldPaths: [metadata.namespace]
+      - select:
+          kind: Agent
+          name: kubernetes-mcp-fleet-agent
+        fieldPaths:
+          - metadata.namespace
+          - spec.declarative.tools.0.mcpServer.namespace
+      - select:
+          kind: NetworkPolicy
+          name: kubernetes-mcp-fleet-allow
+        fieldPaths:
+          - spec.ingress.0.from.0.namespaceSelector.matchLabels.[kubernetes.io/metadata.name]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.AGENTGATEWAY_NAMESPACE
+    targets:
+      - select:
+          kind: AgentgatewayBackend
+        fieldPaths: [metadata.namespace]
+      - select:
+          kind: AgentgatewayPolicy
+        fieldPaths: [metadata.namespace]
+      - select:
+          kind: HTTPRoute
+        fieldPaths:
+          - metadata.namespace
+          - spec.parentRefs.0.namespace
+          - spec.rules.0.backendRefs.0.namespace
+      - select:
+          kind: NetworkPolicy
+          name: kubernetes-mcp-fleet-allow
+        fieldPaths:
+          - spec.ingress.0.from.1.namespaceSelector.matchLabels.[kubernetes.io/metadata.name]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.AGENTGATEWAY_NAME
+    targets:
+      - select:
+          kind: HTTPRoute
+        fieldPaths: [spec.parentRefs.0.name]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.MODEL_CONFIG
+    targets:
+      - select:
+          kind: Agent
+          name: kubernetes-mcp-fleet-agent
+        fieldPaths: [spec.declarative.modelConfig]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.MCP_SERVICE_HOST
+    targets:
+      - select:
+          kind: AgentgatewayBackend
+          name: kubernetes-mcp-fleet
+        fieldPaths: [spec.mcp.targets.0.static.host]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.DIRECT_MCP_URL
+    targets:
+      - select:
+          kind: RemoteMCPServer
+          name: kubernetes-mcp-fleet-direct
+        fieldPaths: [spec.url]
+
+  - source:
+      kind: ConfigMap
+      name: kubernetes-mcp-work-values
+      fieldPath: data.AGENTGATEWAY_MCP_URL
+    targets:
+      - select:
+          kind: RemoteMCPServer
+          name: kubernetes-mcp-fleet-gateway
+        fieldPaths: [spec.url]

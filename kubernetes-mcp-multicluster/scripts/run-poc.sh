@@ -2,10 +2,12 @@
 set -euo pipefail
 
 BUNDLE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-: "${HOST_CONTEXT:?set HOST_CONTEXT to the management-cluster kubeconfig context}"
+# shellcheck source=load-config.sh
+source "$BUNDLE_DIR/scripts/load-config.sh"
+load_bundle_config "$BUNDLE_DIR"
 
 "$BUNDLE_DIR/scripts/preflight.sh"
-kubectl --context "$HOST_CONTEXT" apply -f "$BUNDLE_DIR/manifests/namespace-networkpolicy.yaml" >/dev/null
+kubectl --context "$HOST_CONTEXT" apply -k "$BUNDLE_DIR" >/dev/null
 "$BUNDLE_DIR/scripts/install-readers.sh"
 secret_name=$("$BUNDLE_DIR/scripts/refresh-kubeconfig.sh")
 "$BUNDLE_DIR/scripts/deploy.sh" "$secret_name"

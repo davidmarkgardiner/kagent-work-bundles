@@ -10,7 +10,7 @@ data. Runtime aliases are redacted below as `management-proof` and
 ## Build and deployment
 
 - Public image tag: `quay.io/containers/kubernetes_mcp_server:latest`
-- Published chart: `oci://ghcr.io/containers/charts/kubernetes-mcp-server`
+- Chart: local `charts/kubernetes-mcp-server` directory, version `0.1.0`
 - Helm release: `kubernetes-mcp-fleet`
 - Namespace: `kubernetes-mcp-poc`
 - Deployment: Ready `1/1`; service-account token automount disabled
@@ -44,6 +44,14 @@ replica because the management node had limited spare requested capacity.
 - `AgentgatewayBackend`: accepted.
 - `HTTPRoute`: accepted.
 - `kubernetes-mcp-fleet-agent`: Accepted and Ready.
+- The air-gap bundle re-verification rendered its non-Helm resources with
+  Kustomize, applied them with `kubectl apply -k`, and repeated the complete
+  direct/gateway 20-request smoke successfully. The revised smoke uses direct
+  MCP JSON-RPC over `curl`; it does not download an npm inspector package.
+- The release-matched `v0.0.66` image tag was confirmed in both official
+  registries, and the local `v0.0.66` source chart rendered that tag correctly.
+  The running pod receipt above remains the separately pinned image artifact
+  used for the live behavior proof.
 
 The repository A2A helper invoked the gateway-backed Agent twice. Sanitized
 responses were:

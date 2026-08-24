@@ -1,13 +1,15 @@
 fullnameOverride: kubernetes-mcp-fleet
 
-# Start with one replica for the first controlled deployment. Set
-# REPLICA_COUNT=3 through scripts/deploy.sh after capacity and rollout checks.
+# Start with one replica for the first controlled deployment. Change
+# REPLICA_COUNT in work-values.env after capacity and rollout checks.
 replicaCount: 1
 
 image:
-  registry: quay.io
-  repository: containers/kubernetes_mcp_server
-  version: latest
+  # scripts/deploy.sh must override all three values from work-values.env.
+  # Fail closed instead of accidentally pulling from a public registry.
+  registry: REPLACE_WITH_INTERNAL_REGISTRY
+  repository: REPLACE_WITH_INTERNAL_REPOSITORY
+  version: REPLACE_WITH_INTERNAL_TAG
   pullPolicy: IfNotPresent
 
 # Set by scripts/deploy.sh to the immutable Secret created by the credential job.
