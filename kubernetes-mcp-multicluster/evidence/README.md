@@ -22,5 +22,7 @@ any additional evidence directory before sharing it.
 
 The sanitized live receipt is
 [live-homelab-2026-08-24.md](live-homelab-2026-08-24.md).
+The derived image packaging and live MCP compatibility proof is
+[derived-image-live-homelab-2026-08-25.md](derived-image-live-homelab-2026-08-25.md).
 The Kubernetes-native AKS render and current acceptance boundary are in
 [aks-credential-job-render-2026-08-24.md](aks-credential-job-render-2026-08-24.md).

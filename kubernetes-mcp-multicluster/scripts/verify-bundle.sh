@@ -22,6 +22,32 @@ for script in "$BUNDLE_DIR"/scripts/*.sh; do
   bash -n "$script"
 done
 
+mcp_image_dir="$BUNDLE_DIR/mcp-image"
+for required_image_contract in \
+  'quay.io/containers/kubernetes_mcp_server:v0.0.66' \
+  'kubelogin-linux-amd64.zip' \
+  'ebaeff02aa899c5cae6a2b954b64fc02738185319df2570f7dc053451efa4b2f' \
+  'bin/linux_amd64/kubelogin' \
+  'v0.0.66-kubelogin-v0.2.19'; do
+  rg -q --fixed-strings "$required_image_contract" "$mcp_image_dir/README.md" || {
+    echo "MCP image guide is missing pinned contract: $required_image_contract" >&2
+    exit 1
+  }
+done
+for required_dockerfile_fragment in \
+  'COPY --chmod=0555 kubelogin /usr/local/bin/kubelogin' \
+  'RUN /usr/local/bin/kubelogin --version'; do
+  rg -q --fixed-strings "$required_dockerfile_fragment" "$mcp_image_dir/Dockerfile" || {
+    echo "MCP image Dockerfile is missing: $required_dockerfile_fragment" >&2
+    exit 1
+  }
+done
+if rg -n '(^|[[:space:]])(curl|wget|dnf|microdnf|yum|apt(-get)?|apk)([[:space:]]|$)' \
+  "$mcp_image_dir/Dockerfile" >/dev/null; then
+  echo "MCP image Dockerfile must not download or install packages" >&2
+  exit 1
+fi
+
 refresh_script="$BUNDLE_DIR/scripts/refresh-aks-kubeconfig-job.sh"
 if rg -n --fixed-strings -- '--admin' "$refresh_script" >/dev/null; then
   echo "AKS credential Job must never request admin credentials" >&2

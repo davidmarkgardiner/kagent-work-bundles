@@ -44,7 +44,10 @@ kubernetes-mcp-server-0.0.66/charts/kubernetes-mcp-server
 ```
 
 Also stage the release-matched public image tag and approved, pinned Linux
-`kubelogin`, `kubectl`, and `jq` binaries:
+tool binaries. The MCP image needs only `kubelogin`; the credential-refresh
+Job image separately needs Azure CLI, `kubectl`, `kubelogin`, `jq`, and Bash.
+Follow the exact pinned artifact, checksum, offline build, and pipeline proof in
+the [work-side Kubernetes MCP image guide](mcp-image/README.md):
 
 ```bash
 docker pull quay.io/containers/kubernetes_mcp_server:v0.0.66
@@ -56,8 +59,10 @@ Transfer the two ZIP files and image archive through the approved air-gap
 process. Inside the work environment:
 
 1. extract both ZIP files;
-2. load and scan the upstream image, then build the offline derived MCP image
-   in `mcp-image/` and refresh image in `credential-refresh-image/`;
+2. load and scan the upstream image, then follow
+   [`mcp-image/README.md`](mcp-image/README.md) to build and prove the offline
+   derived MCP image; build the refresh image separately from
+   `credential-refresh-image/`;
 3. set `CHART_REF` in `work-values.env` to the extracted local chart directory;
 4. set `IMAGE_REGISTRY`, `IMAGE_REPOSITORY`, and `IMAGE_VERSION` to the
    internal image; and
@@ -391,3 +396,9 @@ The sanitized home-lab receipt is in
 It proves the Kubernetes MCP, kagent, and agentgateway data path. It does not
 claim that the Azure Workload Identity/`kubelogin` refresh has been tested
 against a real AKS target.
+
+The derived-image follow-up is in
+[evidence/derived-image-live-homelab-2026-08-25.md](evidence/derived-image-live-homelab-2026-08-25.md).
+It proves that the exact pinned Linux `kubelogin` binary runs in the non-root
+MCP image and that direct and agentgateway MCP reads still work. Azure token
+exchange remains a work-AKS acceptance gate.
