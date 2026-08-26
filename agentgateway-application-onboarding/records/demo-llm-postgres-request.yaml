@@ -1,0 +1,87 @@
+# Sanitized demonstration record. This is not a Kubernetes resource and must
+# not be applied. Placeholder owners and provider details remain deliberate.
+schemaVersion: agentgateway-onboarding/v1alpha1
+request:
+  name: demo-support-assistant
+  state: accepted-for-documentation-proof
+  owners:
+    application: "{{APPLICATION_OWNER}}"
+    platform: "{{PLATFORM_AGENTGATEWAY_OWNER}}"
+    entra: "{{ENTRA_APPLICATION_ADMIN_OWNER}}"
+    modelProvider: "{{MODEL_GARDEN_OWNER}}"
+    mcp: "{{POSTGRES_DATA_OWNER}}"
+    security: "{{SECURITY_APPROVER}}"
+  workload:
+    cluster: "{{AGENTIC_CLUSTER_NAME}}"
+    namespace: team-demo
+    serviceAccount: demo-support-assistant
+    applicationType: existing-agent-loop
+    ingressType: internal-application-owned
+    preservesEndUserIdentity: false
+    supportsOpenAICompatibleApi: true
+    supportsMcpStreamableHttp: true
+    ownsAgentToolLoop: true
+  callerIdentity:
+    type: uami
+    clientId: "{{DEMO_CALLER_UAMI_CLIENT_ID}}"
+    federatedSubject: system:serviceaccount:team-demo:demo-support-assistant
+    gatewayAudience: "api://{{AGENTGATEWAY_APP_ID}}"
+    requestedRoles:
+      - AgentGateway.Model.Invoke
+      - AgentGateway.Mcp.Read
+  modelAccess:
+    providerService: "{{MODEL_GARDEN_SERVICE}}"
+    route: "{{APPROVED_MODEL_ROUTE}}"
+    model: "{{APPROVED_CHAT_MODEL}}"
+    region: "{{MODEL_REGION}}"
+    backendIdentity: "{{AGENTGATEWAY_MODEL_UAMI_CLIENT_ID}}"
+    providerAudience: "{{MODEL_GARDEN_AUDIENCE}}"
+    billingOwner: "{{MODEL_GARDEN_BILLING_OWNER}}"
+  mcpAccess:
+    catalogEntry: postgres-schema-mcpg-v0.7.1
+    route: /mcp/postgres-inventory
+    tools:
+      - list_schemas
+      - list_tables
+      - describe_table
+    resourceScope: approved-postgresql-schema-metadata-only
+    writeCapable: false
+    backendIdentityBoundary: dedicated-reader-plus-owner-approved-database-grants
+  dataHandling:
+    classification: internal-metadata
+    logPrompts: false
+    logModelResponses: false
+    logToolArguments: false
+    logToolResults: false
+    auditMetadata:
+      - caller_identity
+      - route
+      - model
+      - token_usage
+      - tool_name
+      - outcome
+      - latency
+  traffic:
+    requestsPerMinute: 10
+    concurrency: 2
+    requestTimeout: 60s
+    streaming: to-be-confirmed
+  lifecycle:
+    requestedBy: "{{APPLICATION_OWNER}}"
+    requestedAt: "{{REQUEST_DATE}}"
+    reviewAt: "{{ACCESS_REVIEW_DATE}}"
+    routineRevocationOwner: "{{ENTRA_APPLICATION_ADMIN_OWNER}}"
+    immediateGatewayDenyOwner: "{{PLATFORM_AGENTGATEWAY_OWNER}}"
+  phase0Dependencies:
+    - validate-installed-agentgateway-and-policy-crds
+    - establish-strict-jwt-jwks-network-and-ca-path
+    - confirm-model-garden-endpoint-audience-scope-model-and-backend-uami
+    - validate-postgresql-work-overlay-identity-and-private-network-path
+    - prove-target-cni-and-mesh-network-controls
+    - prove-client-token-refresh-and-stream-expiry-behaviour
+  approvals:
+    applicationOwner: pending
+    platformOwner: pending
+    modelProviderOwner: pending
+    mcpOwner: pending
+    securityOwner: pending

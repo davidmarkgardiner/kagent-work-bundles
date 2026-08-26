@@ -1,0 +1,79 @@
+# Data contract only. This is not a Kubernetes resource and must not be applied.
+schemaVersion: agentgateway-onboarding/v1alpha1
+request:
+  name: "{{REQUEST_NAME}}"
+  state: needs-information
+  owners:
+    application: "{{APPLICATION_OWNER}}"
+    platform: "{{PLATFORM_AGENTGATEWAY_OWNER}}"
+    entra: "{{ENTRA_APPLICATION_ADMIN_OWNER}}"
+    modelProvider: "{{MODEL_GARDEN_OWNER}}"
+    mcp: "{{MCP_OWNER}}"
+    security: "{{SECURITY_APPROVER}}"
+  workload:
+    cluster: "{{AGENTIC_CLUSTER_NAME}}"
+    namespace: "{{TEAM_NAMESPACE}}"
+    serviceAccount: "{{TEAM_SERVICE_ACCOUNT}}"
+    applicationType: "{{APPLICATION_TYPE}}"
+    ingressType: "{{INGRESS_TYPE}}"
+    preservesEndUserIdentity: false
+    supportsOpenAICompatibleApi: true
+    supportsMcpStreamableHttp: true
+    ownsAgentToolLoop: true
+  callerIdentity:
+    type: uami
+    clientId: "{{CALLER_UAMI_CLIENT_ID}}"
+    federatedSubject: "system:serviceaccount:{{TEAM_NAMESPACE}}:{{TEAM_SERVICE_ACCOUNT}}"
+    gatewayAudience: "api://{{AGENTGATEWAY_APP_ID}}"
+    requestedRoles:
+      - "{{GATEWAY_MODEL_ROLE}}"
+      - "{{GATEWAY_MCP_ROLE}}"
+  modelAccess:
+    providerService: "{{MODEL_GARDEN_SERVICE}}"
+    route: "{{APPROVED_MODEL_ROUTE}}"
+    model: "{{APPROVED_MODEL}}"
+    region: "{{MODEL_REGION}}"
+    backendIdentity: "{{AGENTGATEWAY_BACKEND_IDENTITY}}"
+    providerAudience: "{{MODEL_GARDEN_AUDIENCE}}"
+    billingOwner: "{{MODEL_GARDEN_BILLING_OWNER}}"
+  mcpAccess:
+    catalogEntry: "{{MCP_CATALOG_ENTRY}}"
+    route: "{{APPROVED_MCP_ROUTE}}"
+    tools:
+      - "{{MCP_TOOL_1}}"
+    resourceScope: "{{MCP_RESOURCE_SCOPE}}"
+    writeCapable: false
+    backendIdentityBoundary: "{{MCP_BACKEND_IDENTITY_BOUNDARY}}"
+  dataHandling:
+    classification: "{{DATA_CLASSIFICATION}}"
+    logPrompts: false
+    logModelResponses: false
+    logToolArguments: false
+    logToolResults: false
+    auditMetadata:
+      - caller_identity
+      - route
+      - model
+      - token_usage
+      - tool_name
+      - outcome
+      - latency
+  traffic:
+    requestsPerMinute: "{{REQUESTS_PER_MINUTE}}"
+    concurrency: "{{CONCURRENCY}}"
+    requestTimeout: "{{REQUEST_TIMEOUT}}"
+    streaming: "{{STREAMING_REQUIRED}}"
+  lifecycle:
+    requestedBy: "{{REQUESTED_BY}}"
+    requestedAt: "{{REQUEST_DATE}}"
+    reviewAt: "{{ACCESS_REVIEW_DATE}}"
+    routineRevocationOwner: "{{ROUTINE_REVOCATION_OWNER}}"
+    immediateGatewayDenyOwner: "{{IMMEDIATE_DENY_OWNER}}"
+  phase0Dependencies:
+    - "{{DEPENDENCY_1}}"
+  approvals:
+    applicationOwner: pending
+    platformOwner: pending
+    modelProviderOwner: pending
+    mcpOwner: pending
+    securityOwner: pending
