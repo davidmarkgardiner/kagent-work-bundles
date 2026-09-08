@@ -1,13 +1,23 @@
 # FastMCP PostgreSQL password-to-UAMI work bundle
 
+> **Existing workplace deployment:** do not apply this bundle wholesale. The
+> workplace MCP is already running. Use
+> [`WORK-AGENT-START-PROMPT.md`](WORK-AGENT-START-PROMPT.md) and
+> [`WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md`](WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md)
+> to port the token-efficiency delta onto the deployed version. Preserve its
+> objects, authentication, tools, views, grants, Gateway, and Agent. The full
+> password/UAMI deployment instructions below describe the original reference
+> bundle and are not the workplace upgrade procedure.
+
 This bundle contains one bounded FastMCP implementation and two PostgreSQL
 authentication deployments:
 
 1. [`password/`](password/) for the existing username/password connection;
 2. the root Kustomize target for the later AKS Workload Identity/UAMI path.
 
-Deploy the password path first. When the database team supplies the UAMI and
-PostgreSQL Entra mapping, deploy the root UAMI target using the same image. The
+For a new standalone deployment of this sanitized reference bundle, deploy the
+password path first. When the database team supplies the UAMI and PostgreSQL
+Entra mapping, deploy the root UAMI target using the same image. The
 three tool names, parameters, approved-view SQL, Service, Gateway route,
 RemoteMCPServer, Agent, and verification flow remain the same.
 
@@ -92,7 +102,7 @@ kagent and Agent Gateway manifests. A separate earlier adapter proved the
 Gateway/A2A runtime pattern, but this exact three-tool adapter still requires
 an end-to-end Gateway/A2A receipt in the work environment.
 
-## Deploy first: username/password FastMCP
+## Reference-only greenfield deployment: username/password FastMCP
 
 Build the shared adapter image once, then create a private Secret through the
 approved work secret-delivery mechanism. The Secret must contain the existing

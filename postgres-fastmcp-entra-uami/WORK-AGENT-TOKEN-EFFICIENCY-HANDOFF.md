@@ -6,6 +6,43 @@ Upgrade the existing workplace PostgreSQL MCP so large database operations do
 not place bulk rows into model context. Preserve the current authentication
 mode, approved views, caller controls, and database grants.
 
+## Workplace starting point and non-goals
+
+The workplace PostgreSQL MCP is already deployed. Treat this repository as a
+sanitized reference implementation and test package, not as a manifest set to
+apply wholesale.
+
+Do not recreate, replace, or migrate the existing MCP, namespace, Secret,
+ServiceAccount, Gateway, RemoteMCPServer, Agent, authentication mode, database
+principal, approved views, or grants as part of this change. Do not run the
+README's password-first or UAMI deployment walkthrough. Those instructions
+document how the original bundle is assembled and are reference-only for this
+upgrade.
+
+Start from the deployed workplace source and manifests. Produce a reviewed diff
+that ports only the applicable changes below while retaining workplace object
+names, identity wiring, policies, tool contracts, registry, and delivery flow.
+
+## Delta change map
+
+Port these changes onto the currently deployed implementation rather than
+replacing it with this bundle:
+
+| Reference | Delta to port |
+|---|---|
+| `adapter/result_budget.py` | Add the fail-closed row, response-byte, and per-cell result envelope with compiled ceilings. |
+| `adapter/server.py` | Use `fetchmany(max_rows + 1)`, a read-only transaction, bounded statement timeout, and the result envelope. Adapt this to the workplace tool functions; do not replace unrelated tools or SQL. |
+| `adapter/Dockerfile` | Include the new budget module and only the verifiers required by the workplace image/test flow. |
+| `adapter/test_result_budget.py` and `adapter/test_server.py` | Port the budget and tool-contract tests into the workplace test layout. |
+| `adapter/verify_budget_live.py` and `adapter/verify_mcp_transport.py` | Reuse or adapt the marker-only direct and Streamable HTTP checks without recording workplace rows. |
+| Agent system instruction in both reference manifests | Add the truncation stopping rule to the existing Agent; do not replace the Agent manifest. |
+| `token-efficient-query-skill/` | Build and attach the skill only after validating the installed kagent skill schema. It supplements server enforcement. |
+| `token-efficient-query-skill/postgres-token-efficient-query/references/sql-policy-cases.json` | Use only if the deployed MCP already exposes SQL text. Do not add such a tool. |
+
+Do not assume filenames or framework structure match at work. The required
+outcome is the same server-side behaviour and test evidence, expressed as the
+smallest reviewable patch against the deployed version.
+
 ## Source package
 
 Use this directory as the source of truth. The implementation is in `adapter/`,
@@ -29,20 +66,37 @@ results, or workplace SQL into this public repository or handoff evidence.
    representative aggregate and broad-result questions. Inspect the installed
    Agent Gateway metrics rather than assuming metric names are unchanged.
 
+## Iterative upgrade sequence
+
+1. **Baseline:** inventory the deployed objects and digests, capture the current
+   bounded test questions, response bytes, and model input tokens, and save the
+   current image and Agent manifest as rollback inputs.
+2. **Adapter patch:** port only the server-side budget and its tests into the
+   workplace source. Review the diff against the deployed version.
+3. **Image:** build in approved CI, run tests, scan, sign, publish, and record an
+   immutable internal image digest. Do not change authentication or grants.
+4. **Adapter canary:** update only the image/configuration needed for one
+   reversible lower-environment or canary instance. Prove direct MCP and
+   Streamable HTTP bounds before changing Agent behaviour.
+5. **Agent instruction and skill canary:** add the truncation stopping rule and,
+   if compatible, attach the immutable skill image to the existing Agent. Do
+   not replace its other instructions, tools, identity, or Gateway wiring.
+6. **End-to-end comparison:** prove discovery, readiness, a sanitized A2A
+   question, and no automatic paging. Compare response bytes and model input
+   tokens with the baseline.
+7. **Decision gate:** report the exact workplace diff, digests, evidence,
+   measured change, and rollback. Stop before wider or production promotion.
+
+Retain only counts, limits, timings, hashes, and correlation IDs in evidence—not
+database rows.
+
 ## Primary lane: typed FastMCP
 
-1. Apply the adapter changes from this package. Preserve password versus UAMI
-   wiring; do not change authentication while making this upgrade.
-2. Run `scripts/verify-bundle.sh` and the adapter tests.
-3. Build in approved CI, scan, sign, publish, and record an immutable internal
-   image digest.
-4. Deploy one reversible lower-environment/canary instance with the existing
-   approved database view and identity.
-5. Prove the MCP response envelope, Gateway discovery, Agent readiness, and a
-   sanitized A2A question. A truncated response must not cause automatic paging.
-6. Compare response bytes and model input tokens with the baseline before wider
-   rollout. Retain only counts, limits, timings, hashes, and correlation IDs in
-   evidence—not database rows.
+The typed-tool lane is the default. Preserve every existing tool name,
+parameter, approved query, and allowlist unless a separately reviewed workplace
+change requires otherwise. Add the result budget around their returned rows;
+do not import the public POC's three example tools merely because they exist in
+this directory.
 
 Default limits are 50 rows, 32 KiB of adapter data, 512 characters per cell,
 and a five-second statement timeout. Configuration may lower them but cannot
