@@ -9,6 +9,30 @@
 > password/UAMI deployment instructions below describe the original reference
 > bundle and are not the workplace upgrade procedure.
 
+## Evidence and direction map
+
+Start with the workplace documents, then use the supporting material according
+to its evidence level:
+
+| Area | Document | What it establishes |
+|---|---|---|
+| Workplace starting instructions | [`WORK-AGENT-START-PROMPT.md`](WORK-AGENT-START-PROMPT.md) | The MCP is already deployed; inspect it and port only the applicable token-efficiency delta. |
+| Incremental implementation plan | [`WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md`](WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md) | Delta map, staged canary iterations, measurements, acceptance gates, and rollback boundary. |
+| Latest local Kubernetes proof | [`evidence/TOKEN-EFFICIENCY-GEEKOM-POC-2026-09-08.md`](evidence/TOKEN-EFFICIENCY-GEEKOM-POC-2026-09-08.md) | A 5,000-row synthetic match was bounded to 50 returned rows; direct and complete Streamable HTTP envelope sizes were measured. This is lab evidence, not workplace token telemetry. |
+| Earlier Azure/UAMI proof | [`evidence/FASTMCP-ENTRA-AKS-UAMI-POC-2026-08-19.md`](evidence/FASTMCP-ENTRA-AKS-UAMI-POC-2026-08-19.md) | Sanitized identity, database, TLS, approved-view, and direct MCP evidence for the reference adapter. |
+| External design direction | [`AGENTIC-DATABASE-TOKEN-EFFICIENCY-RESEARCH.md`](AGENTIC-DATABASE-TOKEN-EFFICIENCY-RESEARCH.md) | Primary-source comparison with semantic-query systems, schema selection, MCP resource links, kagent compaction, and criteria for keeping or replacing the MCP approach. |
+| Workplace domain-skill template | [`token-efficient-query-skill-template/postgres-domain-query-template/`](token-efficient-query-skill-template/postgres-domain-query-template/) | Fill-in structure for grain, metrics, dimensions, terminology, typed-tool routing, limits, verified question patterns, and evaluation cases. Do not install it unfilled. |
+| Generic behaviour example | [`token-efficient-query-skill/postgres-token-efficient-query/SKILL.md`](token-efficient-query-skill/postgres-token-efficient-query/SKILL.md) | Demonstrates aggregate-first routing and truncation behaviour used by the lab proof. It is not the finished workplace skill. |
+| Legacy SQL policy | [`token-efficient-query-skill/postgres-token-efficient-query/references/legacy-sql-policy.md`](token-efficient-query-skill/postgres-token-efficient-query/references/legacy-sql-policy.md) | Optional AST-enforced boundary only if the deployed MCP already exposes SQL text; do not add such a tool. |
+
+The direction is therefore evidence-backed but not yet workplace-proven. The
+remaining decisive evidence is a sanitized before/after canary through the
+installed Agent Gateway and kagent A2A path: complete MCP transport bytes,
+per-call and cumulative model-input tokens, retry/tool-call counts, truncation
+behaviour, compaction behaviour, answer correctness, and rollback. Do not claim
+the projected token reduction or promote more widely until those measurements
+pass the handoff's acceptance gates.
+
 This bundle contains one bounded FastMCP implementation and two PostgreSQL
 authentication deployments:
 
