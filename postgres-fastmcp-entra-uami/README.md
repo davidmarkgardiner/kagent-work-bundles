@@ -11,6 +11,48 @@ PostgreSQL Entra mapping, deploy the root UAMI target using the same image. The
 three tool names, parameters, approved-view SQL, Service, Gateway route,
 RemoteMCPServer, Agent, and verification flow remain the same.
 
+All tool results pass through the shared adapter's fail-closed response budget:
+50 rows, 32 KiB per MCP result, 512 characters per cell, and a five-second
+PostgreSQL statement timeout by default. Configuration can lower these values
+but cannot raise the compiled hard ceilings. Large exports must stay outside
+model context.
+
+## Why this should reduce token burn
+
+The expensive failure mode is not PostgreSQL executing a large query by itself;
+it is thousands of returned rows being serialized into an MCP response and then
+copied into the model's input context. This bundle limits that data before the
+MCP response is created:
+
+- the adapter fetches at most one row beyond the configured row budget instead
+  of materializing the complete result set;
+- row, byte, per-cell, and statement-time budgets are enforced in code with
+  compiled ceilings;
+- truncation is explicit metadata and is a stopping condition for the agent,
+  not permission to page repeatedly and reconstruct an export in chat;
+- the packaged skill directs the agent toward typed summaries, aggregates, and
+  narrower filters; and
+- any retained legacy SQL-text tool must reject projection `SELECT *`, broad
+  detail queries, writes, and unapproved sources using an AST-aware policy.
+  `COUNT(*)` remains valid because it returns an aggregate rather than every
+  column in every row.
+
+In the synthetic GEEKOM test, a query matching 5,000 rows returned 50 rows—a
+99% reduction in rows admitted to model context—and the complete Streamable
+HTTP MCP envelope was 24,963 bytes. This is evidence that the transport is
+bounded, not a claim of a 99% token saving: actual token reduction depends on
+the workplace schema, values, MCP client, prompts, and model. The workplace
+rollout must capture sanitized before/after input-token telemetry through the
+real Agent Gateway and kagent A2A path before claiming a measured saving. See
+[`evidence/TOKEN-EFFICIENCY-GEEKOM-POC-2026-09-08.md`](evidence/TOKEN-EFFICIENCY-GEEKOM-POC-2026-09-08.md).
+
+The complete work-agent upgrade package is
+[`WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md`](WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md).
+It includes the tested adapter, a reusable token-efficient PostgreSQL skill,
+legacy SQL policy cases, deployment gates, token-measurement requirements, and
+rollback instructions. Start the workplace agent with
+[`WORK-AGENT-START-PROMPT.md`](WORK-AGENT-START-PROMPT.md).
+
 This is a self-contained work bundle. Its deployable source is
 [`adapter/`](adapter/), and its live sanitized proof is
 [`evidence/FASTMCP-ENTRA-AKS-UAMI-POC-2026-08-19.md`](evidence/FASTMCP-ENTRA-AKS-UAMI-POC-2026-08-19.md).

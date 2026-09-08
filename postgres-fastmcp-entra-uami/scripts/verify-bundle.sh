@@ -29,10 +29,49 @@ if rg -n -i 'azure\.workload\.identity|UAMI_CLIENT_ID|DefaultAzureCredential' \
 fi
 
 python3 -c 'from pathlib import Path; [compile(p.read_text(), str(p), "exec") for p in (Path("'"$root"'") / "adapter").glob("*.py")]'
+(cd "$root/adapter" && python3 -m unittest -v test_result_budget.py)
+if rg -n 'fetchall\(' "$root/adapter/server.py"; then
+  echo "FASTMCP_UNBOUNDED_FETCH_FAILED" >&2
+  exit 1
+fi
+rg -q 'fetchmany\(RESULT_BUDGET\.max_rows \+ 1\)' "$root/adapter/server.py"
 sh -n "$root/adapter/verify-live.sh"
 if command -v shellcheck >/dev/null; then
   shellcheck "$root/adapter/verify-live.sh"
 fi
+
+python3 - "$root/token-efficient-query-skill/postgres-token-efficient-query/references/sql-policy-cases.json" <<'PY'
+import json
+from pathlib import Path
+import sys
+
+data = json.loads(Path(sys.argv[1]).read_text())
+cases = {case["id"]: case for case in data["cases"]}
+required = {
+    "allow-count-star": "allow",
+    "allow-filtered-group": "allow",
+    "deny-projection-star": "deny",
+    "deny-qualified-star": "deny",
+    "deny-unbounded-detail": "deny",
+    "deny-unapproved-source": "deny",
+    "deny-write-cte": "deny",
+    "deny-multiple-statements": "deny",
+}
+if {name: cases[name]["decision"] for name in required} != required:
+    raise SystemExit("SQL policy cases do not match the required decisions")
+if "count(*)" not in cases["allow-count-star"]["sql"].lower():
+    raise SystemExit("COUNT(*) allow case is missing")
+if "select *" not in cases["deny-projection-star"]["sql"].lower():
+    raise SystemExit("projection wildcard deny case is missing")
+print("POSTGRES_TOKEN_EFFICIENT_SQL_POLICY_CASES_OK")
+PY
+
+skill_root="$root/token-efficient-query-skill/postgres-token-efficient-query"
+rg -q '^name: postgres-token-efficient-query$' "$skill_root/SKILL.md"
+rg -q 'Treat `truncated: true` as a stopping condition' "$skill_root/SKILL.md"
+rg -q 'COPY postgres-token-efficient-query/ /' \
+  "$root/token-efficient-query-skill/Dockerfile"
+echo "POSTGRES_TOKEN_EFFICIENT_SKILL_PACKAGE_OK"
 
 # Kustomize requires the ignored workplace values file. When it is not present,
 # use the public placeholder template only to validate replacement structure.
