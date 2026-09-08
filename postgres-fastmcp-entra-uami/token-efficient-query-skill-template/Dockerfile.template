@@ -1,0 +1,5 @@
+FROM scratch
+
+# Rename both paths after copying postgres-domain-query-template/ to the
+# approved workplace skill name.
+COPY postgres-domain-query-template/ /postgres-domain-query-template/

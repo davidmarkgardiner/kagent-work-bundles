@@ -63,6 +63,13 @@ legacy SQL policy cases, deployment gates, token-measurement requirements, and
 rollback instructions. Start the workplace agent with
 [`WORK-AGENT-START-PROMPT.md`](WORK-AGENT-START-PROMPT.md).
 
+The generic POC skill is not the finished workplace skill. Copy and populate
+[`token-efficient-query-skill-template/postgres-domain-query-template/`](token-efficient-query-skill-template/postgres-domain-query-template/)
+with the approved data grain, metrics, dimensions, terminology, typed-tool
+routing, and sanitized evaluation cases. The external comparison and guidance
+on when MCP remains appropriate are in
+[`AGENTIC-DATABASE-TOKEN-EFFICIENCY-RESEARCH.md`](AGENTIC-DATABASE-TOKEN-EFFICIENCY-RESEARCH.md).
+
 This is a self-contained work bundle. Its deployable source is
 [`adapter/`](adapter/), and its live sanitized proof is
 [`evidence/FASTMCP-ENTRA-AKS-UAMI-POC-2026-08-19.md`](evidence/FASTMCP-ENTRA-AKS-UAMI-POC-2026-08-19.md).

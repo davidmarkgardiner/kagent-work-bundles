@@ -36,7 +36,8 @@ replacing it with this bundle:
 | `adapter/test_result_budget.py` and `adapter/test_server.py` | Port the budget and tool-contract tests into the workplace test layout. |
 | `adapter/verify_budget_live.py` and `adapter/verify_mcp_transport.py` | Reuse or adapt the marker-only direct and Streamable HTTP checks without recording workplace rows. |
 | Agent system instruction in both reference manifests | Add the truncation stopping rule to the existing Agent; do not replace the Agent manifest. |
-| `token-efficient-query-skill/` | Build and attach the skill only after validating the installed kagent skill schema. It supplements server enforcement. |
+| `token-efficient-query-skill/` | Use the generic POC skill only as behavioural reference and regression evidence. Do not install it unchanged at work. |
+| `token-efficient-query-skill-template/postgres-domain-query-template/` | Copy, rename, and populate the template with the approved workplace semantics, typed-tool routing, and sanitized evaluations. |
 | `token-efficient-query-skill/postgres-token-efficient-query/references/sql-policy-cases.json` | Use only if the deployed MCP already exposes SQL text. Do not add such a tool. |
 
 Do not assume filenames or framework structure match at work. The required
@@ -51,6 +52,8 @@ acceptance tests are in `tests/local-k8s/`.
 
 The sanitized GEEKOM test receipt is
 `evidence/TOKEN-EFFICIENCY-GEEKOM-POC-2026-09-08.md`.
+The external design review and decision criteria are in
+`AGENTIC-DATABASE-TOKEN-EFFICIENCY-RESEARCH.md`.
 
 Do not copy credentials, endpoints, identity IDs, database coordinates, query
 results, or workplace SQL into this public repository or handoff evidence.
@@ -79,11 +82,13 @@ results, or workplace SQL into this public repository or handoff evidence.
    reversible lower-environment or canary instance. Prove direct MCP and
    Streamable HTTP bounds before changing Agent behaviour.
 5. **Agent instruction and skill canary:** add the truncation stopping rule and,
-   if compatible, attach the immutable skill image to the existing Agent. Do
-   not replace its other instructions, tools, identity, or Gateway wiring.
+   if compatible, attach the immutable populated workplace skill image to the
+   existing Agent. Do not install the generic or unfilled template and do not
+   replace its other instructions, tools, identity, or Gateway wiring.
 6. **End-to-end comparison:** prove discovery, readiness, a sanitized A2A
-   question, and no automatic paging. Compare response bytes and model input
-   tokens with the baseline.
+   question, and no automatic paging. Inspect text/structured-content
+   duplication, compare response bytes and per-call/cumulative input tokens with
+   the baseline, and test kagent compaction below the model's hard limit.
 7. **Decision gate:** report the exact workplace diff, digests, evidence,
    measured change, and rollback. Stop before wider or production promotion.
 
@@ -116,11 +121,39 @@ from both the Agent and Gateway allowlists.
 
 ## Skill deployment
 
-Build `token-efficient-query-skill/Dockerfile`, publish it to the approved
-internal registry by immutable digest, and add that digest under the kagent
-Agent's `spec.skills.refs`. Validate the exact skill schema against the
-installed kagent CRD. The skill improves tool selection and truncation handling;
-it is not a permission boundary.
+The packaged `postgres-token-efficient-query` skill proves the generic behaviour
+in the public POC; it does not know the workplace data contract and must not be
+installed unchanged.
+
+Copy `token-efficient-query-skill-template/postgres-domain-query-template/` to a
+new, appropriately named workplace skill. Replace every placeholder with
+data-owner-approved information, keeping the entrypoint short and placing
+conditional domain detail in its references. Populate:
+
+- logical source, grain, freshness, and scope;
+- approved metrics, dimensions, filters, relationships, business terms, and
+  sensitive/large-field exclusions;
+- exact typed-tool routing, required parameters, top-N/bucket/lookup limits, and
+  the separate export or analysis-job route;
+- a small set of common verified question patterns; and
+- at least ten sanitized evaluations covering ambiguity, high cardinality,
+  truncation, forbidden fields, exports, and a follow-up turn.
+
+Rename both paths in `token-efficient-query-skill-template/Dockerfile.template`
+to match the copied skill. Validate the populated skill and installed kagent
+CRD schema, then build, publish, and attach the workplace skill by immutable
+internal digest under the existing Agent's `spec.skills.refs`. The skill
+improves tool selection and truncation handling; it is not a permission
+boundary.
+
+## Session-context backstop
+
+Inspect the installed kagent version and configure its supported context
+compaction fields using a threshold safely below the active model's hard context
+window. Measure when compaction occurs, what events remain, summary size, and
+answer continuity. Do not copy values from this public bundle without a
+workplace baseline. Server-side result limits remain the primary control because
+compaction occurs after tool data has already entered at least one model call.
 
 ## Acceptance gates
 
@@ -130,12 +163,18 @@ it is not a permission boundary.
   row and byte budgets with `truncated: true`.
 - The Streamable HTTP MCP response retains the bounded result and truncation
   metadata.
+- The complete client-visible transport envelope is measured, including any
+  structured-content copy serialized into text.
 - The Agent reports truncation and does not auto-page.
 - Projection `SELECT *` and `alias.*` fail if an SQL-text lane exists;
   `COUNT(*)` against an approved view passes.
 - Database base-table access and all writes remain denied.
 - Before/after response bytes and model input-token measurements demonstrate
   the reduction using sanitized evidence.
+- Per-call and cumulative session-token telemetry show that representative
+  follow-up conversations remain within the approved operating budget, and
+  compaction triggers before the model's hard context limit without preserving
+  old raw row payloads.
 
 ## Rollback
 

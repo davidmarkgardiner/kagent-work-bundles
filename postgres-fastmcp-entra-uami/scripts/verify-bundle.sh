@@ -73,6 +73,18 @@ rg -q 'COPY postgres-token-efficient-query/ /' \
   "$root/token-efficient-query-skill/Dockerfile"
 echo "POSTGRES_TOKEN_EFFICIENT_SKILL_PACKAGE_OK"
 
+template_root="$root/token-efficient-query-skill-template/postgres-domain-query-template"
+rg -q '^name: postgres-domain-query-template$' "$template_root/SKILL.md"
+rg -q 'Do not install this unfilled template' "$template_root/SKILL.md"
+for reference in data-contract.md tool-routing.md verified-question-patterns.md evaluation-cases.md; do
+  test -f "$template_root/references/$reference"
+done
+rg -Fq 'COPY postgres-domain-query-template/' \
+  "$root/token-efficient-query-skill-template/Dockerfile.template"
+rg -Fq '{{DOMAIN_NAME}}' "$template_root/references/data-contract.md"
+rg -q 'cumulative session tokens' "$template_root/references/evaluation-cases.md"
+echo "POSTGRES_DOMAIN_QUERY_SKILL_TEMPLATE_OK"
+
 # Kustomize requires the ignored workplace values file. When it is not present,
 # use the public placeholder template only to validate replacement structure.
 created_values=false
