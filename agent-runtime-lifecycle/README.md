@@ -5,6 +5,15 @@
 The API and UI do not decide how many pods run. The selected kagent resource
 and its runtime decide that.
 
+> **Management summary:** Today, each triage request runs in one Argo Workflow
+> caller pod. The Workflow cleanup policy removes that pod after completion.
+> The caller sends the request to a persistent kagent agent pod, which is reused
+> across triage requests. With Agent Substrate, each request can run in an
+> isolated sandbox restored onto a reusable worker. After the response, kagent
+> removes the sandbox from the worker and suspends its state. This improves
+> isolation and resource use, but it does not automatically erase retained
+> session data or snapshots.
+
 | Model | What starts for a request or chat? | What happens after an answer? |
 | --- | --- | --- |
 | Normal kagent `Agent` | Nothing new. The request uses an existing Deployment pod. | The pod stays running. Session IDs keep chat histories separate inside the shared service. |
