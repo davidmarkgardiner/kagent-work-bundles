@@ -30,6 +30,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 
 | Bundle | Capability | Primary outcome |
 |---|---|---|
+| `agent-runtime-lifecycle/` | Kagent chat, Argo/DeepEval, pod, actor, and harness lifecycles | Explains normal Deployment-backed agents, Argo and Job caller pods, DeepEval suites, Substrate-backed `SandboxAgent` sessions, and OpenClaw or Hermes `AgentHarness` behavior |
 | `postgres-natural-language-query-integration/` | Natural-language PostgreSQL query architecture | Compares retrieval-assisted text-to-SQL with typed MCP tools and defines how both chat front doors can share the FastMCP/UAMI execution boundary |
 | `postgres-mcpg-password/` | PostgreSQL MCPg username/password path | Deploys MCPg v0.7.1 with an approved TLS DSN Secret and SELECT-only database role; contains no UAMI/FastMCP deployment assets |
 | `postgres-fastmcp-entra-uami/` | PostgreSQL FastMCP password-to-UAMI path | Builds one bounded FastMCP image; deploys it first with a username/password Secret and later swaps only the database authentication wiring to AKS Workload Identity/UAMI |
