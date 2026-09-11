@@ -1,5 +1,34 @@
 # Kagent chat, pod, actor, and harness lifecycles
 
+## TLDR
+
+The API and UI do not decide how many pods run. The selected kagent resource
+and its runtime decide that.
+
+| Model | What starts for a request or chat? | What happens after an answer? |
+| --- | --- | --- |
+| Normal kagent `Agent` | Nothing new. The request uses an existing Deployment pod. | The pod stays running. Session IDs keep chat histories separate inside the shared service. |
+| Argo calls a normal `Agent` | Argo runs its caller pod or Workflow Agent. The target agent already exists. | The Argo pod follows Workflow cleanup policy. The target agent and MCP pods stay running. |
+| Kubernetes Job per request | Kubernetes creates a Job pod. | The process exits. A Job TTL or another controller must delete the Job and pod. |
+| Substrate `SandboxAgent` | kagent creates or resumes one logical actor for that session on a warm worker pod. | kagent snapshots and suspends the actor after the response body closes. The worker is wiped and reused. The actor remains until session cleanup. Snapshot bytes follow a separate retention policy. |
+| Substrate `AgentHarness` | The current implementation resumes one actor for the harness. Its ACP process holds multiple chat sessions. | Closing the UI connection leaves the actor running. An explicit suspend snapshots it and frees the worker. |
+
+Substrate does not normally create and delete one Kubernetes pod per prompt.
+It restores an isolated actor into an existing worker pod, runs the request,
+then removes that actor from the worker. For a `SandboxAgent`, each independent
+chat or Argo incident must use a unique `contextId`. Reusing a `contextId`
+intentionally reuses the same actor and conversation state.
+
+The active environment is disposable. Its saved state is not. Suspending an
+actor preserves its memory and disk snapshot. Deleting the kagent session
+deletes the actor record, but snapshot data follows the Substrate storage and
+garbage-collection policy.
+
+Read the rest of this page for the exact API, UI, isolation, and cleanup
+lifecycles.
+
+## Scope
+
 This page explains what starts when a user opens a chat or sends a request to
 kagent. It compares four execution models and the Argo caller lifecycle:
 
@@ -8,41 +37,9 @@ kagent. It compares four execution models and the Argo caller lifecycle:
 - a kagent `SandboxAgent` backed by Agent Substrate; and
 - an OpenClaw or Hermes `AgentHarness`, which also runs on Agent Substrate.
 
-This page covers the two likely meanings of the earlier wording: an Argo
-Workflow that calls a kagent API, and an `AgentHarness` backend such as Hermes.
-The UI, API, A2A, and ACP are request or control protocols. They do not decide
-the compute lifecycle by themselves. The Kubernetes resource type and the
-configured runtime decide it.
-
-## Short answer
-
-A normal kagent chat does not start one pod and delete it when the chat ends.
-The kagent controller creates an agent `Deployment` when it reconciles the
-`Agent` resource. Kubernetes starts the configured number of pods, normally
-one, before any chat begins. UI and A2A requests reuse those pods. Closing the
-browser or switching chats does not delete or restart them.
-
-A Job-per-request design does create a pod for a bounded task. The container
-exits when the task finishes. The completed Job and pod remain in the API until
-a controller or operator removes them. Set `ttlSecondsAfterFinished` if the
-platform should delete them automatically.
-
-When an Argo Workflow step calls an already deployed agent, only the Argo
-caller reaches completion after the response. The target kagent agent pod and
-its MCP server are separate workloads and remain running. The completed Argo
-pod is deleted only when the Workflow has an appropriate pod garbage collection
-or retention policy.
-
-Agent Substrate normally does not create a new Kubernetes pod for every
-request. It keeps a smaller pool of worker pods ready. A request restores a
-logical actor into a free worker. Suspending the actor checkpoints its state and
-releases the worker, but the worker pod remains running.
-
-An `AgentHarness` for OpenClaw or Hermes uses Agent Substrate. It is not an
-alternative to Substrate. In the current implementation, the first chat creates
-or resumes one shared harness actor. Multiple ACP chat sessions run inside that
-actor. Closing a browser connection leaves the actor running. Use the explicit
-suspend action to checkpoint it and free its worker slot.
+The UI, API, A2A, and ACP are request and control protocols. The Kubernetes
+resource type and configured runtime control the compute lifecycle. An Argo
+Workflow is a caller unless its templates run the agent process themselves.
 
 ## Keep the resource lifecycles separate
 
@@ -60,6 +57,43 @@ lifetimes.
 Stopping a chat does not imply that Kubernetes stops an agent pod. Suspending
 an actor does not imply that Kubernetes deletes a worker pod. Suspending an
 agent also does not stop a separate PostgreSQL MCP server.
+
+## How chats remain separate
+
+A normal `Agent` uses logical session isolation. The A2A `contextId` becomes
+the kagent session ID. kagent loads events by the user ID and session ID before
+each request. Separate IDs therefore produce separate model histories even
+when the requests enter the same Deployment pod.
+
+Logical isolation is not a separate security boundary. Sessions in one agent
+pod share the process, filesystem, service account, credentials, CPU, and
+memory. A bad custom tool can leak state through a global variable, a shared
+temporary filename, or an unkeyed cache. A crash, memory leak, or stuck request
+can also affect every chat on that replica.
+
+A Substrate `SandboxAgent` adds an execution boundary. Each session ID maps to
+one actor with its own sandboxed process, memory, and disk state. Sessions can
+use the same worker pod at different times, but Substrate wipes the worker
+before reassigning it. This design reduces cross-session process and filesystem
+risk. It does not isolate shared databases, MCP servers, model quotas, or
+credentials unless those systems also enforce a separate identity or policy.
+
+Use these controls in either model:
+
+- Generate an unguessable `contextId` for every independent chat or incident.
+- Bind the session to the authenticated user or tenant.
+- Reuse a `contextId` only when the caller wants conversation continuity.
+- Give the agent and its MCP tools the least privilege they need.
+- Keep custom tools stateless, or key their state by both the user and session.
+- Set request, concurrency, timeout, token, CPU, and memory limits.
+- Record the `contextId`, Argo Workflow UID, agent name, and tool calls in traces.
+- Test two concurrent sessions with unique sentinel values and check responses,
+  tool calls, files, and logs for cross-session data.
+
+Use separate agents, identities, namespaces, or WorkerPools when tenants do not
+trust each other. A per-session actor limits the execution failure domain, but
+an overprivileged shared database credential keeps a shared data failure
+domain.
 
 ## Normal kagent Agent
 
@@ -288,9 +322,42 @@ finishes reading the response body. This means the actor can be suspended
 between two turns in an open UI chat. The user does not need to close the chat
 first.
 
-Deleting a kagent session can delete that session's actor. Deleting the
-`SandboxAgent` cleans up the actors and generated templates that it owns. The
-platform-owned `WorkerPool` remains.
+### API and Argo lifecycle
+
+An API caller supplies the A2A `contextId`. For the first request with that ID,
+kagent creates an actor from the current ready `ActorTemplate`. Substrate starts
+the actor from the golden snapshot on a free worker. For later requests, kagent
+resumes the same actor from its latest snapshot.
+
+After the client consumes or closes the streaming response, kagent schedules a
+suspend operation. Substrate captures the actor's memory and disk, stores the
+snapshot, wipes the worker, and returns the worker to the pool. The Argo caller
+pod then follows the Workflow's separate cleanup policy.
+
+Use one new `contextId` per independent triage request. If an Argo retry must
+continue the same analysis, reuse the original ID deliberately. Do not use one
+fixed ID for unrelated incidents because that joins their agent state.
+
+### UI lifecycle
+
+The UI creates a kagent session for a new chat and uses its ID as the A2A
+`contextId`. Each `SandboxAgent` chat therefore gets a separate actor.
+
+The actor does not need to remain active while the user reads the answer. It
+can suspend as soon as the response stream closes, even if the browser tab
+remains open. The next message resumes the same actor and restores its saved
+memory and disk.
+
+Closing the browser does not delete the session or actor. When the user deletes
+the kagent session, the controller deletes the session row and makes a
+best-effort request to delete its actor. Deleting the `SandboxAgent` cleans up
+all actors and generated templates that it owns. Neither operation deletes the
+platform-owned `WorkerPool`.
+
+Actor deletion and snapshot deletion are separate concerns. The current
+Substrate architecture states that snapshot garbage collection is not yet
+implemented. Treat stored snapshots as retained sensitive data until the
+installed version and storage policy prove their removal.
 
 ### Benefits
 
@@ -310,6 +377,8 @@ platform-owned `WorkerPool` remains.
   the pool has no capacity, depending on the installed version and caller.
 - Snapshot confidentiality, integrity, retention, and deletion need explicit
   controls.
+- Actor deletion might not remove snapshot bytes immediately. Verify the
+  installed version's garbage-collection behavior.
 - Debugging crosses kagent, the Substrate control plane, the router, the worker,
   and snapshot storage.
 - The APIs are changing faster than standard Kubernetes workload APIs. Pin and
@@ -455,10 +524,17 @@ source on 2026-09-11:
 - Kagent `AgentHarness`, OpenClaw, Hermes, and shared ACP sessions:
   https://kagent.dev/docs/kagent/concepts/agent-harness/
 - Current kagent A2A transport that suspends a `SandboxAgent` after a response:
-  https://github.com/kagent-dev/kagent/blob/main/go/core/internal/a2a/substrate_sandbox_transport.go
+  https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/go/core/internal/a2a/substrate_sandbox_transport.go
+- Current kagent session-to-actor mapping and suspend behavior:
+  https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/go/core/pkg/sandboxbackend/substrate/agent_actor.go
+- Current kagent mapping from A2A `contextId` to the session ID:
+  https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/python/packages/kagent-adk/src/kagent/adk/converters/request_converter.py
+- Current kagent session deletion and actor cleanup:
+  https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/go/core/internal/httpserver/handlers/sessions.go
 - Current kagent harness gateway and explicit session lifecycle handlers:
-  https://github.com/kagent-dev/kagent/blob/main/go/core/internal/httpserver/handlers/agentharness_gateway.go
-  https://github.com/kagent-dev/kagent/blob/main/go/core/internal/httpserver/handlers/agentharness_session.go
+  https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/go/core/internal/httpserver/handlers/agentharness_gateway.go
+  https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/go/core/internal/httpserver/handlers/agentharness_session.go
+  https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/go/core/pkg/sandboxbackend/substrate/agentharness_actor.go
 - Agent Substrate architecture and actor lifecycle:
   https://github.com/agent-substrate/substrate/blob/main/docs/architecture.md
 - Kubernetes Deployments:
