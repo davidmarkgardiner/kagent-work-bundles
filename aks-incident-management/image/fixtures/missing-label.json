@@ -1,0 +1,17 @@
+{
+  "fingerprint": "work-cluster-a:payments:deployment:checkout-worker:missing-service-label",
+  "severity": "SEV-3",
+  "service": "checkout-worker",
+  "namespace": "payments",
+  "summary": "checkout-worker is missing the required service ownership label",
+  "reason": "MissingServiceLabel",
+  "approval_flow": "remediation",
+  "started_at": "2026-09-13T08:05:00Z",
+  "remediation": {
+    "kind": "kubernetes-label",
+    "workload": "checkout-worker",
+    "label_key": "app.kubernetes.io/name",
+    "label_value": "checkout-worker",
+    "expected_state": "missing:app.kubernetes.io/name"
+  }
+}

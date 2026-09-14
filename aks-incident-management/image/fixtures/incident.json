@@ -1,0 +1,29 @@
+{
+  "fingerprint": "checkout-api-high-error-rate",
+  "severity": "SEV-1",
+  "service": "checkout-api",
+  "summary": "Checkout API error rate reached 18.7%",
+  "started_at": "2026-09-11T08:42:00Z",
+  "impact": {
+    "failed_checkouts_per_minute": 782,
+    "regions": ["eu-west-1", "eu-central-1"]
+  },
+  "metrics": {
+    "http_5xx_percent": 18.7,
+    "redis_waiting_requests": 143,
+    "redis_connection_pool_max": 8
+  },
+  "deployment": {
+    "current_version": "2026.09.11.4",
+    "previous_healthy_version": "2026.09.11.3",
+    "deployed_at": "2026-09-11T08:36:00Z",
+    "change": "Reduced Redis max_connections from 64 to 8",
+    "pull_request": 418,
+    "commit": "8c41f2e"
+  },
+  "similar_incident": {
+    "id": "INC-0931",
+    "root_cause": "Redis connection pool exhaustion after an undersized pool rollout",
+    "mitigation": "Rollback and verify queue depth, error rate, and checkout success rate"
+  }
+}

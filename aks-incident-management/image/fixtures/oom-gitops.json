@@ -1,0 +1,18 @@
+{
+  "fingerprint": "work-cluster-a:payments:deployment:checkout-worker:oomkilled",
+  "severity": "SEV-2",
+  "service": "checkout-worker",
+  "namespace": "payments",
+  "summary": "checkout-worker restarted after OOMKilled",
+  "reason": "OOMKilled",
+  "container": "worker",
+  "approval_flow": "merge_request",
+  "started_at": "2026-09-13T08:00:00Z",
+  "remediation": {
+    "kind": "gitops-memory",
+    "workload": "checkout-worker",
+    "current_memory_limit": "256Mi",
+    "proposed_memory_request": "256Mi",
+    "proposed_memory_limit": "512Mi"
+  }
+}

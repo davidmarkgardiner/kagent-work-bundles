@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hybrid Incident Command</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">Argo × local kagent incident control plane</p>
+          <h1>Incident command</h1>
+          <p class="lede">One durable incident. One local investigation runtime. One human-gated output boundary.</p>
+        </div>
+        <div class="status" id="runtime-status"><span></span>Checking runtime</div>
+      </header>
+      <section class="runtime-grid" id="runtime-grid" aria-label="Runtime status"></section>
+      <section class="incident-card">
+        <div><p class="severity" id="severity">SEV-1</p><h2 id="summary">Loading incident</h2><p class="meta" id="service"></p></div>
+        <div class="incident-actions"><button id="run-remediation">Run remediation approval</button><button id="run-merge">Run merge approval</button><button id="redeliver" class="reject" disabled>Redeliver same alert</button></div>
+      </section>
+      <section class="pipeline" id="pipeline" aria-label="Incident workflow"></section>
+      <section class="workspace">
+        <div class="panel evidence-panel">
+          <div class="panel-heading"><div><p class="eyebrow">Investigation</p><h3>Evidence and agents</h3></div><span id="incident-id">not started</span></div>
+          <div id="agents" class="agents empty">Inject the fixture alert to start the coordinator.</div>
+        </div>
+        <aside class="panel finding-panel">
+          <p class="eyebrow">Coordinator synthesis</p><h3 id="cause">Waiting for evidence</h3>
+          <p id="impact" class="muted">The canonical record will collect deterministic and live read-only findings.</p>
+          <div class="proposal hidden" id="proposal"><p class="eyebrow">Proposed mitigation</p><strong id="proposal-text"></strong><ul id="checks"></ul></div>
+          <div class="outputs hidden" id="outputs"><p class="eyebrow">GitLab record</p><div id="output-links"></div></div>
+          <div class="approval hidden" id="approval"><p id="approval-question">This records a responder decision.</p><p>The Argo workflow is suspended for up to 72 hours. Approval unlocks only this action, target, and version or commit SHA.</p><div><button data-decision="approved" class="approve" id="approve-action">Approve</button><button data-decision="rejected" class="reject">Reject</button></div></div>
+          <button id="resolve" class="resolve hidden">Close without execution</button><p id="decision" class="decision"></p>
+        </aside>
+      </section>
+      <section class="panel timeline-panel"><div class="panel-heading"><div><p class="eyebrow">Audit trail</p><h3>Incident timeline</h3></div><span id="delivery-count">0 deliveries</span></div><ol id="timeline" class="timeline"><li>Waiting for an alert.</li></ol></section>
+      <footer><span>PostgreSQL incident ledger</span><span>Read-only investigator</span><span>Bounded executor</span><span>GitLab MCP</span><span>72h Argo gate</span></footer>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
