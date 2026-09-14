@@ -1,0 +1,85 @@
+fullnameOverride: kubernetes-mcp-fleet
+
+# Start with one replica for the first controlled deployment. Change
+# REPLICA_COUNT in work-values.env after capacity and rollout checks.
+replicaCount: 1
+
+image:
+  # scripts/deploy.sh must override all three values from work-values.env.
+  # Fail closed instead of accidentally pulling from a public registry.
+  registry: REPLACE_WITH_INTERNAL_REGISTRY
+  repository: REPLACE_WITH_INTERNAL_REPOSITORY
+  version: REPLACE_WITH_INTERNAL_TAG
+  pullPolicy: IfNotPresent
+
+# Set by scripts/deploy.sh to the immutable Secret created by the credential job.
+kubeconfigSecretName: REPLACE_WITH_IMMUTABLE_SECRET_NAME
+
+serviceAccount:
+  create: true
+  name: kubernetes-mcp-fleet
+  automountToken: false
+
+# The pod authenticates only with the mounted, target-specific kubeconfig.
+rbac:
+  create: false
+
+podLabels:
+  app.kubernetes.io/part-of: kubernetes-mcp-fleet-poc
+  kubernetes-mcp-fleet/access: server
+  azure.workload.identity/use: "true"
+
+podAnnotations:
+  kubernetes-mcp-fleet/credential-revision: "{{ .Values.kubeconfigSecretName }}"
+
+ingress:
+  enabled: false
+
+httpRoute:
+  enabled: false
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: http
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+config:
+  port: "8080"
+  stateless: true
+  read_only: true
+  disable_destructive: true
+  cluster_provider_strategy: kubeconfig
+  cluster_auth_mode: kubeconfig
+  kubeconfig: /etc/kubernetes-mcp-server/fleet/kubeconfig
+  list_output: table
+  toolsets:
+    - core
+  # Populated from TOOL_ALLOWLIST by deploy.sh/verify-bundle.sh. Do not run
+  # Helm manually with this empty list: upstream interprets it as no filter,
+  # which exposes every tool in the selected toolsets.
+  enabled_tools: []
+
+extraVolumes:
+  - name: fleet-kubeconfig
+    secret:
+      secretName: "{{ .Values.kubeconfigSecretName }}"
+      optional: false
+      items:
+        - key: kubeconfig
+          path: kubeconfig
+      # Secret volumes are owned by root; 0444 lets the non-root process read
+      # the credential file while the read-only mount prevents modification.
+      defaultMode: 292
+
+extraVolumeMounts:
+  - name: fleet-kubeconfig
+    mountPath: /etc/kubernetes-mcp-server/fleet
+    readOnly: true
