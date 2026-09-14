@@ -30,8 +30,9 @@ intentionally reuses the same actor and conversation state.
 
 The active environment is disposable. Its saved state is not. Suspending an
 actor preserves its memory and disk snapshot. Deleting the kagent session
-deletes the actor record, but snapshot data follows the Substrate storage and
-garbage-collection policy.
+starts cleanup, but physical deletion depends on the installed kagent and
+Substrate versions, snapshot ownership, and every external system that copied
+the data. See [Retained data and deletion](#retained-data-and-deletion).
 
 Read the rest of this page for the exact API, UI, isolation, and cleanup
 lifecycles.
@@ -103,6 +104,108 @@ Use separate agents, identities, namespaces, or WorkerPools when tenants do not
 trust each other. A per-session actor limits the execution failure domain, but
 an overprivileged shared database credential keeps a shared data failure
 domain.
+
+## Retained data and deletion
+
+### TLDR
+
+Pod cleanup is not data deletion. An Argo pod can disappear while its Workflow,
+archived output, central logs, kagent session history, Substrate snapshot, model
+provider record, and database backups still exist.
+
+Use the shortest retention period that the data owner and security team can
+justify. Remove sensitive fields before they enter the prompt where possible.
+Delete a Substrate actor when it no longer needs to resume. Do not rely on
+actor suspension because suspension deliberately preserves state.
+
+### What the installed versions do
+
+Live `red` cluster evidence captured on 2026-09-14 showed kagent
+v0&#46;10&#46;0-beta7 and Substrate `v0.0.8`. Verify the installed versions again
+before changing a production retention policy.
+
+In the installed kagent beta, deleting a UI or API session soft-deletes the
+session row by setting `deleted_at`. Related events, tasks, and other records
+are not physically removed by that operation. The handler then makes a
+best-effort request to delete the related Substrate actor. A failed actor
+cleanup must therefore be retried and monitored.
+
+Newer kagent releases support `database.postgres.sessionRetentionDays`. The
+default value of `0` disables scheduled cleanup. A positive value hard-deletes
+idle sessions and their related events, tasks, checkpoints, shares, push
+notifications, memory, and flow state. For example:
+
+```yaml
+database:
+  postgres:
+    sessionRetentionDays: 30
+```
+
+The value `30` is an example, not a recommendation. Agree the period with the
+data owner and security team, confirm version compatibility, test the deletion
+path, and then deploy it through the normal delivery process.
+
+For Substrate, deletion behavior is version-specific:
+
+- On the installed `v0.0.8`, physical snapshot deletion has not been proven.
+- In documented `v0.1.0` behavior, an actor owns its current snapshot. A later
+  suspension replaces the previous actor-owned snapshot, and deleting the
+  actor deletes its actor-owned snapshot.
+- A snapshot tag owns a separate copy. That copy remains until the tag is
+  deleted. Do not delete a tag while actors still borrow its snapshot.
+
+Do not apply the `v0.1.0` guarantee to `v0.0.8` without a version-specific
+storage deletion test.
+
+### Systems that need their own retention policy
+
+Cleaning one layer does not clean the others. Review each place where prompt,
+tool, or response data can be retained:
+
+| Layer | Required control |
+| --- | --- |
+| kagent PostgreSQL | Hard-delete expired sessions and related rows after the approved period. |
+| Substrate | Delete actors that no longer need to resume. Review and delete unneeded tags and confirm object removal. |
+| Argo Workflows | Set pod garbage collection, Workflow TTL, archive retention, and artifact-store lifecycle rules. |
+| Application and central logs | Redact sensitive content and set retention for controller, agent, MCP, gateway, and log-platform data. |
+| Traces and telemetry | Avoid prompt or tool-result bodies unless justified. Set retention in OpenTelemetry and its backend. |
+| Tickets and notifications | Avoid copying full prompts or results. Apply the destination system's retention and access policy. |
+| Model provider | Confirm the provider's data-use and retention settings for the selected API and account. |
+| PostgreSQL backups | Align backup and point-in-time recovery windows with the approved deletion policy. |
+| Agent memory | Disable long-term memory when it is unnecessary. Expire or delete it independently when enabled. |
+
+### Recommended cleanup process
+
+1. Classify the data and agree separate retention periods for raw content and
+   minimal audit metadata.
+2. Prevent unnecessary capture. Redact or minimise CID data before the model,
+   avoid full responses in stdout or tickets, and disable content tracing or
+   long-term memory where it is not required.
+3. Upgrade kagent only after compatibility review, then configure and monitor
+   its hard-delete retention job.
+4. Delete completed Substrate actors instead of only suspending them. Delete
+   unused snapshot tags separately after confirming that no actor borrows them.
+5. Align Argo, log, trace, artifact, provider, ticket, and backup retention with
+   the same approved policy.
+6. Retry cleanup failures and alert when deletion exceeds its expected time.
+7. Prove the whole path with a synthetic, non-sensitive marker.
+
+The deletion test should show all of the following:
+
+- the session is absent from the API;
+- related PostgreSQL child-row counts are zero;
+- the Substrate actor returns `NotFound`;
+- the actor-owned snapshot prefix is absent from object storage;
+- every remaining snapshot tag has a documented owner and purpose;
+- Argo pods, Workflow records, archives, and artifacts expire as configured;
+- logs, traces, tickets, provider records, backups, and agent memory follow
+  their documented expiry schedules.
+
+Keep small audit records where they are required, such as the timestamp,
+incident ID, agent and tool names, outcome, and deletion status. Retaining raw
+prompts and tool results needs a separate justification. This approach reduces
+breach exposure, accidental disclosure, and storage growth without discarding
+the minimum evidence needed for incident audit.
 
 ## Normal kagent Agent
 
@@ -363,10 +466,11 @@ best-effort request to delete its actor. Deleting the `SandboxAgent` cleans up
 all actors and generated templates that it owns. Neither operation deletes the
 platform-owned `WorkerPool`.
 
-Actor deletion and snapshot deletion are separate concerns. The current
-Substrate architecture states that snapshot garbage collection is not yet
-implemented. Treat stored snapshots as retained sensitive data until the
-installed version and storage policy prove their removal.
+Actor deletion and snapshot deletion are separate concerns on the installed
+`v0.0.8` deployment because physical snapshot removal has not been proven.
+Substrate `v0.1.0` documents owner-based cleanup, but tagged snapshots have a
+separate owner and lifetime. Treat every stored snapshot as retained sensitive
+data until the installed version and storage policy prove its removal.
 
 ### Benefits
 
@@ -521,8 +625,9 @@ kubectl -n {{WORK_NAMESPACE}} get pods -l workflows.argoproj.io/workflow={{WORKF
 
 ## Sources
 
-This explanation was checked against the following upstream documentation and
-source on 2026-09-11:
+This explanation and the `red` cluster versions quoted above were reviewed on
+2026-09-14 against the following upstream documentation, source, and live
+deployment images:
 
 - Kagent agents and deployment-backed agents:
   https://kagent.dev/docs/kagent/concepts/agents/
@@ -540,12 +645,20 @@ source on 2026-09-11:
   https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/python/packages/kagent-adk/src/kagent/adk/converters/request_converter.py
 - Current kagent session deletion and actor cleanup:
   https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/go/core/internal/httpserver/handlers/sessions.go
+- Installed kagent session soft-delete query:
+  https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/go/core/internal/database/queries/sessions.sql
+- Kagent session cleanup configuration:
+  https://kagent.dev/docs/kagent/operations/operational-considerations/#session-cleanup
+- Kagent v0&#46;10&#46;1 hard-delete queries and related-data cleanup:
+  https://github.com/kagent-dev/kagent/blob/a3d26eaf2eda002d9c9104d2a8f6f27a2ff23ec3/go/core/internal/database/queries/sessions.sql#L48-L109
 - Current kagent harness gateway and explicit session lifecycle handlers:
   https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/go/core/internal/httpserver/handlers/agentharness_gateway.go
   https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/go/core/internal/httpserver/handlers/agentharness_session.go
   https://github.com/kagent-dev/kagent/blob/446cfcf7104f309e782ab87d20cd72306d98f150/go/core/pkg/sandboxbackend/substrate/agentharness_actor.go
 - Agent Substrate architecture and actor lifecycle:
   https://github.com/agent-substrate/substrate/blob/main/docs/architecture.md
+- Agent Substrate `v0.1.0` snapshot ownership and lifetime:
+  https://github.com/agent-substrate/substrate/blob/v0.1.0/docs/api-guide.md#snapshot-lifetime
 - Kubernetes Deployments:
   https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 - Kubernetes Jobs and TTL cleanup:
