@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: dice-daily-cluster-health
+  namespace: argo-events
+  labels:
+    app.kubernetes.io/name: dice-daily-cluster-health
+    app.kubernetes.io/part-of: dice
+    dice.platform/workstream: daily-health
+spec:
+  schedules:
+    - "0 7 * * *"
+  timezone: Europe/London
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 900
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 7
+  suspend: true
+  workflowSpec:
+    workflowTemplateRef:
+      name: cluster-certification
+    serviceAccountName: argo-events-sa
+    activeDeadlineSeconds: 1200
+    ttlStrategy:
+      secondsAfterSuccess: 604800
+      secondsAfterFailure: 1209600
+    synchronization:
+      mutexes:
+        - name: dice-daily-cluster-health-red
+    arguments:
+      parameters:
+        - name: cluster-name
+          value: red

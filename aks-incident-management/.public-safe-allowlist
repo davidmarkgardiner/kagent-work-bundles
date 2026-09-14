@@ -1,0 +1,4 @@
+# Dependency lock contains version strings that resemble private IPv4 prefixes.
+**/package-lock.json
+# Local npm installs are generated verification material, never part of the bundle.
+**/node_modules/**
