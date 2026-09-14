@@ -1,0 +1,45 @@
+{
+  "contract": "postgres-token-efficient-sql-policy-v1",
+  "cases": [
+    {
+      "id": "allow-count-star",
+      "decision": "allow",
+      "sql": "SELECT count(*) FROM approved.inventory_view WHERE observed_at >= $1"
+    },
+    {
+      "id": "allow-filtered-group",
+      "decision": "allow",
+      "sql": "SELECT region, count(*) AS total FROM approved.inventory_view WHERE observed_at >= $1 GROUP BY region LIMIT 20"
+    },
+    {
+      "id": "deny-projection-star",
+      "decision": "deny",
+      "sql": "SELECT * FROM approved.inventory_view"
+    },
+    {
+      "id": "deny-qualified-star",
+      "decision": "deny",
+      "sql": "SELECT inventory.* FROM approved.inventory_view AS inventory LIMIT 20"
+    },
+    {
+      "id": "deny-unbounded-detail",
+      "decision": "deny",
+      "sql": "SELECT namespace_name, owner_team FROM approved.inventory_view"
+    },
+    {
+      "id": "deny-unapproved-source",
+      "decision": "deny",
+      "sql": "SELECT namespace_name FROM private.raw_inventory LIMIT 20"
+    },
+    {
+      "id": "deny-write-cte",
+      "decision": "deny",
+      "sql": "WITH changed AS (DELETE FROM approved.inventory_view RETURNING *) SELECT count(*) FROM changed"
+    },
+    {
+      "id": "deny-multiple-statements",
+      "decision": "deny",
+      "sql": "SELECT count(*) FROM approved.inventory_view; SELECT current_user"
+    }
+  ]
+}

@@ -3,6 +3,10 @@
 The primary workplace path is one FastMCP implementation with two separate
 authentication deployments. Do not deploy the MCPg bundle for this proof.
 
+For the tested model-context/token-efficiency upgrade and work-agent handoff,
+start with
+[`postgres-fastmcp-entra-uami/WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md`](postgres-fastmcp-entra-uami/WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md).
+
 For the comparison with retrieval-assisted text-to-SQL and the recommended
 shared-backend integration, read
 [`postgres-natural-language-query-integration/`](postgres-natural-language-query-integration/).

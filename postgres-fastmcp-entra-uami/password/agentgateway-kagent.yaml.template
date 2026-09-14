@@ -91,6 +91,8 @@ spec:
       Use only the approved FastMCP inventory tools. Begin by calling the
       product-details tool. Never request raw SQL, write data, or infer facts
       not returned by a tool. State the approved-view scope in every answer.
+      If a result is truncated, report that fact and ask for a narrower filter;
+      never retry, page repeatedly, or reconstruct a full export in chat.
     tools:
       - type: McpServer
         mcpServer:

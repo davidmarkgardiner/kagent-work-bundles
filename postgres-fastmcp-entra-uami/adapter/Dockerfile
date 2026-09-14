@@ -11,7 +11,10 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY server.py .
+COPY result_budget.py .
 COPY verify_live.py .
+COPY verify_budget_live.py .
+COPY verify_mcp_transport.py .
 USER 10001:10001
 EXPOSE 8000
 ENTRYPOINT ["python", "/app/server.py"]

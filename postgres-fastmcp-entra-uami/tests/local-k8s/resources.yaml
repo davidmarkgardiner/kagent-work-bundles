@@ -1,0 +1,173 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-budget-init
+data:
+  00-init.sh: |
+    #!/bin/sh
+    set -eu
+    psql --set ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" \
+      --set reader_credential="$READER_PASSWORD" <<'SQL'
+    CREATE ROLE budget_reader LOGIN PASSWORD :'reader_credential';
+    CREATE SCHEMA work_inventory;
+    CREATE TABLE work_inventory.inventory_source (
+      namespace_name text NOT NULL,
+      owner_team text NOT NULL,
+      workload_type text NOT NULL,
+      lob text NOT NULL,
+      region text NOT NULL,
+      workload_count integer NOT NULL,
+      running_pod_count integer NOT NULL,
+      observed_at timestamptz NOT NULL
+    );
+    INSERT INTO work_inventory.inventory_source
+    SELECT 'bulk-test',
+           'synthetic-team-' || series,
+           'Deployment',
+           'synthetic-lob',
+           'uksouth',
+           series,
+           series,
+           now()
+    FROM generate_series(1, 5000) AS series;
+    CREATE VIEW work_inventory.approved_namespaces AS
+      SELECT * FROM work_inventory.inventory_source;
+    GRANT CONNECT ON DATABASE budget_test TO budget_reader;
+    GRANT USAGE ON SCHEMA work_inventory TO budget_reader;
+    GRANT SELECT ON work_inventory.approved_namespaces TO budget_reader;
+    SQL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-budget
+spec:
+  selector:
+    app.kubernetes.io/name: postgres-budget
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-budget
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres-budget
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres-budget
+    spec:
+      automountServiceAccountToken: false
+      initContainers:
+        - name: prepare-tls
+          image: pgvector/pgvector:0.8.6-pg17-bookworm
+          command: ["sh", "-ec"]
+          args:
+            - cp /input-tls/tls.crt /tls/server.crt;
+              cp /input-tls/tls.key /tls/server.key;
+              chown 999:999 /tls/server.crt /tls/server.key;
+              chmod 600 /tls/server.key
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - {name: input-tls, mountPath: /input-tls, readOnly: true}
+            - {name: postgres-tls, mountPath: /tls}
+      containers:
+        - name: postgres
+          image: pgvector/pgvector:0.8.6-pg17-bookworm
+          args:
+            - -c
+            - ssl=on
+            - -c
+            - ssl_cert_file=/tls/server.crt
+            - -c
+            - ssl_key_file=/tls/server.key
+          ports:
+            - {name: postgres, containerPort: 5432}
+          env:
+            - {name: POSTGRES_DB, value: budget_test}
+            - {name: POSTGRES_USER, value: postgres}
+            - name: POSTGRES_PASSWORD
+              valueFrom: {secretKeyRef: {name: postgres-budget-credentials, key: admin-credential}}
+            - name: READER_PASSWORD
+              valueFrom: {secretKeyRef: {name: postgres-budget-credentials, key: reader-credential}}
+          readinessProbe:
+            exec: {command: ["sh", "-ec", "pg_isready -U postgres -d budget_test"]}
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          volumeMounts:
+            - {name: postgres-init, mountPath: /docker-entrypoint-initdb.d, readOnly: true}
+            - {name: postgres-tls, mountPath: /tls, readOnly: true}
+      volumes:
+        - name: input-tls
+          secret: {secretName: postgres-budget-tls}
+        - name: postgres-init
+          configMap: {name: postgres-budget-init, defaultMode: 0555}
+        - name: postgres-tls
+          emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastmcp-budget
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fastmcp-budget
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: fastmcp-budget
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: fastmcp
+          image: fastmcp-postgres-budget:local
+          imagePullPolicy: Never
+          ports:
+            - {name: mcp, containerPort: 8000}
+          env:
+            - {name: POSTGRES_AUTH_MODE, value: password}
+            - {name: POSTGRES_HOST, value: postgres-budget}
+            - {name: POSTGRES_DATABASE, value: budget_test}
+            - {name: APPROVED_VIEW, value: work_inventory.approved_namespaces}
+            - {name: DENIED_BASE_TABLE, value: work_inventory.inventory_source}
+            - name: POSTGRES_USER
+              value: budget_reader
+            - name: POSTGRES_PASSWORD
+              valueFrom: {secretKeyRef: {name: postgres-budget-credentials, key: reader-credential}}
+          readinessProbe:
+            tcpSocket: {port: mcp}
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: ["ALL"]}
+            readOnlyRootFilesystem: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastmcp-budget
+spec:
+  selector:
+    app.kubernetes.io/name: fastmcp-budget
+  ports:
+    - name: mcp
+      port: 8000
+      targetPort: mcp

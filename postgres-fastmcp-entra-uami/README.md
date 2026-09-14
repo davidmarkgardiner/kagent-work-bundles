@@ -1,27 +1,104 @@
 # FastMCP PostgreSQL password-to-UAMI work bundle
 
+> **Existing workplace deployment:** do not apply this bundle wholesale. The
+> workplace MCP is already running. Use
+> [`WORK-AGENT-START-PROMPT.md`](WORK-AGENT-START-PROMPT.md) and
+> [`WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md`](WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md)
+> to port the token-efficiency delta onto the deployed version. Preserve its
+> objects, authentication, tools, views, grants, Gateway, and Agent. The full
+> password/UAMI deployment instructions below describe the original reference
+> bundle and are not the workplace upgrade procedure.
+
+## Evidence and direction map
+
+Start with the workplace documents, then use the supporting material according
+to its evidence level:
+
+| Area | Document | What it establishes |
+|---|---|---|
+| Workplace starting instructions | [`WORK-AGENT-START-PROMPT.md`](WORK-AGENT-START-PROMPT.md) | The MCP is already deployed; inspect it and port only the applicable token-efficiency delta. |
+| Incremental implementation plan | [`WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md`](WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md) | Delta map, staged canary iterations, measurements, acceptance gates, and rollback boundary. |
+| Latest local Kubernetes proof | [`evidence/TOKEN-EFFICIENCY-GEEKOM-POC-2026-09-08.md`](evidence/TOKEN-EFFICIENCY-GEEKOM-POC-2026-09-08.md) | A 5,000-row synthetic match was bounded to 50 returned rows; direct and complete Streamable HTTP envelope sizes were measured. This is lab evidence, not workplace token telemetry. |
+| Earlier Azure/UAMI proof | [`evidence/FASTMCP-ENTRA-AKS-UAMI-POC-2026-08-19.md`](evidence/FASTMCP-ENTRA-AKS-UAMI-POC-2026-08-19.md) | Sanitized identity, database, TLS, approved-view, and direct MCP evidence for the reference adapter. |
+| External design direction | [`AGENTIC-DATABASE-TOKEN-EFFICIENCY-RESEARCH.md`](AGENTIC-DATABASE-TOKEN-EFFICIENCY-RESEARCH.md) | Primary-source comparison with semantic-query systems, schema selection, MCP resource links, kagent compaction, and criteria for keeping or replacing the MCP approach. |
+| Workplace domain-skill template | [`token-efficient-query-skill-template/postgres-domain-query-template/`](token-efficient-query-skill-template/postgres-domain-query-template/) | Fill-in structure for grain, metrics, dimensions, terminology, typed-tool routing, limits, verified question patterns, and evaluation cases. Do not install it unfilled. |
+| Generic behaviour example | [`token-efficient-query-skill/postgres-token-efficient-query/SKILL.md`](token-efficient-query-skill/postgres-token-efficient-query/SKILL.md) | Demonstrates aggregate-first routing and truncation behaviour used by the lab proof. It is not the finished workplace skill. |
+| Legacy SQL policy | [`token-efficient-query-skill/postgres-token-efficient-query/references/legacy-sql-policy.md`](token-efficient-query-skill/postgres-token-efficient-query/references/legacy-sql-policy.md) | Optional AST-enforced boundary only if the deployed MCP already exposes SQL text; do not add such a tool. |
+
+The direction is therefore evidence-backed but not yet workplace-proven. The
+remaining decisive evidence is a sanitized before/after canary through the
+installed Agent Gateway and kagent A2A path: complete MCP transport bytes,
+per-call and cumulative model-input tokens, retry/tool-call counts, truncation
+behaviour, compaction behaviour, answer correctness, and rollback. Do not claim
+the projected token reduction or promote more widely until those measurements
+pass the handoff's acceptance gates.
+
 This bundle contains one bounded FastMCP implementation and two PostgreSQL
 authentication deployments:
 
 1. [`password/`](password/) for the existing username/password connection;
 2. the root Kustomize target for the later AKS Workload Identity/UAMI path.
 
-Deploy the password path first. When the database team supplies the UAMI and
-PostgreSQL Entra mapping, deploy the root UAMI target using the same image. The
+For a new standalone deployment of this sanitized reference bundle, deploy the
+password path first. When the database team supplies the UAMI and PostgreSQL
+Entra mapping, deploy the root UAMI target using the same image. The
 three tool names, parameters, approved-view SQL, Service, Gateway route,
 RemoteMCPServer, Agent, and verification flow remain the same.
+
+All tool results pass through the shared adapter's fail-closed response budget:
+50 rows, 32 KiB per MCP result, 512 characters per cell, and a five-second
+PostgreSQL statement timeout by default. Configuration can lower these values
+but cannot raise the compiled hard ceilings. Large exports must stay outside
+model context.
+
+## Why this should reduce token burn
+
+The expensive failure mode is not PostgreSQL executing a large query by itself;
+it is thousands of returned rows being serialized into an MCP response and then
+copied into the model's input context. This bundle limits that data before the
+MCP response is created:
+
+- the adapter fetches at most one row beyond the configured row budget instead
+  of materializing the complete result set;
+- row, byte, per-cell, and statement-time budgets are enforced in code with
+  compiled ceilings;
+- truncation is explicit metadata and is a stopping condition for the agent,
+  not permission to page repeatedly and reconstruct an export in chat;
+- the packaged skill directs the agent toward typed summaries, aggregates, and
+  narrower filters; and
+- any retained legacy SQL-text tool must reject projection `SELECT *`, broad
+  detail queries, writes, and unapproved sources using an AST-aware policy.
+  `COUNT(*)` remains valid because it returns an aggregate rather than every
+  column in every row.
+
+In the synthetic GEEKOM test, a query matching 5,000 rows returned 50 rows—a
+99% reduction in rows admitted to model context—and the complete Streamable
+HTTP MCP envelope was 24,963 bytes. This is evidence that the transport is
+bounded, not a claim of a 99% token saving: actual token reduction depends on
+the workplace schema, values, MCP client, prompts, and model. The workplace
+rollout must capture sanitized before/after input-token telemetry through the
+real Agent Gateway and kagent A2A path before claiming a measured saving. See
+[`evidence/TOKEN-EFFICIENCY-GEEKOM-POC-2026-09-08.md`](evidence/TOKEN-EFFICIENCY-GEEKOM-POC-2026-09-08.md).
+
+The complete work-agent upgrade package is
+[`WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md`](WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md).
+It includes the tested adapter, a reusable token-efficient PostgreSQL skill,
+legacy SQL policy cases, deployment gates, token-measurement requirements, and
+rollback instructions. Start the workplace agent with
+[`WORK-AGENT-START-PROMPT.md`](WORK-AGENT-START-PROMPT.md).
+
+The generic POC skill is not the finished workplace skill. Copy and populate
+[`token-efficient-query-skill-template/postgres-domain-query-template/`](token-efficient-query-skill-template/postgres-domain-query-template/)
+with the approved data grain, metrics, dimensions, terminology, typed-tool
+routing, and sanitized evaluation cases. The external comparison and guidance
+on when MCP remains appropriate are in
+[`AGENTIC-DATABASE-TOKEN-EFFICIENCY-RESEARCH.md`](AGENTIC-DATABASE-TOKEN-EFFICIENCY-RESEARCH.md).
 
 This is a self-contained work bundle. Its deployable source is
 [`adapter/`](adapter/), and its live sanitized proof is
 [`evidence/FASTMCP-ENTRA-AKS-UAMI-POC-2026-08-19.md`](evidence/FASTMCP-ENTRA-AKS-UAMI-POC-2026-08-19.md).
 MCPg is not part of this workflow. Do not mix this bundle with the separate
 MCPg examples at `../postgres-mcpg-password/`.
-
-For the workplace UAMI setup, required variables, federation permissions, and
-an owner-by-owner command walkthrough, start with
-[`README-UAMI-WORKLOAD-IDENTITY.md`](README-UAMI-WORKLOAD-IDENTITY.md).
-It explains why the AKS OIDC issuer is a cluster URL rather than a separate
-"OIDC subscription", and why no access token should be stored in Kubernetes.
 
 Run `scripts/verify-bundle.sh` before handoff. It renders both authentication
 paths, checks that their identity wiring remains separate, validates the shared
@@ -56,7 +133,7 @@ kagent and Agent Gateway manifests. A separate earlier adapter proved the
 Gateway/A2A runtime pattern, but this exact three-tool adapter still requires
 an end-to-end Gateway/A2A receipt in the work environment.
 
-## Deploy first: username/password FastMCP
+## Reference-only greenfield deployment: username/password FastMCP
 
 Build the shared adapter image once, then create a private Secret through the
 approved work secret-delivery mechanism. The Secret must contain the existing
@@ -91,10 +168,9 @@ root Kustomize target, and apply it over the password Deployment. The root
 target replaces the Pod template with the workload-identity ServiceAccount and
 removes the username/password Secret references.
 
-Before removing the password Secret, complete the passwordless validation gates
-in [`README-UAMI-WORKLOAD-IDENTITY.md`](README-UAMI-WORKLOAD-IDENTITY.md),
-including a new connection after the original access-token expiry boundary,
-Gateway discovery, and the same A2A question through the UAMI Pod.
+Before removing the password Secret, prove token acquisition, approved-view
+access, base-table/write denial, a fresh second connection, Gateway discovery,
+and the same A2A question through the UAMI Pod.
 
 ## UAMI inputs to obtain at work
 
@@ -134,10 +210,13 @@ Do not deploy a mutable tag.
 
 ## UAMI step 1: federate the UAMI
 
-The platform identity owner creates the exact AKS federation tuple documented
-in [`README-UAMI-WORKLOAD-IDENTITY.md`](README-UAMI-WORKLOAD-IDENTITY.md). The
-subject's namespace must equal the rendered `FASTMCP_NAMESPACE`, and its service
-account must remain `fastmcp-postgres-entra`.
+The platform identity owner creates an AKS federated identity credential with:
+
+```text
+issuer:  the target AKS OIDC issuer
+subject: system:serviceaccount:fastmcp-entra-poc:fastmcp-postgres-entra
+audience: api://AzureADTokenExchange
+```
 
 Do not add an Azure client secret. The Pod label and ServiceAccount annotation
 in `aks-workload-identity.yaml.template` activate workload identity.

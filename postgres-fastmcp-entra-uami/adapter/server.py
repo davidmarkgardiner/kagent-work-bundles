@@ -9,6 +9,8 @@ from fastmcp import FastMCP
 import psycopg
 from psycopg import sql
 
+from result_budget import bounded_result, budget_from_env
+
 
 mcp = FastMCP("postgres-kubernetes-inventory-readonly")
 AUTH_MODE = os.environ.get("POSTGRES_AUTH_MODE", "entra").lower()
@@ -19,6 +21,22 @@ CREDENTIAL = DefaultAzureCredential() if AUTH_MODE == "entra" else None
 DB_HOST = os.environ["POSTGRES_HOST"]
 DB_NAME = os.environ["POSTGRES_DATABASE"]
 QUALIFIED_NAME = re.compile(r"^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*$")
+RESULT_BUDGET = budget_from_env()
+
+
+def required_statement_timeout_ms() -> int:
+    """Return a bounded PostgreSQL timeout that cannot be disabled by config."""
+    raw = os.environ.get("POSTGRES_STATEMENT_TIMEOUT_MS", "5000")
+    try:
+        value = int(raw)
+    except ValueError as exc:
+        raise ValueError("POSTGRES_STATEMENT_TIMEOUT_MS must be an integer") from exc
+    if not 100 <= value <= 30_000:
+        raise ValueError("POSTGRES_STATEMENT_TIMEOUT_MS must be between 100 and 30000")
+    return value
+
+
+STATEMENT_TIMEOUT_MS = required_statement_timeout_ms()
 
 
 def required_qualified_name(variable: str) -> tuple[str, str]:
@@ -51,13 +69,19 @@ def connect():
     return psycopg.connect(**common)
 
 
-def query(statement: sql.Composable, params: tuple[object, ...] = ()) -> list[dict[str, object]]:
-    """Run a fixed, parameterised SELECT using a fresh TLS connection."""
+def query(statement: sql.Composable, params: tuple[object, ...] = ()) -> dict[str, object]:
+    """Run a fixed SELECT and return a size-bounded model-context envelope."""
     with connect() as conn:
         with conn.cursor() as cur:
+            cur.execute("SET TRANSACTION READ ONLY")
+            cur.execute(
+                "SELECT set_config('statement_timeout', %s, true)",
+                (f"{STATEMENT_TIMEOUT_MS}ms",),
+            )
             cur.execute(statement, params)
             columns = [item.name for item in cur.description]
-            return [dict(zip(columns, row, strict=True)) for row in cur.fetchall()]
+            rows = cur.fetchmany(RESULT_BUDGET.max_rows + 1)
+            return bounded_result(columns, rows, RESULT_BUDGET)
 
 
 @mcp.tool()
@@ -69,11 +93,17 @@ def get_inventory_data_product_details() -> dict[str, object]:
         "authentication": AUTH_MODE,
         "writes_supported": False,
         "arbitrary_sql_supported": False,
+        "response_budget": {
+            "max_rows": RESULT_BUDGET.max_rows,
+            "max_response_bytes": RESULT_BUDGET.max_response_bytes,
+            "max_cell_chars": RESULT_BUDGET.max_cell_chars,
+            "statement_timeout_ms": STATEMENT_TIMEOUT_MS,
+        },
     }
 
 
 @mcp.tool()
-def get_namespace_count() -> list[dict[str, object]]:
+def get_namespace_count() -> dict[str, object]:
     """Return the number of distinct namespaces in the approved inventory view."""
     return query(
         sql.SQL("SELECT count(DISTINCT namespace_name) AS namespace_count FROM {}")
@@ -82,7 +112,7 @@ def get_namespace_count() -> list[dict[str, object]]:
 
 
 @mcp.tool()
-def get_namespace_summary(namespace_name: str) -> list[dict[str, object]]:
+def get_namespace_summary(namespace_name: str) -> dict[str, object]:
     """Return the approved ownership and workload summary for one namespace."""
     return query(
         sql.SQL(

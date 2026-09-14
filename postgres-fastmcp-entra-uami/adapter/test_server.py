@@ -31,10 +31,15 @@ class ToolContractTests(unittest.TestCase):
         )
 
     def test_namespace_count_uses_the_approved_view(self) -> None:
-        with patch.object(server, "query", return_value=[{"namespace_count": 3}]) as query:
+        expected = {
+            "rows": [{"namespace_count": 3}],
+            "returned_rows": 1,
+            "truncated": False,
+        }
+        with patch.object(server, "query", return_value=expected) as query:
             result = server.get_namespace_count.fn()
 
-        self.assertEqual(result, [{"namespace_count": 3}])
+        self.assertEqual(result, expected)
         (statement,) = query.call_args.args
         rendered = statement.as_string(None)
         self.assertIn("count(DISTINCT namespace_name)", rendered)
@@ -49,6 +54,11 @@ class ToolContractTests(unittest.TestCase):
         self.assertIn('FROM "work_inventory"."approved_namespaces"', rendered)
         self.assertIn("WHERE namespace_name = %s", rendered)
         self.assertEqual(params, ("payments",))
+
+    def test_statement_timeout_has_a_non_bypassable_ceiling(self) -> None:
+        with patch.dict(os.environ, {"POSTGRES_STATEMENT_TIMEOUT_MS": "30001"}):
+            with self.assertRaises(ValueError):
+                server.required_statement_timeout_ms()
 
     def test_live_verifier_accepts_only_qualified_identifiers(self) -> None:
         with patch.dict(os.environ, {"APPROVED_VIEW": "public.approved_inventory"}):

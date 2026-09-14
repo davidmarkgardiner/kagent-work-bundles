@@ -10,6 +10,21 @@ It deliberately exposes three bounded, read-only tools, not arbitrary SQL:
 2. `get_namespace_count()`
 3. `get_namespace_summary(namespace_name)`
 
+Every database result is wrapped in a fail-closed model-context budget. The
+adapter fetches at most 51 rows, returns at most 50 rows, limits each cell to
+512 characters, limits the complete result to 32 KiB, and marks truncation in
+the response. Environment values may lower these limits but cannot raise the
+hard ceilings of 100 rows, 2,048 characters per cell, or 64 KiB per response.
+Queries also run in a read-only transaction with a five-second statement
+timeout whose hard ceiling is 30 seconds. Do not treat pagination as an export
+mechanism; create an approved out-of-band export when full data is required.
+
+The optional controls are `MCP_MAX_ROWS`, `MCP_MAX_RESPONSE_BYTES`,
+`MCP_MAX_CELL_CHARS`, and `POSTGRES_STATEMENT_TIMEOUT_MS`.
+
+Use [`../tests/local-k8s/`](../tests/local-k8s/) to prove the compiled adapter
+against a disposable 5,000-row TLS PostgreSQL fixture in a local kind cluster.
+
 Set exactly one supported `POSTGRES_AUTH_MODE`:
 
 - `password`: `psycopg.connect` receives `POSTGRES_USER` and
