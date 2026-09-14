@@ -1,0 +1,24 @@
+{
+  "alias": "management-smoke",
+  "date": "2026-08-24",
+  "remote_mcp_accepted": true,
+  "discovered_tools": [
+    "call_kubectl"
+  ],
+  "agent_ready": true,
+  "task_state": "completed",
+  "function_responses": [
+    {
+      "name": "call_kubectl",
+      "explicit_error": false,
+      "response_keys": [
+        "output"
+      ],
+      "target_only_marker_matched": true
+    }
+  ],
+  "final_artifact_marker_matched": true,
+  "cleanup_verified": true,
+  "raw_receipt_bytes": 3598,
+  "raw_receipt_sha256": "c19696afd7d7636f4edf8f7530106d108a29c68a07713a67284dc02a54156249"
+}

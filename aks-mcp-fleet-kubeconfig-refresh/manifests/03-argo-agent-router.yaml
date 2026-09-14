@@ -1,0 +1,90 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: aks-fleet-agent-router
+  namespace: argo
+spec:
+  serviceAccountName: default
+  entrypoint: route
+  arguments:
+    parameters:
+      - name: payload
+  templates:
+    - name: route
+      inputs:
+        parameters:
+          - name: payload
+      outputs:
+        parameters:
+          - name: agent-response
+            valueFrom:
+              path: /work/response.json
+      container:
+        image: "{{A2A_ROUTER_IMAGE}}"
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/bash", "-ceu"]
+        args:
+          - |
+            alias_name="$(jq -er '.clusterAlias' <<<"$INCIDENT_PAYLOAD")"
+            namespace_name="$(jq -er '.namespace' <<<"$INCIDENT_PAYLOAD")"
+            question="$(jq -er '.question | select(type == "string" and length > 0 and length <= 4000)' <<<"$INCIDENT_PAYLOAD")"
+            [[ "$namespace_name" =~ ^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$ ]] || {
+              echo "BLOCKED_UNKNOWN_NAMESPACE" >&2
+              exit 1
+            }
+            match_count="$(jq --arg alias "$alias_name" '[.clusters[] | select(.alias == $alias)] | length' /routing/clusters.json)"
+            [[ "$match_count" == "1" ]] || {
+              echo "BLOCKED_UNKNOWN_CLUSTER" >&2
+              exit 1
+            }
+            agent_name="$(jq -er --arg alias "$alias_name" '.clusters[] | select(.alias == $alias) | .agentName' /routing/clusters.json)"
+            namespace_allowed="$(jq -er --arg alias "$alias_name" --arg namespace "$namespace_name" \
+              '[.clusters[] | select(.alias == $alias) | .allowedNamespaces[] | select(. == $namespace)] | length' \
+              /routing/clusters.json)"
+            [[ "$namespace_allowed" == "1" ]] || {
+              echo "BLOCKED_UNKNOWN_NAMESPACE" >&2
+              exit 1
+            }
+            [[ "$agent_name" =~ ^[a-z0-9][a-z0-9-]{0,62}$ ]] || exit 1
+            [[ -n "$question" ]] || exit 1
+            request_id="argo-${HOSTNAME}"
+            request_body="$(jq -cn \
+              --arg id "$request_id" \
+              --arg text "$INCIDENT_PAYLOAD" \
+              '{jsonrpc:"2.0",id:$id,method:"message/send",params:{message:{kind:"message",messageId:$id,contextId:$id,role:"user",parts:[{kind:"text",text:$text}]}}}')"
+            curl --fail-with-body --silent --show-error --max-time 180 \
+              -H 'Content-Type: application/json' \
+              -d "$request_body" \
+              "http://kagent-controller.kagent.svc.cluster.local:8083/api/a2a/kagent/${agent_name}/" \
+              > /work/response.json
+            jq -e 'has("error") | not' /work/response.json >/dev/null
+        env:
+          - name: INCIDENT_PAYLOAD
+            value: "{{inputs.parameters.payload}}"
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+        volumeMounts:
+          - name: routing
+            mountPath: /routing
+            readOnly: true
+          - name: work
+            mountPath: /work
+      volumes:
+        - name: routing
+          configMap:
+            name: aks-fleet-argo-routing
+        - name: work
+          emptyDir:
+            sizeLimit: 2Mi

@@ -1,0 +1,204 @@
+# AKS-MCP fleet kubeconfig refresh
+
+This bundle replaces per-request `az aks get-credentials` writes with one
+morning Argo `CronWorkflow`. It builds and proves a fresh multi-context
+candidate, splits it into one current-context file per cluster, and atomically
+stores those files as keys in one Secret. Each fixed-target AKS-MCP/Agent pair
+mounts only its key. The incoming Argo job validates both `clusterAlias` and
+`namespace` against an allowlist and routes the payload to the matching Agent.
+Kagent reaches each shard only through an API-key-authenticated Agent Gateway
+route; NetworkPolicy blocks direct access to the AKS-MCP Service.
+
+The old Secret and running pods remain untouched if any cluster fails. A
+periodic blind pod recycle is therefore unnecessary as a credential-repair
+mechanism; normal KEDA scaling, Kubernetes rescheduling, and a controlled
+rollout after a verified credential change cover separate lifecycle concerns.
+
+## Flow
+
+1. `aks-fleet-registry` holds approved AKS aliases and Azure lookup fields.
+2. At 05:00 Europe/London, Argo starts one refresh because concurrency is
+   `Forbid`.
+3. The workflow uses Azure Workload Identity to establish an ephemeral Azure
+   CLI session in `/work/.azure`, verifies the active account, and uses an
+   approved builder image to run `az aks get-credentials --format exec` for
+   each cluster into a new file.
+4. The script converts authentication to `kubelogin` workload identity, removes
+   the candidate's `current-context`, rejects aliases outside the registry and
+   embedded static credentials, and checks namespace plus read-only pod access
+   on every context.
+5. If the SHA-256 and every shard rollout marker are unchanged, the workflow
+   exits without touching the Secret or pods. If changed or a prior rollout was
+   interrupted, it reconciles the Secret/markers and waits in bounded batches.
+6. `aks-fleet-agent-router` maps an approved alias and namespace to
+   `aks-<alias>-agent`. That Agent has exactly one gateway-fronted AKS-MCP tool
+   source, and its MCP pod sees exactly one current context.
+7. Agent Gateway authenticates the per-shard client key, authorizes only
+   `call_kubectl` for the matching agent/alias, and forwards to the shard. The
+   shard independently enforces `--allow-namespaces`.
+
+## Why this shape
+
+- Credential acquisition and Secret publication remain one fleet operation,
+  while execution identity and failure scope stay isolated per cluster.
+- Nothing writes to the kubeconfig inside a running MCP pod. Secret volumes are
+  read-only and kubelet refresh semantics are not relied upon: a changed Secret
+  deliberately rolls the pods.
+- A candidate is all-or-nothing. One broken or rebuilt cluster cannot publish a
+  partially valid fleet file over the last-known-good copy.
+- The refresher can update only the named Secret and restart only the named
+  shard Deployments. Each read-only Agent exposes only `call_kubectl`.
+- The API key is not the Kubernetes credential. It protects the MCP transport,
+  is delivered to kagent and Agent Gateway through Secrets, and can be rotated
+  independently. A production secret controller should own both copies.
+
+The requested one-Agent/one-MCP/multi-context shape is not supported by stock
+AKS-MCP v0.0.19. Its `mcp-kubernetes` security validator intentionally rejects
+`--context`, `--kubeconfig`, `--server`, token, and certificate flags because
+they can redirect API traffic or inject credentials. Read-only mode also blocks
+`kubectl config use-context`. A shared writable current context would introduce
+cross-request races. The supported answer is therefore one agent/MCP pair per
+cluster, with one shared refresh workflow and one multi-key Secret. Building a
+separate allowlisted fleet-router MCP is a possible future alternative, but it
+would be a new component rather than stock AKS-MCP.
+
+## Files
+
+| Path | Purpose |
+|---|---|
+| `manifests/00-core.yaml` | Workload Identity SA, narrow RBAC, bootstrap Secret, production registry, sanitized agent routing |
+| `manifests/01-cronworkflow.yaml` | Morning Argo schedule and ephemeral build pod |
+| `manifests/02-agent.yaml` | Repeatable fixed-target RemoteMCPServer and Agent template |
+| `manifests/03-argo-agent-router.yaml` | Fail-closed Argo payload-to-Agent routing template |
+| `manifests/04-agentgateway.yaml` | Per-shard authenticated MCP backend, route, policy, and placeholder client Secrets |
+| `aks-mcp-values.yaml` | Per-alias, three-replica, read-only AKS-MCP shard values |
+| `scripts/refresh-fleet-kubeconfig.sh` | Candidate, validation, atomic publication, and rollout logic |
+| `scripts/homelab-smoke.sh` | Reversible two-cluster MCP and A2A proof using one-hour read-only identities |
+| `scripts/verify-bundle.sh` | Offline test, render, lint, and public-safety gate |
+
+## Production installation
+
+1. Build and approve an immutable `{{FLEET_KUBECONFIG_BUILDER_IMAGE}}`
+   containing `az`, `kubectl`, `kubelogin`, `jq`, Bash, and GNU coreutils.
+2. Replace every `{{PLACEHOLDER}}`. Add one registry/routing row and render one
+   `02-agent.yaml`, `04-agentgateway.yaml`, and `aks-mcp-values.yaml` instance
+   per cluster. Context aliases must be unique DNS-style lowercase names.
+   Generate a different high-entropy `{{AKS_MCP_GATEWAY_API_KEY}}` for each
+   shard. Deliver it to both placeholder Secrets using the approved secret
+   controller; do not store rendered keys in Git.
+3. Configure Azure Workload Identity. The identity needs AKS cluster-user
+   credential read access on the approved fleet; never use `--admin`. Create a
+   federated credential for the refresh subject
+   `system:serviceaccount:aks-mcp:fleet-kubeconfig-refresher` and one for every
+   shard subject `system:serviceaccount:aks-mcp:aks-mcp-{{CLUSTER_ALIAS}}`, all
+   using the management cluster OIDC issuer and audience
+   `api://AzureADTokenExchange`. Each shard ServiceAccount is annotated with
+   `{{AZURE_CLIENT_ID}}`; its management-cluster token automount and chart RBAC
+   are disabled because kubelogin uses the projected workload-identity token.
+   Credential retrieval does not grant Kubernetes data-plane access. For an
+   Azure RBAC-enabled AKS cluster, assign `Azure Kubernetes Service RBAC Reader`
+   to the UAMI at the narrowest approved cluster or namespace scope. For a
+   Kubernetes RBAC cluster, create an equivalent read-only RoleBinding or
+   ClusterRoleBinding for the exact Entra principal or group represented by the
+   kubeconfig. Prove both the configured smoke-namespace read and
+   `auth can-i get pods` before enabling the schedule.
+4. Bootstrap `manifests/00-core.yaml`, then configure Flux to ignore only
+   `/data` and the kubeconfig hash annotation on the named Secret. Do not
+   make the whole Secret unmanaged.
+5. Confirm the installed Agent Gateway CRDs support MCP backends, strict API-key
+   authentication, and MCP authorization. Confirm the cluster CNI enforces
+   NetworkPolicy. Install one shard for each alias, then the gateway route and
+   policy, workflows, and fixed-target Agents:
+
+   ```bash
+   helm upgrade --install "aks-mcp-{{CLUSTER_ALIAS}}" ../../platform/aks-mcp/chart \
+     --namespace aks-mcp --create-namespace -f aks-mcp-values.yaml
+   kubectl apply -k .
+   ```
+
+6. Submit the template once before enabling the schedule:
+
+   ```bash
+   argo submit --from cronwf/aks-mcp-fleet-kubeconfig-refresh -n aks-mcp --watch
+   kubectl get secret aks-mcp-fleet-kubeconfig -n aks-mcp \
+     -o jsonpath='{.metadata.annotations.platform\.example\.com/kubeconfig-sha256}'
+   kubectl rollout status deployment/aks-mcp-{{CLUSTER_ALIAS}} -n aks-mcp
+   ```
+
+7. Submit the router with an explicit JSON payload; it chooses the allowlisted
+   fixed-target Agent rather than asking AKS-MCP to switch context:
+
+   ```json
+   {"clusterAlias":"{{CLUSTER_ALIAS}}","namespace":"{{ALLOWED_NAMESPACE}}","question":"Which pods are not Ready?"}
+   ```
+
+8. Prove the transport boundary before accepting the shard: a request without
+   the key receives `401`, the RemoteMCPServer discovers only `call_kubectl`, a
+   request for another namespace returns `BLOCKED_UNKNOWN_NAMESPACE` before an
+   Agent call, and direct pod-to-Service traffic is denied by NetworkPolicy.
+
+## Rebuilt or unavailable cluster
+
+The normal morning run already requests current AKS user credentials and tests
+the resulting API context, so a rebuilt cluster is picked up automatically when
+its registry identity is unchanged. If the cluster name/resource group changes,
+update the registry through GitOps first. If one target is unavailable, alert on
+the failed Workflow; do not replace the valid fleet Secret. An operator can
+rerun the CronWorkflow after the cluster is restored. Every run reconciles the
+candidate hash onto each shard's pod template and waits for availability, even
+when the Secret hash is unchanged, so an interrupted rollout resumes safely.
+
+Suggested alerts are: last successful refresh older than 30 hours, any failed
+refresh, Secret hash unchanged for an unexpectedly long fleet migration, or an
+AKS-MCP rollout that does not complete in five minutes.
+
+## Homelab proof
+
+The smoke helper never copies administrator kubeconfigs into AKS-MCP. It creates
+one-hour ServiceAccount tokens bound to Kubernetes' built-in `view` role in an
+isolated namespace on two explicit contexts, builds one candidate and one
+two-key Secret, starts two fixed-target AKS-MCP/Agent pairs, and performs one
+A2A call per alias. Each call must return a random target-only marker and retain
+exactly one successful marker-bearing `call_kubectl` function response. The
+helper also requires each RemoteMCPServer to discover exactly that one tool.
+All namespaces, bindings, Helm releases, Agents, and RemoteMCPServers are
+run-scoped. A default run prints `HOMELAB_SMOKE_OK` only after confirming they
+are absent; `--keep` deliberately reports `cleanup=retained` instead.
+
+```bash
+scripts/homelab-smoke.sh \
+  --management-context "{{MANAGEMENT_CONTEXT}}" \
+  --worker-context "{{WORKER_CONTEXT}}" \
+  --receipt-dir "{{OWNER_ONLY_RECEIPT_DIRECTORY}}"
+```
+
+The optional receipt directory must already exist. It receives owner-only raw
+A2A responses for trace review; keep it outside Git and sanitize any derived
+evidence before publication. Without the option, receipts remain ephemeral.
+
+Static sources and embedded tokens are test-only escape hatches requiring both
+`ALLOW_STATIC_SOURCES=true` and `ALLOW_STATIC_CREDENTIALS=true`. They are not
+set in the production CronWorkflow.
+
+The committed homelab receipt proves the fixed-context AKS-MCP and kagent A2A
+behavior. The production Agent Gateway manifest is server-schema validated
+against the installed homelab CRDs; work acceptance still requires the four
+negative/positive transport checks in step 8 with work-managed keys.
+
+## Version boundary
+
+The repository's HTTP chart cannot use AKS-MCP v0.0.20 because that release is
+stdio-only. This bundle pins v0.0.19 for the compatibility proof. Before work
+deployment, pin the approved image digest and repeat RemoteMCPServer discovery
+plus A2A testing. Do not silently float the tag.
+
+## Verification
+
+```bash
+scripts/verify-bundle.sh
+```
+
+Offline verification does not prove Azure RBAC, private network routes, the
+approved builder image, or installed-version CRD compatibility. Record those
+receipts in the work environment without kubeconfig content, tokens, endpoints,
+tenant IDs, or subscription IDs.

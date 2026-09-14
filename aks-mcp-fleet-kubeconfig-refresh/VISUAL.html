@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AKS-MCP fleet kubeconfig refresh</title>
+  <style>
+    :root{color-scheme:dark;--bg:#07111f;--panel:#102238;--line:#2b4968;--text:#e8f1fb;--muted:#9db2c8;--ok:#62d6a7;--warn:#ffca68;--blue:#73b7ff}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#12304b,var(--bg) 58%);font:16px/1.5 ui-sans-serif,system-ui;color:var(--text)}
+    main{max-width:1180px;margin:auto;padding:52px 28px}h1{font-size:clamp(2rem,5vw,4.2rem);line-height:1.02;margin:0 0 14px;max-width:900px}h2{font-size:1rem;text-transform:uppercase;letter-spacing:.13em;color:var(--blue);margin:0 0 18px}.lead{font-size:1.2rem;color:var(--muted);max-width:850px;margin-bottom:44px}
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;align-items:stretch}.card{background:linear-gradient(145deg,rgba(20,48,75,.95),rgba(12,30,49,.95));border:1px solid var(--line);border-radius:16px;padding:20px;min-height:180px;position:relative}.card:not(:last-child):after{content:'→';position:absolute;right:-17px;top:45%;color:var(--blue);font-size:1.5rem;z-index:2}.num{color:var(--ok);font-weight:800;font-size:.82rem;letter-spacing:.1em}.card h3{font-size:1.06rem;margin:10px 0}.card p{color:var(--muted);font-size:.9rem;margin:0}
+    .decision{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;margin-top:34px}.box{border:1px solid var(--line);background:rgba(9,24,40,.8);border-radius:16px;padding:24px}.good{border-color:#2a775e}.fail{border-color:#805e29}.box strong{display:block;font-size:1.1rem;margin-bottom:8px}.box span{color:var(--muted)}
+    .footer{display:flex;gap:22px;flex-wrap:wrap;margin-top:30px;color:var(--muted);font-size:.9rem}.pill{border:1px solid var(--line);border-radius:999px;padding:7px 12px}.pill b{color:var(--text)}
+    @media(max-width:850px){.flow{grid-template-columns:1fr}.card{min-height:auto}.card:not(:last-child):after{content:'↓';right:50%;top:auto;bottom:-25px}.decision{grid-template-columns:1fr}}
+  </style>
+</head>
+<body><main>
+  <h2>One refresh · one Secret · fixed-target pairs</h2>
+  <h1>Refresh once. Prove everything. Publish atomically.</h1>
+  <p class="lead">The MCP pods never modify or redirect their kubeconfig. A morning workflow validates the fleet, publishes one single-context key per alias, and rolls only the matching fixed-target shards.</p>
+  <section class="flow" aria-label="workflow">
+    <article class="card"><div class="num">01 · REGISTRY</div><h3>Approved aliases</h3><p>GitOps defines each AKS identity and a separate sanitized routing map for the agent.</p></article>
+    <article class="card"><div class="num">02 · BUILD</div><h3>Fresh candidate</h3><p>Argo uses Workload Identity and an ephemeral volume. No existing file is merged in.</p></article>
+    <article class="card"><div class="num">03 · PROVE</div><h3>Every context</h3><p>Exact aliases, exec auth, size, namespace reachability, and read-only access must all pass.</p></article>
+    <article class="card"><div class="num">04 · PUBLISH</div><h3>One Secret</h3><p>Each alias becomes one single-context key. Changed hash triggers atomic replacement and shard rollouts.</p></article>
+    <article class="card"><div class="num">05 · ROUTE</div><h3>Authenticated target</h3><p>Argo validates alias + namespace. Agent Gateway authenticates the agent, then routes to the MCP shard mounting only that alias's key.</p></article>
+  </section>
+  <section class="decision">
+    <div class="box good"><strong>All clusters pass</strong><span>Publish every single-context key, then restart one pod at a time across the named MCP shards.</span></div>
+    <div class="box fail"><strong>Any cluster fails</strong><span>Keep the last-known-good Secret and pods. Fail the Workflow and alert; never publish a partial fleet.</span></div>
+  </section>
+  <div class="footer"><div class="pill"><b>Read-only</b> call_kubectl only</div><div class="pill"><b>Authenticated</b> per-shard gateway key</div><div class="pill"><b>Bounded</b> namespace at router + MCP</div><div class="pill"><b>Isolated</b> one pair per target</div></div>
+</main></body></html>

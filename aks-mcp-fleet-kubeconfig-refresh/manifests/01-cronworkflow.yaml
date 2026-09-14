@@ -1,0 +1,85 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: aks-mcp-fleet-kubeconfig-refresh
+  namespace: aks-mcp
+spec:
+  # Argo Workflows v3.6+ uses schedules, not the removed singular schedule.
+  schedules:
+    - "0 5 * * *"
+  timezone: "Europe/London"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  workflowSpec:
+    serviceAccountName: fleet-kubeconfig-refresher
+    entrypoint: refresh
+    activeDeadlineSeconds: 1800
+    podGC:
+      strategy: OnWorkflowCompletion
+    ttlStrategy:
+      secondsAfterCompletion: 86400
+    templates:
+      - name: refresh
+        metadata:
+          labels:
+            azure.workload.identity/use: "true"
+        container:
+          # Approved image containing az, kubectl, kubelogin, jq, and GNU coreutils.
+          image: "{{FLEET_KUBECONFIG_BUILDER_IMAGE}}"
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/bash", "/opt/fleet-refresh/refresh-fleet-kubeconfig.sh"]
+          env:
+            - name: AZURE_CLIENT_ID
+              value: "{{AZURE_CLIENT_ID}}"
+            - name: AZURE_TENANT_ID
+              value: "{{AZURE_TENANT_ID}}"
+            - name: AZURE_CONFIG_DIR
+              value: /work/.azure
+            - name: REGISTRY_PATH
+              value: /etc/fleet-registry/clusters.json
+            - name: TARGET_NAMESPACE
+              value: aks-mcp
+            - name: FLEET_SECRET_NAME
+              value: aks-mcp-fleet-kubeconfig
+            - name: MCP_DEPLOYMENT_PREFIX
+              value: aks-mcp-
+            - name: ROLLOUT_ON_CHANGE
+              value: "true"
+            - name: ROLLOUT_MAX_PARALLEL
+              value: "4"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          volumeMounts:
+            - name: refresh-script
+              mountPath: /opt/fleet-refresh
+              readOnly: true
+            - name: fleet-registry
+              mountPath: /etc/fleet-registry
+              readOnly: true
+            - name: work
+              mountPath: /work
+        volumes:
+          - name: refresh-script
+            configMap:
+              name: aks-mcp-fleet-kubeconfig-refresh-script
+              defaultMode: 0555
+          - name: fleet-registry
+            configMap:
+              name: aks-fleet-registry
+          - name: work
+            emptyDir:
+              sizeLimit: 16Mi
