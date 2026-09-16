@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/cluster-health/alert.schema.json",
+  "title": "Thresholded cluster health alert",
+  "type": "object",
+  "required": ["schema_version", "event_id", "dedupe_key", "action", "automation_allowed", "emitted_at", "dispatch", "cluster", "health", "scope", "evidence", "investigation"],
+  "properties": {
+    "schema_version": {"const": "cluster-health.alert.v1"},
+    "event_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "dedupe_key": {"type": "string", "minLength": 1, "maxLength": 256},
+    "action": {"enum": ["investigate", "healthy"]},
+    "automation_allowed": {"const": false},
+    "emitted_at": {"type": "string", "format": "date-time"},
+    "dispatch": {
+      "type": "object",
+      "required": ["workflow_name"],
+      "properties": {
+        "workflow_name": {"type": "string", "pattern": "^cluster-health-investigation-[0-9a-f]{20}$"}
+      },
+      "additionalProperties": false
+    },
+    "cluster": {
+      "type": "object",
+      "required": ["id", "source_generation", "mcp_target"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "source_generation": {"type": "string", "minLength": 1, "maxLength": 128},
+        "mcp_target": {"type": "string", "minLength": 1, "maxLength": 256}
+      },
+      "additionalProperties": false
+    },
+    "health": {
+      "type": "object",
+      "required": ["display_score", "severity", "gate_reason", "coverage_complete", "domains"],
+      "properties": {
+        "display_score": {"type": "integer", "minimum": 0, "maximum": 100},
+        "severity": {"enum": ["healthy", "watch", "degraded", "critical"]},
+        "gate_reason": {"type": "string", "maxLength": 240},
+        "coverage_complete": {"type": "boolean"},
+        "domains": {"type": "object", "minProperties": 5, "maxProperties": 5}
+      },
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "object",
+      "required": ["namespaces", "top_problem_groups", "problem_group_total", "problem_groups_truncated"],
+      "properties": {
+        "namespaces": {"type": "array", "maxItems": 20, "items": {"type": "string", "maxLength": 63}, "uniqueItems": true},
+        "top_problem_groups": {"type": "array", "maxItems": 20},
+        "problem_group_total": {"type": "integer", "minimum": 0},
+        "problem_groups_truncated": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["daily_slot_utc", "snapshot_name", "snapshot_seq", "snapshot_checksum", "snapshot_completed_at", "policy_version"],
+      "properties": {
+        "daily_slot_utc": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "snapshot_name": {"type": "string", "minLength": 1, "maxLength": 253},
+        "snapshot_seq": {"type": "integer", "minimum": 1},
+        "snapshot_checksum": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "snapshot_completed_at": {"type": "string", "format": "date-time"},
+        "policy_version": {"type": "string", "minLength": 1, "maxLength": 80}
+      },
+      "additionalProperties": false
+    },
+    "investigation": {"type": "object"}
+  },
+  "additionalProperties": false
+}

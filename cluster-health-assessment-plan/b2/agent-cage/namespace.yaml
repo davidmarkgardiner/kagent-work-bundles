@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agent-health-system
+  labels:
+    app.kubernetes.io/part-of: cluster-health-assessment
+    platform.com/team: platform

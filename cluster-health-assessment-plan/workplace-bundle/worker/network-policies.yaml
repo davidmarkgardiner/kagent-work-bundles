@@ -1,0 +1,92 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cluster-health-components-default-deny
+  namespace: cluster-health-system
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/part-of
+        operator: In
+        values: [cluster-health-assessment, cluster-health-fox-mesh]
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cluster-health-dns-egress
+  namespace: cluster-health-system
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/part-of
+        operator: In
+        values: [cluster-health-assessment, cluster-health-fox-mesh]
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - {protocol: UDP, port: 53}
+        - {protocol: TCP, port: 53}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cluster-health-kubernetes-api-egress
+  namespace: cluster-health-system
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/part-of
+        operator: In
+        values: [cluster-health-assessment, cluster-health-fox-mesh]
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - ipBlock:
+            cidr: "{{KUBERNETES_API_CIDR}}"
+      ports:
+        - {protocol: TCP, port: 443}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cluster-health-kafka-egress
+  namespace: cluster-health-system
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: cluster-health-alert-bridge
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - ipBlock:
+            cidr: "{{KAFKA_EGRESS_CIDR}}"
+      ports:
+        - {protocol: TCP, port: 9092}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cluster-health-prometheus-ingress
+  namespace: cluster-health-system
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values: [autonomous-monitor, cluster-health-assessment]
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: "{{PROMETHEUS_NAMESPACE}}"
+      ports:
+        - {protocol: TCP, port: 8080}

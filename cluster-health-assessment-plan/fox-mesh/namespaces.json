@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "scope_name": "homelab-alloy-vector-triage",
+  "source": "work-agent-bundles/homelab-verified-triage-replication/config/01-alloy.yaml",
+  "namespaces": [
+    "aks-istio-ingress",
+    "aks-istio-egress",
+    "aks-istio-system",
+    "alloy",
+    "flux-system",
+    "gatekeeper-system",
+    "kube-system",
+    "kyverno",
+    "logging",
+    "monitoring",
+    "xxx-system",
+    "uk8s-config",
+    "uk8s-core",
+    "external-dns",
+    "cert-manager",
+    "external-secrets",
+    "informer",
+    "kro-system",
+    "platform-test-app",
+    "xxx-issuer-system",
+    "agentic-triage-proof",
+    "aks-platform-triage-smoke"
+  ]
+}

@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../b2/agent-cage
+  - ../b2/worker
+  - ../b3
+  - ../b4
+patches:
+  - target:
+      kind: Service
+      name: cluster-health-intake
+      namespace: agent-health-system
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: ClusterIP
+      - op: remove
+        path: /spec/ports/0/nodePort
+  - target:
+      kind: CronJob
+      name: cluster-health-publisher
+      namespace: cluster-health-system
+    patch: |-
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/containers/0/env/3/value
+        value: https://cluster-health-intake.agent-health-system.svc:8443/v1/snapshots
+  - target:
+      kind: Namespace
+      name: agent-health-system
+    patch: |-
+      - op: add
+        path: /metadata/labels/platform.com~1cluster-role
+        value: manager-agent

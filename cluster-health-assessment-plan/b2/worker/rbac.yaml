@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cluster-health-publisher
+  namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cluster-health-publisher-read
+  namespace: cluster-health-system
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-publisher-read
+  namespace: cluster-health-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cluster-health-publisher-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-publisher
+    namespace: cluster-health-system

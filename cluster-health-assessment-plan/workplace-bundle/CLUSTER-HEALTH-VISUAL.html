@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cluster Health — from 20,000 signals to one useful SRE summary</title>
+  <style>
+    :root {
+      --ivory: #faf9f5;
+      --paper: #ffffff;
+      --ink: #191917;
+      --muted: #67665f;
+      --line: #d7d2c8;
+      --soft: #f0eee6;
+      --clay: #d16c49;
+      --clay-dark: #a8492d;
+      --olive: #6e8257;
+      --olive-soft: #e8ede2;
+      --gold: #b9892e;
+      --gold-soft: #f5eedc;
+      --red: #ad433e;
+      --red-soft: #f6e8e5;
+      --blue: #476a7d;
+      --blue-soft: #e7eef1;
+      --serif: ui-serif, Georgia, "Times New Roman", serif;
+      --sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      --shadow: 0 16px 42px rgba(45, 40, 31, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--ivory);
+      font-family: var(--sans);
+      line-height: 1.55;
+    }
+    a { color: var(--clay-dark); text-underline-offset: 3px; }
+    code { font-family: var(--mono); font-size: .9em; }
+
+    .page {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 84px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 8px 0 24px;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 750; }
+    .brand-mark { width: 24px; height: 6px; background: var(--clay); border-radius: 999px; }
+    .status { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 54px;
+      align-items: center;
+      min-height: 590px;
+      padding: 70px 0 72px;
+      border-bottom: 1.5px solid var(--line);
+    }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--clay-dark);
+      font: 700 12px/1 var(--mono);
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 28px; height: 3px; background: var(--clay); }
+    h1, h2, h3 { margin-top: 0; }
+    h1 {
+      margin: 24px 0 26px;
+      font-family: var(--serif);
+      font-size: clamp(43px, 5.7vw, 70px);
+      line-height: 1.01;
+      letter-spacing: -.035em;
+      font-weight: 500;
+    }
+    h1 em { color: var(--clay-dark); font-weight: 500; }
+    .lede { max-width: 690px; color: #3f3e39; font-size: clamp(18px, 2vw, 22px); line-height: 1.5; }
+    .hero-note {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 34px;
+    }
+    .mini-stat { padding: 14px 12px; border-top: 2px solid var(--ink); }
+    .mini-stat strong { display: block; font-family: var(--serif); font-size: 25px; font-weight: 500; }
+    .mini-stat span { color: var(--muted); font-size: 12px; }
+
+    .noise-card {
+      position: relative;
+      min-height: 430px;
+      padding: 28px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .noise-card h3 { font: 700 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    .ticket-stack { position: relative; height: 210px; margin-top: 32px; }
+    .ticket {
+      position: absolute;
+      left: 50%;
+      width: 78%;
+      padding: 17px 18px;
+      border: 1px solid #e4bbb0;
+      background: #fff8f6;
+      box-shadow: 0 8px 18px rgba(94, 43, 31, .07);
+      transform-origin: 50% 50%;
+    }
+    .ticket:nth-child(1) { top: 0; transform: translateX(-50%) rotate(-4deg); }
+    .ticket:nth-child(2) { top: 38px; transform: translateX(-48%) rotate(3deg); }
+    .ticket:nth-child(3) { top: 78px; transform: translateX(-52%) rotate(-2deg); }
+    .ticket:nth-child(4) { top: 118px; transform: translateX(-47%) rotate(4deg); }
+    .ticket b { display: block; font-size: 13px; }
+    .ticket small { color: var(--red); }
+    .compress-arrow { display: flex; justify-content: center; align-items: center; height: 58px; color: var(--clay-dark); font: 700 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+    .one-summary { padding: 18px; border-left: 5px solid var(--olive); background: var(--olive-soft); }
+    .one-summary strong { display: block; font-family: var(--serif); font-size: 22px; }
+    .one-summary span { color: #536147; font-size: 13px; }
+
+    section { padding: 70px 0; border-bottom: 1.5px solid var(--line); }
+    .section-head { display: grid; grid-template-columns: .62fr 1.38fr; gap: 40px; align-items: start; margin-bottom: 42px; }
+    .section-number { color: var(--clay-dark); font: 700 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    h2 { font-family: var(--serif); font-size: clamp(34px, 4vw, 50px); line-height: 1.05; letter-spacing: -.025em; font-weight: 500; margin-bottom: 16px; }
+    .section-copy { color: var(--muted); font-size: 17px; max-width: 760px; }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      position: relative;
+    }
+    .pipeline::before {
+      content: "";
+      position: absolute;
+      top: 40px;
+      left: 8%;
+      right: 8%;
+      border-top: 2px dashed #c2b9aa;
+      z-index: 0;
+    }
+    .stage { position: relative; z-index: 1; padding: 19px 17px 20px; min-height: 220px; background: var(--paper); border: 1px solid var(--line); }
+    .stage-icon { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 26px; border-radius: 50%; background: var(--soft); border: 2px solid var(--paper); outline: 1px solid var(--line); font: 700 12px var(--mono); }
+    .stage h3 { margin-bottom: 8px; font-size: 16px; }
+    .stage p { margin: 0; color: var(--muted); font-size: 13px; }
+    .stage .cadence { display: inline-block; margin-top: 16px; padding: 5px 7px; background: var(--soft); font: 700 10px var(--mono); text-transform: uppercase; }
+    .stage.highlight { border-top: 4px solid var(--clay); }
+    .stage.highlight .stage-icon { background: var(--red-soft); color: var(--red); }
+
+    .timeline { display: grid; grid-template-columns: 140px 1fr; gap: 0 26px; margin-top: 42px; }
+    .time { font: 700 12px/1.4 var(--mono); color: var(--clay-dark); padding-top: 2px; text-align: right; }
+    .time-event { position: relative; padding: 0 0 32px 27px; border-left: 2px solid var(--line); }
+    .time-event::before { content: ""; position: absolute; width: 10px; height: 10px; border-radius: 50%; background: var(--paper); border: 3px solid var(--clay); left: -7px; top: 1px; }
+    .time-event:last-child { border-left-color: transparent; }
+    .time-event b { display: block; margin-bottom: 3px; }
+    .time-event span { color: var(--muted); font-size: 14px; }
+
+    .score-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .panel { background: var(--paper); border: 1px solid var(--line); padding: 28px; }
+    .panel h3 { font-family: var(--serif); font-size: 25px; font-weight: 500; }
+    .weight-row { display: grid; grid-template-columns: 165px 1fr 46px; align-items: center; gap: 12px; margin: 15px 0; font-size: 13px; }
+    .bar { height: 12px; background: var(--soft); overflow: hidden; }
+    .bar span { display: block; height: 100%; background: var(--blue); }
+    .weight { text-align: right; font: 700 12px var(--mono); }
+    .formula { margin: 24px 0 0; padding: 14px; background: var(--blue-soft); color: #355363; font: 600 12px/1.6 var(--mono); }
+    .gate-list { display: grid; gap: 12px; }
+    .gate-rule { display: grid; grid-template-columns: 86px 1fr; gap: 14px; padding: 14px; border: 1px solid var(--line); }
+    .gate-rule strong { font: 700 11px/1.4 var(--mono); text-transform: uppercase; }
+    .gate-rule p { margin: 0; font-size: 13px; color: var(--muted); }
+    .critical { border-left: 5px solid var(--red); background: var(--red-soft); }
+    .degraded { border-left: 5px solid var(--gold); background: var(--gold-soft); }
+    .recovery { border-left: 5px solid var(--olive); background: var(--olive-soft); }
+    .key-point { margin-top: 18px; padding: 18px; border: 2px solid var(--ink); font-family: var(--serif); font-size: 21px; line-height: 1.35; }
+
+    .branch { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .branch-card { padding: 30px; border: 1px solid var(--line); background: var(--paper); }
+    .branch-card.healthy { border-top: 6px solid var(--olive); }
+    .branch-card.unhealthy { border-top: 6px solid var(--red); }
+    .branch-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .branch-title h3 { font-family: var(--serif); font-size: 29px; font-weight: 500; margin: 0; }
+    .score-pill { padding: 6px 9px; border-radius: 99px; background: var(--soft); font: 700 11px var(--mono); }
+    .branch-flow { list-style: none; padding: 0; margin: 24px 0 0; }
+    .branch-flow li { position: relative; padding: 0 0 22px 34px; color: var(--muted); font-size: 14px; }
+    .branch-flow li::before { content: ""; position: absolute; left: 6px; top: 3px; width: 10px; height: 10px; border-radius: 50%; background: var(--paper); border: 2px solid currentColor; }
+    .branch-flow li:not(:last-child)::after { content: ""; position: absolute; left: 11px; top: 17px; height: 22px; border-left: 1px solid var(--line); }
+    .branch-flow b { color: var(--ink); }
+
+    .payload { display: grid; grid-template-columns: 1fr 1.1fr; gap: 22px; }
+    .payload-code { background: #252521; color: #f7f2e9; padding: 26px; overflow: hidden; }
+    .payload-code .label { color: #c9c3b9; font: 700 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+    pre { margin: 18px 0 0; white-space: pre-wrap; word-break: break-word; font: 12px/1.7 var(--mono); }
+    .json-key { color: #e4a281; }
+    .json-value { color: #b9d29f; }
+    .payload-notes { display: grid; gap: 10px; }
+    .payload-note { display: grid; grid-template-columns: 34px 1fr; gap: 12px; padding: 16px; background: var(--paper); border: 1px solid var(--line); }
+    .payload-note span:first-child { display: grid; place-items: center; width: 30px; height: 30px; background: var(--soft); border-radius: 50%; font: 700 11px var(--mono); }
+    .payload-note b { display: block; margin-bottom: 3px; font-size: 14px; }
+    .payload-note small { color: var(--muted); }
+
+    .boundary-wrap { display: grid; grid-template-columns: 1fr 120px 1fr; align-items: stretch; gap: 18px; }
+    .zone { padding: 28px; background: var(--paper); border: 1px solid var(--line); }
+    .zone h3 { font-family: var(--serif); font-size: 27px; font-weight: 500; }
+    .zone ul { padding-left: 18px; margin-bottom: 0; color: var(--muted); font-size: 14px; }
+    .transport { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; color: var(--blue); font: 700 11px/1.4 var(--mono); text-transform: uppercase; }
+    .transport-line { width: 100%; border-top: 3px solid var(--blue); position: relative; }
+    .transport-line::after { content: ""; position: absolute; right: -1px; top: -7px; border-left: 9px solid var(--blue); border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+    .no-share { margin-top: 22px; padding: 18px; background: var(--gold-soft); border-left: 5px solid var(--gold); font-size: 14px; }
+
+    .controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .control { padding: 21px; background: var(--paper); border: 1px solid var(--line); }
+    .control .control-no { color: var(--clay-dark); font: 700 11px var(--mono); }
+    .control h3 { margin: 13px 0 8px; font-size: 16px; }
+    .control p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .deploy { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; counter-reset: deploy; }
+    .deploy-step { counter-increment: deploy; position: relative; padding: 28px 24px 24px; background: var(--paper); border: 1px solid var(--line); }
+    .deploy-step::before { content: "0" counter(deploy); display: block; margin-bottom: 28px; color: var(--clay-dark); font: 700 13px var(--mono); }
+    .deploy-step h3 { font-family: var(--serif); font-size: 24px; font-weight: 500; }
+    .deploy-step p { color: var(--muted); font-size: 14px; }
+    .deploy-step code { display: inline-block; padding: 4px 6px; background: var(--soft); }
+
+    .proof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .proof { padding: 28px; border: 1px solid var(--line); background: var(--paper); }
+    .proof h3 { display: flex; align-items: center; gap: 10px; font-size: 18px; }
+    .proof h3 span { width: 10px; height: 10px; border-radius: 50%; }
+    .proof.pass h3 span { background: var(--olive); }
+    .proof.pending h3 span { background: var(--gold); }
+    .proof ul { padding-left: 19px; color: var(--muted); font-size: 14px; }
+
+    .answer-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 22px; background: var(--line); border: 1px solid var(--line); }
+    .answer { padding: 22px; background: var(--paper); }
+    .answer b { display: block; margin-bottom: 8px; }
+    .answer span { color: var(--muted); font-size: 13px; }
+
+    footer { padding-top: 46px; display: flex; justify-content: space-between; gap: 28px; color: var(--muted); font-size: 13px; }
+    footer strong { color: var(--ink); }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 16px; }
+
+    @media (max-width: 940px) {
+      .hero, .section-head, .score-layout, .payload { grid-template-columns: 1fr; }
+      .hero { min-height: auto; }
+      .pipeline { grid-template-columns: 1fr 1fr; }
+      .pipeline::before { display: none; }
+      .boundary-wrap { grid-template-columns: 1fr; }
+      .transport { min-height: 90px; }
+      .transport-line { width: 60%; transform: rotate(90deg); }
+      .controls { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 650px) {
+      .page { width: min(100% - 28px, 1180px); }
+      .topbar, footer { align-items: flex-start; flex-direction: column; }
+      .hero { padding-top: 48px; gap: 34px; }
+      .hero-note, .pipeline, .branch, .controls, .deploy, .proof-grid, .answer-strip { grid-template-columns: 1fr; }
+      .timeline { grid-template-columns: 76px 1fr; gap: 0 16px; }
+      .weight-row { grid-template-columns: 118px 1fr 36px; }
+      section { padding: 54px 0; }
+      .noise-card { min-height: 400px; }
+    }
+    @media print {
+      body { background: white; }
+      .page { width: 100%; padding: 0 18mm; }
+      .hero { min-height: auto; }
+      .noise-card, .panel, .stage, .branch-card, .zone, .control, .deploy-step, .proof { box-shadow: none; break-inside: avoid; }
+      section { break-inside: auto; }
+      a { color: var(--ink); text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark"></span> Cluster Health Assessment</div>
+      <div class="status"><span class="status-dot"></span> Offline bundle verified · workplace proof pending</div>
+    </header>
+
+    <section class="hero" id="top">
+      <div>
+        <div class="eyebrow">The visual explanation</div>
+        <h1>Turn thousands of signals into <em>one useful decision.</em></h1>
+        <p class="lede">The cluster is observed continuously, scored deterministically and reported once a day. Only an unhealthy result reaches the investigation agent, which groups symptoms into root causes and prepares one managed SRE summary.</p>
+        <div class="hero-note">
+          <div class="mini-stat"><strong>5 min</strong><span>fresh deterministic snapshot</span></div>
+          <div class="mini-stat"><strong>1 / day</strong><span>bounded Kafka health record</span></div>
+          <div class="mini-stat"><strong>1 issue</strong><span>per cluster, updated in place</span></div>
+        </div>
+      </div>
+      <div class="noise-card" aria-label="Many repetitive tickets become one cluster summary">
+        <h3>Before: symptoms become tickets</h3>
+        <div class="ticket-stack">
+          <div class="ticket"><b>Pod pending</b><small>FailedScheduling · payments</small></div>
+          <div class="ticket"><b>Replica unavailable</b><small>Deployment/api · payments</small></div>
+          <div class="ticket"><b>Pod pending</b><small>FailedScheduling · catalogue</small></div>
+          <div class="ticket"><b>Node pressure</b><small>Shared underlying cause</small></div>
+        </div>
+        <div class="compress-arrow">↓ correlate, score and deduplicate ↓</div>
+        <div class="one-summary"><strong>Cluster scheduling capacity is degraded</strong><span>Two namespaces affected · likely one node/capacity cause · read-only investigation attached</span></div>
+      </div>
+    </section>
+
+    <section id="flow">
+      <div class="section-head">
+        <div class="section-number">01 · End-to-end flow</div>
+        <div><h2>Collect often. Dispatch rarely.</h2><p class="section-copy">Collection frequency and agent frequency are deliberately different. The worker side stays current every few minutes; the manager side sees one compact daily decision rather than every log line, Kubernetes event or pod transition.</p></div>
+      </div>
+      <div class="pipeline">
+        <article class="stage"><div class="stage-icon">FOX</div><h3>Namespace evidence</h3><p>Fox reads the same namespace scope as Alloy/Vector: pod state, events, bounded logs and workload conditions.</p><span class="cadence">continuous polling</span></article>
+        <article class="stage"><div class="stage-icon">B1</div><h3>Cluster snapshot</h3><p>Stable workload identities collapse pod churn. Five required health domains and coverage are calculated.</p><span class="cadence">every 5 minutes</span></article>
+        <article class="stage highlight"><div class="stage-icon">1×</div><h3>Daily gate</h3><p>The latest complete snapshot becomes one bounded <code>cluster-health.alert.v1</code> record.</p><span class="cadence">once per UTC date</span></article>
+        <article class="stage"><div class="stage-icon">K</div><h3>Kafka → Argo</h3><p>Vector owns SASL/TLS publication. Argo filters healthy records and admits only valid unhealthy records.</p><span class="cadence">deterministic identity</span></article>
+        <article class="stage"><div class="stage-icon">AI</div><h3>Investigate + summarise</h3><p>The agent rechecks the worker through read-only AKS-MCP. A separate writer updates one GitLab issue.</p><span class="cadence">unhealthy only</span></article>
+      </div>
+
+      <div class="timeline" aria-label="Typical daily cadence">
+        <div class="time">All day</div><div class="time-event"><b>Evidence keeps refreshing</b><span>Fox polls; B1 emits immutable five-minute snapshots. No agent or ticket is created.</span></div>
+        <div class="time">07:30 UTC</div><div class="time-event"><b>One daily decision is emitted</b><span>The freshest valid snapshot becomes either <code>healthy</code> or <code>investigate</code>.</span></div>
+        <div class="time">If unhealthy</div><div class="time-event"><b>One read-only workflow runs</b><span>Argo validates freshness, cluster identity and replay-safe workflow identity before calling the agent.</span></div>
+        <div class="time">After analysis</div><div class="time-event"><b>One SRE issue is created or updated</b><span>The agent never receives the GitLab token; the fixed writer is a separate, explicitly enabled step.</span></div>
+      </div>
+    </section>
+
+    <section id="score">
+      <div class="section-head">
+        <div class="section-number">02 · Score and gate</div>
+        <div><h2>The score explains health. The gate decides action.</h2><p class="section-copy">A numeric score is useful for trend and communication, but it is not trusted as the automation threshold. The gate uses explicit domain state, complete coverage and consecutive assessments.</p></div>
+      </div>
+      <div class="score-layout">
+        <article class="panel">
+          <h3>Display score: 0–100</h3>
+          <div class="weight-row"><span>Nodes &amp; scheduling</span><div class="bar"><span style="width:100%"></span></div><span class="weight">30%</span></div>
+          <div class="weight-row"><span>Workload availability</span><div class="bar"><span style="width:83%"></span></div><span class="weight">25%</span></div>
+          <div class="weight-row"><span>Shared services</span><div class="bar"><span style="width:67%"></span></div><span class="weight">20%</span></div>
+          <div class="weight-row"><span>Resource pressure</span><div class="bar"><span style="width:50%"></span></div><span class="weight">15%</span></div>
+          <div class="weight-row"><span>Delivery</span><div class="bar"><span style="width:33%"></span></div><span class="weight">10%</span></div>
+          <div class="formula">healthy = 100 · watch = 80 · degraded = 50 · critical = 0<br>score = weighted mean of all five domains</div>
+        </article>
+        <article class="panel">
+          <h3>Deterministic action gate</h3>
+          <div class="gate-list">
+            <div class="gate-rule critical"><strong>Immediate</strong><p>Any required domain is <b>critical</b> → breach now, even if another domain has incomplete coverage.</p></div>
+            <div class="gate-rule degraded"><strong>Confirmed</strong><p>A required domain is <b>degraded</b> in two consecutive complete five-minute assessments → breach.</p></div>
+            <div class="gate-rule recovery"><strong>Recovery</strong><p>Two consecutive complete assessments with every domain healthy or watch → clear the gate.</p></div>
+          </div>
+          <div class="key-point">A score of 90 cannot overrule a critical domain. Incomplete coverage cannot declare recovery.</div>
+        </article>
+      </div>
+    </section>
+
+    <section id="branches">
+      <div class="section-head">
+        <div class="section-number">03 · Daily outcome</div>
+        <div><h2>Healthy and unhealthy records take different paths.</h2><p class="section-copy">There is still one daily Kafka record for observability and proof, but only the unhealthy branch consumes model capacity or writes to GitLab.</p></div>
+      </div>
+      <div class="branch">
+        <article class="branch-card healthy">
+          <div class="branch-title"><h3>Healthy day</h3><span class="score-pill">action: healthy</span></div>
+          <ol class="branch-flow">
+            <li><b>Daily record reaches Kafka.</b><br>It proves the health loop is alive.</li>
+            <li><b>Argo EventSource consumes it.</b><br>The Sensor action filter rejects it.</li>
+            <li><b>No Workflow, agent or GitLab call.</b><br>The system stays quiet.</li>
+          </ol>
+        </article>
+        <article class="branch-card unhealthy">
+          <div class="branch-title"><h3>Unhealthy day</h3><span class="score-pill">action: investigate</span></div>
+          <ol class="branch-flow">
+            <li><b>Sensor admits one deterministic Workflow.</b><br>A same-day replay hits the same name.</li>
+            <li><b>Agent rechecks current worker state.</b><br>At most 12 read-only AKS-MCP calls.</li>
+            <li><b>Writer creates or updates one issue.</b><br>Symptoms are grouped beneath the smallest credible causes.</li>
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <section id="payload">
+      <div class="section-head">
+        <div class="section-number">04 · Kafka payload</div>
+        <div><h2>The handoff carries a map, not a data dump.</h2><p class="section-copy">Raw log lines and raw event messages stay out of the daily contract. The agent receives just enough identity, scope, evidence and top problem groups to perform a fresh, bounded investigation.</p></div>
+      </div>
+      <div class="payload">
+        <div class="payload-code">
+          <div class="label">cluster-health.alert.v1 · simplified</div>
+<pre>{
+  <span class="json-key">"action"</span>: <span class="json-value">"investigate"</span>,
+  <span class="json-key">"cluster"</span>: {
+    <span class="json-key">"id"</span>: <span class="json-value">"worker-a"</span>,
+    <span class="json-key">"mcp_target"</span>: <span class="json-value">"approved-worker-alias"</span>
+  },
+  <span class="json-key">"health"</span>: {
+    <span class="json-key">"display_score"</span>: <span class="json-value">70</span>,
+    <span class="json-key">"severity"</span>: <span class="json-value">"critical"</span>,
+    <span class="json-key">"coverage_complete"</span>: <span class="json-value">true</span>
+  },
+  <span class="json-key">"scope"</span>: {
+    <span class="json-key">"namespaces"</span>: [<span class="json-value">"payments"</span>, <span class="json-value">"catalogue"</span>],
+    <span class="json-key">"top_problem_groups"</span>: [
+      <span class="json-value">"Deployment/api · scheduling · 50"</span>
+    ]
+  },
+  <span class="json-key">"evidence"</span>: {
+    <span class="json-key">"daily_slot_utc"</span>: <span class="json-value">"2026-09-16"</span>,
+    <span class="json-key">"snapshot_seq"</span>: <span class="json-value">412</span>
+  }
+}</pre>
+        </div>
+        <div class="payload-notes">
+          <div class="payload-note"><span>1</span><div><b>Exact cluster target</b><small>The Agent must use the payload's approved AKS-MCP target, never a default context.</small></div></div>
+          <div class="payload-note"><span>2</span><div><b>Stable workload grouping</b><small>Replica churn is collapsed to Deployment, StatefulSet, DaemonSet or CronJob ownership.</small></div></div>
+          <div class="payload-note"><span>3</span><div><b>Fresh snapshot identity</b><small>Cluster, generation, sequence, checksum and completion time make stale or conflicting evidence rejectable.</small></div></div>
+          <div class="payload-note"><span>4</span><div><b>Bounded evidence only</b><small>Top groups and affected namespaces are capped; raw bulk logs, events, Secrets and credentials are excluded.</small></div></div>
+          <div class="payload-note"><span>5</span><div><b>Replay-safe Workflow name</b><small>The event identity produces one deterministic Kubernetes Workflow name for the date.</small></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="boundary">
+      <div class="section-head">
+        <div class="section-number">05 · Cluster boundary</div>
+        <div><h2>No shared filesystem. No shared database required.</h2><p class="section-copy">The same logical boundary works whether worker and manager are namespaces on one homelab cluster today or physically separate clusters at work later.</p></div>
+      </div>
+      <div class="boundary-wrap">
+        <article class="zone"><h3>Worker plane</h3><ul><li>Fox state-only collectors</li><li>B1 five-minute snapshots</li><li>Daily alert controller</li><li>Vector with Kafka credentials</li><li>No model or GitLab token</li></ul></article>
+        <div class="transport"><span>bounded JSON</span><div class="transport-line"></div><span>Kafka SASL/TLS</span></div>
+        <article class="zone"><h3>Manager / agent plane</h3><ul><li>Argo EventSource and Sensor</li><li>Replay-safe Workflow</li><li>Read-only kagent Agent</li><li>Worker-targeted AKS-MCP</li><li>Separate GitLab writer token</li></ul></article>
+      </div>
+      <div class="no-share"><b>One cluster now:</b> pass the same Kubernetes context for worker and manager. <b>Two clusters later:</b> move the manager resources and change endpoints/NetworkPolicies—the Kafka contract and security responsibilities stay the same.</div>
+    </section>
+
+    <section id="guardrails">
+      <div class="section-head">
+        <div class="section-number">06 · Guardrails</div>
+        <div><h2>The agent can investigate. It cannot quietly become an operator.</h2><p class="section-copy">Read, decide and write are separate authorities. A prompt is not the security boundary; credentials, tools, RBAC, NetworkPolicy and fixed adapters enforce the shape.</p></div>
+      </div>
+      <div class="controls">
+        <article class="control"><span class="control-no">01</span><h3>Read-only Kubernetes</h3><p>The agent has only the approved AKS-MCP read tools. No apply, delete, scale, exec, restart or remediation tools.</p></article>
+        <article class="control"><span class="control-no">02</span><h3>GitLab token isolation</h3><p>The agent never sees the token. Only the fixed-purpose writer step receives the project-scoped Secret.</p></article>
+        <article class="control"><span class="control-no">03</span><h3>Default-disabled writing</h3><p><code>GITLAB_WRITE_ENABLED=false</code> remains set until Kafka and agent-only proofs pass.</p></article>
+        <article class="control"><span class="control-no">04</span><h3>One issue identity</h3><p>Three exact labels identify the managed issue. Zero matches creates, one updates, ambiguity fails closed.</p></article>
+        <article class="control"><span class="control-no">05</span><h3>Restricted containers</h3><p>Non-root, read-only filesystems, dropped capabilities, seccomp, bounded CPU, memory and ephemeral storage.</p></article>
+        <article class="control"><span class="control-no">06</span><h3>Exact egress</h3><p>Kafka, Kubernetes API, kagent A2A and GitLab egress are scoped to reviewed CIDRs, namespaces and ports.</p></article>
+      </div>
+    </section>
+
+    <section id="deploy">
+      <div class="section-head">
+        <div class="section-number">07 · Workplace path</div>
+        <div><h2>Build it, point it, deploy it—then prove every boundary.</h2><p class="section-copy">The handoff is intentionally staged so a valid manifest or Ready pod cannot be mistaken for end-to-end delivery evidence.</p></div>
+      </div>
+      <div class="deploy">
+        <article class="deploy-step"><h3>Build two images</h3><p>Build the pinned, state-only Fox adaptation and the local assessor image. Scan, produce SBOMs, push internally and record immutable digests.</p><code>build-fox-image.sh</code><br><code>build-assessor-image.sh</code></article>
+        <article class="deploy-step"><h3>Render for work</h3><p>Supply private cluster, Kafka, AKS-MCP, GitLab and CIDR values outside the public checkout. Keep the writer disabled.</p><code>render.py</code><br><code>verify-live.sh</code></article>
+        <article class="deploy-step"><h3>Deploy and prove</h3><p>Commit through the owning GitOps flow. Prove produced/consumed Kafka traffic, one daily record, one agent run and one disposable GitLab issue.</p><code>verify-running.sh</code><br><code>TEST-PLAN.md</code></article>
+      </div>
+    </section>
+
+    <section id="proof">
+      <div class="section-head">
+        <div class="section-number">08 · Evidence boundary</div>
+        <div><h2>What we know—and what work still has to prove.</h2><p class="section-copy">This is a deployable source bundle, not a claim that the workplace Kafka, cluster permissions, image registry or GitLab project already accept it.</p></div>
+      </div>
+      <div class="proof-grid">
+        <article class="proof pass"><h3><span></span>Verified offline</h3><ul><li>47 deterministic unit tests</li><li>Alert and snapshot schemas</li><li>Kustomize and placeholder-free rendering</li><li>Default-disabled GitLab writer</li><li>Token confinement and hardened pod specs</li><li>Standalone copied-folder verification</li></ul></article>
+        <article class="proof pending"><h3><span></span>Must be proven at work</h3><ul><li>Internal image build, scan, SBOM and digest</li><li>Real Alloy namespace-scope parity</li><li>Actual Kafka produce and consume</li><li>Installed Argo/kagent/AKS-MCP compatibility</li><li>Effective RBAC and NetworkPolicy</li><li>Disposable GitLab create/update drill and soak</li></ul></article>
+      </div>
+      <div class="answer-strip">
+        <div class="answer"><b>Does this replace Alloy/Vector?</b><span>No. It uses the same scope, then compresses current state into a separate daily decision lane.</span></div>
+        <div class="answer"><b>Does the score trigger tickets?</b><span>No. The explicit critical/degraded/recovery gate triggers investigation; the score explains the outcome.</span></div>
+        <div class="answer"><b>Can the agent fix the cluster?</b><span>No. It investigates and recommends. SRE owns review, change control, execution and rollback.</span></div>
+      </div>
+    </section>
+
+    <footer>
+      <div><strong>Cluster Health Assessment · visual explainer</strong><br>Source of truth: the workplace bundle README, PRD, test plan and deterministic policy code.</div>
+      <div class="footer-links"><a href="README.md">Deployment README</a><a href="WORKPLACE-QUICKSTART.md">Quick start</a><a href="TEST-PLAN.md">Test plan</a><a href="https://github.com/foxj77/autonomous-monitor">Fox upstream</a></div>
+    </footer>
+  </main>
+</body>
+</html>

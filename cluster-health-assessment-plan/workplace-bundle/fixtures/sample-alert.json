@@ -1,0 +1,47 @@
+{
+  "schema_version": "cluster-health.alert.v1",
+  "event_id": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "dedupe_key": "cluster-health/worker-a/episode-a",
+  "action": "investigate",
+  "automation_allowed": false,
+  "emitted_at": "2026-09-16T08:00:00Z",
+  "dispatch": {
+    "workflow_name": "cluster-health-investigation-aaaaaaaaaaaaaaaaaaaa"
+  },
+  "cluster": {
+    "id": "worker-a",
+    "source_generation": "test-v1",
+    "mcp_target": "worker-a"
+  },
+  "health": {
+    "display_score": 70,
+    "severity": "critical",
+    "gate_reason": "at least one required domain is critical",
+    "coverage_complete": true,
+    "domains": {
+      "nodes_scheduling": {"status": "critical", "reasons": ["node unavailable"]},
+      "workload_availability": {"status": "degraded", "reasons": ["workload unavailable"]},
+      "shared_services": {"status": "healthy", "reasons": []},
+      "resource_pressure": {"status": "watch", "reasons": []},
+      "delivery": {"status": "healthy", "reasons": []}
+    }
+  },
+  "scope": {
+    "namespaces": ["payments"],
+    "top_problem_groups": [{"namespace": "payments", "owner_kind": "Deployment", "owner_name": "api", "symptom_family": "scheduling", "count": 50, "sources": ["native"]}],
+    "problem_group_total": 1,
+    "problem_groups_truncated": false
+  },
+  "evidence": {
+    "daily_slot_utc": "2026-09-16",
+    "snapshot_name": "cluster-health-snapshot-0000000007",
+    "snapshot_seq": 7,
+    "snapshot_checksum": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "snapshot_completed_at": "2026-09-16T07:59:30Z",
+    "policy_version": "policy-v1"
+  },
+  "investigation": {
+    "read_only": true,
+    "requested_checks": ["Confirm current node and control-plane health"]
+  }
+}

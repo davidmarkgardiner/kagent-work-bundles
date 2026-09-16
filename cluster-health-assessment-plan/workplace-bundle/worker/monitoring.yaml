@@ -1,0 +1,53 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: fox-cluster-health-mesh
+  namespace: cluster-health-system
+  labels:
+    app.kubernetes.io/part-of: cluster-health-assessment
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: autonomous-monitor
+      app.kubernetes.io/part-of: cluster-health-fox-mesh
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cluster-health-assessment
+  namespace: cluster-health-system
+  labels:
+    app.kubernetes.io/part-of: cluster-health-assessment
+spec:
+  groups:
+    - name: cluster-health-assessment
+      rules:
+        - alert: ClusterHealthCollectorMeshUnavailable
+          expr: count(up{namespace="cluster-health-system",pod=~"fox-monitor-.*"} == 1) < {{EXPECTED_NAMESPACE_COUNT}}
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: Fox cluster-health collector mesh is incomplete
+            description: Fewer than the expected {{EXPECTED_NAMESPACE_COUNT}} namespace collectors have been scrapeable for ten minutes.
+        - alert: ClusterHealthAssessmentStale
+          expr: time() - cluster_health_snapshot_completed_timestamp_seconds > 900
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: Cluster-health assessment is stale
+            description: No complete worker snapshot has been recorded within the required freshness window.
+        - alert: ClusterHealthKafkaDeliveryFailing
+          expr: increase(vector_component_errors_total{component_id="kafka_cluster_health"}[10m]) > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: Cluster-health summary Kafka delivery is failing
+            description: The dedicated Vector summary sink has reported delivery errors.

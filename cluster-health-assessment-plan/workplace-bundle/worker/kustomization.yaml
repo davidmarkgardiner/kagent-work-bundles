@@ -1,0 +1,64 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../b1
+  - ../../fox-mesh
+  - alert-bridge.yaml
+  - network-policies.yaml
+  - monitoring.yaml
+images:
+  - name: python
+    newName: "{{ASSESSOR_IMAGE}}"
+    newTag: workplace
+  - name: cluster-health-assessor-image
+    newName: "{{ASSESSOR_IMAGE}}"
+    newTag: workplace
+  - name: ghcr.io/foxj77/autonomous-monitor
+    newName: "{{FOX_IMAGE}}"
+    newTag: workplace
+  - name: timberio/vector
+    newName: "{{VECTOR_IMAGE}}"
+    newTag: workplace
+patches:
+  - target:
+      kind: ConfigMap
+      name: cluster-health-config
+    patch: |-
+      - op: replace
+        path: /data/CLUSTER_ID
+        value: "{{CLUSTER_ID}}"
+      - op: replace
+        path: /data/SOURCE_GENERATION
+        value: "{{SOURCE_GENERATION}}"
+      - op: replace
+        path: /data/CRITICAL_NAMESPACES
+        value: "{{CRITICAL_NAMESPACES}}"
+  - target:
+      kind: Namespace
+      name: cluster-health-system
+    patch: |-
+      - op: add
+        path: /metadata/labels/pod-security.kubernetes.io~1enforce
+        value: restricted
+      - op: add
+        path: /metadata/labels/pod-security.kubernetes.io~1audit
+        value: restricted
+      - op: add
+        path: /metadata/labels/pod-security.kubernetes.io~1warn
+        value: restricted
+  - target:
+      kind: CronJob
+      labelSelector: app.kubernetes.io/name=cluster-health-assessment
+    patch: |-
+      - op: remove
+        path: /spec/jobTemplate/spec/template/spec/containers/0/volumeMounts/0
+      - op: remove
+        path: /spec/jobTemplate/spec/template/spec/volumes/0
+  - target:
+      kind: Deployment
+      name: cluster-health-metrics
+    patch: |-
+      - op: remove
+        path: /spec/template/spec/containers/0/volumeMounts/0
+      - op: remove
+        path: /spec/template/spec/volumes/0

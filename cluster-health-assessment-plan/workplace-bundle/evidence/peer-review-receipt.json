@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-09-16T08:57:32.335242+00:00",
+  "primary": "claude",
+  "fallback": "kimi",
+  "attempts": [
+    {
+      "provider": "claude",
+      "status": "failed",
+      "exit_code": 1,
+      "duration_ms": 3257,
+      "output_bytes": 34,
+      "output_sha256": "ddcf5c1f4a3b398837003d800ea793d0a3ebb7ec0a1304b3186393460a7d5bd6",
+      "failure": "non-zero exit: 1"
+    },
+    {
+      "provider": "kimi",
+      "status": "failed",
+      "exit_code": 1,
+      "duration_ms": 1203,
+      "output_bytes": 0,
+      "failure": "non-zero exit: 1"
+    }
+  ],
+  "completed_at": "2026-09-16T08:57:36.796675+00:00",
+  "status": "failed",
+  "fallback_used": true
+}

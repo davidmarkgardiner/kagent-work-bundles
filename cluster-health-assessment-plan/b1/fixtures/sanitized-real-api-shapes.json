@@ -1,0 +1,73 @@
+{
+  "source": {
+    "capture_date": "2026-09-15",
+    "context": "home-lab worker",
+    "sanitization": "Names, UIDs, addresses, images, messages, and environment identifiers replaced; Kubernetes field presence and timestamp forms retained."
+  },
+  "replicasets": [
+    {
+      "metadata": {
+        "name": "web-rs",
+        "namespace": "demo",
+        "ownerReferences": [
+          {"apiVersion": "apps/v1", "kind": "Deployment", "name": "web", "controller": true}
+        ]
+      }
+    }
+  ],
+  "pods": [
+    {
+      "metadata": {
+        "name": "completed-job-pod",
+        "namespace": "demo",
+        "uid": "SANITIZED-UID-1",
+        "ownerReferences": [
+          {"apiVersion": "batch/v1", "kind": "Job", "name": "completed-job", "controller": true}
+        ]
+      },
+      "spec": {"containers": [{"name": "job", "resources": {}}]},
+      "status": {"phase": "Succeeded", "containerStatuses": [{"name": "job", "ready": false, "restartCount": 0}]}
+    },
+    {
+      "metadata": {
+        "name": "web-replacement-pod",
+        "namespace": "demo",
+        "uid": "SANITIZED-UID-2",
+        "ownerReferences": [
+          {"apiVersion": "apps/v1", "kind": "ReplicaSet", "name": "web-rs", "controller": true}
+        ]
+      },
+      "spec": {"containers": [{"name": "web", "resources": {"limits": {"cpu": "100m", "memory": "64Mi"}}}]},
+      "status": {
+        "phase": "Pending",
+        "containerStatuses": [
+          {
+            "name": "web",
+            "ready": false,
+            "restartCount": 7,
+            "lastState": {"terminated": {"reason": "OOMKilled", "finishedAt": "2026-09-15T08:12:13.173860Z"}}
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "metadata": {"name": "recent-warning", "uid": "SANITIZED-UID-3"},
+      "type": "Warning",
+      "reason": "FailedScheduling",
+      "eventTime": "2026-09-15T08:12:13.173860Z",
+      "lastTimestamp": null,
+      "count": 12,
+      "involvedObject": {"kind": "Pod", "namespace": "demo", "name": "web-replacement-pod"}
+    },
+    {
+      "metadata": {"name": "audit-only", "uid": "SANITIZED-UID-4"},
+      "type": "Warning",
+      "reason": "PolicyViolation",
+      "series": {"lastObservedTime": "2026-09-15T08:13:00Z"},
+      "count": 1000,
+      "involvedObject": {"kind": "Deployment", "namespace": "demo", "name": "web"}
+    }
+  ]
+}

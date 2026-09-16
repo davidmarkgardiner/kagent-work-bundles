@@ -1,0 +1,78 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cluster-health-publisher
+  namespace: cluster-health-system
+  labels:
+    app.kubernetes.io/name: cluster-health-publisher
+spec:
+  schedule: "2-59/5 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 240
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400
+      activeDeadlineSeconds: 60
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cluster-health-publisher
+        spec:
+          serviceAccountName: cluster-health-publisher
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            fsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: publisher
+              image: python:3.11-slim@sha256:d1053354624536b044162aaab1e418bd000ea35184fb1ae098ab3166b1072e72
+              command: ["python", "/app/publisher.py"]
+              env:
+                - name: STATE_NAMESPACE
+                  value: cluster-health-system
+                - name: CLUSTER_ID
+                  value: homelab-worker-red
+                - name: SOURCE_GENERATION
+                  value: homelab-b1-g1
+                - name: INTAKE_URL
+                  value: https://agent-cage.example.invalid:30443/v1/snapshots
+                - name: PYTHONDONTWRITEBYTECODE
+                  value: "1"
+              resources:
+                requests:
+                  cpu: 5m
+                  memory: 24Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: script
+                  mountPath: /app
+                  readOnly: true
+                - name: auth
+                  mountPath: /auth
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: script
+              configMap:
+                name: cluster-health-publisher-script
+            - name: auth
+              secret:
+                secretName: cluster-health-publisher-auth
+            - name: tmp
+              emptyDir:
+                sizeLimit: 8Mi

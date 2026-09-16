@@ -1,0 +1,307 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: aks-istio-ingress
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: aks-istio-egress
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: aks-istio-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: alloy
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: flux-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: gatekeeper-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: kyverno
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: logging
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: xxx-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: uk8s-config
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: uk8s-core
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: external-dns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: cert-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: external-secrets
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: informer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: kro-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: platform-test-app
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: xxx-issuer-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: agentic-triage-proof
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-assessor-read
+  namespace: aks-platform-triage-smoke
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-health-assessor-namespace-read
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-assessor
+    namespace: cluster-health-system

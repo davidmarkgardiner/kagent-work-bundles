@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - k8s/namespace.yaml
+  - k8s/rbac.yaml
+  - k8s/watched-namespaces.yaml
+  - k8s/collector-cronjob.yaml
+  - k8s/report-cronjobs.yaml
+  - k8s/metrics.yaml
+configMapGenerator:
+  - name: cluster-health-config
+    namespace: cluster-health-system
+    envs:
+      - k8s/config.env
+  - name: cluster-health-scripts
+    namespace: cluster-health-system
+    files:
+      - collector.py
+      - health.py
+      - metrics.py
+  - name: cluster-health-grafana-dashboard
+    namespace: cluster-health-system
+    files:
+      - grafana/cluster-health-overview.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: cluster-health-assessment
+    app.kubernetes.io/part-of: cluster-health-assessment

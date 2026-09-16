@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/cluster-health/snapshot.schema.json",
+  "title": "Cluster health snapshot",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "cluster_id",
+    "source_generation",
+    "snapshot_seq",
+    "completed_at",
+    "checksum",
+    "coverage",
+    "domains",
+    "display_score",
+    "gate",
+    "membership_complete",
+    "problem_group_total",
+    "problem_groups",
+    "problem_groups_truncated",
+    "policy_version",
+    "serialized_bytes",
+    "triage_mode"
+  ],
+  "properties": {
+    "cluster_id": {"type": "string", "minLength": 1},
+    "source_generation": {"type": "string", "minLength": 1},
+    "snapshot_seq": {"type": "integer", "minimum": 1},
+    "completed_at": {"type": "string", "format": "date-time"},
+    "checksum": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "coverage": {
+      "type": "object",
+      "required": ["complete"],
+      "properties": {"complete": {"type": "boolean"}}
+    },
+    "domains": {"type": "object", "minProperties": 5},
+    "display_score": {"type": "integer", "minimum": 0, "maximum": 100},
+    "gate": {
+      "type": "object",
+      "required": ["active"],
+      "properties": {"active": {"type": "boolean"}}
+    },
+    "membership_complete": {"type": "boolean"},
+    "problem_group_total": {"type": "integer", "minimum": 0},
+    "problem_groups": {"type": "array", "maxItems": 100},
+    "problem_groups_truncated": {"type": "boolean"},
+    "serialized_bytes": {"type": "integer", "minimum": 1, "maximum": 262144},
+    "triage_mode": {"const": "report_only"}
+  },
+  "additionalProperties": true
+}

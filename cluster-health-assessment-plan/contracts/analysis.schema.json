@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/cluster-health/analysis.schema.json",
+  "title": "Evidence-only cluster health analysis",
+  "type": "object",
+  "required": ["cluster_id", "source_generation", "snapshot_seq", "source_checksum", "mode", "model_invoked", "tool_calls", "document"],
+  "properties": {
+    "cluster_id": {"type": "string", "minLength": 1},
+    "source_generation": {"type": "string", "minLength": 1},
+    "snapshot_seq": {"type": "integer", "minimum": 1},
+    "source_checksum": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "mode": {"enum": ["deterministic_evidence_only", "model_evidence_only"]},
+    "model_invoked": {"type": "boolean"},
+    "tool_calls": {"type": "array", "maxItems": 0},
+    "document": {
+      "type": "object",
+      "required": ["score", "gate", "priorities", "problem_groups", "claims", "limitations", "agent_handoff"],
+      "properties": {
+        "claims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["claim", "evidence_path"],
+            "properties": {"evidence_path": {"type": "string", "pattern": "^/"}}
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

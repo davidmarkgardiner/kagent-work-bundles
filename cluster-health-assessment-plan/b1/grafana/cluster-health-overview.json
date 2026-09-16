@@ -1,0 +1,64 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Cluster health score (display only)",
+      "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0},
+      "targets": [{"refId": "A", "expr": "cluster_health_display_score{cluster=\"$cluster\"}"}],
+      "fieldConfig": {"defaults": {"min": 0, "max": 100, "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "orange", "value": 50}, {"color": "yellow", "value": 80}, {"color": "green", "value": 95}]}}}
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Deterministic gate active",
+      "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0},
+      "targets": [{"refId": "A", "expr": "cluster_health_gate_active{cluster=\"$cluster\"}"}],
+      "fieldConfig": {"defaults": {"mappings": [{"type": "value", "options": {"0": {"text": "CLEAR", "color": "green"}, "1": {"text": "BREACH", "color": "red"}}}]}}
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Required coverage complete",
+      "gridPos": {"h": 6, "w": 6, "x": 12, "y": 0},
+      "targets": [{"refId": "A", "expr": "cluster_health_coverage_complete{cluster=\"$cluster\"}"}]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Snapshot age (seconds)",
+      "gridPos": {"h": 6, "w": 6, "x": 18, "y": 0},
+      "targets": [{"refId": "A", "expr": "cluster_health_snapshot_age_seconds{cluster=\"$cluster\"}"}],
+      "fieldConfig": {"defaults": {"unit": "s", "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 900}, {"color": "red", "value": 1200}]}}}
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Health domains (0 healthy, 3 critical)",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
+      "targets": [{"refId": "A", "expr": "cluster_health_domain_status{cluster=\"$cluster\"}", "legendFormat": "{{domain}}"}],
+      "fieldConfig": {"defaults": {"min": 0, "max": 3}}
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Collector cost",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
+      "targets": [
+        {"refId": "A", "expr": "cluster_health_collector_api_calls{cluster=\"$cluster\"}", "legendFormat": "API calls"},
+        {"refId": "B", "expr": "cluster_health_collector_response_bytes{cluster=\"$cluster\"}", "legendFormat": "response bytes"}
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["cluster-health", "report-only", "b1"],
+  "templating": {"list": [{"name": "cluster", "type": "query", "query": "label_values(cluster_health_display_score, cluster)", "current": {"text": "homelab-worker-red", "value": "homelab-worker-red"}}]},
+  "time": {"from": "now-24h", "to": "now"},
+  "timezone": "browser",
+  "title": "Cluster Health Assessment — B1",
+  "uid": "cluster-health-b1",
+  "version": 1
+}

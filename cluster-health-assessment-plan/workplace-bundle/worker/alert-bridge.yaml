@@ -1,0 +1,305 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cluster-health-alert-bridge
+  namespace: cluster-health-system
+  labels:
+    app.kubernetes.io/name: cluster-health-alert-bridge
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-health-alert-state
+  namespace: cluster-health-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
+  labels:
+    app.kubernetes.io/name: cluster-health-alert-bridge
+    app.kubernetes.io/component: dispatch-state
+data:
+  state.json: '{}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cluster-health-alert-bridge
+  namespace: cluster-health-system
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["cluster-health-latest", "cluster-health-alert-state"]
+    verbs: ["get", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get"]
+    # Snapshot names are immutable and sequence-numbered. Kubernetes RBAC
+    # cannot express a resource-name prefix, so the bridge's only broader read
+    # is ConfigMaps inside this platform-owned namespace.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-health-alert-bridge
+  namespace: cluster-health-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cluster-health-alert-bridge
+subjects:
+  - kind: ServiceAccount
+    name: cluster-health-alert-bridge
+    namespace: cluster-health-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-health-alert-vector
+  namespace: cluster-health-system
+  labels:
+    app.kubernetes.io/name: cluster-health-alert-bridge
+data:
+  vector.yaml: |
+    data_dir: /var/lib/vector
+    api:
+      enabled: true
+      address: 0.0.0.0:8686
+    sources:
+      cluster_health_alerts:
+        type: file
+        include: [/var/run/cluster-health/alerts.ndjson]
+        read_from: beginning
+        fingerprint:
+          strategy: device_and_inode
+    transforms:
+      parse_and_validate:
+        type: remap
+        inputs: [cluster_health_alerts]
+        drop_on_abort: true
+        source: |
+          parsed = parse_json!(.message)
+          if parsed.schema_version != "cluster-health.alert.v1" { abort }
+          if parsed.automation_allowed != false { abort }
+          if !includes(["investigate", "healthy"], parsed.action) { abort }
+          . = parsed
+    sinks:
+      kafka_cluster_health:
+        type: kafka
+        inputs: [parse_and_validate]
+        bootstrap_servers: "${KAFKA_BOOTSTRAP}"
+        topic: "${KAFKA_TOPIC}"
+        key_field: dedupe_key
+        compression: zstd
+        encoding:
+          codec: json
+        acknowledgements:
+          enabled: true
+        healthcheck:
+          enabled: true
+        librdkafka_options:
+          security.protocol: sasl_ssl
+          sasl.mechanism: PLAIN
+          sasl.username: "${KAFKA_KEY}"
+          sasl.password: "${KAFKA_SECRET}"
+          enable.idempotence: "true"
+          acks: all
+          message.timeout.ms: "30000"
+        buffer:
+          type: memory
+          max_events: 500
+          when_full: block
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluster-health-alert-bridge
+  namespace: cluster-health-system
+  labels:
+    app.kubernetes.io/name: cluster-health-alert-bridge
+    app.kubernetes.io/component: threshold-publisher
+    app.kubernetes.io/part-of: cluster-health-assessment
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cluster-health-alert-bridge
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cluster-health-alert-bridge
+        app.kubernetes.io/component: threshold-publisher
+        app.kubernetes.io/part-of: cluster-health-assessment
+    spec:
+      serviceAccountName: cluster-health-alert-bridge
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: controller
+          image: cluster-health-assessor-image:workplace
+          imagePullPolicy: IfNotPresent
+          command: ["python3", "/app/alert_controller.py"]
+          env:
+            - name: STATE_NAMESPACE
+              value: cluster-health-system
+            - name: CLUSTER_ID
+              value: "{{CLUSTER_ID}}"
+            - name: SOURCE_GENERATION
+              value: "{{SOURCE_GENERATION}}"
+            - name: MCP_CLUSTER_TARGET
+              value: "{{MCP_CLUSTER_TARGET}}"
+            - name: ALERT_POLL_SECONDS
+              value: "30"
+            - name: DAILY_REPORT_HOUR_UTC
+              value: "7"
+            - name: DAILY_REPORT_MINUTE_UTC
+              value: "30"
+            - name: ALERT_TOP_N
+              value: "10"
+            - name: ALERT_MAX_EVENT_BYTES
+              value: "65536"
+            - name: MAX_SNAPSHOT_AGE_SECONDS
+              value: "900"
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+              ephemeral-storage: 16Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+              ephemeral-storage: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            exec:
+              command: ["python3", "-c", "import os,time,sys; sys.exit(0 if time.time()-os.stat('/var/run/cluster-health/controller.ready').st_mtime < 180 else 1)"]
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command: ["python3", "-c", "import os,time,sys; sys.exit(0 if time.time()-os.stat('/var/run/cluster-health/controller.live').st_mtime < 180 else 1)"]
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            - name: exchange
+              mountPath: /var/run/cluster-health
+            - name: kube-api-access
+              mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+        - name: vector
+          image: timberio/vector:0.45.0-debian
+          imagePullPolicy: IfNotPresent
+          args: ["--config", "/etc/vector/vector.yaml"]
+          env:
+            - name: KAFKA_BOOTSTRAP
+              valueFrom:
+                secretKeyRef:
+                  name: "{{KAFKA_CREDENTIALS_SECRET}}"
+                  key: bootstrap
+            - name: KAFKA_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{KAFKA_CREDENTIALS_SECRET}}"
+                  key: key
+            - name: KAFKA_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: "{{KAFKA_CREDENTIALS_SECRET}}"
+                  key: secret
+            - name: KAFKA_TOPIC
+              value: "{{CLUSTER_HEALTH_ALERT_TOPIC}}"
+            - name: VECTOR_REQUIRE_HEALTHY
+              value: "true"
+          ports:
+            - name: vector-api
+              containerPort: 8686
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+              ephemeral-storage: 32Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+              ephemeral-storage: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: vector-api
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: vector-api
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            - name: exchange
+              mountPath: /var/run/cluster-health
+              readOnly: true
+            - name: vector-config
+              mountPath: /etc/vector
+              readOnly: true
+            - name: vector-data
+              mountPath: /var/lib/vector
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: exchange
+          emptyDir:
+            sizeLimit: 16Mi
+        - name: vector-config
+          configMap:
+            name: cluster-health-alert-vector
+        - name: vector-data
+          emptyDir:
+            sizeLimit: 32Mi
+        - name: tmp
+          emptyDir:
+            sizeLimit: 16Mi
+        - name: kube-api-access
+          projected:
+            defaultMode: 0440
+            sources:
+              - serviceAccountToken:
+                  path: token
+                  expirationSeconds: 3600
+                  audience: https://kubernetes.default.svc
+              - configMap:
+                  name: kube-root-ca.crt
+                  items:
+                    - key: ca.crt
+                      path: ca.crt

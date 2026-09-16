@@ -1,0 +1,19 @@
+# These stdlib Kubernetes clients construct the in-cluster HTTP Authorization
+# header from the mounted ServiceAccount token. They never contain a token.
+**/b1/collector.py
+**/b1/metrics.py
+# Runtime-only Kubernetes Secret references and Authorization header builders.
+# The files contain no credential values; public manifests use named references.
+**/b2/agent-cage/intake.yaml
+**/b2/worker/cronjob.yaml
+**/b2/worker/publisher.py
+**/b2/intake/main.go
+**/b3/assessor.py
+**/b3/workload.yaml
+**/b4/reconciler.py
+**/b4/workload.yaml
+# The alert controller constructs the in-cluster ServiceAccount auth header;
+# the offline verifier rejects GitLab token/header and Secret manifests.
+**/workplace-bundle/runtime/alert_controller.py
+**/workplace-bundle/runtime/gitlab_summary_writer.py
+**/workplace-bundle/scripts/verify.py

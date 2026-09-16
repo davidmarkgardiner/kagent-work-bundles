@@ -57,6 +57,10 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 | `cluster-health-baseline-sentinel/` | Cluster-scope baseline detection and generic triage | Catches cluster-wide problems namespace routing structurally cannot: periodic whole-cluster snapshot, baseline drift detection, and a generic orchestrator agent that investigates. Proven end-to-end on RED. Includes `REVERSE-PROMPT.md` for an independent team to design their own answer. |
 | `aks-mcp-fleet-kubeconfig-refresh/` | Central AKS credential refresh with fixed-target MCP/Agent routing | Builds and validates one morning fleet candidate, atomically publishes one single-context Secret key per alias, and routes Argo payloads to fixed-target AKS-MCP/Agent pairs; two-cluster homelab A2A proof included |
 
+## Plans and staged pilots
+
+- [Cluster health assessment: daily workplace handoff](cluster-health-assessment-plan/README.md) combines the pinned Fox state collector with deterministic five-minute assessment, one bounded daily Kafka record, an Argo/kagent read-only investigation path, and a default-disabled single GitLab summary writer. The standalone source bundle passes offline gates; internal image builds, workplace Kafka/AKS-MCP/GitLab proofs, soak, and independent review remain promotion gates.
+
 ## Recommended Work Order
 
 1. `team-handover-pack/`
