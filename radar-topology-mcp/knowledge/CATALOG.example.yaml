@@ -1,0 +1,25 @@
+# Proposed knowledge lookup contract. Neither Radar nor the bundled Agent loads this file.
+# Keep content in approved Git/KB sources. Review mappings before exposing a knowledge tool.
+version: 1
+bindings:
+  - target:
+      cluster: "{{APPROVED_CLUSTER_ID}}"
+      namespace: "{{PRODUCT_NAMESPACE}}"
+      apiGroup: apps
+      kind: Deployment
+      name: "{{STABLE_WORKLOAD_NAME}}"
+    references:
+      - type: skill
+        uri: "{{APPROVED_SKILL_URI}}"
+        revision: "{{REVIEWED_COMMIT_OR_VERSION}}"
+      - type: runbook
+        uri: "{{APPROVED_RUNBOOK_URI}}"
+        revision: "{{REVIEWED_COMMIT_OR_VERSION}}"
+      - type: knowledge
+        uri: "{{APPROVED_KB_URI}}"
+        revision: "{{REVIEWED_DOCUMENT_VERSION}}"
+      - type: rubric
+        uri: "{{APPROVED_RUBRIC_URI}}"
+        revision: "{{REVIEWED_COMMIT_OR_VERSION}}"
+# Future typed tools: find_guidance(cluster, namespace, kind, name, symptom)
+# and read_guidance(reference_id), each bounded and limited to approved sources.

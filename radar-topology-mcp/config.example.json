@@ -1,0 +1,6 @@
+{
+  "radar_namespace": "radar-topology",
+  "kagent_namespace": "kagent",
+  "model_config": "{{EXISTING_KAGENT_MODEL_CONFIG}}",
+  "image_repository": "ghcr.io/skyhook-io/radar"
+}

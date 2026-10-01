@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: radar-topology
+  namespace: "{{RADAR_NAMESPACE}}"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "{{RADAR_NAMESPACE}}-inventory-reader"
+rules:
+  - apiGroups: [""]
+    resources: [pods, services, endpoints, namespaces, nodes, configmaps, serviceaccounts, persistentvolumeclaims, persistentvolumes, events]
+    verbs: [get, list, watch]
+  - apiGroups: [apps]
+    resources: [deployments, replicasets, statefulsets, daemonsets]
+    verbs: [get, list, watch]
+  - apiGroups: [batch]
+    resources: [jobs, cronjobs]
+    verbs: [get, list, watch]
+  - apiGroups: [discovery.k8s.io]
+    resources: [endpointslices]
+    verbs: [get, list, watch]
+  - apiGroups: [networking.k8s.io]
+    resources: [ingresses, ingressclasses, networkpolicies]
+    verbs: [get, list, watch]
+  - apiGroups: [gateway.networking.k8s.io]
+    resources: [gatewayclasses, gateways, httproutes, grpcroutes, tcproutes, tlsroutes, udproutes, referencegrants]
+    verbs: [get, list, watch]
+  - apiGroups: [networking.istio.io]
+    resources: [virtualservices, gateways, destinationrules, serviceentries]
+    verbs: [get, list, watch]
+  - apiGroups: [autoscaling]
+    resources: [horizontalpodautoscalers]
+    verbs: [get, list, watch]
+  - apiGroups: [policy]
+    resources: [poddisruptionbudgets]
+    verbs: [get, list, watch]
+  - apiGroups: [storage.k8s.io]
+    resources: [storageclasses]
+    verbs: [get, list, watch]
+  - apiGroups: [apiextensions.k8s.io]
+    resources: [customresourcedefinitions]
+    verbs: [get, list, watch]
+  - apiGroups: [metrics.k8s.io]
+    resources: [pods, nodes]
+    verbs: [get, list]
+  - apiGroups: [authorization.k8s.io]
+    resources: [selfsubjectaccessreviews]
+    verbs: [create] # Permission check; no workload mutation.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "{{RADAR_NAMESPACE}}-inventory-reader"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "{{RADAR_NAMESPACE}}-inventory-reader"
+subjects:
+  - kind: ServiceAccount
+    name: radar-topology
+    namespace: "{{RADAR_NAMESPACE}}"

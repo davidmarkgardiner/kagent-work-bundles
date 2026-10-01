@@ -1,0 +1,14 @@
+{
+  "chart": "radar",
+  "chart_version": "1.15.0",
+  "chart_repository": "https://skyhook-io.github.io/helm-charts",
+  "chart_sha256": "7407b294ebb2b52482234e1630d8a111333b6e3c68e9e6bdbba58c474c0e334c",
+  "image": "ghcr.io/skyhook-io/radar:1.15.0",
+  "shared_helpers": {
+    "kagent-a2a-invoke.sh": "33a328bb924924aa4df32d943e7c7f58e8f05d4c2cb13d1929683c8d1e29347b",
+    "kagent-verify-agent.sh": "2151aa94fef67294f07f1dd325f04b28e5c390c8a371ce85d3a3cf2fd4624ba4"
+  },
+  "tested_kagent_version": "0.10.1",
+  "tested_kagent_runtime": "go",
+  "mcp_path": "/mcp-readonly"
+}
