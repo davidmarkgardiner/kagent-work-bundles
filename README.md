@@ -26,6 +26,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 
 | Bundle | Capability | Primary outcome |
 |---|---|---|
+| [`radar-topology-mcp/`](radar-topology-mcp/README.md) | Radar topology plus existing vector KB; air-gapped OCI handoff | Resolves workload identity before cited KB lookup, with pinned artifact imports and live evaluation boundaries |
 | `team-handover-pack/` | Human handover, tickets, Teams messages, game-day planning | Provides GitLab ticket templates, Teams messages, game-day plan, and an HTML presentation for SRE/stakeholder handover |
 | `runtime-model-gateway-readiness/` | Runtime, model, Agent Gateway, A2A, and MCP preflight | Proves model backend, Agent Gateway, A2A, and required MCP servers are live before downstream demos |
 | `sre-grafana-mcp-observability/` | Grafana MCP observability | SRE asks a kagent front door to build/verify dashboards, alerts, logs, metrics, and GitOps observability changes |
@@ -123,3 +124,6 @@ Run that command from a clean `kagent-public` checkout; the script deliberately
 lives only in the source repository. It publishes the committed subtree to the
 sister repository's `main` branch. Do not make independent edits in the sister
 repository; the next source sync will overwrite them.
+
+The Radar bundle's reusable KB deployment/indexer source is in the primary repo:
+https://github.com/davidmarkgardiner/kagent-public/tree/6ab7e2f24d7a56bf99809696433d76665022c797/ai-platform/kagent-knowledge-base

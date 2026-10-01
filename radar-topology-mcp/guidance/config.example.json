@@ -1,0 +1,7 @@
+{
+  "radar_namespace": "radar-topology",
+  "kagent_namespace": "kagent",
+  "model_config": "{{EXISTING_KAGENT_MODEL_CONFIG}}",
+  "guidance_image": "{{APPROVED_GUIDANCE_IMAGE_AT_SHA256_DIGEST}}",
+  "guidance_cluster": "radar-lab"
+}

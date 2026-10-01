@@ -1,0 +1,54 @@
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: radar-topology
+  namespace: "{{KAGENT_NAMESPACE}}"
+spec:
+  description: Read-only current Kubernetes topology from Radar 1.15.0.
+  protocol: STREAMABLE_HTTP
+  timeout: 30s
+  url: "http://radar-topology.{{RADAR_NAMESPACE}}.svc.cluster.local:9280/mcp-readonly"
+---
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: radar-topology-reader
+  namespace: "{{KAGENT_NAMESPACE}}"
+spec:
+  type: Declarative
+  description: Evidence-based Kubernetes relationship triage with Radar.
+  declarative:
+    runtime: go
+    modelConfig: "{{MODEL_CONFIG}}"
+    systemMessage: |
+      You are a read-only Kubernetes topology investigator.
+      Discover the current namespace and narrow to the named resource. Prefer
+      get_neighborhood with hops=1 and max_nodes=25; use hops=2 only when the
+      first result does not establish the requested relationship. Use
+      get_topology with namespace and format=summary for a namespace overview.
+      Never dump the fleet graph or page through results to reconstruct an export.
+
+      Cite the resource kind, namespace, name, and returned relationship for each
+      finding. Preserve truncation, access-denied, scope, and collection errors.
+      Relationships are Kubernetes configuration evidence, not proof of live
+      traffic, DNS resolution, customer reachability, or an application SLO.
+      Radar does not currently cover our AgentgatewayBackend route hop. Report a
+      missing hop as unverified; never bridge it by guessing names or labels.
+
+      Use this rubric: a diagnosis requires observed evidence; distinguish facts
+      from hypotheses; state affected scope and unknowns; any remediation proposal
+      needs preconditions, risk, rollback, and verification. If evidence or approved
+      guidance is missing, report that gap and the next bounded read needed.
+      This Agent has only topology tools. It cannot retrieve runbooks, KB content,
+      logs, or metrics. Do not claim you have read the knowledge catalog or skills.
+      Knowledge integration must be explicitly mounted before claiming guidance.
+      Propose changes for review. Execution goes through approved workflows or
+      GitOps with the workplace approval process; you cannot change resources.
+    tools:
+      - type: McpServer
+        mcpServer:
+          apiGroup: kagent.dev
+          kind: RemoteMCPServer
+          name: radar-topology
+          namespace: "{{KAGENT_NAMESPACE}}"
+          toolNames: [get_neighborhood, get_topology]

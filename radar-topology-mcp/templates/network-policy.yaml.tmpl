@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: radar-topology-ingress
+  namespace: "{{RADAR_NAMESPACE}}"
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: radar-topology
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: "{{KAGENT_NAMESPACE}}"
+      ports:
+        - protocol: TCP
+          port: 9280
+# This permits all pods in the selected kagent namespace. Narrow to your
+# controller/runtime labels after checking the deployed labels. A CNI that
+# enforces NetworkPolicy is required. No egress policy is added by this bundle.

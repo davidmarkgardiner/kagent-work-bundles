@@ -1,0 +1,61 @@
+fullnameOverride: radar-topology
+replicaCount: 1
+image:
+  repository: "{{IMAGE_REPOSITORY}}"
+  tag: "1.15.0"
+serviceAccount:
+  create: false
+  name: radar-topology
+rbac:
+  create: false # inventory-access.yaml owns the selected read permissions.
+  helm: false
+  secrets: false
+  podExec: false
+  podLogs: false
+  portForward: false
+  traffic: false
+  viewRBAC: false
+  viewWebhooks: false
+  viewNodeRuntime: false
+  selfUpgrade: false
+auth:
+  mode: none # Controlled internal trial: NetworkPolicy + localhost UI only.
+cloud:
+  enabled: false
+usageReporting:
+  enabled: false
+ingress:
+  enabled: false
+httpRoute:
+  enabled: false
+service:
+  type: ClusterIP
+  port: 9280
+mcp:
+  enabled: true
+timeline:
+  storage: memory
+  historyLimit: 1000
+persistence:
+  enabled: false
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  seccompProfile:
+    type: RuntimeDefault
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65532
+  capabilities:
+    drop: [ALL]

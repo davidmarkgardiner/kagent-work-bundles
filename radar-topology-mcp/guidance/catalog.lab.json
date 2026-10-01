@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "bindings": [
+    {
+      "target": {
+        "cluster": "radar-lab",
+        "namespace": "cert-manager",
+        "kind": "Deployment",
+        "name": "cert-manager"
+      },
+      "references": [
+        "cert-manager-investigation",
+        "cert-manager-http01",
+        "synthetic-incident-http01",
+        "cert-manager-evidence-rubric"
+      ]
+    }
+  ],
+  "documents": [
+    {
+      "id": "cert-manager-investigation",
+      "type": "skill",
+      "title": "Certificate investigation procedure",
+      "source_uri": "https://cert-manager.io/docs/troubleshooting/",
+      "revision": "lab-snapshot-2026-10-01",
+      "applicability": "Lab cert-manager Deployment; verify installed version and symptom before use",
+      "reviewed_by": "Codex lab fixture; workplace owner review required",
+      "reviewed_on": "2026-10-01",
+      "review_after": "2026-10-31",
+      "content": "Start with the affected Certificate and its conditions/events. Follow observed owner references to CertificateRequest; for ACME, continue to Order and Challenge. Check the referenced Issuer or ClusterIssuer readiness. Read narrowly scoped logs only if resource evidence does not explain the failure. Do not restart cert-manager just because a certificate is pending. Preserve missing-resource, permission, and stale-evidence gaps."
+    },
+    {
+      "id": "cert-manager-http01",
+      "type": "runbook",
+      "title": "HTTP-01 pending challenge checks",
+      "source_uri": "https://cert-manager.io/docs/troubleshooting/acme/",
+      "revision": "lab-snapshot-2026-10-01",
+      "applicability": "Lab cert-manager Deployment; verify installed version and symptom before use",
+      "reviewed_by": "Codex lab fixture; workplace owner review required",
+      "reviewed_on": "2026-10-01",
+      "review_after": "2026-10-31",
+      "content": "Applicability: an observed ACME HTTP-01 Challenge is pending. Inspect its status reason and solver configuration. Verify the configured ingress class and the challenge route; distinguish Kubernetes configuration from independently observed DNS and HTTP reachability. Request only the next bounded evidence read. No Secret read, deletion, restart, or issuer reconfiguration is authorized by this runbook."
+    },
+    {
+      "id": "synthetic-incident-http01",
+      "type": "knowledge",
+      "title": "Synthetic lab incident: wrong ingress class",
+      "source_uri": "urn:radar-lab:synthetic-incident-http01",
+      "revision": "lab-snapshot-2026-10-01",
+      "applicability": "Lab cert-manager Deployment; verify installed version and symptom before use",
+      "reviewed_by": "Codex lab fixture; workplace owner review required",
+      "reviewed_on": "2026-10-01",
+      "review_after": "2026-10-31",
+      "content": "SYNTHETIC TEST FIXTURE, not an actual workplace incident. In this fictional case an HTTP-01 challenge stayed pending because the solver used a different ingress class from the reachable ingress controller. Restarting cert-manager did not address that configuration mismatch. Use this as a candidate hypothesis only when current challenge and ingress evidence supports it. Do not claim this happened in the current cluster or at work."
+    },
+    {
+      "id": "cert-manager-evidence-rubric",
+      "type": "rubric",
+      "title": "Certificate triage evidence rubric",
+      "source_uri": "urn:radar-lab:cert-manager-rubric",
+      "revision": "lab-snapshot-2026-10-01",
+      "applicability": "Lab cert-manager Deployment; verify installed version and symptom before use",
+      "reviewed_by": "Codex lab fixture; workplace owner review required",
+      "reviewed_on": "2026-10-01",
+      "review_after": "2026-10-31",
+      "content": "A useful response cites the observed Pod ownership/workload identity, exact guidance IDs and revisions, and the affected certificate evidence. It separates topology, historical hypotheses, and current cause. It reports absent guidance and unavailable diagnostic tools. A change proposal states preconditions, risk, rollback, verification, and the required approved execution path. Never label configuration edges as live traffic."
+    }
+  ]
+}

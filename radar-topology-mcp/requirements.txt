@@ -1,0 +1,2 @@
+# Local manifest verification only. The installed Radar image needs no Python.
+PyYAML>=6.0.2,<7

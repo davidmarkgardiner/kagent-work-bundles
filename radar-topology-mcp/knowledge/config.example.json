@@ -1,0 +1,9 @@
+{
+  "KAGENT_NAMESPACE": "{{KAGENT_NAMESPACE}}",
+  "MODEL_CONFIG": "{{MODEL_CONFIG}}",
+  "RADAR_MCP_NAME": "{{EXISTING_RADAR_MCP_NAME}}",
+  "KB_MCP_NAME": "{{EXISTING_QUERYDOC_MCP_NAME}}",
+  "KB_PRODUCT": "platform-kb",
+  "KB_VERSION": "current",
+  "KB_DATABASE": "platform-kb.db"
+}
