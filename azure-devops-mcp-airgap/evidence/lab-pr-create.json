@@ -1,0 +1,33 @@
+{
+  "observedAt": "2026-10-01T11:22:56.810635+00:00",
+  "kagentVersion": "0.7.13",
+  "microsoftMcpVersion": "2.10.0",
+  "agent": "azure-devops-triage",
+  "agentAccepted": true,
+  "agentReady": true,
+  "controllerApiListed": true,
+  "discoveredToolCount": 9,
+  "unauthenticatedDenied": true,
+  "unrelatedWriteDenied": true,
+  "localTestsPassed": 11,
+  "branchPreparation": "Git REST API, isolated new branch with one Markdown file",
+  "prCreation": "kagent A2A invoking scoped repo_pull_request_write",
+  "kagentA2AInvoked": true,
+  "a2aReplySource": "artifact",
+  "a2aElapsedMs": 14000,
+  "independentAzureDevOpsReadStatus": 200,
+  "independentDiffReadStatus": 200,
+  "draftVerified": true,
+  "configuredSourceAndTargetVerified": true,
+  "changedFiles": [
+    "/docs/kagent-mcp-demo.md"
+  ],
+  "autoCompleteEnabled": false,
+  "reviewerCount": 0,
+  "merged": false,
+  "limitations": [
+    "NetworkPolicy CNI enforcement not independently tested.",
+    "POC installs native dependencies at startup.",
+    "Duplicate checking is instructed in the agent; no transactional bridge deduplication."
+  ]
+}

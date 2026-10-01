@@ -1,0 +1,7 @@
+*
+!app/
+!app/**
+!test/
+!test/**
+!Dockerfile
+!Dockerfile.offline

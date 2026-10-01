@@ -1,0 +1,6 @@
+# Load the exported matching dependencies image first. No npm/apt/npx.
+ARG DEPENDENCIES_IMAGE=azure-devops-mcp-dependencies:2.10.0-poc1
+FROM ${DEPENDENCIES_IMAGE}
+WORKDIR /app
+COPY --chown=1000:1000 app/ ./
+CMD ["node", "bridge.mjs"]

@@ -1,0 +1,70 @@
+{
+  "verifiedAt": "2026-10-01T11:49:11.578535+00:00",
+  "architecture": "linux/amd64",
+  "microsoftMcpVersion": "2.10.0",
+  "sdkVersion": "1.31.0",
+  "images": [
+    {
+      "tags": [
+        "azure-devops-mcp:2.10.0-poc1"
+      ],
+      "localImageId": "sha256:961996dbd37e3b2a2dc690ded765ff7b65965cdc4ebee666541cde9ad9a00433",
+      "architecture": "amd64",
+      "sizeBytes": 437566601
+    },
+    {
+      "tags": [
+        "azure-devops-mcp-dependencies:2.10.0-poc1"
+      ],
+      "localImageId": "sha256:7e2ce9f67cd77cd1e285978c5bedf8323a6f957d5d2c9b932fe2f9dc1d7eb436",
+      "architecture": "amd64",
+      "sizeBytes": 437528801
+    }
+  ],
+  "offlineContainerTests": {
+    "passed": 11,
+    "failed": 0,
+    "network": "none",
+    "rootFilesystem": "read-only"
+  },
+  "offlineOfficialServerSmoke": {
+    "upstreamInitialized": true,
+    "httpDiscovery": true,
+    "selectedTools": 8,
+    "unauthenticatedDenied": true,
+    "unrelatedWriteDenied": true,
+    "azureDevOpsDataRead": false
+  },
+  "offlineApplicationRebuild": {
+    "passed": true,
+    "buildStepNetwork": "none",
+    "pull": false,
+    "dependenciesImagePreloaded": true,
+    "builderMetadataNetworkingNotBlocked": true
+  },
+  "kagentServerDryRun": {
+    "passed": true,
+    "version": "0.7.13",
+    "objects": 5,
+    "deployed": false
+  },
+  "readOnlyRenderChecked": true,
+  "sanitization": {
+    "strictScannerHits": 39,
+    "reviewedHits": "Version strings only; scanner interprets 10.x versions as private IP fragments.",
+    "focusedPrivateValueScan": "no hits"
+  },
+  "sourceHashes": {
+    "bridge.mjs": "311a77128a7261f1121eed1f637c5b2c00c5d73e574e9039c932dda9a56d127d",
+    "demo-read.mjs": "4803c7c02d54609fb7b8ed140b5e39fd79c65964cb48c6cc699b40b8fc547f92",
+    "diagnostics.mjs": "05d28ea7ce76015d59dfdf14c4c3709c3f1e8c55faeed59bbc1c84985b9bf5a1",
+    "image-smoke.mjs": "dfcc467768ec95135ad2a43d0e5cc91295f8d33bbec22c07f998bbc496f40b67",
+    "policy.mjs": "feb0d3d590028cfc96af2ef3cc09a581289cee2687374673f9fa50702bcedd72",
+    "upstream.mjs": "ef68958173468731f6674bb7f8f785f018606a6f36fc641426b7fbd89c416235"
+  },
+  "limitations": [
+    "Not deployed in work environment.",
+    "No live Azure DevOps call from this new immutable image; earlier lab runtime proved PR creation with the same adapter source.",
+    "amd64 only; connected Debian rebuilds are not byte-reproducible."
+  ]
+}
