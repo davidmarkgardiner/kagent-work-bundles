@@ -1,0 +1,29 @@
+[
+  {
+    "exit_code": 0,
+    "timed_out": false,
+    "reviewer": "opus",
+    "elapsed_seconds": 152.3,
+    "input_sha256": "47f4d7442962935f93128e6dbd17aa59b9a90e933aa91ac1be0b0088f963ef32",
+    "plan_sha256": "ab690f2b9ea669b2fa2ab0d70339ed9e8bdc92e528b7fbe0fcef02c874d0b399",
+    "review_scope": "supplied plan only; no live verification",
+    "actual_model": "claude-opus-5-5",
+    "review_file": "opus-v1.md",
+    "review_sha256": "3b8f5b17a76535b094cdfca184db3cadaea5a5d1d833ceee4fc5790f3ef07a9e"
+  },
+  {
+    "exit_code": 0,
+    "timed_out": false,
+    "reviewer": "kimi",
+    "requested_model": "kimi-code/k3",
+    "attempt": 2,
+    "prior_attempt": "CLI rejected --plan with --prompt before model execution",
+    "elapsed_seconds": 100.7,
+    "input_sha256": "47f4d7442962935f93128e6dbd17aa59b9a90e933aa91ac1be0b0088f963ef32",
+    "plan_sha256": "ab690f2b9ea669b2fa2ab0d70339ed9e8bdc92e528b7fbe0fcef02c874d0b399",
+    "review_scope": "supplied plan only; no live verification",
+    "actual_model": "requested kimi-code/k3; stream output does not independently name backend model",
+    "review_file": "kimi-v1.md",
+    "review_sha256": "4ba8ce213d3d59ef3441a8243655238a230e9f062606f3dc4f78418ea181d2fc"
+  }
+]

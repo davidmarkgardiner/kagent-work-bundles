@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/namespace-health.report.v1.schema.json",
+  "title": "Namespace health report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "cluster", "source_generation", "policy_version", "slot_id", "scheduled_at", "assessment_started_at", "assessment_ended_at", "window_started_at", "status", "automation_allowed", "threshold", "namespaces", "watched_namespace_count", "assessed_namespace_count", "eligible_namespace_count", "qualifying_namespaces_omitted", "coverage", "finding_digest", "payload_digest"],
+  "properties": {
+    "schema": {"const": "namespace-health.report.v1"},
+    "cluster": {"type": "string", "pattern": "^[A-Za-z0-9_.-]{1,80}$"},
+    "source_generation": {"type": "string", "pattern": "^[A-Za-z0-9_.-]{1,80}$"},
+    "policy_version": {"type": "string", "pattern": "^[A-Za-z0-9_.-]{1,80}$"},
+    "slot_id": {"$ref": "#/$defs/digest"},
+    "scheduled_at": {"type": "string", "format": "date-time"},
+    "assessment_started_at": {"type": "string", "format": "date-time"},
+    "assessment_ended_at": {"type": "string", "format": "date-time"},
+    "window_started_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["investigate", "no_breach_observed", "unknown"]},
+    "automation_allowed": {"const": false},
+    "threshold": {"type": "integer", "minimum": 60, "maximum": 100},
+    "namespaces": {"type": "array", "maxItems": 3, "items": {"$ref": "#/$defs/namespace"}},
+    "watched_namespace_count": {"type": "integer", "minimum": 1, "maximum": 5},
+    "assessed_namespace_count": {"type": "integer", "minimum": 0, "maximum": 5},
+    "eligible_namespace_count": {"type": "integer", "minimum": 0, "maximum": 5},
+    "qualifying_namespaces_omitted": {"type": "integer", "minimum": 0, "maximum": 5},
+    "coverage": {"type": "object", "additionalProperties": false, "required": ["required_failed", "assessed", "failed_checks", "failure_sources", "rotation_cycle_hours_lower_bound", "log_candidates", "log_candidates_not_inspected", "unconfigured_containers", "allocated_log_reads", "completed_log_reads", "truncated_log_reads", "api_calls", "structured_api_bytes", "log_bytes", "sampling"], "properties": {"required_failed": {"type": "boolean"}, "assessed": {"type": "integer", "minimum": 0}, "failed_checks": {"type": "integer", "minimum": 0}, "failure_sources": {"type": "array", "maxItems": 8, "items": {"type": "string", "maxLength": 40}}, "rotation_cycle_hours_lower_bound": {"type": "integer", "minimum": 1}, "log_candidates": {"type": "integer", "minimum": 0}, "log_candidates_not_inspected": {"type": "integer", "minimum": 0}, "unconfigured_containers": {"type": "integer", "minimum": 0}, "allocated_log_reads": {"type": "integer", "minimum": 0, "maximum": 24}, "completed_log_reads": {"type": "integer", "minimum": 0, "maximum": 24}, "truncated_log_reads": {"type": "integer", "minimum": 0, "maximum": 24}, "api_calls": {"type": "integer", "minimum": 0, "maximum": 60}, "structured_api_bytes": {"type": "integer", "minimum": 0, "maximum": 8388608}, "log_bytes": {"type": "integer", "minimum": 0, "maximum": 3145728}, "sampling": {"const": "bounded"}}},
+    "finding_digest": {"$ref": "#/$defs/digest"},
+    "payload_digest": {"$ref": "#/$defs/digest"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "workload": {"type": "object", "additionalProperties": false, "required": ["kind", "name", "resolved"], "properties": {"kind": {"type": "string", "maxLength": 32}, "name": {"type": "string", "maxLength": 63}, "resolved": {"type": "boolean"}}},
+    "finding": {"type": "object", "additionalProperties": false, "required": ["rule_id", "risk_tier", "observed_count", "workloads"], "properties": {"rule_id": {"type": "string", "pattern": "^[a-z0-9_]{1,80}$"}, "risk_tier": {"type": "integer", "minimum": 60, "maximum": 100}, "observed_count": {"type": "integer", "minimum": 0}, "workloads": {"type": "array", "maxItems": 3, "items": {"$ref": "#/$defs/workload"}}}},
+    "namespace": {"type": "object", "additionalProperties": false, "required": ["uid", "name", "risk_tier", "affected_workload_count", "findings"], "properties": {"uid": {"type": "string", "maxLength": 80}, "name": {"type": "string", "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"}, "risk_tier": {"type": "integer", "minimum": 60, "maximum": 100}, "affected_workload_count": {"type": "integer", "minimum": 0}, "findings": {"type": "array", "maxItems": 3, "items": {"$ref": "#/$defs/finding"}}}}
+  }
+}

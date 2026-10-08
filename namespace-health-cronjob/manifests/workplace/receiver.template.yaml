@@ -1,0 +1,315 @@
+# Render privately; apply only to the compatible receiver cluster after EventBus preflight.
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: namespace-health-sensor
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: namespace-health-sensor
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+rules:
+- apiGroups:
+  - argoproj.io
+  resources:
+  - workflows
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: namespace-health-sensor
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: namespace-health-sensor
+subjects:
+- kind: ServiceAccount
+  name: namespace-health-sensor
+  namespace: '{{RECEIVER_NAMESPACE}}'
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: namespace-health-receipt
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: namespace-health-receipt
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - get
+- apiGroups:
+  - argoproj.io
+  resources:
+  - workflowtaskresults
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: namespace-health-receipt
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: namespace-health-receipt
+subjects:
+- kind: ServiceAccount
+  name: namespace-health-receipt
+  namespace: '{{RECEIVER_NAMESPACE}}'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: namespace-health-receipt
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+spec:
+  serviceAccountName: namespace-health-receipt
+  entrypoint: receipt
+  arguments:
+    parameters:
+    - name: report
+  templates:
+  - name: receipt
+    container:
+      image: '{{APPROVED_IMAGE_REF}}'
+      imagePullPolicy: IfNotPresent
+      command:
+      - python
+      - /app/receipt.py
+      env:
+      - name: REPORT_JSON
+        value: '{{workflow.parameters.report}}'
+      - name: TRUSTED_CLUSTER
+        value: '{{CLUSTER_ID}}'
+      - name: TRUSTED_SOURCE_GENERATION
+        value: '{{SOURCE_GENERATION}}'
+      - name: RECEIPT_NAMESPACE
+        value: '{{RECEIVER_NAMESPACE}}'
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 65532
+        capabilities:
+          drop:
+          - ALL
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 250m
+          memory: 128Mi
+---
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: namespace-health-scheduled-kafka
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+spec:
+  eventBusName: '{{EVENTBUS_NAME}}'
+  kafka:
+    reports:
+      url: '{{BROKER_BOOTSTRAP}}'
+      topic: '{{SCHEDULED_TOPIC}}'
+      version: 2.5.0
+      jsonBody: true
+      partition: ''
+      consumerGroup:
+        groupName: '{{RECEIVER_GROUP}}'
+        oldest: false
+        rebalanceStrategy: ''
+      sasl:
+        mechanism: '{{SASL_MECHANISM}}'
+        userSecret:
+          name: '{{RECEIVER_KAFKA_SECRET}}'
+          key: username
+        passwordSecret:
+          name: '{{RECEIVER_KAFKA_SECRET}}'
+          key: password
+      tls:
+        insecureSkipVerify: false
+        caCertSecret:
+          name: '{{RECEIVER_KAFKA_SECRET}}'
+          key: ca.crt
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: namespace-health-scheduled-receipt
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+spec:
+  eventBusName: '{{EVENTBUS_NAME}}'
+  template:
+    serviceAccountName: namespace-health-sensor
+  dependencies:
+  - name: investigate-report
+    eventSourceName: namespace-health-scheduled-kafka
+    eventName: reports
+    filters:
+      data:
+      - path: body.schema
+        type: string
+        value:
+        - namespace-health.report.v1
+      - path: body.status
+        type: string
+        value:
+        - investigate
+      - path: body.cluster
+        type: string
+        value:
+        - '{{CLUSTER_ID}}'
+  triggers:
+  - template:
+      name: accept-receipt
+      k8s:
+        operation: create
+        source:
+          resource:
+            apiVersion: argoproj.io/v1alpha1
+            kind: Workflow
+            metadata:
+              generateName: namespace-health-receipt-
+              namespace: '{{RECEIVER_NAMESPACE}}'
+              labels:
+                app.kubernetes.io/part-of: namespace-health
+                app.kubernetes.io/name: namespace-health-receipt
+            spec:
+              workflowTemplateRef:
+                name: namespace-health-receipt
+              arguments:
+                parameters:
+                - name: report
+        parameters:
+        - src:
+            dependencyName: investigate-report
+            dataKey: body
+          dest: spec.arguments.parameters.0.value
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: namespace-health-cleanup
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: namespace-health-cleanup
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - list
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: namespace-health-cleanup
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: namespace-health-cleanup
+subjects:
+- kind: ServiceAccount
+  name: namespace-health-cleanup
+  namespace: '{{RECEIVER_NAMESPACE}}'
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: namespace-health-receipt-cleanup
+  namespace: '{{RECEIVER_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+spec:
+  schedule: 25 3 * * *
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 60
+      backoffLimit: 1
+      template:
+        spec:
+          serviceAccountName: namespace-health-cleanup
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+          - name: cleanup
+            image: '{{APPROVED_IMAGE_REF}}'
+            imagePullPolicy: IfNotPresent
+            command:
+            - python
+            - /app/receipt.py
+            - cleanup
+            env:
+            - name: RECEIPT_NAMESPACE
+              value: '{{RECEIVER_NAMESPACE}}'
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                - ALL
+            resources:
+              requests:
+                cpu: 25m
+                memory: 32Mi
+              limits:
+                cpu: 100m
+                memory: 64Mi

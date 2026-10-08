@@ -1,0 +1,375 @@
+{
+  "acceptance_not_yet_proved": [
+    "three real hourly scheduled occurrences",
+    "unaccelerated missing-slot deadline",
+    "workplace TLS/SASL and CNI behavior",
+    "workplace canary"
+  ],
+  "argo_charts": {
+    "namespace-health-events": {
+      "app_version": "v1.9.11",
+      "chart": "argo-events-2.4.24"
+    },
+    "namespace-health-workflows": {
+      "app_version": "v4.0.8",
+      "chart": "argo-workflows-1.0.23"
+    }
+  },
+  "argo_workflow_receipts": [
+    {
+      "name": "namespace-health-receipt-6kkfb",
+      "outcomes": [
+        {
+          "outcome": "material_conflict",
+          "slot_id": "sha256:f9358abe10d1ed4a45eee7187323a7eadd87babcf07a7e6d234ca40167d78c7a"
+        },
+        {
+          "error": "material_conflict alert required",
+          "error_type": "RuntimeError",
+          "outcome": "rejected_or_failed"
+        }
+      ],
+      "phase": "Failed"
+    },
+    {
+      "name": "namespace-health-receipt-85fxs",
+      "outcomes": [
+        {
+          "outcome": "accepted",
+          "slot_id": "sha256:a805d0498f700cb4363a09ae8b97d2face545eef403dcba79713563f4b5704ca"
+        }
+      ],
+      "phase": "Succeeded"
+    },
+    {
+      "name": "namespace-health-receipt-mqbn5",
+      "outcomes": [
+        {
+          "outcome": "accepted",
+          "slot_id": "sha256:f9358abe10d1ed4a45eee7187323a7eadd87babcf07a7e6d234ca40167d78c7a"
+        }
+      ],
+      "phase": "Succeeded"
+    }
+  ],
+  "behavior_tests_passed": 17,
+  "benchmark_100_pods": {
+    "api_calls": [
+      60
+    ],
+    "durations_seconds": [
+      0.347,
+      0.176,
+      0.154,
+      0.129,
+      0.122,
+      0.153,
+      0.121,
+      0.128,
+      0.136,
+      0.226,
+      0.365,
+      0.194,
+      2.671,
+      2.804,
+      3.188,
+      0.663,
+      0.536,
+      0.612,
+      0.609,
+      0.454
+    ],
+    "log_candidates": [
+      100
+    ],
+    "log_reads": [
+      18
+    ],
+    "max_seconds": 3.188,
+    "p95_seconds_nearest_rank": 2.804,
+    "process_resources": {
+      "cpu_system_seconds": 0.492983,
+      "cpu_user_seconds": 3.30556,
+      "maxrss_kib": 36084,
+      "runs": 20
+    },
+    "ready_pods": 100,
+    "runs": 20,
+    "stable_rotation_cycle_hours": [
+      6
+    ],
+    "statuses": [
+      "no_breach_observed"
+    ]
+  },
+  "external_monitor_alerts": [
+    {
+      "cluster": "kind-namespace-health",
+      "kind": "required_coverage_gap",
+      "slot": "2026-10-07T12:27:00Z"
+    },
+    {
+      "cluster": "kind-namespace-health",
+      "kind": "material_conflict",
+      "slot": "2026-10-07T12:27:00Z"
+    },
+    {
+      "cluster": "kind-namespace-health",
+      "kind": "required_coverage_gap",
+      "slot": "2026-10-07T12:29:00Z"
+    },
+    {
+      "cluster": "kind-namespace-health",
+      "kind": "broker_unreachable"
+    },
+    {
+      "cluster": "kind-namespace-health",
+      "kind": "missing_slot",
+      "slot": "2026-10-07T12:00:00Z"
+    }
+  ],
+  "final_image_canary": {
+    "argo_outcome": "accepted",
+    "argo_phase": "Succeeded",
+    "argo_workflow": "namespace-health-receipt-8d9r4",
+    "eligible_namespace_count": 5,
+    "finding_digest": "sha256:cefdad55146e88741cd598dbab3e7d8e9985d02575e76973fe7202332bf53a18",
+    "job": "namespace-health-canary-8k648",
+    "kafka_offset": 5,
+    "kafka_partition": 0,
+    "kafka_topic": "namespace-health-canary-v1-final",
+    "qualifying_namespaces_omitted": 2,
+    "report_bytes": 2935,
+    "scheduled_at": "2026-10-07T12:50:00Z",
+    "slot_id": "sha256:23bdd7606a28f41d268eacd7e9972a36945c2e9cf697deae0f8826995b94471d",
+    "status": "investigate",
+    "value_sha256": "eb996d71449097076abf4b818e74dbc855fdb916e46502d6fe403fa888f54017"
+  },
+  "full_kafka_values_file": "evidence/final-kafka-values.jsonl",
+  "kafka_consumed": [
+    {
+      "bytes": 1552,
+      "eligible": 1,
+      "key": "sha256:f9358abe10d1ed4a45eee7187323a7eadd87babcf07a7e6d234ca40167d78c7a",
+      "offset": 0,
+      "omitted": 0,
+      "required_failed": false,
+      "risk_tiers": [
+        80
+      ],
+      "slot_id": "sha256:f9358abe10d1ed4a45eee7187323a7eadd87babcf07a7e6d234ca40167d78c7a",
+      "status": "investigate",
+      "value_sha256": "7fbd22e71f891e32e3d14e3b9c1fe5e84d74cd6fab587e2a36404d07e7c63ffb"
+    },
+    {
+      "bytes": 1721,
+      "eligible": 1,
+      "key": "sha256:f9358abe10d1ed4a45eee7187323a7eadd87babcf07a7e6d234ca40167d78c7a",
+      "offset": 1,
+      "omitted": 0,
+      "required_failed": true,
+      "risk_tiers": [
+        100
+      ],
+      "slot_id": "sha256:f9358abe10d1ed4a45eee7187323a7eadd87babcf07a7e6d234ca40167d78c7a",
+      "status": "investigate",
+      "value_sha256": "594a1c73b0237f001ed54023d188ce4b47064cc20ce806638436f2651e642c29"
+    },
+    {
+      "bytes": 1139,
+      "eligible": 0,
+      "key": "sha256:cbec9931c1ced1ecc626c4d3c7f3bd4243ab3629f22498380073676f53161807",
+      "offset": 2,
+      "omitted": 0,
+      "required_failed": false,
+      "risk_tiers": [],
+      "slot_id": "sha256:cbec9931c1ced1ecc626c4d3c7f3bd4243ab3629f22498380073676f53161807",
+      "status": "no_breach_observed",
+      "value_sha256": "c5c17c355832b62ac8cbbc742f4d3e82c9c9a7c7caa9170e38f4bb15294a22b0"
+    },
+    {
+      "bytes": 1148,
+      "eligible": 0,
+      "key": "sha256:cbec9931c1ced1ecc626c4d3c7f3bd4243ab3629f22498380073676f53161807",
+      "offset": 3,
+      "omitted": 0,
+      "required_failed": true,
+      "risk_tiers": [],
+      "slot_id": "sha256:cbec9931c1ced1ecc626c4d3c7f3bd4243ab3629f22498380073676f53161807",
+      "status": "unknown",
+      "value_sha256": "b0cc34faaf64001a744a651bdc24bdd6c4353aee3dd369835cce97379571cea5"
+    },
+    {
+      "bytes": 2393,
+      "eligible": 5,
+      "key": "sha256:a805d0498f700cb4363a09ae8b97d2face545eef403dcba79713563f4b5704ca",
+      "offset": 4,
+      "omitted": 2,
+      "required_failed": false,
+      "risk_tiers": [
+        100,
+        100,
+        100
+      ],
+      "slot_id": "sha256:a805d0498f700cb4363a09ae8b97d2face545eef403dcba79713563f4b5704ca",
+      "status": "investigate",
+      "value_sha256": "9eec421577befae493e5852ee2d5c3be3a95741748f1f8f88884a37c2a482711"
+    },
+    {
+      "bytes": 2935,
+      "eligible": 5,
+      "key": "sha256:23bdd7606a28f41d268eacd7e9972a36945c2e9cf697deae0f8826995b94471d",
+      "offset": 5,
+      "omitted": 2,
+      "required_failed": false,
+      "risk_tiers": [
+        100,
+        100,
+        100
+      ],
+      "slot_id": "sha256:23bdd7606a28f41d268eacd7e9972a36945c2e9cf697deae0f8826995b94471d",
+      "status": "investigate",
+      "value_sha256": "eb996d71449097076abf4b818e74dbc855fdb916e46502d6fe403fa888f54017"
+    }
+  ],
+  "kubernetes_version": "v1.35.0",
+  "lab_broker": "apache/kafka-native:3.9.1, single ephemeral broker, trial-only PLAINTEXT",
+  "offline_behavior_tests_passed": 16,
+  "partial_essential_api_failure_canary": {
+    "failure_sources": [
+      "essential_api_state"
+    ],
+    "induced_failure": "Events list forbidden in one fixture namespace",
+    "job": "namespace-health-canary-r2r88",
+    "required_failed": true,
+    "role_restored_and_can_i_events": "yes",
+    "selected_namespaces": [
+      "health-fixture-b",
+      "health-fixture-e",
+      "health-fixture-a"
+    ],
+    "selected_risk_tiers": [
+      100,
+      100,
+      100
+    ],
+    "status": "investigate"
+  },
+  "producer_receipts": [
+    {
+      "job": "namespace-health-canary-t8z5b",
+      "receipt": {
+        "api_calls": 42,
+        "coverage_required_failed": false,
+        "delivery": {
+          "offset": 0,
+          "partition": 0,
+          "topic": "namespace-health-canary-v1-final"
+        },
+        "duration_seconds": 1.483,
+        "finding_digest": "sha256:4d5b6ddd6f254b83b74c55ac190f8e9354aeac443124679ca28668ea2db0dee6",
+        "log_reads": 1,
+        "report_bytes": 1552,
+        "slot_id": "sha256:f9358abe10d1ed4a45eee7187323a7eadd87babcf07a7e6d234ca40167d78c7a",
+        "status": "investigate"
+      }
+    },
+    {
+      "job": "namespace-health-canary-t5xf8",
+      "receipt": {
+        "api_calls": 43,
+        "coverage_required_failed": true,
+        "delivery": {
+          "offset": 1,
+          "partition": 0,
+          "topic": "namespace-health-canary-v1-final"
+        },
+        "duration_seconds": 0.665,
+        "finding_digest": "sha256:104afc16990c23c9c605323cb789495b4334602be2ca2db70765bb3b82de94d5",
+        "log_reads": 2,
+        "report_bytes": 1721,
+        "slot_id": "sha256:f9358abe10d1ed4a45eee7187323a7eadd87babcf07a7e6d234ca40167d78c7a",
+        "status": "investigate"
+      }
+    },
+    {
+      "job": "namespace-health-canary-zm8sq",
+      "receipt": {
+        "api_calls": 41,
+        "coverage_required_failed": false,
+        "delivery": {
+          "offset": 2,
+          "partition": 0,
+          "topic": "namespace-health-canary-v1-final"
+        },
+        "duration_seconds": 0.619,
+        "finding_digest": "sha256:e99ff5652e3dbe6979848a8c99d16033d4f089ede8c8b361a7308de41ba9ef82",
+        "log_reads": 0,
+        "report_bytes": 1139,
+        "slot_id": "sha256:cbec9931c1ced1ecc626c4d3c7f3bd4243ab3629f22498380073676f53161807",
+        "status": "no_breach_observed"
+      }
+    },
+    {
+      "job": "namespace-health-canary-n94h6",
+      "receipt": {
+        "api_calls": 35,
+        "coverage_required_failed": true,
+        "delivery": {
+          "offset": 3,
+          "partition": 0,
+          "topic": "namespace-health-canary-v1-final"
+        },
+        "duration_seconds": 0.585,
+        "finding_digest": "sha256:ab5b707f2a55de0c71f19e73bea6de710c33f8c59c42ce2cf31333ed19ba9ae4",
+        "log_reads": 0,
+        "report_bytes": 1148,
+        "slot_id": "sha256:cbec9931c1ced1ecc626c4d3c7f3bd4243ab3629f22498380073676f53161807",
+        "status": "unknown"
+      }
+    },
+    {
+      "job": "namespace-health-canary-8n7wd",
+      "receipt": {
+        "api_calls": 60,
+        "coverage_required_failed": false,
+        "delivery": {
+          "offset": 4,
+          "partition": 0,
+          "topic": "namespace-health-canary-v1-final"
+        },
+        "duration_seconds": 2.936,
+        "finding_digest": "sha256:c566d64c87d1ea72ff16c2f8d94a0c30ec211899e391e5bd5e3c2820c2e91eb9",
+        "log_reads": 18,
+        "report_bytes": 2393,
+        "slot_id": "sha256:a805d0498f700cb4363a09ae8b97d2face545eef403dcba79713563f4b5704ca",
+        "status": "investigate"
+      }
+    }
+  ],
+  "recorded_at_utc": "2026-10-07T12:42:54.127609+00:00",
+  "report_only": {
+    "coverage": {
+      "allocated_log_reads": 0,
+      "api_calls": 41,
+      "assessed": 5,
+      "completed_log_reads": 0,
+      "failed_checks": 0,
+      "failure_sources": [],
+      "log_bytes": 0,
+      "log_candidates": 0,
+      "log_candidates_not_inspected": 0,
+      "required_failed": false,
+      "rotation_cycle_hours_lower_bound": 1,
+      "sampling": "bounded",
+      "structured_api_bytes": 23233,
+      "truncated_log_reads": 0,
+      "unconfigured_containers": 0
+    },
+    "duration_seconds": 0.205,
+    "status": "no_breach_observed"
+  },
+  "schema_validation": "all five full Kafka values passed Draft 2020-12 JSON Schema validation",
+  "scope": "isolated kind canary; real hourly soak recorded separately",
+  "source_image_id": "sha256:53ecf27634ffd7fdb8486acb0171dfb14c0733359dd944799affaead68b191fc"
+}

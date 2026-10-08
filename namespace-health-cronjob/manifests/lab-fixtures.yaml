@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Namespace
+metadata: {name: health-fixture-a, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+---
+apiVersion: v1
+kind: Namespace
+metadata: {name: health-fixture-b, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+---
+apiVersion: v1
+kind: Namespace
+metadata: {name: health-fixture-c, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+---
+apiVersion: v1
+kind: Namespace
+metadata: {name: health-fixture-d, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+---
+apiVersion: v1
+kind: Namespace
+metadata: {name: health-fixture-e, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-app
+  namespace: health-fixture-a
+  labels: {app.kubernetes.io/part-of: namespace-health-trial}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: log-app}}
+  template:
+    metadata: {labels: {app: log-app}}
+    spec:
+      containers:
+      - name: app
+        image: python:3.12-slim-bookworm@sha256:54c85f3c47607a77f32adec749d3c81d1348bf25833671f512b26a9b6d778cb3
+        imagePullPolicy: IfNotPresent
+        command: [python, -u, -c]
+        args:
+          - |
+            import json,time
+            for i in range(24):
+                print(json.dumps({"level":"error","code":"fixture_error","n":i}),flush=True)
+            while True:
+                print(json.dumps({"level":"info","code":"fixture_healthy"}),flush=True)
+                time.sleep(5)
+        resources:
+          requests: {cpu: 10m, memory: 32Mi}
+          limits: {cpu: 100m, memory: 96Mi}

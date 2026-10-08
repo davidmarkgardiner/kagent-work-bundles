@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: namespace-health-cleanup, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: namespace-health-cleanup, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+rules:
+- apiGroups: [""]
+  resources: [configmaps]
+  verbs: [list, delete]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: namespace-health-cleanup, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: namespace-health-cleanup}
+subjects: [{kind: ServiceAccount, name: namespace-health-cleanup, namespace: health-trial}]
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata: {name: namespace-health-receipt-cleanup, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+spec:
+  schedule: "25 3 * * *"
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 60
+      backoffLimit: 1
+      template:
+        spec:
+          serviceAccountName: namespace-health-cleanup
+          restartPolicy: Never
+          securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: RuntimeDefault}}
+          containers:
+          - name: cleanup
+            image: namespace-health:lab-arm64
+            imagePullPolicy: IfNotPresent
+            command: [python, /app/receipt.py, cleanup]
+            env: [{name: RECEIPT_NAMESPACE, value: health-trial}]
+            securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+            resources: {requests: {cpu: 25m, memory: 32Mi}, limits: {cpu: 100m, memory: 64Mi}}

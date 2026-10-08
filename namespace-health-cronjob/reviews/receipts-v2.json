@@ -1,0 +1,26 @@
+[
+  {
+    "exit_code": 0,
+    "timed_out": false,
+    "reviewer": "opus",
+    "elapsed_seconds": 100.3,
+    "input_sha256": "0594338923759cc2dc4862f1a232a487107db087adb7fd1799cca416d41689ea",
+    "plan_sha256": "99c7bd3c312891a0a7fe4f1af650cbb8ec90c868116c2d90f5876bf42c4ea970",
+    "review_scope": "supplied revised plan and dispositions; no runtime verification",
+    "actual_model": "claude-opus-5-5",
+    "review_file": "opus-v2.md",
+    "review_sha256": "4b08a40bab798ba905f0cfc672a33c7263379092f8c0eeac9dd900fc82de9969"
+  },
+  {
+    "exit_code": 0,
+    "timed_out": false,
+    "reviewer": "kimi",
+    "elapsed_seconds": 70.8,
+    "input_sha256": "0594338923759cc2dc4862f1a232a487107db087adb7fd1799cca416d41689ea",
+    "plan_sha256": "99c7bd3c312891a0a7fe4f1af650cbb8ec90c868116c2d90f5876bf42c4ea970",
+    "review_scope": "supplied revised plan and dispositions; no runtime verification",
+    "actual_model": "requested kimi-code/k3; backend not independently identified",
+    "review_file": "kimi-v2.md",
+    "review_sha256": "f3c8f4f344e39b174a953843930ed366a36146f43549c44ae727b0a74910f268"
+  }
+]

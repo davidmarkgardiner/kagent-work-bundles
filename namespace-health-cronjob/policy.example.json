@@ -1,0 +1,51 @@
+{
+  "version": "lab-policy-v2",
+  "cronjob_name": "namespace-health-assessor",
+  "watched_namespaces": [
+    "health-fixture-a",
+    "health-fixture-b",
+    "health-fixture-c",
+    "health-fixture-d",
+    "health-fixture-e"
+  ],
+  "critical_workloads": {
+    "health-fixture-a": [
+      "Deployment/critical-app"
+    ],
+    "health-fixture-b": [
+      "Deployment/critical-app"
+    ],
+    "health-fixture-c": [
+      "Deployment/critical-app"
+    ],
+    "health-fixture-d": [
+      "Deployment/critical-app"
+    ],
+    "health-fixture-e": [
+      "Deployment/critical-app"
+    ]
+  },
+  "application_containers": {
+    "health-fixture-a": [
+      "app"
+    ],
+    "health-fixture-b": [
+      "app"
+    ],
+    "health-fixture-c": [
+      "app"
+    ],
+    "health-fixture-d": [
+      "app"
+    ],
+    "health-fixture-e": [
+      "app"
+    ]
+  },
+  "excluded_containers": {},
+  "require_configured_applications": true,
+  "threshold": 80,
+  "max_rotation_hours": 6,
+  "scheduled_topic": "namespace-health-trial-v1",
+  "canary_topic": "namespace-health-canary-v1-final"
+}

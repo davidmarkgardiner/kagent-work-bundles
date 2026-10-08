@@ -1,0 +1,8 @@
+# The base scan still covers every file. Strict-only false positives:
+**/src/collect.py
+**/src/receipt.py
+**/manifests/workplace/source.template.yaml
+**/manifests/workplace/pilot-two-namespaces.source.template.yaml
+**/evidence/final-kafka-values.jsonl
+**/evidence/scheduled-kafka-values.jsonl
+**/evidence/iteration1-live.json

@@ -47,6 +47,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 | `incident-evidence-trace-log-metrics/` | Trace, log, and metric evidence packs | Builds source-backed incident evidence from Grafana MCP metrics, logs, traces or trace fallback, dashboards, and triage synthesis |
 | `aks-fleet-reporting-day2/` | AKS fleet reporting and day-2 ops | Platform gets repeatable fleet inventory, health, dashboards, and day-to-day reporting |
 | `cluster-health-baseline-sentinel/` | Cluster-scope baseline detection and generic triage | Catches cluster-wide problems namespace routing structurally cannot: periodic whole-cluster snapshot, baseline drift detection, and a generic orchestrator agent that investigates. Proven end-to-end on RED. Includes `REVERSE-PROMPT.md` for an independent team to design their own answer. |
+| [`namespace-health-cronjob/`](namespace-health-cronjob/FRONT-SHEET.md) | Two-namespace scheduled health assessment | Reads Kubernetes Events and bounded app logs, sends only qualifying summaries to Kafka, and records an Argo receipt; compact Linux amd64 handoff with a step-by-step workplace walkthrough. |
 
 ## Recommended Work Order
 
@@ -110,20 +111,28 @@ efficiency, safety boundaries, and missing concepts without claiming live proof.
 
 ## Sister repository mirror
 
-The public repository [`davidmarkgardiner/kagent-work-bundles`](https://github.com/davidmarkgardiner/kagent-work-bundles)
-mirrors this directory at its repository root, so a work environment can clone
-only these bundles. `kagent-public` is the source of truth: make reviewed bundle
-changes here, merge them to `main`, then run:
+This public repository carries selected handoff bundles from
+[`kagent-public`](https://github.com/davidmarkgardiner/kagent-public), which
+remains the source of truth. The `namespace-health-cronjob/` folder is a
+compact Linux amd64 transfer: it omits arm64 wheels and adds a work-side front
+sheet, ticket, and visual. Its manifest records the source commit and included
+file hashes. That keeps this repository's download smaller than the full
+source checkout.
+
+The source repository also has a full-subtree sync script:
 
 ```bash
 git remote add work-bundles https://github.com/davidmarkgardiner/kagent-work-bundles.git
 scripts/sync-work-bundles-repo.sh
 ```
 
-Run that command from a clean `kagent-public` checkout; the script deliberately
-lives only in the source repository. It publishes the committed subtree to the
-sister repository's `main` branch. Do not make independent edits in the sister
-repository; the next source sync will overwrite them.
+Run that command only after reviewing the full subtree diff from a clean
+`kagent-public` `main` checkout. It publishes every committed bundle, including
+the arm64 wheels omitted here, and may increase this repository's download
+substantially. A raw subtree push is not currently a fast-forward of this
+repository's independent history. For a scoped update, copy reviewed files
+from the source commit, verify the per-bundle manifest, and preserve unrelated
+folders.
 
 The Radar bundle's reusable KB deployment/indexer source is in the primary repo:
 https://github.com/davidmarkgardiner/kagent-public/tree/6ab7e2f24d7a56bf99809696433d76665022c797/ai-platform/kagent-knowledge-base

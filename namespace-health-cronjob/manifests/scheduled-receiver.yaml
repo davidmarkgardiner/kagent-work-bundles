@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata: {name: namespace-health-scheduled-kafka, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+spec:
+  eventBusName: default
+  kafka:
+    reports:
+      url: kafka.health-trial.svc:9092
+      topic: namespace-health-trial-v1
+      version: 2.5.0
+      jsonBody: true
+      partition: ""
+      consumerGroup: {groupName: namespace-health-scheduled-receiver-v1, oldest: true, rebalanceStrategy: ""}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata: {name: namespace-health-scheduled-receipt, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+spec:
+  eventBusName: default
+  template: {serviceAccountName: namespace-health-sensor}
+  dependencies:
+  - name: investigate-report
+    eventSourceName: namespace-health-scheduled-kafka
+    eventName: reports
+    filters:
+      data:
+      - {path: body.schema, type: string, value: [namespace-health.report.v1]}
+      - {path: body.status, type: string, value: [investigate]}
+      - {path: body.cluster, type: string, value: [kind-namespace-health]}
+  triggers:
+  - template:
+      name: accept-receipt
+      k8s:
+        operation: create
+        source:
+          resource:
+            apiVersion: argoproj.io/v1alpha1
+            kind: Workflow
+            metadata:
+              generateName: namespace-health-receipt-
+              namespace: health-trial
+              labels: {app.kubernetes.io/part-of: namespace-health-trial, app.kubernetes.io/name: namespace-health-receipt}
+            spec:
+              workflowTemplateRef: {name: namespace-health-receipt}
+              arguments: {parameters: [{name: report}]}
+        parameters:
+        - src: {dependencyName: investigate-report, dataKey: body}
+          dest: spec.arguments.parameters.0.value

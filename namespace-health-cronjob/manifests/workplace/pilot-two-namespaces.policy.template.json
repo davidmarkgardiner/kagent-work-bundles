@@ -1,0 +1,30 @@
+{
+  "version": "workplace-pilot-v1",
+  "cronjob_name": "namespace-health-assessor",
+  "watched_namespaces": [
+    "{{WATCHED_NAMESPACE_1}}",
+    "{{WATCHED_NAMESPACE_2}}"
+  ],
+  "critical_workloads": {
+    "{{WATCHED_NAMESPACE_1}}": [
+      "{{CRITICAL_WORKLOAD_1}}"
+    ],
+    "{{WATCHED_NAMESPACE_2}}": [
+      "{{CRITICAL_WORKLOAD_2}}"
+    ]
+  },
+  "application_containers": {
+    "{{WATCHED_NAMESPACE_1}}": [
+      "{{APPLICATION_CONTAINER_1}}"
+    ],
+    "{{WATCHED_NAMESPACE_2}}": [
+      "{{APPLICATION_CONTAINER_2}}"
+    ]
+  },
+  "excluded_containers": {},
+  "require_configured_applications": true,
+  "threshold": 80,
+  "max_rotation_hours": 6,
+  "scheduled_topic": "{{SCHEDULED_TOPIC}}",
+  "canary_topic": "{{CANARY_TOPIC}}"
+}

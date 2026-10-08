@@ -1,0 +1,62 @@
+{
+  "captured_at_utc": "2026-10-07T17:27:28.712554+00:00",
+  "evidence_type": "persisted state of independent direct Kafka consumer outside source cluster",
+  "hourly_slots": [
+    {
+      "scheduled_at": "2026-10-07T13:00:00Z",
+      "status": "investigate"
+    },
+    {
+      "scheduled_at": "2026-10-07T14:00:00Z",
+      "status": "no_breach_observed"
+    },
+    {
+      "scheduled_at": "2026-10-07T15:00:00Z",
+      "status": "no_breach_observed"
+    },
+    {
+      "scheduled_at": "2026-10-07T16:00:00Z",
+      "status": "no_breach_observed"
+    },
+    {
+      "scheduled_at": "2026-10-07T17:00:00Z",
+      "status": "no_breach_observed"
+    }
+  ],
+  "monitor_alerts": [
+    {
+      "cluster": "kind-namespace-health",
+      "kind": "required_coverage_gap",
+      "slot": "2026-10-07T12:27:00Z"
+    },
+    {
+      "cluster": "kind-namespace-health",
+      "kind": "material_conflict",
+      "slot": "2026-10-07T12:27:00Z"
+    },
+    {
+      "cluster": "kind-namespace-health",
+      "kind": "required_coverage_gap",
+      "slot": "2026-10-07T12:29:00Z"
+    },
+    {
+      "cluster": "kind-namespace-health",
+      "kind": "broker_unreachable"
+    },
+    {
+      "cluster": "kind-namespace-health",
+      "kind": "missing_slot",
+      "slot": "2026-10-07T12:00:00Z"
+    },
+    {
+      "cluster": "kind-namespace-health",
+      "kind": "required_coverage_gap",
+      "slot": "2026-10-07T13:00:00Z"
+    }
+  ],
+  "state_file_mtime_utc": "2026-10-07T17:00:01.866974+00:00",
+  "state_file_sha256": "833c7d92ec285ad5c912ad4287226deb5473d3f4421a76ea2a4d493df4046b13",
+  "trusted_cluster": "kind-namespace-health",
+  "unaccelerated_missing_slot_alarm": "not exercised; scheduled hourly reports remained present",
+  "validation_limit": "Consumer state proves it accepted valid Kafka reports for these slots; exact broker bytes and Argo receiver state were not reread in this session because runtime access was denied."
+}
