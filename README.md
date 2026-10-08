@@ -27,6 +27,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 | Bundle | Capability | Primary outcome |
 |---|---|---|
 | [`radar-topology-mcp/`](radar-topology-mcp/README.md) | Radar topology plus existing vector KB; air-gapped OCI handoff | Resolves workload identity before cited KB lookup, with pinned artifact imports and live evaluation boundaries |
+| [`agent-substrate/`](agent-substrate/WORK-AGENT-RUNSC-EQUIVALENCE-HANDOFF.md) | AKS Substrate 0.0.9 gVisor/runsc equivalence | Cross-check the work cluster, node, images, charts, and runsc mount against the tested AKS path before retrying installation |
 | `team-handover-pack/` | Human handover, tickets, Teams messages, game-day planning | Provides GitLab ticket templates, Teams messages, game-day plan, and an HTML presentation for SRE/stakeholder handover |
 | `runtime-model-gateway-readiness/` | Runtime, model, Agent Gateway, A2A, and MCP preflight | Proves model backend, Agent Gateway, A2A, and required MCP servers are live before downstream demos |
 | `sre-grafana-mcp-observability/` | Grafana MCP observability | SRE asks a kagent front door to build/verify dashboards, alerts, logs, metrics, and GitOps observability changes |
@@ -109,30 +110,23 @@ Before giving the bundle set to a work-side implementation agent, hand
 That reviewer should check handover clarity, required variables, token
 efficiency, safety boundaries, and missing concepts without claiming live proof.
 
-## Sister repository mirror
+## Source and distribution
 
-This public repository carries selected handoff bundles from
-[`kagent-public`](https://github.com/davidmarkgardiner/kagent-public), which
-remains the source of truth. The `namespace-health-cronjob/` folder is a
-compact Linux amd64 transfer: it omits arm64 wheels and adds a work-side front
-sheet, ticket, and visual. Its manifest records the source commit and included
-file hashes. That keeps this repository's download smaller than the full
-source checkout.
+This repository contains selected public-safe work-agent bundles from
+[`kagent-public/work-agent-bundles`](https://github.com/davidmarkgardiner/kagent-public/tree/main/work-agent-bundles).
+The larger repository is the canonical source; this smaller repository is a
+convenient distribution copy. Compare selected files with the current source
+before updating them here.
 
-The source repository also has a full-subtree sync script:
+The `namespace-health-cronjob/` folder is a compact Linux amd64 transfer. It
+omits six arm64 dependency wheels and adds a work-side front sheet, ticket, and
+visual. Its manifest records the source commit and included file hashes.
 
-```bash
-git remote add work-bundles https://github.com/davidmarkgardiner/kagent-work-bundles.git
-scripts/sync-work-bundles-repo.sh
-```
-
-Run that command only after reviewing the full subtree diff from a clean
-`kagent-public` `main` checkout. It publishes every committed bundle, including
-the arm64 wheels omitted here, and may increase this repository's download
-substantially. A raw subtree push is not currently a fast-forward of this
-repository's independent history. For a scoped update, copy reviewed files
-from the source commit, verify the per-bundle manifest, and preserve unrelated
-folders.
+The repositories have independent Git histories, so the historical subtree
+sync script cannot fast-forward this repository's `main` branch without
+reconciliation. It would also add the arm64 wheels and substantially increase
+the download. For a scoped update, copy reviewed files from the source commit,
+verify the per-bundle manifest, and preserve unrelated folders.
 
 The Radar bundle's reusable KB deployment/indexer source is in the primary repo:
 https://github.com/davidmarkgardiner/kagent-public/tree/6ab7e2f24d7a56bf99809696433d76665022c797/ai-platform/kagent-knowledge-base

@@ -1,0 +1,21 @@
+# kagent 1.0.0-alpha8 / Agent Substrate 0.4.0-alpha1 example.
+# Replace placeholders and validate against the installed CRDs before applying.
+apiVersion: api.kagent.dev/v1alpha3
+kind: Agent
+metadata:
+  name: gvisor-lifecycle-proof
+  namespace: kagent
+spec:
+  template:
+    modelConfig:
+      name: "{{MODEL_CONFIG_NAME}}"
+    systemPrompt: You are a disposable lifecycle test agent.
+  harness:
+    kagent: {}
+    workload:
+      image: "{{INTERNAL_REGISTRY}}/kagent-dev/kagent/golang-adk@sha256:{{PINNED_DIGEST}}"
+    substrate:
+      workerPoolRef:
+        name: "{{GVISOR_WORKER_POOL_NAME}}"
+      snapshotPolicy:
+        location: "gs://{{INTERNAL_BUCKET}}/kagent-lifecycle-proof/"
