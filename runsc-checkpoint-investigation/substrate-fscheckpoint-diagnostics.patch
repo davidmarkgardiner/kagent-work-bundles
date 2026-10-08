@@ -1,0 +1,177 @@
+diff --git a/cmd/ateom-gvisor/checkpoint_diagnostics.go b/cmd/ateom-gvisor/checkpoint_diagnostics.go
+new file mode 100644
+index 0000000..c7613aa
+--- /dev/null
++++ b/cmd/ateom-gvisor/checkpoint_diagnostics.go
+@@ -0,0 +1,68 @@
++// Copyright 2026 Google LLC
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++
++package main
++
++import (
++	"fmt"
++	"io"
++	"os/exec"
++	"strings"
++)
++
++const checkpointStderrLimit = 16 * 1024
++
++// stderrTail retains bounded diagnostic output while stderr continues to stream.
++type stderrTail struct {
++	data      []byte
++	truncated bool
++}
++
++func (b *stderrTail) Write(p []byte) (int, error) {
++	n := len(p)
++	if len(b.data)+n > checkpointStderrLimit {
++		b.truncated = true
++	}
++	if n >= checkpointStderrLimit {
++		b.data = append(b.data[:0], p[n-checkpointStderrLimit:]...)
++	} else {
++		excess := len(b.data) + n - checkpointStderrLimit
++		if excess > 0 {
++			b.data = b.data[excess:]
++		}
++		b.data = append(b.data, p...)
++	}
++	return n, nil
++}
++
++func runWithCheckpointDiagnostics(cmd *exec.Cmd) error {
++	var tail stderrTail
++	stream := cmd.Stderr
++	if stream == nil {
++		stream = io.Discard
++	}
++	cmd.Stderr = io.MultiWriter(stream, &tail)
++	if err := cmd.Run(); err != nil {
++		detail := strings.TrimSpace(string(tail.data))
++		if detail == "" {
++			detail = "<empty>"
++		}
++		qualifier := ""
++		if tail.truncated {
++			qualifier = " (truncated to last 16384 bytes)"
++		}
++		return fmt.Errorf("while running `runsc fscheckpoint`: %w; stderr%s: %s", err, qualifier, detail)
++	}
++	return nil
++}
+diff --git a/cmd/ateom-gvisor/checkpoint_diagnostics_test.go b/cmd/ateom-gvisor/checkpoint_diagnostics_test.go
+new file mode 100644
+index 0000000..afde631
+--- /dev/null
++++ b/cmd/ateom-gvisor/checkpoint_diagnostics_test.go
+@@ -0,0 +1,80 @@
++// Copyright 2026 Google LLC
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++
++package main
++
++import (
++	"bytes"
++	"errors"
++	"os"
++	"os/exec"
++	"strings"
++	"testing"
++)
++
++func TestCheckpointDiagnostics(t *testing.T) {
++	cmd := exec.Command("sh", "-c", "printf 'filesystem checkpoint saving failed: fixture\\n' >&2; exit 128")
++	var stream bytes.Buffer
++	cmd.Stderr = &stream
++	err := runWithCheckpointDiagnostics(cmd)
++	var exit *exec.ExitError
++	if !errors.As(err, &exit) || exit.ExitCode() != 128 {
++		t.Fatalf("exit cause lost: %v", err)
++	}
++	if !strings.Contains(err.Error(), "filesystem checkpoint saving failed: fixture") {
++		t.Fatal(err)
++	}
++	if !strings.Contains(stream.String(), "filesystem checkpoint saving failed: fixture") {
++		t.Fatal("stderr stream lost")
++	}
++	t.Log(err)
++}
++func TestCheckpointDiagnosticsSuccess(t *testing.T) {
++	if err := runWithCheckpointDiagnostics(exec.Command("sh", "-c", "exit 0")); err != nil {
++		t.Fatal(err)
++	}
++}
++func TestCheckpointDiagnosticsEmpty(t *testing.T) {
++	err := runWithCheckpointDiagnostics(exec.Command("sh", "-c", "exit 128"))
++	if err == nil || !strings.Contains(err.Error(), "stderr: <empty>") {
++		t.Fatal(err)
++	}
++}
++func TestStderrTail(t *testing.T) {
++	var tail stderrTail
++	for _, data := range [][]byte{bytes.Repeat([]byte("a"), checkpointStderrLimit-1), []byte("bc"), bytes.Repeat([]byte("z"), checkpointStderrLimit+10)} {
++		n, err := tail.Write(data)
++		if n != len(data) || err != nil || len(tail.data) > checkpointStderrLimit {
++			t.Fatal("invalid bounded write")
++		}
++	}
++	if !tail.truncated || !bytes.Equal(tail.data, bytes.Repeat([]byte("z"), checkpointStderrLimit)) {
++		t.Fatal("tail not retained")
++	}
++}
++
++// Optional real runsc negative test: nonexistent container, not the workplace workload.
++func TestRealRunscFatalDiagnostics(t *testing.T) {
++	path := os.Getenv("CHECKPOINT_DIAGNOSTICS_RUNSC")
++	if path == "" {
++		t.Skip("set CHECKPOINT_DIAGNOSTICS_RUNSC for Linux runtime check")
++	}
++	cmd := exec.Command(path, "--root", t.TempDir(), "fscheckpoint", "--image-path", t.TempDir(), "--path", "/data", "missing-fixture")
++	err := runWithCheckpointDiagnostics(cmd)
++	var exit *exec.ExitError
++	if !errors.As(err, &exit) || exit.ExitCode() != 128 || !strings.Contains(err.Error(), "loading container") {
++		t.Fatalf("unexpected diagnostic: %v", err)
++	}
++	t.Log(err)
++}
+diff --git a/cmd/ateom-gvisor/runsc.go b/cmd/ateom-gvisor/runsc.go
+index ec69886..a224b98 100644
+--- a/cmd/ateom-gvisor/runsc.go
++++ b/cmd/ateom-gvisor/runsc.go
+@@ -165,11 +165,7 @@ func (r *runsc) cmdFsCheckpoint(ctx context.Context, containerName, checkpointPa
+ 	)
+ 	cmd.Stdout = os.Stdout
+ 	cmd.Stderr = os.Stderr
+-	err := cmd.Run()
+-	if err != nil {
+-		return fmt.Errorf("while running `runsc fscheckpoint`: %w", err)
+-	}
+-	return nil
++	return runWithCheckpointDiagnostics(cmd)
+ }
+ 
+ // We take a checkpoint only of the root container of the sandbox, but we need

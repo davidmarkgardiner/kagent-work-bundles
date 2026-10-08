@@ -1,5 +1,11 @@
 # Agent Substrate on kagent — Work Bundle
 
+For the October 2026 **AKS Substrate 0.0.9 + kagent 0.10** result and the
+workplace installation retry, start with the
+[runsc equivalence handoff](WORK-AGENT-RUNSC-EQUIVALENCE-HANDOFF.md).
+The older quickstart and requirements below describe a separate 0.0.6/0.9.9
+evaluation and must not be used as the version pin for that retry.
+
 Run declarative kagent agents as **suspend/resume gVisor actors** instead of always-on
 Deployments. Idle agents snapshot to storage and free their RAM; a request re-animates
 them from a golden snapshot in milliseconds. The upstream demo shows ~**30x** actor-to-pod
@@ -21,6 +27,9 @@ Both captured the full actor lifecycle: boot → gVisor checkpoint → suspend-t
 - **Where it fits (orchestration vs execution):** [`ARCHITECTURE-FIT.md`](ARCHITECTURE-FIT.md)
 - Adapting to the work cluster (AKS): [`WORK-CLUSTER-ADAPTATION.md`](WORK-CLUSTER-ADAPTATION.md)
 - **Air-gapped AKS install and verification:** [`AIRGAPPED-AKS-README.md`](AIRGAPPED-AKS-README.md)
+- **AKS 0.0.9 runsc parity and work-agent installation handoff:** [`WORK-AGENT-RUNSC-EQUIVALENCE-HANDOFF.md`](WORK-AGENT-RUNSC-EQUIVALENCE-HANDOFF.md)
+- **AKS evaluation receipts and version boundaries:** [`AKS-EVAL-WORK-AGENT-HANDOFF.md`](AKS-EVAL-WORK-AGENT-HANDOFF.md)
+- **Checkpoint failure diagnostic handoff:** [`../runsc-checkpoint-investigation/WORK-AGENT-HANDOFF.md`](../runsc-checkpoint-investigation/WORK-AGENT-HANDOFF.md)
 - **Copy-ready GitLab issue:** [`GITLAB-ISSUE-AIRGAPPED-AKS-EVALUATION.md`](GITLAB-ISSUE-AIRGAPPED-AKS-EVALUATION.md)
 
 > **Known issue (registry):** the Go ADK agent-runtime image resolves against the chart's

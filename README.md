@@ -27,6 +27,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 | Bundle | Capability | Primary outcome |
 |---|---|---|
 | [`radar-topology-mcp/`](radar-topology-mcp/README.md) | Radar topology plus existing vector KB; air-gapped OCI handoff | Resolves workload identity before cited KB lookup, with pinned artifact imports and live evaluation boundaries |
+| [`agent-substrate/`](agent-substrate/WORK-AGENT-RUNSC-EQUIVALENCE-HANDOFF.md) | AKS Substrate 0.0.9 gVisor/runsc equivalence | Cross-check the work cluster, node, images, charts, and runsc mount against the tested AKS path before retrying installation |
 | `team-handover-pack/` | Human handover, tickets, Teams messages, game-day planning | Provides GitLab ticket templates, Teams messages, game-day plan, and an HTML presentation for SRE/stakeholder handover |
 | `runtime-model-gateway-readiness/` | Runtime, model, Agent Gateway, A2A, and MCP preflight | Proves model backend, Agent Gateway, A2A, and required MCP servers are live before downstream demos |
 | `sre-grafana-mcp-observability/` | Grafana MCP observability | SRE asks a kagent front door to build/verify dashboards, alerts, logs, metrics, and GitOps observability changes |
@@ -108,22 +109,15 @@ Before giving the bundle set to a work-side implementation agent, hand
 That reviewer should check handover clarity, required variables, token
 efficiency, safety boundaries, and missing concepts without claiming live proof.
 
-## Sister repository mirror
+## Source and distribution
 
-The public repository [`davidmarkgardiner/kagent-work-bundles`](https://github.com/davidmarkgardiner/kagent-work-bundles)
-mirrors this directory at its repository root, so a work environment can clone
-only these bundles. `kagent-public` is the source of truth: make reviewed bundle
-changes here, merge them to `main`, then run:
-
-```bash
-git remote add work-bundles https://github.com/davidmarkgardiner/kagent-work-bundles.git
-scripts/sync-work-bundles-repo.sh
-```
-
-Run that command from a clean `kagent-public` checkout; the script deliberately
-lives only in the source repository. It publishes the committed subtree to the
-sister repository's `main` branch. Do not make independent edits in the sister
-repository; the next source sync will overwrite them.
+This repository contains selected public-safe work-agent bundles from
+[`kagent-public/work-agent-bundles`](https://github.com/davidmarkgardiner/kagent-public/tree/main/work-agent-bundles).
+The larger repository is the canonical source; this smaller repository is a
+convenient distribution copy. Compare selected files with the current source
+before updating them here. The repositories currently have independent Git
+histories, so the historical subtree sync script cannot fast-forward this
+repository's `main` branch without reconciliation.
 
 The Radar bundle's reusable KB deployment/indexer source is in the primary repo:
 https://github.com/davidmarkgardiner/kagent-public/tree/6ab7e2f24d7a56bf99809696433d76665022c797/ai-platform/kagent-knowledge-base

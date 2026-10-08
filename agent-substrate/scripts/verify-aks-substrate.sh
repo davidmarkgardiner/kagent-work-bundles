@@ -73,7 +73,7 @@ rollout_all() {
 workerpools_ready() {
   local rows namespace name desired replicas
   rows="$(k get workerpool.ate.dev -A \
-    -o jsonpath='{range .items[*]}{.metadata.namespace}{"\t"}{.metadata.name}{"\t"}{.status.desiredReplicas}{"\t"}{.status.replicas}{"\n"}{end}' \
+    -o jsonpath='{range .items[*]}{.metadata.namespace}{"\t"}{.metadata.name}{"\t"}{.spec.replicas}{"\t"}{.status.replicas}{"\n"}{end}' \
     2>/dev/null || true)"
   if [[ -z "${rows}" ]]; then
     fail "at least one WorkerPool exists"
@@ -113,9 +113,22 @@ if [[ -n "${SANDBOX_AGENT}" ]]; then
   echo "==> Checking SandboxAgent ${KAGENT_NAMESPACE}/${SANDBOX_AGENT}"
   check "SandboxAgent exists" k -n "${KAGENT_NAMESPACE}" get sandboxagent "${SANDBOX_AGENT}"
   check "SandboxAgent is Ready" k -n "${KAGENT_NAMESPACE}" wait "sandboxagent/${SANDBOX_AGENT}" --for=condition=Ready --timeout="${TIMEOUT}"
-  check "generated ActorTemplate exists" k -n "${KAGENT_NAMESPACE}" get actortemplate "${SANDBOX_AGENT}"
-  check "generated ActorTemplate golden snapshot is Ready" bash -c \
-    "test \"\$(kubectl --context '$CONTEXT' -n '$KAGENT_NAMESPACE' get actortemplate '$SANDBOX_AGENT' -o jsonpath='{.status.phase}')\" = Ready"
+  TEMPLATE_ROWS="$(k -n "${KAGENT_NAMESPACE}" get actortemplate \
+    -l "kagent.dev/sandbox-agent=${SANDBOX_AGENT}" \
+    -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.phase}{"\t"}{.status.goldenSnapshot}{"\n"}{end}' \
+    2>/dev/null || true)"
+  TEMPLATE_COUNT="$(printf '%s\n' "${TEMPLATE_ROWS}" | sed '/^$/d' | wc -l | tr -d ' ')"
+  if [[ "${TEMPLATE_COUNT}" -eq 1 ]]; then
+    IFS=$'\t' read -r TEMPLATE_NAME TEMPLATE_PHASE TEMPLATE_SNAPSHOT <<< "${TEMPLATE_ROWS}"
+    pass "generated ActorTemplate ${TEMPLATE_NAME} exists"
+    if [[ "${TEMPLATE_PHASE}" == "Ready" && -n "${TEMPLATE_SNAPSHOT}" ]]; then
+      pass "generated ActorTemplate golden snapshot is Ready"
+    else
+      fail "generated ActorTemplate is not ready (phase=${TEMPLATE_PHASE:-unknown}, goldenSnapshot=${TEMPLATE_SNAPSHOT:+present})"
+    fi
+  else
+    fail "exactly one generated ActorTemplate exists for ${SANDBOX_AGENT} (found=${TEMPLATE_COUNT})"
+  fi
 fi
 
 if [[ "${FAILURES}" -gt 0 ]]; then
