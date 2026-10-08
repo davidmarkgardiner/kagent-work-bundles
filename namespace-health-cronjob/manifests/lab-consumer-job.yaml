@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata: {name: namespace-health-top3-details, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: consumer
+        image: namespace-health:lab-arm64
+        imagePullPolicy: IfNotPresent
+        command: [python, -c]
+        args:
+        - |
+          import hashlib,json,time
+          from confluent_kafka import Consumer
+          from assess import validate_report
+          from datetime import datetime,timezone
+          c=Consumer({'bootstrap.servers':'kafka.health-trial.svc:9092','group.id':'namespace-health-top3-details-20261007','auto.offset.reset':'earliest','enable.auto.commit':False})
+          c.subscribe(['namespace-health-canary-v1-final'])
+          seen=0;deadline=time.monotonic()+25
+          while seen<5 and time.monotonic()<deadline:
+              message=c.poll(1)
+              if not message:continue
+              if message.error():raise RuntimeError(str(message.error()))
+              raw=message.value();report=json.loads(raw)
+              validate_report(report,'kind-namespace-health',datetime.now(timezone.utc))
+              print(json.dumps({'offset':message.offset(),'key':message.key().decode(),'value_sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw),'status':report['status'],'slot_id':report['slot_id'],'risk_tiers':[n['risk_tier'] for n in report['namespaces']],'eligible':report['eligible_namespace_count'],'omitted':report['qualifying_namespaces_omitted'],'required_failed':report['coverage']['required_failed']}),flush=True)
+              seen+=1
+          c.close()
+          if seen!=5:raise RuntimeError(f'expected 5 records, saw {seen}')

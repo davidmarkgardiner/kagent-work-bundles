@@ -1,0 +1,35 @@
+{
+  "bank_amd64_archive": {
+    "absolute_path": "{{LOCAL_STAGING_DIR}}/namespace-health-bank-amd64.tar.gz",
+    "bytes": 58758147,
+    "sha256": "bd71d6c4ebf560a1def5c7567a5bcc41419c2eb40ce0f6b9c96280b5c91834df"
+  },
+  "bank_amd64_local_image_id": "sha256:d9128b8cbd9b4a001be2604cf0d2a189ab59579915b08052035310023532960a",
+  "dockerfile_sha256": "5708e1df5b2ec74c2dfc2b2bb09788825d204fcc8a41972d09ae522315bd3c53",
+  "lab_arm64_local_image_id": "sha256:9fdd6b953fcad232393513f70cef417893a68487550e085edafabb510b2f3854",
+  "python_base": "python:3.12-slim-bookworm@sha256:54c85f3c47607a77f32adec749d3c81d1348bf25833671f512b26a9b6d778cb3",
+  "recorded_at_utc": "2026-10-07T13:10:39.192674+00:00",
+  "requirements_lock_sha256": "6c40e74949426e7cc0efe91aa6f979e0a0fc37a0ce35ee78a08883dc5bda079d",
+  "source_sha256": {
+    "src/assess.py": "e402bbec314305c063fe600e4fdcab883aedfc065767680c41bccc0ca774156c",
+    "src/collect.py": "aca668de82eeac89dca534733b28f246753aa304a668c6adc3a0f740ebd19264",
+    "src/monitor.py": "d095ff78d7159afc11bb09632f3fbc0a8fb15edc5985ead5dca7b4f9bf9606a2",
+    "src/publish.py": "6377e45fc531e8fa7bc5a1d76606f062e69430d12a95abc630ded49fda3e4292",
+    "src/receipt.py": "8c7baafc56fb10ad6af36c2598df26c38f8019a20ec78a28b2f6461b6712e050"
+  },
+  "wheels": {
+    "wheelhouse/amd64/certifi-2026.7.22-py3-none-any.whl": "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775",
+    "wheelhouse/amd64/charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "3d31298449090ab8d47b7b1b2a555ff73cac7ed438a08b7ac160980c7ebed649",
+    "wheelhouse/amd64/confluent_kafka-2.11.1-cp312-cp312-manylinux_2_28_x86_64.whl": "3e01607c3613863fb0f4f86c7fc3421c4af6f70686bf903ab475c113dfacb372",
+    "wheelhouse/amd64/idna-3.20-py3-none-any.whl": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+    "wheelhouse/amd64/requests-2.32.5-py3-none-any.whl": "2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6",
+    "wheelhouse/amd64/urllib3-2.8.0-py3-none-any.whl": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+    "wheelhouse/arm64/certifi-2026.7.22-py3-none-any.whl": "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775",
+    "wheelhouse/arm64/charset_normalizer-3.5.2-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl": "b91363207bd9dc966a691e959bb47f64b30f7ac4b072be9968b366982f7db77c",
+    "wheelhouse/arm64/confluent_kafka-2.11.1-cp312-cp312-manylinux_2_28_aarch64.whl": "bc6842dc30ef258e4c5b7c6e322d992cd001b6e319838aa7a6ec210374e16830",
+    "wheelhouse/arm64/idna-3.20-py3-none-any.whl": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+    "wheelhouse/arm64/requests-2.32.5-py3-none-any.whl": "2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6",
+    "wheelhouse/arm64/urllib3-2.8.0-py3-none-any.whl": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3"
+  },
+  "workplace_registry_digest": "not assigned; publish through approved workplace process"
+}

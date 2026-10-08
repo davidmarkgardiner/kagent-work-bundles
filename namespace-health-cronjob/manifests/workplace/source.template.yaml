@@ -1,0 +1,478 @@
+# Render privately; apply only to the source cluster after preflight.
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: namespace-health-assessor
+  namespace: '{{ASSESSOR_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: '{{SOURCE_NAMESPACE_ROLE_NAME}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - namespaces
+  resourceNames:
+  - kube-system
+  - '{{WATCHED_NAMESPACE_1}}'
+  - '{{WATCHED_NAMESPACE_2}}'
+  - '{{WATCHED_NAMESPACE_3}}'
+  - '{{WATCHED_NAMESPACE_4}}'
+  - '{{WATCHED_NAMESPACE_5}}'
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: '{{SOURCE_NAMESPACE_ROLE_NAME}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: '{{SOURCE_NAMESPACE_ROLE_NAME}}'
+subjects:
+- kind: ServiceAccount
+  name: namespace-health-assessor
+  namespace: '{{ASSESSOR_NAMESPACE}}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: namespace-health-own-job
+  namespace: '{{ASSESSOR_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  verbs:
+  - get
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: namespace-health-own-job
+  namespace: '{{ASSESSOR_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: namespace-health-own-job
+subjects:
+- kind: ServiceAccount
+  name: namespace-health-assessor
+  namespace: '{{ASSESSOR_NAMESPACE}}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: namespace-health-reader
+  namespace: '{{WATCHED_NAMESPACE_1}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  - events
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ''
+  resources:
+  - pods/log
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - statefulsets
+  - daemonsets
+  - replicasets
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: namespace-health-reader
+  namespace: '{{WATCHED_NAMESPACE_1}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: namespace-health-reader
+subjects:
+- kind: ServiceAccount
+  name: namespace-health-assessor
+  namespace: '{{ASSESSOR_NAMESPACE}}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: namespace-health-reader
+  namespace: '{{WATCHED_NAMESPACE_2}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  - events
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ''
+  resources:
+  - pods/log
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - statefulsets
+  - daemonsets
+  - replicasets
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: namespace-health-reader
+  namespace: '{{WATCHED_NAMESPACE_2}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: namespace-health-reader
+subjects:
+- kind: ServiceAccount
+  name: namespace-health-assessor
+  namespace: '{{ASSESSOR_NAMESPACE}}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: namespace-health-reader
+  namespace: '{{WATCHED_NAMESPACE_3}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  - events
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ''
+  resources:
+  - pods/log
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - statefulsets
+  - daemonsets
+  - replicasets
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: namespace-health-reader
+  namespace: '{{WATCHED_NAMESPACE_3}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: namespace-health-reader
+subjects:
+- kind: ServiceAccount
+  name: namespace-health-assessor
+  namespace: '{{ASSESSOR_NAMESPACE}}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: namespace-health-reader
+  namespace: '{{WATCHED_NAMESPACE_4}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  - events
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ''
+  resources:
+  - pods/log
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - statefulsets
+  - daemonsets
+  - replicasets
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: namespace-health-reader
+  namespace: '{{WATCHED_NAMESPACE_4}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: namespace-health-reader
+subjects:
+- kind: ServiceAccount
+  name: namespace-health-assessor
+  namespace: '{{ASSESSOR_NAMESPACE}}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: namespace-health-reader
+  namespace: '{{WATCHED_NAMESPACE_5}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  - events
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ''
+  resources:
+  - pods/log
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - statefulsets
+  - daemonsets
+  - replicasets
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: namespace-health-reader
+  namespace: '{{WATCHED_NAMESPACE_5}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: namespace-health-reader
+subjects:
+- kind: ServiceAccount
+  name: namespace-health-assessor
+  namespace: '{{ASSESSOR_NAMESPACE}}'
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: namespace-health-policy
+  namespace: '{{ASSESSOR_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+data:
+  policy.json: '{{POLICY_JSON}}'
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: namespace-health-assessor
+  namespace: '{{ASSESSOR_NAMESPACE}}'
+  labels:
+    app.kubernetes.io/part-of: namespace-health
+spec:
+  schedule: 0 * * * *
+  timeZone: Etc/UTC
+  suspend: true
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 180
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/part-of: namespace-health
+        spec:
+          serviceAccountName: namespace-health-assessor
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+          - name: assessor
+            image: '{{APPROVED_IMAGE_REF}}'
+            imagePullPolicy: IfNotPresent
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                - ALL
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 256Mi
+            env:
+            - name: POLICY_PATH
+              value: /etc/namespace-health/policy.json
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CLUSTER_ID
+              value: '{{CLUSTER_ID}}'
+            - name: CLUSTER_UID
+              value: '{{CLUSTER_UID}}'
+            - name: SOURCE_GENERATION
+              value: '{{SOURCE_GENERATION}}'
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: '{{BROKER_BOOTSTRAP}}'
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: SASL_SSL
+            - name: KAFKA_TOPIC
+              value: '{{SCHEDULED_TOPIC}}'
+            - name: RUN_MODE
+              value: scheduled
+            - name: KAFKA_SASL_MECHANISM
+              value: '{{SASL_MECHANISM}}'
+            - name: KAFKA_SASL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: '{{SOURCE_KAFKA_SECRET}}'
+                  key: username
+            - name: KAFKA_SASL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: '{{SOURCE_KAFKA_SECRET}}'
+                  key: password
+            - name: KAFKA_CA_PATH
+              value: /etc/kafka/ca.crt
+            volumeMounts:
+            - name: policy
+              mountPath: /etc/namespace-health
+              readOnly: true
+            - name: kafka-ca
+              mountPath: /etc/kafka
+              readOnly: true
+          volumes:
+          - name: policy
+            configMap:
+              name: namespace-health-policy
+          - name: kafka-ca
+            secret:
+              secretName: '{{SOURCE_KAFKA_SECRET}}'
+              items:
+              - key: ca.crt
+                path: ca.crt

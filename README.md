@@ -48,6 +48,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 | `incident-evidence-trace-log-metrics/` | Trace, log, and metric evidence packs | Builds source-backed incident evidence from Grafana MCP metrics, logs, traces or trace fallback, dashboards, and triage synthesis |
 | `aks-fleet-reporting-day2/` | AKS fleet reporting and day-2 ops | Platform gets repeatable fleet inventory, health, dashboards, and day-to-day reporting |
 | `cluster-health-baseline-sentinel/` | Cluster-scope baseline detection and generic triage | Catches cluster-wide problems namespace routing structurally cannot: periodic whole-cluster snapshot, baseline drift detection, and a generic orchestrator agent that investigates. Proven end-to-end on RED. Includes `REVERSE-PROMPT.md` for an independent team to design their own answer. |
+| [`namespace-health-cronjob/`](namespace-health-cronjob/FRONT-SHEET.md) | Two-namespace scheduled health assessment | Reads Kubernetes Events and bounded app logs, sends only qualifying summaries to Kafka, and records an Argo receipt; compact Linux amd64 handoff with a step-by-step workplace walkthrough. |
 
 ## Recommended Work Order
 
@@ -115,9 +116,17 @@ This repository contains selected public-safe work-agent bundles from
 [`kagent-public/work-agent-bundles`](https://github.com/davidmarkgardiner/kagent-public/tree/main/work-agent-bundles).
 The larger repository is the canonical source; this smaller repository is a
 convenient distribution copy. Compare selected files with the current source
-before updating them here. The repositories currently have independent Git
-histories, so the historical subtree sync script cannot fast-forward this
-repository's `main` branch without reconciliation.
+before updating them here.
+
+The `namespace-health-cronjob/` folder is a compact Linux amd64 transfer. It
+omits six arm64 dependency wheels and adds a work-side front sheet, ticket, and
+visual. Its manifest records the source commit and included file hashes.
+
+The repositories have independent Git histories, so the historical subtree
+sync script cannot fast-forward this repository's `main` branch without
+reconciliation. It would also add the arm64 wheels and substantially increase
+the download. For a scoped update, copy reviewed files from the source commit,
+verify the per-bundle manifest, and preserve unrelated folders.
 
 The Radar bundle's reusable KB deployment/indexer source is in the primary repo:
 https://github.com/davidmarkgardiner/kagent-public/tree/6ab7e2f24d7a56bf99809696433d76665022c797/ai-platform/kagent-knowledge-base

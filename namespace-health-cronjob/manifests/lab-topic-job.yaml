@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata: {name: namespace-health-create-topics, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+spec:
+  ttlSecondsAfterFinished: 3600
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: admin
+        image: namespace-health:lab-arm64
+        imagePullPolicy: IfNotPresent
+        command: [python, -c]
+        args:
+        - |
+          from confluent_kafka.admin import AdminClient,NewTopic
+          client=AdminClient({'bootstrap.servers':'kafka.health-trial.svc:9092'})
+          names=['namespace-health-canary-v1-final','namespace-health-trial-v1']
+          futures=client.create_topics([NewTopic(n,1,1) for n in names],request_timeout=10)
+          for name,future in futures.items():
+              try:future.result(15);print('created',name)
+              except Exception as exc:
+                  if 'TOPIC_ALREADY_EXISTS' not in str(exc):raise
+                  print('exists',name)

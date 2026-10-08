@@ -1,0 +1,25 @@
+{
+  "checked_at_utc": "2026-10-07T11:42:44.716145+00:00",
+  "scope": "read-only home-lab access and hypervisor power-state checks",
+  "direct_kubernetes_inventory": "unavailable",
+  "direct_control_plane_ssh": "unavailable",
+  "hypervisor_ssh": "reachable",
+  "hypervisor_vm_inventory": "read successfully",
+  "control_plane_vm": "stopped",
+  "kubernetes_worker_vms": [
+    "stopped",
+    "stopped"
+  ],
+  "cluster_api_versions": "not verified",
+  "kafka_and_argo_runtime": "not verified",
+  "retained_log_backend": "not verified",
+  "mutations_performed": false,
+  "build_prerequisite": "Start the intended home-lab Kubernetes VMs after design review and implementation go-ahead; then repeat full runtime inventory.",
+  "private_endpoints_included": false,
+  "hypervisor_memory_mib": {
+    "total": 64162,
+    "available": 44125,
+    "swap_used": 0,
+    "note": "Point-in-time read-only observation; recheck before starting VMs."
+  }
+}

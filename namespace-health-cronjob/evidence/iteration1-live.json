@@ -1,0 +1,224 @@
+{
+  "consumer_records": [
+    {
+      "bytes": 1374,
+      "key": "sha256:d894ce808d54ee21178dbc73184128759dd6cadffc7ca94210d5a49012b9e45c",
+      "offset": 0,
+      "required_failed": false,
+      "risk_tiers": [
+        80
+      ],
+      "slot_id": "sha256:d894ce808d54ee21178dbc73184128759dd6cadffc7ca94210d5a49012b9e45c",
+      "status": "investigate",
+      "value_sha256": "515eeb97b59db9333badf07b1d4994f34ae9d3aedc034608d9e9a466ebc1e1f0"
+    },
+    {
+      "bytes": 1374,
+      "key": "sha256:d58b96269b95c7638744eda22d95418268b7340cf0f0bb3cb2b270cda6946017",
+      "offset": 1,
+      "required_failed": false,
+      "risk_tiers": [
+        80
+      ],
+      "slot_id": "sha256:d58b96269b95c7638744eda22d95418268b7340cf0f0bb3cb2b270cda6946017",
+      "status": "investigate",
+      "value_sha256": "8a15a41a76bb4dae6b3423317d6a6131912587efaeb904f0a1b3944cc6f81936"
+    },
+    {
+      "bytes": 1374,
+      "key": "sha256:d894ce808d54ee21178dbc73184128759dd6cadffc7ca94210d5a49012b9e45c",
+      "offset": 2,
+      "required_failed": false,
+      "risk_tiers": [
+        80
+      ],
+      "slot_id": "sha256:d894ce808d54ee21178dbc73184128759dd6cadffc7ca94210d5a49012b9e45c",
+      "status": "investigate",
+      "value_sha256": "9bf917f2914dba2375f154e42b3600e1723fd3c994763db5795fcf8eb94ab1a8"
+    },
+    {
+      "bytes": 1684,
+      "key": "sha256:d894ce808d54ee21178dbc73184128759dd6cadffc7ca94210d5a49012b9e45c",
+      "offset": 3,
+      "required_failed": true,
+      "risk_tiers": [
+        100
+      ],
+      "slot_id": "sha256:d894ce808d54ee21178dbc73184128759dd6cadffc7ca94210d5a49012b9e45c",
+      "status": "investigate",
+      "value_sha256": "13a2758df7edf1d1bf3008908498798a52934721fcaca143743b2eba84167914"
+    }
+  ],
+  "jobs": [
+    {
+      "job": "namespace-health-canary-jcv45",
+      "result": {
+        "duration_seconds": 0.133,
+        "report": {
+          "assessed_namespace_count": 5,
+          "assessment_ended_at": "2026-10-07T12:18:31Z",
+          "assessment_started_at": "2026-10-07T12:18:31Z",
+          "automation_allowed": false,
+          "cluster": "kind-namespace-health",
+          "coverage": {
+            "allocated_log_reads": 1,
+            "api_calls": 42,
+            "assessed": 5,
+            "completed_log_reads": 1,
+            "failed_checks": 0,
+            "failure_sources": [],
+            "log_bytes": 3374,
+            "log_candidates": 1,
+            "log_candidates_not_inspected": 0,
+            "required_failed": false,
+            "sampling": "bounded",
+            "structured_api_bytes": 29992,
+            "truncated_log_reads": 0,
+            "unconfigured_containers": 0
+          },
+          "eligible_namespace_count": 1,
+          "finding_digest": "sha256:901aad6c6920af855739a453bc0b27a2081fd9f9c20b7455c3930310482f970c",
+          "namespaces": [
+            {
+              "affected_workload_count": 1,
+              "findings": [
+                {
+                  "observed_count": 24,
+                  "risk_tier": 80,
+                  "rule_id": "sampled_application_errors_20",
+                  "workloads": [
+                    {
+                      "kind": "Deployment",
+                      "name": "log-app",
+                      "resolved": true
+                    }
+                  ]
+                }
+              ],
+              "name": "health-fixture-a",
+              "risk_tier": 80,
+              "uid": "87bcc7b0-5544-428d-91e8-7f15cc3cbadd"
+            }
+          ],
+          "payload_digest": "sha256:32b1ebeec4d788b786724fe9800cb0588d285ba432f4456d444a231353e6bf50",
+          "policy_version": "lab-policy-v1",
+          "qualifying_namespaces_omitted": 0,
+          "scheduled_at": "2026-10-07T12:18:00Z",
+          "schema": "namespace-health.report.v1",
+          "slot_id": "sha256:d894ce808d54ee21178dbc73184128759dd6cadffc7ca94210d5a49012b9e45c",
+          "source_generation": "lab-g1",
+          "status": "investigate",
+          "threshold": 80,
+          "watched_namespace_count": 5,
+          "window_started_at": "2026-10-07T11:18:00Z"
+        }
+      }
+    },
+    {
+      "job": "namespace-health-canary-s4mw5",
+      "result": {
+        "api_calls": 42,
+        "coverage_required_failed": false,
+        "delivery": {
+          "offset": 0,
+          "partition": 0,
+          "topic": "namespace-health-canary-v1"
+        },
+        "duration_seconds": 1.09,
+        "finding_digest": "sha256:901aad6c6920af855739a453bc0b27a2081fd9f9c20b7455c3930310482f970c",
+        "log_reads": 1,
+        "report_bytes": 1374,
+        "slot_id": "sha256:d894ce808d54ee21178dbc73184128759dd6cadffc7ca94210d5a49012b9e45c",
+        "status": "investigate"
+      }
+    },
+    {
+      "job": "namespace-health-canary-6zfrr",
+      "result": {
+        "api_calls": 42,
+        "coverage_required_failed": false,
+        "delivery": {
+          "offset": 2,
+          "partition": 0,
+          "topic": "namespace-health-canary-v1"
+        },
+        "duration_seconds": 0.62,
+        "finding_digest": "sha256:901aad6c6920af855739a453bc0b27a2081fd9f9c20b7455c3930310482f970c",
+        "log_reads": 1,
+        "report_bytes": 1374,
+        "slot_id": "sha256:d894ce808d54ee21178dbc73184128759dd6cadffc7ca94210d5a49012b9e45c",
+        "status": "investigate"
+      }
+    },
+    {
+      "job": "namespace-health-canary-th7w8",
+      "result": {
+        "api_calls": 43,
+        "coverage_required_failed": true,
+        "delivery": {
+          "offset": 3,
+          "partition": 0,
+          "topic": "namespace-health-canary-v1"
+        },
+        "duration_seconds": 0.614,
+        "finding_digest": "sha256:104afc16990c23c9c605323cb789495b4334602be2ca2db70765bb3b82de94d5",
+        "log_reads": 2,
+        "report_bytes": 1684,
+        "slot_id": "sha256:d894ce808d54ee21178dbc73184128759dd6cadffc7ca94210d5a49012b9e45c",
+        "status": "investigate"
+      }
+    },
+    {
+      "job": "namespace-health-canary-lhh9g",
+      "result": {
+        "api_calls": 41,
+        "coverage_required_failed": false,
+        "delivery": {
+          "offset": 5,
+          "partition": 0,
+          "topic": "namespace-health-canary-v1"
+        },
+        "duration_seconds": 0.665,
+        "finding_digest": "sha256:e99ff5652e3dbe6979848a8c99d16033d4f089ede8c8b361a7308de41ba9ef82",
+        "log_reads": 0,
+        "report_bytes": 1139,
+        "slot_id": "sha256:784f2918b9cc1b391217cb44b1128876517df1747bdb4706c09b0489cab411e4",
+        "status": "no_breach_observed"
+      }
+    },
+    {
+      "job": "namespace-health-canary-k8jdm",
+      "result": {
+        "api_calls": 35,
+        "coverage_required_failed": true,
+        "delivery": {
+          "offset": 6,
+          "partition": 0,
+          "topic": "namespace-health-canary-v1"
+        },
+        "duration_seconds": 0.578,
+        "finding_digest": "sha256:ab5b707f2a55de0c71f19e73bea6de710c33f8c59c42ce2cf31333ed19ba9ae4",
+        "log_reads": 0,
+        "report_bytes": 1148,
+        "slot_id": "sha256:784f2918b9cc1b391217cb44b1128876517df1747bdb4706c09b0489cab411e4",
+        "status": "unknown"
+      }
+    },
+    {
+      "job": "namespace-health-canary-dvp5f",
+      "result": {
+        "error": "Kafka delivery not confirmed",
+        "error_type": "RuntimeError",
+        "outcome": "failed"
+      }
+    }
+  ],
+  "stage": "superseded pre-release trial; later code tightened contract and rotation",
+  "workflow_phases": {
+    "namespace-health-receipt-29rc6": "Succeeded",
+    "namespace-health-receipt-hszpp": "Succeeded",
+    "namespace-health-receipt-nv5n6": "Error",
+    "namespace-health-receipt-psbvb": "Failed",
+    "namespace-health-receipt-splz2": "Succeeded"
+  }
+}

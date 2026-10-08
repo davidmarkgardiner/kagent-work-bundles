@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: namespace-health-sensor, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: namespace-health-sensor, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+rules:
+- apiGroups: [argoproj.io]
+  resources: [workflows]
+  verbs: [create]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: namespace-health-sensor, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: namespace-health-sensor}
+subjects: [{kind: ServiceAccount, name: namespace-health-sensor, namespace: health-trial}]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: namespace-health-receipt, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: namespace-health-receipt, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+rules:
+- apiGroups: [""]
+  resources: [configmaps]
+  verbs: [create, get]
+- apiGroups: [argoproj.io]
+  resources: [workflowtaskresults]
+  verbs: [create, patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: namespace-health-receipt, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: namespace-health-receipt}
+subjects: [{kind: ServiceAccount, name: namespace-health-receipt, namespace: health-trial}]
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata: {name: namespace-health-receipt, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+spec:
+  serviceAccountName: namespace-health-receipt
+  entrypoint: receipt
+  arguments:
+    parameters: [{name: report}]
+  templates:
+  - name: receipt
+    container:
+      image: namespace-health:lab-arm64
+      imagePullPolicy: IfNotPresent
+      command: [python, /app/receipt.py]
+      env:
+      - {name: REPORT_JSON, value: "{{workflow.parameters.report}}"}
+      - {name: TRUSTED_CLUSTER, value: kind-namespace-health}
+      - {name: TRUSTED_SOURCE_GENERATION, value: lab-g1}
+      - {name: RECEIPT_NAMESPACE, value: health-trial}
+      securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, runAsNonRoot: true, runAsUser: 65532, capabilities: {drop: [ALL]}}
+      resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: 250m, memory: 128Mi}}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata: {name: namespace-health-canary-kafka, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+spec:
+  eventBusName: default
+  kafka:
+    reports:
+      url: kafka.health-trial.svc:9092
+      topic: namespace-health-canary-v1-final
+      version: 2.5.0
+      jsonBody: true
+      partition: ""
+      consumerGroup: {groupName: namespace-health-canary-receiver-v1, oldest: true, rebalanceStrategy: ""}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata: {name: namespace-health-canary-receipt, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+spec:
+  eventBusName: default
+  template: {serviceAccountName: namespace-health-sensor}
+  dependencies:
+  - name: investigate-report
+    eventSourceName: namespace-health-canary-kafka
+    eventName: reports
+    filters:
+      data:
+      - {path: body.schema, type: string, value: [namespace-health.report.v1]}
+      - {path: body.status, type: string, value: [investigate]}
+      - {path: body.cluster, type: string, value: [kind-namespace-health]}
+  triggers:
+  - template:
+      name: accept-receipt
+      k8s:
+        operation: create
+        source:
+          resource:
+            apiVersion: argoproj.io/v1alpha1
+            kind: Workflow
+            metadata:
+              generateName: namespace-health-receipt-
+              namespace: health-trial
+              labels: {app.kubernetes.io/part-of: namespace-health-trial, app.kubernetes.io/name: namespace-health-receipt}
+            spec:
+              workflowTemplateRef: {name: namespace-health-receipt}
+              arguments: {parameters: [{name: report}]}
+        parameters:
+        - src: {dependencyName: investigate-report, dataKey: body}
+          dest: spec.arguments.parameters.0.value

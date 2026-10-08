@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Namespace health selective pilot</title>
+  <style>
+    body{font:16px/1.5 system-ui,sans-serif;max-width:780px;margin:3rem auto;padding:0 1rem;color:#182536;background:#f7fafc}
+    h1{font-size:2rem;line-height:1.15}p{max-width:65ch}.flow{display:grid;gap:1rem;margin:2rem 0}
+    .box{background:#fff;border:1px solid #d1dbe5;border-radius:12px;padding:1rem 1.25rem;box-shadow:0 2px 8px #15273a0d}
+    .box strong{display:block}.arrow{text-align:center;font-size:1.5rem;color:#52677d}.routes{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:1rem}
+    .investigate{border-top:5px solid #b94621}.quiet{border-top:5px solid #187b58}.unknown{border-top:5px solid #8b6a16}
+    code{background:#e8eff5;padding:.1rem .3rem;border-radius:4px}
+  </style>
+</head>
+<body>
+  <h1>Two-namespace health pilot</h1>
+  <p>An hourly Python Job checks Kubernetes workload state, Events, and bounded application-log samples in two approved test namespaces. It scores named findings against the configured threshold.</p>
+  <div class="flow">
+    <div class="box"><strong>Two test namespaces</strong>Pods, controllers, recent Events, and timestamped JSON application logs</div>
+    <div class="arrow" aria-hidden="true">↓</div>
+    <div class="box"><strong>Deterministic assessment</strong>One hour of evidence; explicit coverage; selected findings only</div>
+    <div class="arrow" aria-hidden="true">↓</div>
+    <div class="routes">
+      <div class="box investigate"><strong>Threshold met</strong>Bounded JSON report → Kafka → Argo receipt. No agent or remediation yet.</div>
+      <div class="box quiet"><strong>No breach observed</strong>Job succeeds; no Kafka record and no Argo Workflow.</div>
+      <div class="box unknown"><strong>Required evidence missing</strong>Job fails; no Kafka record. Independent Job monitoring alerts.</div>
+    </div>
+  </div>
+  <p>Kafka silence can mean a quiet run or a failed run. Monitor the scheduled Job separately. See <code>WORK-AGENT-WALKTHROUGH.md</code> for the exact canary and hourly proof sequence.</p>
+</body>
+</html>

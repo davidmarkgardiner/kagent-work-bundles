@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: critical-app
+  namespace: health-fixture-a
+  labels: {app.kubernetes.io/part-of: namespace-health-trial}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: critical-app}}
+  template:
+    metadata: {labels: {app: critical-app}}
+    spec:
+      containers:
+      - name: app
+        image: namespace-health-fixture:deliberately-missing
+        imagePullPolicy: Never
+        resources: {requests: {cpu: 5m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}

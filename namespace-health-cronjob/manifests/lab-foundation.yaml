@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: health-trial
+  labels: {app.kubernetes.io/part-of: namespace-health-trial}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+  namespace: health-trial
+  labels: {app.kubernetes.io/part-of: namespace-health-trial}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: namespace-health-kafka}}
+  template:
+    metadata: {labels: {app: namespace-health-kafka}}
+    spec:
+      containers:
+        - name: kafka
+          image: apache/kafka-native:3.9.1
+          imagePullPolicy: IfNotPresent
+          env:
+            - {name: KAFKA_NODE_ID, value: "1"}
+            - {name: KAFKA_PROCESS_ROLES, value: "broker,controller"}
+            - {name: KAFKA_LISTENERS, value: "PLAINTEXT://:9092,EXTERNAL://:9094,CONTROLLER://:9093"}
+            - {name: KAFKA_ADVERTISED_LISTENERS, value: "PLAINTEXT://kafka.health-trial.svc:9092,EXTERNAL://namespace-health-control-plane:30092"}
+            - {name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP, value: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT"}
+            - {name: KAFKA_CONTROLLER_LISTENER_NAMES, value: CONTROLLER}
+            - {name: KAFKA_INTER_BROKER_LISTENER_NAME, value: PLAINTEXT}
+            - {name: KAFKA_CONTROLLER_QUORUM_VOTERS, value: "1@localhost:9093"}
+            - {name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR, value: "1"}
+            - {name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR, value: "1"}
+            - {name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR, value: "1"}
+          resources:
+            requests: {cpu: 50m, memory: 256Mi}
+            limits: {cpu: "1", memory: 1Gi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  namespace: health-trial
+  labels: {app.kubernetes.io/part-of: namespace-health-trial}
+spec:
+  selector: {app: namespace-health-kafka}
+  type: NodePort
+  ports:
+  - {name: broker, port: 9092, targetPort: 9092}
+  - {name: external, port: 9094, targetPort: 9094, nodePort: 30092}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: EventBus
+metadata:
+  name: default
+  namespace: health-trial
+  labels: {app.kubernetes.io/part-of: namespace-health-trial}
+spec:
+  nats:
+    native: {auth: token, replicas: 1}

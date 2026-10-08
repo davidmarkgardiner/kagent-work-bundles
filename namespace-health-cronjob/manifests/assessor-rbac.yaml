@@ -1,0 +1,150 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: namespace-health-assessor, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: {name: namespace-health-trial-namespace-ids, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+rules:
+- apiGroups: [""]
+  resources: [namespaces]
+  resourceNames: [kube-system, health-fixture-a, health-fixture-b, health-fixture-c, health-fixture-d, health-fixture-e]
+  verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: {name: namespace-health-trial-namespace-ids, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: namespace-health-trial-namespace-ids}
+subjects: [{kind: ServiceAccount, name: namespace-health-assessor, namespace: health-trial}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: namespace-health-own-job, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+rules:
+- apiGroups: [""]
+  resources: [pods]
+  verbs: [get]
+- apiGroups: [batch]
+  resources: [jobs]
+  verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: namespace-health-own-job, namespace: health-trial, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: namespace-health-own-job}
+subjects: [{kind: ServiceAccount, name: namespace-health-assessor, namespace: health-trial}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: namespace-health-reader, namespace: health-fixture-a, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+rules:
+- apiGroups: [""]
+  resources: [pods, events]
+  verbs: [get, list]
+- apiGroups: [""]
+  resources: [pods/log]
+  verbs: [get]
+- apiGroups: [apps]
+  resources: [deployments, statefulsets, daemonsets, replicasets]
+  verbs: [get, list]
+- apiGroups: [batch]
+  resources: [jobs]
+  verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: namespace-health-reader, namespace: health-fixture-a, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: namespace-health-reader}
+subjects: [{kind: ServiceAccount, name: namespace-health-assessor, namespace: health-trial}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: namespace-health-reader, namespace: health-fixture-b, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+rules:
+- apiGroups: [""]
+  resources: [pods, events]
+  verbs: [get, list]
+- apiGroups: [""]
+  resources: [pods/log]
+  verbs: [get]
+- apiGroups: [apps]
+  resources: [deployments, statefulsets, daemonsets, replicasets]
+  verbs: [get, list]
+- apiGroups: [batch]
+  resources: [jobs]
+  verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: namespace-health-reader, namespace: health-fixture-b, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: namespace-health-reader}
+subjects: [{kind: ServiceAccount, name: namespace-health-assessor, namespace: health-trial}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: namespace-health-reader, namespace: health-fixture-c, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+rules:
+- apiGroups: [""]
+  resources: [pods, events]
+  verbs: [get, list]
+- apiGroups: [""]
+  resources: [pods/log]
+  verbs: [get]
+- apiGroups: [apps]
+  resources: [deployments, statefulsets, daemonsets, replicasets]
+  verbs: [get, list]
+- apiGroups: [batch]
+  resources: [jobs]
+  verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: namespace-health-reader, namespace: health-fixture-c, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: namespace-health-reader}
+subjects: [{kind: ServiceAccount, name: namespace-health-assessor, namespace: health-trial}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: namespace-health-reader, namespace: health-fixture-d, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+rules:
+- apiGroups: [""]
+  resources: [pods, events]
+  verbs: [get, list]
+- apiGroups: [""]
+  resources: [pods/log]
+  verbs: [get]
+- apiGroups: [apps]
+  resources: [deployments, statefulsets, daemonsets, replicasets]
+  verbs: [get, list]
+- apiGroups: [batch]
+  resources: [jobs]
+  verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: namespace-health-reader, namespace: health-fixture-d, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: namespace-health-reader}
+subjects: [{kind: ServiceAccount, name: namespace-health-assessor, namespace: health-trial}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: namespace-health-reader, namespace: health-fixture-e, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+rules:
+- apiGroups: [""]
+  resources: [pods, events]
+  verbs: [get, list]
+- apiGroups: [""]
+  resources: [pods/log]
+  verbs: [get]
+- apiGroups: [apps]
+  resources: [deployments, statefulsets, daemonsets, replicasets]
+  verbs: [get, list]
+- apiGroups: [batch]
+  resources: [jobs]
+  verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: namespace-health-reader, namespace: health-fixture-e, labels: {app.kubernetes.io/part-of: namespace-health-trial}}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: namespace-health-reader}
+subjects: [{kind: ServiceAccount, name: namespace-health-assessor, namespace: health-trial}]

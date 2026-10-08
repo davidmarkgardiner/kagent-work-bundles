@@ -1,0 +1,5 @@
+# Trial rollback
+
+Suspend `namespace-health-assessor` in `health-trial` first. Inspect active Jobs: suspending a CronJob does not stop them. Wait for them or terminate only the trial Jobs by exact name. Stop the two trial EventSources/Sensors and the external monitor after capturing evidence; retain the trial topic and labelled receipt ConfigMaps through the audit window. Remove the five disposable fixture namespaces and trial-only Helm releases only after exporting their evidence. `kind delete cluster --name namespace-health` removes the entire isolated test cluster and its ephemeral broker; it is not a workplace rollback command.
+
+At work, reverse only objects named in the approved trial inventory, then verify the existing telemetry and Argo routes against the preflight snapshot. The initial canary makes no change to those routes. If an image or policy is replaced, suspend the CronJob, restore the previous immutable image digest and ConfigMap, and resume only after a report-only check and broker/receiver verification. Never use a quiet or unknown report as proof that an earlier finding recovered.

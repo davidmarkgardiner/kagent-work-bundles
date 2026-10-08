@@ -1,0 +1,324 @@
+{
+  "acceptance_not_yet_proved": [
+    "three real hourly scheduled occurrences",
+    "unaccelerated missing-slot deadline",
+    "workplace TLS/SASL and CNI behavior",
+    "workplace canary"
+  ],
+  "cluster": "kind-namespace-health",
+  "exact_values_file": "evidence/scheduled-kafka-values.jsonl",
+  "external_monitor": {
+    "delivered_alerts": [
+      {
+        "cluster": "kind-namespace-health",
+        "kind": "required_coverage_gap",
+        "slot": "2026-10-07T13:00:00Z"
+      }
+    ],
+    "outside_cluster": true,
+    "received_slots": {
+      "2026-10-07T13:00:00Z": "investigate",
+      "2026-10-07T13:03:00Z": "investigate",
+      "2026-10-07T13:04:00Z": "investigate",
+      "2026-10-07T13:05:00Z": "no_breach_observed",
+      "2026-10-07T13:06:00Z": "no_breach_observed",
+      "2026-10-07T13:07:00Z": "investigate"
+    }
+  },
+  "runs": [
+    {
+      "coverage": {
+        "allocated_log_reads": 16,
+        "api_calls": 60,
+        "assessed": 5,
+        "completed_log_reads": 16,
+        "failed_checks": 1,
+        "failure_sources": [
+          "rotation_cycle"
+        ],
+        "log_bytes": 0,
+        "log_candidates": 100,
+        "log_candidates_not_inspected": 84,
+        "required_failed": true,
+        "rotation_cycle_hours_lower_bound": 7,
+        "sampling": "bounded",
+        "structured_api_bytes": 1181283,
+        "truncated_log_reads": 0,
+        "unconfigured_containers": 0
+      },
+      "eligible_namespaces": 5,
+      "job": "namespace-health-assessor-29856300",
+      "job_annotation_evidence": "observed before CronJob history cleanup",
+      "kafka": {
+        "bytes": 2950,
+        "key": "sha256:f7f1fb86f45189dedb785ba98147e8c0d4ee4e7b107c37e4777791cf3634b17c",
+        "offset": 0,
+        "partition": 0,
+        "status": "investigate",
+        "topic": "namespace-health-trial-v1",
+        "value_sha256": "2278811f1aa61fb0bc62e4c312ede4c07e6f5c324159d706546a4707d72db56d"
+      },
+      "omitted_namespaces": 2,
+      "proof_cadence": "real hourly",
+      "receiver": {
+        "name": "namespace-health-receipt-pzm8m",
+        "outcome": "accepted",
+        "phase": "Succeeded"
+      },
+      "scheduled_at": "2026-10-07T13:00:00Z",
+      "selected_risk_tiers": [
+        100,
+        100,
+        100
+      ],
+      "selected_rule_ids": [
+        "critical_zero_available",
+        "deployment_available_false_5m",
+        "zero_ready_after_startup_grace_duration_unknown",
+        "critical_zero_available",
+        "deployment_available_false_5m",
+        "zero_ready_after_startup_grace_duration_unknown",
+        "critical_zero_available",
+        "deployment_available_false_5m",
+        "zero_ready_after_startup_grace_duration_unknown"
+      ],
+      "status": "investigate"
+    },
+    {
+      "coverage": {
+        "allocated_log_reads": 17,
+        "api_calls": 60,
+        "assessed": 5,
+        "completed_log_reads": 17,
+        "failed_checks": 0,
+        "failure_sources": [],
+        "log_bytes": 0,
+        "log_candidates": 100,
+        "log_candidates_not_inspected": 83,
+        "required_failed": false,
+        "rotation_cycle_hours_lower_bound": 6,
+        "sampling": "bounded",
+        "structured_api_bytes": 1181065,
+        "truncated_log_reads": 0,
+        "unconfigured_containers": 0
+      },
+      "eligible_namespaces": 5,
+      "job": "namespace-health-assessor-29856303",
+      "job_annotation_evidence": "observed before CronJob history cleanup",
+      "kafka": {
+        "bytes": 2935,
+        "key": "sha256:79a6684490000ddb546fedbf8f49b985d1ac861fc4fd4d6394e68686dcfc217a",
+        "offset": 1,
+        "partition": 0,
+        "status": "investigate",
+        "topic": "namespace-health-trial-v1",
+        "value_sha256": "4054ae46f1bff583872d202c6bcfc3c8958a1748ebd515c18eb4a3b887451cfb"
+      },
+      "omitted_namespaces": 2,
+      "proof_cadence": "accelerated one-minute CronJob transition",
+      "receiver": {
+        "name": "namespace-health-receipt-vfldw",
+        "outcome": "accepted",
+        "phase": "Succeeded"
+      },
+      "scheduled_at": "2026-10-07T13:03:00Z",
+      "selected_risk_tiers": [
+        100,
+        100,
+        100
+      ],
+      "selected_rule_ids": [
+        "critical_zero_available",
+        "deployment_available_false_5m",
+        "zero_ready_after_startup_grace_duration_unknown",
+        "critical_zero_available",
+        "deployment_available_false_5m",
+        "zero_ready_after_startup_grace_duration_unknown",
+        "critical_zero_available",
+        "deployment_available_false_5m",
+        "zero_ready_after_startup_grace_duration_unknown"
+      ],
+      "status": "investigate"
+    },
+    {
+      "coverage": {
+        "allocated_log_reads": 17,
+        "api_calls": 60,
+        "assessed": 5,
+        "completed_log_reads": 17,
+        "failed_checks": 0,
+        "failure_sources": [],
+        "log_bytes": 0,
+        "log_candidates": 100,
+        "log_candidates_not_inspected": 83,
+        "required_failed": false,
+        "rotation_cycle_hours_lower_bound": 6,
+        "sampling": "bounded",
+        "structured_api_bytes": 1181065,
+        "truncated_log_reads": 0,
+        "unconfigured_containers": 0
+      },
+      "eligible_namespaces": 5,
+      "job": "namespace-health-assessor-29856304",
+      "job_annotation_evidence": "not preserved before CronJob history cleanup",
+      "kafka": {
+        "bytes": 2935,
+        "key": "sha256:26d073d7eae602749381a5846a7d248b69cd482b2e4851f946c05153ca78bd10",
+        "offset": 2,
+        "partition": 0,
+        "status": "investigate",
+        "topic": "namespace-health-trial-v1",
+        "value_sha256": "a2fa4139ca907379beb0b061f64a96785d59df22e65e2bb4fdb3da3fc957f8db"
+      },
+      "omitted_namespaces": 2,
+      "proof_cadence": "accelerated one-minute CronJob transition",
+      "receiver": {
+        "name": "namespace-health-receipt-bmmj6",
+        "outcome": "accepted",
+        "phase": "Succeeded"
+      },
+      "scheduled_at": "2026-10-07T13:04:00Z",
+      "selected_risk_tiers": [
+        100,
+        100,
+        100
+      ],
+      "selected_rule_ids": [
+        "critical_zero_available",
+        "deployment_available_false_5m",
+        "zero_ready_after_startup_grace_duration_unknown",
+        "critical_zero_available",
+        "deployment_available_false_5m",
+        "zero_ready_after_startup_grace_duration_unknown",
+        "critical_zero_available",
+        "deployment_available_false_5m",
+        "zero_ready_after_startup_grace_duration_unknown"
+      ],
+      "status": "investigate"
+    },
+    {
+      "coverage": {
+        "allocated_log_reads": 17,
+        "api_calls": 60,
+        "assessed": 5,
+        "completed_log_reads": 17,
+        "failed_checks": 0,
+        "failure_sources": [],
+        "log_bytes": 0,
+        "log_candidates": 100,
+        "log_candidates_not_inspected": 83,
+        "required_failed": false,
+        "rotation_cycle_hours_lower_bound": 6,
+        "sampling": "bounded",
+        "structured_api_bytes": 1122210,
+        "truncated_log_reads": 0,
+        "unconfigured_containers": 0
+      },
+      "eligible_namespaces": 0,
+      "job": "namespace-health-assessor-29856305",
+      "job_annotation_evidence": "not preserved before CronJob history cleanup",
+      "kafka": {
+        "bytes": 1146,
+        "key": "sha256:1311056ce484c6f3938ec559ac7d5ac7aeba60b9fd0f53fe99e2e2bff64db952",
+        "offset": 3,
+        "partition": 0,
+        "status": "no_breach_observed",
+        "topic": "namespace-health-trial-v1",
+        "value_sha256": "4a73fe45b45b14b495335d222ce8b89b42e8ca0c551973f049b2037d50419014"
+      },
+      "omitted_namespaces": 0,
+      "proof_cadence": "accelerated one-minute CronJob transition",
+      "receiver": null,
+      "scheduled_at": "2026-10-07T13:05:00Z",
+      "selected_risk_tiers": [],
+      "selected_rule_ids": [],
+      "status": "no_breach_observed"
+    },
+    {
+      "coverage": {
+        "allocated_log_reads": 0,
+        "api_calls": 43,
+        "assessed": 5,
+        "completed_log_reads": 0,
+        "failed_checks": 0,
+        "failure_sources": [],
+        "log_bytes": 0,
+        "log_candidates": 0,
+        "log_candidates_not_inspected": 0,
+        "required_failed": false,
+        "rotation_cycle_hours_lower_bound": 1,
+        "sampling": "bounded",
+        "structured_api_bytes": 659225,
+        "truncated_log_reads": 0,
+        "unconfigured_containers": 0
+      },
+      "eligible_namespaces": 0,
+      "job": "namespace-health-assessor-29856306",
+      "job_annotation_evidence": "verified from live CronJob-owned Job",
+      "kafka": {
+        "bytes": 1140,
+        "key": "sha256:1af890da56e51a943a560d109fe1239e70df967f342e3197ae555cd49ffe3b80",
+        "offset": 4,
+        "partition": 0,
+        "status": "no_breach_observed",
+        "topic": "namespace-health-trial-v1",
+        "value_sha256": "8f4c1bffbe22c0889df96abe2f3c08419d934e5cf81fb2e55c5a166987b2ea31"
+      },
+      "omitted_namespaces": 0,
+      "proof_cadence": "accelerated one-minute CronJob transition",
+      "receiver": null,
+      "scheduled_at": "2026-10-07T13:06:00Z",
+      "selected_risk_tiers": [],
+      "selected_rule_ids": [],
+      "status": "no_breach_observed"
+    },
+    {
+      "coverage": {
+        "allocated_log_reads": 1,
+        "api_calls": 44,
+        "assessed": 5,
+        "completed_log_reads": 1,
+        "failed_checks": 0,
+        "failure_sources": [],
+        "log_bytes": 2158,
+        "log_candidates": 1,
+        "log_candidates_not_inspected": 0,
+        "required_failed": false,
+        "rotation_cycle_hours_lower_bound": 1,
+        "sampling": "bounded",
+        "structured_api_bytes": 686951,
+        "truncated_log_reads": 0,
+        "unconfigured_containers": 0
+      },
+      "eligible_namespaces": 1,
+      "job": "namespace-health-assessor-29856307",
+      "job_annotation_evidence": "verified from live CronJob-owned Job",
+      "kafka": {
+        "bytes": 1553,
+        "key": "sha256:052c577e8665c145222023c9316c6e5c44d6754bcbf75423983199b625b9a4c6",
+        "offset": 5,
+        "partition": 0,
+        "status": "investigate",
+        "topic": "namespace-health-trial-v1",
+        "value_sha256": "fefcef141d4d2da1c74cc396bb26c7b9c5ac4128c0fb3c20dbeff063c1306d0a"
+      },
+      "omitted_namespaces": 0,
+      "proof_cadence": "accelerated one-minute CronJob transition",
+      "receiver": {
+        "name": "namespace-health-receipt-mg4kx",
+        "outcome": "accepted",
+        "phase": "Succeeded"
+      },
+      "scheduled_at": "2026-10-07T13:07:00Z",
+      "selected_risk_tiers": [
+        80
+      ],
+      "selected_rule_ids": [
+        "sampled_application_errors_20",
+        "recent_warning_context"
+      ],
+      "status": "investigate"
+    }
+  ],
+  "scheduled_topic": "namespace-health-trial-v1"
+}
