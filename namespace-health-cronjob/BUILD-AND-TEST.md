@@ -8,9 +8,18 @@ The isolated home-lab trial uses `kind-namespace-health` (Kubernetes 1.35.0), Ar
 
 ## Rebuild exactly
 
-The Dockerfile pins the Python 3.12 Bookworm base by digest. `requirements.lock` pins six packages and accepts only the hashes of the vendored Linux arm64 and amd64 wheels. No runtime download occurs.
+The Dockerfile pins the Python 3.12 Bookworm base by digest. `requirements.lock`
+pins six packages and accepts only the recorded Linux arm64 and amd64 wheel
+hashes. The repository ZIP excludes wheel binaries. On an approved connected
+packaging host, prepare each required architecture from an approved package
+index, then transfer the verified `wheelhouse/` directory and pinned base image
+through the approved air-gap route. The script checks filenames and hashes
+against `evidence/IMAGE-INVENTORY.json`; the Docker build itself makes no
+package download. Keep generated wheels out of Git.
 
 ```bash
+bash scripts-prepare-wheelhouse.sh arm64
+bash scripts-prepare-wheelhouse.sh amd64
 docker buildx build --platform linux/arm64 --provenance=false --sbom=false --load -t namespace-health:lab-arm64 .
 docker buildx build --platform linux/amd64 --provenance=false --sbom=false --load -t namespace-health:bank-amd64 .
 docker run --rm --platform linux/amd64 namespace-health:bank-amd64 python -c 'import assess,collect,monitor,publish,receipt,confluent_kafka,requests; print("image imports OK")'

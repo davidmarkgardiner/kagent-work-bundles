@@ -45,6 +45,14 @@ scan/admission result, and architecture. Do not reuse the October 7 staging
 archive: it predates quiet suppression. The receiver uses the **same image**
 for `/app/receipt.py`.
 
+The repository ZIP does not include Python wheels. Before the offline image
+build, obtain the pinned amd64 wheels on an approved packaging host with
+`bash scripts-prepare-wheelhouse.sh amd64`, or import those exact wheels through
+the approved artifact route. The script verifies filenames and SHA-256 values
+against `evidence/IMAGE-INVENTORY.json`. Transfer `wheelhouse/amd64/` into this
+bundle's build context and keep the pinned base image available internally.
+Do not make the disconnected builder fetch packages.
+
 ```bash
 cd work-agent-bundles/namespace-health-cronjob
 python3 -m unittest discover -s tests -p 'test_*.py'

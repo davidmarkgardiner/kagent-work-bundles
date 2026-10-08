@@ -8,6 +8,9 @@ Start with [the step-by-step work-agent walkthrough](WORK-AGENT-WALKTHROUGH.md),
 
 This route is independent of Alloy and Vector. It needs one custom Python image plus existing Kubernetes, Kafka and Argo. It does not need an HTTP intake, PostgreSQL, a new workplace broker, an always-running collector, or a runtime LLM. It assesses declared namespace checks rather than certifying complete cluster health or reconstructing a historical log stream.
 
+The source ZIP excludes the Python wheel binaries. [Build and test](BUILD-AND-TEST.md)
+explains how to prepare and verify them separately before an offline image build.
+
 ## Evidence boundary
 
 The isolated `kind-namespace-health` cluster used Kubernetes 1.35, Argo Events 1.9.11, Argo Workflows 4.0.8 and disposable Kafka 3.9.1. Seventeen behavior tests and two workplace-renderer tests pass. Live canary reports were produced and consumed with exact JSON and Kafka offsets; Argo accepted, deduplicated and rejected a conflicting slot as designed. A live partial-API fault retained known critical findings while marking coverage incomplete. Quiet and unknown reports started no investigation workflow. The external direct Kafka monitor delivered coverage, conflict, accelerated missing-slot and unreachable-broker alerts to a test webhook. Twenty runs over 100 running fixture Pods had p95 2.804 seconds, a maximum 60 API calls and 36,084 KiB peak process RSS. See [the image inventory](evidence/IMAGE-INVENTORY.json) for source, dependency, image and staging-archive hashes.

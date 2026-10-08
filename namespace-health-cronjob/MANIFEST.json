@@ -1,7 +1,7 @@
 {
   "final_plan_independently_rereviewed": false,
   "final_plan_revision": 3,
-  "generated_at_utc": "2026-10-08T12:27:41.818479+00:00",
+  "generated_at_utc": "2026-10-08T12:55:32.431832+00:00",
   "implementation": {
     "accelerated_controller_created_occurrences_proved": 5,
     "assessor_monitor_behavior_tests_passed": 17,
@@ -26,21 +26,21 @@
   },
   "reviewed_revision": 2,
   "sha256": {
-    ".gitignore": "862263fa1f46c20f0d1e4dac5ffcc75abd55c08211b2c3864c5f8764b9d87793",
-    "BUILD-AND-TEST.md": "e91f6b74d053703dfa2a0296b553094971a9e7e9f63b6fda0018063d19c4f863",
+    ".gitignore": "8d6c6a6a80ca3c8a940f21e95e23ea69801435c8b8803993dbb963d4db307eec",
+    "BUILD-AND-TEST.md": "967860ad3d1dbbd22f75a1800afa53924daf6b7cad8515cffe005863d0397ec4",
     "Dockerfile": "5708e1df5b2ec74c2dfc2b2bb09788825d204fcc8a41972d09ae522315bd3c53",
     "FRONT-SHEET.md": "b8087bab8139ed123065c353a775d959c0860db256c51e2255950d42b723f634",
     "GITLAB-TICKET.md": "9ad379147f77f8daaa907906808b58c0ca2d0d7c6855b33738d10b78d7891cb9",
     "PLAN.md": "d98553ef25af4c6ade15f78c2e86ec9e35cfd2235c5337eb6e2a75515d7c070c",
     "PREFLIGHT.json": "aa42163bb7ac450223638a2406848e527330f003fbdb9cf3cfac0513ec324993",
-    "README.md": "7ca5e89a71d2d65bdff856cbc829116ac6a94aa029196e8603a533fbc3335acc",
+    "README.md": "4909c04b75a1e0cecb95f03210525387c61359adceb5148ec1f49b4cad7ecd35",
     "REVIEW-PROMPT.md": "0e8457fa06d59ed131c5af80f5628758362b9517eda532d463d25ef22b603690",
     "REVIEW-RESOLUTION.md": "d80e9f47ef06f11e298562e37bf0df8f465851de3049cea6980033909cf07e38",
     "ROLLBACK.md": "a352fc5043181f697c0f5589fa63af83ad1cd51588dada264b448fe7994f4b69",
     "TRIAGE-PAYLOAD-AND-ADMISSION.md": "611330311109a7dab542d3c0486c312c820aed8b7607d566ff476c4b8a0318a5",
     "VISUAL.html": "1043e5cfcdd2e2da741d034bf28cdd2c952901b62f971cda1e99b9e3c8f48175",
     "WORK-AGENT-START-HERE.md": "17d3be72efbcc4995532c83f7e6b60deca322bec53d68666f3b99129917f67cf",
-    "WORK-AGENT-WALKTHROUGH.md": "67701e08545f8eaf16105046d82fbb97c4453bb5f70c2b19f266e69c53ec7a84",
+    "WORK-AGENT-WALKTHROUGH.md": "d734d8a8a0cca8416687381121f20884cf18bb907a28a296526b4b8b31e1178e",
     "WORKPLACE-HANDOFF.md": "26d21e604d62449d454ff8198fc651797a757ccca415e9c5930270fc6e7ccaa3",
     "evidence/HOURLY-SOAK-MONITOR.json": "81a582239ca3a694bd89ea58636fc09385466e9b6a9e4ad8bbe8d4602d52b46c",
     "evidence/IMAGE-INVENTORY.json": "8ed9ca98ee6a3006e31fe2302f12ee0674f3cf9e500e5413b2f876565a77b622",
@@ -93,12 +93,7 @@
     "tests/alert_sink.py": "b0587441922c4b5c69feb189f7a9d06314b4a3276a58ba6f3fb967e59c22594b",
     "tests/test_behavior.py": "35a0534791911226f61eff4a3f965d34acedc2fa134ff85453b1e53db73c036f",
     "tests/test_workplace_pilot.py": "5e093146e1de67d0808d030c946a14b2a65fbe32cc62225bc841e8f886ee721c",
-    "wheelhouse/amd64/certifi-2026.7.22-py3-none-any.whl": "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775",
-    "wheelhouse/amd64/charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": "3d31298449090ab8d47b7b1b2a555ff73cac7ed438a08b7ac160980c7ebed649",
-    "wheelhouse/amd64/confluent_kafka-2.11.1-cp312-cp312-manylinux_2_28_x86_64.whl": "3e01607c3613863fb0f4f86c7fc3421c4af6f70686bf903ab475c113dfacb372",
-    "wheelhouse/amd64/idna-3.20-py3-none-any.whl": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
-    "wheelhouse/amd64/requests-2.32.5-py3-none-any.whl": "2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6",
-    "wheelhouse/amd64/urllib3-2.8.0-py3-none-any.whl": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3"
+    "scripts-prepare-wheelhouse.sh": "1d16ab4a753d1be5f2f47418d11d855488c18df35a4a57795056bb8e0c1105dc"
   },
   "source_delta_after_october_7": {
     "independent_job_monitor_proved": false,
