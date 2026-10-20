@@ -15,6 +15,16 @@ native runtime, gateway, and MCP spans/logs → collector → UI
 
 The app, collector, model gateway, and both MCP servers run on one cluster. The model provider and GitLab API can be external services. The Kubernetes data is the actual demo namespace. The GitLab data is an existing approved sandbox project. Reading these two sources does not establish that the GitLab project built the Kubernetes deployments.
 
+## Pick a live scenario and inspect the actual tool
+
+The UI offers **Live Kubernetes workload check**, **Live GitLab pipeline review**, and **Live Kubernetes + GitLab inspection**, plus a custom prompt. These invoke the real registered tools. The Kubernetes preset uses the Helm release namespace; the GitLab server remains fixed to its privately configured project.
+
+The Kubernetes MCP and GitLab MCP panels light up separately when their completed **MCP execution spans** arrive. Each panel shows the latest exact tool, completed-call count, duration, and exported OTel status for the selected workflow. Select a panel or operation to inspect the original span, service, trace, and metadata. The shared request topology can stay the same while these panels show which MCP actually handled a tool call.
+
+A client span proves an attempt and is labelled accordingly. A completed server span shows server execution. The pinned Kubernetes MCP 0.3.0 emits `mcp.tool.TOOL` handler spans as internal spans: only the exact registered Kubernetes service, allowlisted tool, and matching operation name qualify for its separate **MCP handler completed (internal span)** label. Arbitrary internal spans do not qualify. An unset OTel status is displayed as **status not reported**, rather than success. Highlights reflect completed spans received by the collector, so they can appear after the tool finishes. They do not claim to measure in-flight execution.
+
+Kubernetes tool names arrive in `mcp.tool.name` on service `flow-kubernetes-mcp`; GitLab uses `gen_ai.tool.name` on `flow-gitlab-mcp`. Kubernetes currently exports tool spans, not native tool log records. In the **Logs** tab, GitLab emits tool/API metadata and the gateway emits access records. The UI keeps these logs separate from spans and omits request/result bodies.
+
 ## Configure the source deployment
 
 1. Build the current source through the normal image pipeline. No container archive is needed.
@@ -61,3 +71,5 @@ For a continuing demo, supply a separately managed read-only project credential.
 To return to rehearsal, deploy the fixture values and the original model mode through the same release. This removes the chart-owned live MCP resources and scoped Role. Existing external Secrets remain. Do not delete platform namespaces, GitLab projects, or the shared kagent/Substrate installation.
 
 The saved final receipt used an in-cluster HTTPS client because local kubectl port-forward reset during blocked-endpoint probes. Its test process resolved the certificate hostname `localhost` to `flow-https` while retaining TLS/SNI and CA/hostname validation. No runtime application route or security policy was bypassed. The laptop UI/API checks separately used https://localhost:9443. Use the real routable HTTPS hostname for AKS acceptance.
+
+The pinned upstream handler instrumentation uses the default internal span kind: https://github.com/kagent-dev/tools/blob/v0.3.0/internal/telemetry/middleware.go . This adaptation is specific to the bundled Kubernetes MCP; verify other internal-span emitters before adding an evidence rule.

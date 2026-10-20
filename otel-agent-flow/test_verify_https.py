@@ -10,6 +10,12 @@ import urllib.error
 
 
 class ConnectedVerificationTests(unittest.TestCase):
+    def test_client_attempt_cannot_satisfy_server_completion(self):
+        pairs = runpy.run_path(str(Path(__file__).parent / "scripts/verify-https.py"))["server_tool_pairs"]
+        attempt = {"service": "kubernetes-mcp", "kind": "client", "status": "ok", "attributes": {"mcp.tool.name": "read_status"}}
+        self.assertEqual(pairs([attempt]), set())
+        self.assertEqual(pairs([{**attempt, "kind": "server", "toolExecution": "server"}]), {("kubernetes-mcp", "read_status")})
+
     def run_verifier(self, mode, custom, simulated=False, multiple=False):
         submitted = []
         with tempfile.TemporaryDirectory() as directory:
@@ -25,10 +31,10 @@ class ConnectedVerificationTests(unittest.TestCase):
                           "startedAt": 1, "finishedAt": 2}
             spans = [{"service": "atelet", "name": name, "attributes": {}, "status": "ok"} for name in
                      ["ateom.Ateom/RestoreWorkload", "ateom.Ateom/CheckpointWorkload"]]
-            spans.append({"service": "kubernetes-mcp", "name": "read_status", "status": "ok",
+            spans.append({"service": "kubernetes-mcp", "name": "read_status", "status": "ok", "kind": "server", "toolExecution": "server",
                           "attributes": {"mcp.tool.name": "read_status", "flow.simulated": simulated}})
             if multiple:
-                spans.append({"service": "gitlab-mcp", "name": "read_project", "status": "ok", "attributes": {"gen_ai.tool.name": "read_project"}})
+                spans.append({"service": "gitlab-mcp", "name": "read_project", "status": "ok", "kind": "server", "toolExecution": "server", "attributes": {"gen_ai.tool.name": "read_project"}})
             trace = {"traceId": "request", "spans": spans, "spanCount": len(spans), "inputTokens": 10,
                      "outputTokens": 5, "modelCalls": [], "costUsd": None}
             state = {"runtime": {"demoMode": mode}, "invocation": invocation, "traces": [trace],

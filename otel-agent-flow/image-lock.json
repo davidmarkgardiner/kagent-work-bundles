@@ -54,20 +54,20 @@
     }
   },
   "liveToolsRehearsalArtifact": {
-    "tag": "otel-agent-flow:poc-8",
-    "imageId": "sha256:19a791f9ddfd371a0c47a4a0c5044c4ada81da96cfa1370e711331d4cd00a0d0",
-    "scope": "Verified current live-model Kubernetes and GitLab read-only rehearsal. Work registry image is built from source.",
+    "tag": "otel-agent-flow:poc-11",
+    "imageId": "sha256:2e876db25a2134b57784ea8c636960a910f58c18deba86659e614a4d0e156770",
+    "scope": "Live read-only Kubernetes and GitLab scenario rehearsal with separate MCP execution highlights. Local image ID; build a work registry image from source and record its manifest digest.",
     "runtimeSourceHashes": {
-      "backend.py": "f6015b6ce3fcc79ea8e4864aa73363e25b298db2b9298b745686a3c6bd5f86ef",
-      "telemetry.py": "b8e6251c7b0331f94bea494420ad6c1c02af2f58b39e73ae1f3c1e14073451d6",
+      "backend.py": "2655a27e92bede6b68bbc09d7279c21171e8f5c4705fb5c6b383bdf629ceaff8",
+      "telemetry.py": "47234b56b4e21e93a41375c2e97a7b7cd23306bd30f30d4ab4efeef0d346bd61",
       "substrate_call.py": "3247696dd0b427ca9c63b383bfaba20ca055211a8f0cbebc96612c1aafb707b6",
       "workflow_demo.py": "332d551adb5f37998411f1ed5f1df09e4e99e094832956aa906787ea5138f2b5",
       "isolation_demo.py": "7454dcc026062feaf9b8e1590ad790aab08b90a2e97b8440b937da166f5f8acb",
       "live_gitlab.py": "a6f5b0de1740eb86991eb6a3bb97d69d1b9c97592335a72f340d1d870b9e400d",
       "ui/favicon.svg": "c3bd4bf0721aff1103fb18e082b707d0e520abc5e85fbb85655fd3372f720bd6",
-      "ui/style.css": "6e0921f07df92a61d7ccf06e343ddc0d96c693b488084b2b30f13c8c9d8a46fd",
-      "ui/index.html": "95aba0b26b5b1f2828717064984b9459dcc6336db794dfb3352a0f1684597845",
-      "ui/app.js": "26f3034a0a283ab87b37bfa8c84fc23f6a90244b09f9f4a3b123154c1ff936b4",
+      "ui/style.css": "4c07af896007b2a7f6f23a7eeebf43a36a0e2458fd1c1e0f1684318b4153788a",
+      "ui/index.html": "4fea1184595de108ef7760b304c4a02f8245945ae241b36985205a6fc9f91fa4",
+      "ui/app.js": "b660c4bd313adccea3ea8ece8cef9a8eb4cbbfe00a2c5903e8fca75ed0ddb025",
       "ui/logs.css": "0cd7bf6331a837380925f83e256bda346dc88d87c5a02b366314f389ba3700d8"
     }
   }

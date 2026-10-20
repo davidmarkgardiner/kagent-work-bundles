@@ -1,0 +1,15 @@
+{
+  "url": "https://localhost:9443",
+  "image": "otel-agent-flow:poc-11",
+  "servedAssets": true,
+  "actualOtelStateForBothLiveScenarios": true,
+  "liveScenarioPicker": true,
+  "onlyObservedMcpHighlighted": true,
+  "receivedExecutionSpanPulsesSpecificMcp": true,
+  "exactToolDurationAndEvidenceShown": true,
+  "clickInspectsOriginalSpan": true,
+  "logsToggle": true,
+  "clientOnlyNegativeControlDoesNotConfirmMcp": true,
+  "browserVisualRecheck": false,
+  "verificationMethod": "Node DOM model of HTTPS-served assets with actual native OTel for each live scenario, plus a synthetic client-only negative control."
+}

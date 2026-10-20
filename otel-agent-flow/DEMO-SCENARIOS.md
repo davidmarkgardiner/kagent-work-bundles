@@ -35,3 +35,7 @@ If the agent uses an existing triage or SDLC skill, show the resulting tool call
 ## Present the isolation example
 
 Use ENTRA-ISOLATION-DEMO.md. Show allowed and denied calls through the policy front door, then inspect the matching native gateway span and backend request counter. Explain Entra identity, gateway authorization, Kubernetes access policy, and Substrate sandbox isolation as separate controls. A green actor lifecycle is not proof of Entra authorization.
+
+## Live read-only scenarios
+
+With `tools.mode: live`, the picker offers Kubernetes workload health, GitLab pipeline review, and a combined inspection. These use real MCP/API reads; fixture presets stay in fixture mode. Separate MCP activity panels highlight completed MCP execution spans and identify the exact tool. See [LIVE-HOMELAB.md](LIVE-HOMELAB.md) for the evidence and logging boundaries.

@@ -1,6 +1,6 @@
 image:
   repository: otel-agent-flow
-  tag: poc-8
+  tag: poc-11
   digest: ''
   pullPolicy: IfNotPresent
 imagePullSecrets: []

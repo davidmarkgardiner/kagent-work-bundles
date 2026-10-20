@@ -20,6 +20,11 @@ CASES = {
 }
 
 
+def server_tool_pairs(spans):
+    return {(s["service"], s["attributes"].get("gen_ai.tool.name") or s["attributes"].get("mcp.tool.name") or s["attributes"].get("tool.name"))
+            for s in spans if s.get("toolExecution") in {"server", "kagent-tools-internal"} and s["status"] == "ok"}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", required=True)
@@ -103,7 +108,7 @@ def main():
             related = [t for t in state["traces"] if t["traceId"] in activity.get("traceIds", [])]
             spans = [s for t in related for s in t["spans"]]
             worker = {s["name"] for s in spans if s["service"] in {"atelet", "ateom-gvisor"}}
-            successful_pairs = {(s["service"], s["attributes"].get("gen_ai.tool.name") or s["attributes"].get("mcp.tool.name") or s["attributes"].get("tool.name")) for s in spans if s["status"] == "ok"}
+            successful_pairs = server_tool_pairs(spans)
             server_tools = {tool for service, tool in successful_pairs if service in expected_services}
             expected_observed = set(expected_pairs) <= successful_pairs if custom else set(tools) <= {s["attributes"].get("gen_ai.tool.name") for s in spans if s["service"] == tool_service}
             states = [e["state"] for e in activity.get("states", [])]

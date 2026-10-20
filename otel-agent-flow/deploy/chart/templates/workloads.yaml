@@ -28,6 +28,7 @@ spec:
         - {name: SUBSTRATE_INSTALLED, value: "true"}
         - {name: DEMO_MODE, value: {{ ternary "connected" (ternary "live-tools" .Values.model.mode (eq .Values.tools.mode "live")) (eq .Values.integration.mode "existing") | quote }}}
         {{- if eq .Values.tools.mode "live" }}
+        - {name: DEMO_NAMESPACE, value: {{ .Release.Namespace | quote }}}
         - {name: DEMO_PROMPT, value: "Call k8s_get_resources with resource_type deployment, namespace {{ .Release.Namespace }}, and output wide. Then call gitlab_get_project, gitlab_list_issues, and gitlab_get_latest_pipeline. Summarize the real results and cite the observed names, issue IIDs, and pipeline status. Do not change anything."}
         {{- end }}
         - {name: RUNTIME_LABEL, value: {{ .Values.dashboard.runtimeLabel | quote }}}

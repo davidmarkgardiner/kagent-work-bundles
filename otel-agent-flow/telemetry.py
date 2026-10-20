@@ -86,6 +86,9 @@ class Span:
     status: str
     attributes: dict
     receivedAt: float
+    kind: str = "unspecified"
+    otelStatus: str = "unset"
+    toolExecution: str = ""
 
 
 @dataclass(frozen=True)
@@ -187,6 +190,19 @@ def component(service, name, values):
     return "unknown"
 
 
+def tool_execution(kind, service, name, values):
+    tool = values.get("gen_ai.tool.name") or values.get("mcp.tool.name") or values.get("tool.name")
+    if not tool:
+        return ""
+    if kind in (2, "SPAN_KIND_SERVER"):
+        return "server"
+    # Pinned kagent tools 0.3.0 starts internal spans inside its tool handler.
+    if (kind in (1, "SPAN_KIND_INTERNAL") and service == "flow-kubernetes-mcp"
+            and tool in {"k8s_get_resources", "k8s_get_events"} and name == "mcp.tool." + tool):
+        return "kagent-tools-internal"
+    return ""
+
+
 def parse_otlp(payload):
     if not isinstance(payload, dict) or not isinstance(payload.get("resourceSpans"), list):
         raise ValueError("Expected OTLP JSON resourceSpans array")
@@ -217,7 +233,10 @@ def parse_otlp(payload):
                 parsed.append(Span(trace.lower(), span.lower(), parent.lower(), name, service,
                                    component(service, name, values), start, end,
                                    "error" if raw.get("status", {}).get("code") in (2, "STATUS_CODE_ERROR") else "ok",
-                                   values, time.time()))
+                                   values, time.time(),
+                                   {1: "internal", 2: "server", 3: "client", "SPAN_KIND_INTERNAL": "internal", "SPAN_KIND_SERVER": "server", "SPAN_KIND_CLIENT": "client"}.get(raw.get("kind"), "unspecified"),
+                                   {1: "ok", 2: "error", "STATUS_CODE_OK": "ok", "STATUS_CODE_ERROR": "error"}.get(raw.get("status", {}).get("code"), "unset"),
+                                   tool_execution(raw.get("kind"), service, name, values)))
                 if len(parsed) > 4000:
                     raise ValueError("Export exceeds 4000 spans")
     return parsed

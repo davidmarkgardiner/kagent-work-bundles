@@ -101,6 +101,20 @@ def invoke(prompt, trace):
         INVOKING.release()
 
 
+def live_scenarios():
+    if os.getenv("DEMO_MODE") != "live-tools":
+        return []
+    namespace = os.getenv("DEMO_NAMESPACE", "agent-flow-demo")
+    return [
+        {"id": "live-kubernetes", "label": "Live Kubernetes workload check",
+         "prompt": f"Call only k8s_get_resources with resource_type deployment, namespace {namespace}, and output wide. Summarize the observed deployment health. Do not call GitLab or change anything."},
+        {"id": "live-gitlab", "label": "Live GitLab pipeline review",
+         "prompt": "Call only gitlab_get_project and gitlab_get_latest_pipeline. Summarize the current project and pipeline status. Do not call Kubernetes, trigger pipelines, or change anything."},
+        {"id": "live-combined", "label": "Live Kubernetes + GitLab inspection",
+         "prompt": os.getenv("DEMO_PROMPT", "")},
+    ]
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *_):
         pass
@@ -128,6 +142,7 @@ class Handler(BaseHTTPRequestHandler):
                 "substrateInstalled": os.getenv("SUBSTRATE_INSTALLED") == "true",
                 "demoMode": os.getenv("DEMO_MODE", ""),
                 "demoPrompt": os.getenv("DEMO_PROMPT", ""),
+                "scenarios": live_scenarios(),
                 "label": os.getenv("RUNTIME_LABEL", "kagent 0.10.1 · agentgateway 1.5.0 · local kind POC"),
                 "promptHelp": os.getenv("PROMPT_HELP", "Read-only inventory agent · Ctrl/⌘ + Enter to send. Each prompt starts a new run.")}})
         if path == "/api/logs":

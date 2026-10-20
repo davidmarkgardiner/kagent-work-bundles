@@ -18,7 +18,7 @@ The deployed platform prerequisites are kagent **1.0.0-alpha8** and Substrate **
 
 ## What is proven
 
-The current live-tools rehearsal used a real model, namespace-scoped Kubernetes MCP, and a real private GitLab project. Four successful server tool spans, independent deployment/issue/pipeline read-back, and native Substrate restore/checkpoint/suspend passed. See [the live tools receipt](evidence/portable-live-tools-verification.json). This does not prove Entra isolation.
+The poc-8 live-tools baseline used a real model, namespace-scoped Kubernetes MCP, and a real private GitLab project. Four successful server tool spans, independent deployment/issue/pipeline read-back, and native Substrate restore/checkpoint/suspend passed. See [the live tools receipt](evidence/portable-live-tools-verification.json). This does not prove Entra isolation.
 
 The single-cluster Linux rehearsal served HTTPS with certificate validation. Triage, SDLC review, simulated identity isolation, inventory, change review, and intentional dependency failure traversed real HTTP/MCP calls and a real Substrate sandbox. See [the current scenario receipt](evidence/portable-demo-scenarios-verification.json). A live Kimi model also completed the inventory workflow through the in-cluster gateway, with the old host bridge disabled. See [evidence/portable-fixture-verification.json](evidence/portable-fixture-verification.json) and [evidence/portable-live-verification.json](evidence/portable-live-verification.json).
 
@@ -35,3 +35,5 @@ Each prompt starts a fresh session. Fixture mode labels its model and tool data 
 Use [DEMO-SCENARIOS.md](DEMO-SCENARIOS.md) for triage and SDLC examples. Use [ENTRA-ISOLATION-DEMO.md](ENTRA-ISOLATION-DEMO.md) for the separate identity allow/deny demonstration and its evidence requirements.
 
 For the real-model example with live Kubernetes and GitLab reads, use [LIVE-HOMELAB.md](LIVE-HOMELAB.md). It includes the server scopes, live values, multi-server verifier, and credential lifecycle boundary.
+
+The latest MCP scenario rehearsal adds separate Kubernetes and GitLab highlights, live scenario choices, and explicit execution-evidence labels. See [the MCP scenario receipt](evidence/portable-mcp-scenarios-verification.json) and [served UI check](evidence/portable-mcp-ui-verification.json). Kubernetes tool calls are currently observed through spans; GitLab also supplies OTel tool/API logs.

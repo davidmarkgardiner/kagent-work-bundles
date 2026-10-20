@@ -13,3 +13,5 @@ Build the backend container from the Dockerfile in work CI. No separate ZIP or i
 Use [DEMO-SCENARIOS.md](DEMO-SCENARIOS.md) for triage and SDLC examples. Use [ENTRA-ISOLATION-DEMO.md](ENTRA-ISOLATION-DEMO.md) for the separate identity allow/deny demonstration and its evidence requirements.
 
 For the real-model example with live Kubernetes and GitLab reads, use [LIVE-HOMELAB.md](LIVE-HOMELAB.md). It includes the server scopes, live values, multi-server verifier, and credential lifecycle boundary.
+
+Live mode also offers Kubernetes-only, GitLab-only, and combined presets. Separate MCP panels identify and highlight the tool that actually ran from received execution spans. Kubernetes currently exports tool spans; GitLab additionally exports OTel logs.

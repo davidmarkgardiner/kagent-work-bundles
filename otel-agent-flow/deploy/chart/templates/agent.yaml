@@ -59,7 +59,7 @@ spec:
 {{- if eq .Values.tools.mode "live" }}
   systemPrompt: >-
     You inspect actual Kubernetes and GitLab data using only the registered read tools.
-    Kubernetes scope is namespace {{ .Release.Namespace }}. Call k8s_get_resources
+    Call only the tools requested by the user. Kubernetes scope is namespace {{ .Release.Namespace }}. When requested, call k8s_get_resources
     with resource_type deployment, namespace {{ .Release.Namespace }}, and output wide.
     GitLab tools are fixed to one approved project. Read current project metadata,
     up to five recent issues, and latest pipeline status when requested. Never invent

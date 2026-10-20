@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 import backend
 from backend import invocation_prompt, terminal_text
-from telemetry import ActivityStore, parse_otlp
+from telemetry import ActivityStore, parse_otlp, tool_execution
 
 
 def export(spans, service="kagent"):
@@ -18,6 +18,32 @@ def span(n=1, parent=None, values=None, trace=1):
 
 
 class TraceProjectionTests(unittest.TestCase):
+    def test_pinned_kubernetes_internal_handler_is_execution_but_client_is_not(self):
+        values = {"mcp.tool.name": "k8s_get_resources"}
+        self.assertEqual(tool_execution(1, "flow-kubernetes-mcp", "mcp.tool.k8s_get_resources", values), "kagent-tools-internal")
+        self.assertEqual(tool_execution(3, "flow-kubernetes-mcp", "mcp.tool.k8s_get_resources", values), "")
+        self.assertEqual(tool_execution(1, "other-client", "mcp.tool.k8s_get_resources", values), "")
+        self.assertEqual(tool_execution(1, "flow-kubernetes-mcp", "planning", values), "")
+
+    def test_server_and_client_evidence_survives_projection(self):
+        store = ActivityStore()
+        server, client = span(1), span(2)
+        server.update(kind=2, status={"code": 1})
+        client.update(kind="SPAN_KIND_CLIENT")
+        store.ingest(export([server, client], "flow-kubernetes-mcp"))
+        projected = store.snapshot()["traces"][0]["spans"]
+        self.assertEqual([(s["kind"], s["otelStatus"]) for s in projected], [("server", "ok"), ("client", "unset")])
+
+    def test_live_presets_use_deployment_namespace_and_separate_tools(self):
+        with patch.dict(backend.os.environ, {"DEMO_MODE": "live-tools", "DEMO_NAMESPACE": "demo-alternate", "DEMO_PROMPT": "combined"}):
+            presets = backend.live_scenarios()
+        self.assertIn("namespace demo-alternate", presets[0]["prompt"])
+        self.assertIn("Call only k8s_get_resources", presets[0]["prompt"])
+        self.assertIn("Call only gitlab_get_project and gitlab_get_latest_pipeline", presets[1]["prompt"])
+        self.assertEqual(presets[2]["prompt"], "combined")
+        with patch.dict(backend.os.environ, {"DEMO_MODE": "connected"}):
+            self.assertEqual(backend.live_scenarios(), [])
+
     def test_otlp_transport_retry_is_deduplicated(self):
         store = ActivityStore()
         payload = export([span()])

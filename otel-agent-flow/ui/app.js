@@ -7,7 +7,7 @@ const workflowPrompts={
   'change-review':'DEMO_WORKFLOW=change-review. Call get_inventory_status, then review_change. Explain the simulated change decision. Do not deploy or modify anything.',
   'dependency-failure':'DEMO_WORKFLOW=dependency-failure. Call check_dependency and explain its intentional simulated failure and a safe next step. Do not retry or modify anything.'
 };
-$('workflow').onchange=()=>{const prompt=workflowPrompts[$('workflow').value];if(prompt){$('prompt').value=prompt;$('prompt').oninput();}};
+$('workflow').onchange=()=>{const prompt=state.runtime?.scenarios?.find(s=>s.id===$('workflow').value)?.prompt||workflowPrompts[$('workflow').value];if(prompt){$('prompt').value=prompt;$('prompt').oninput();}};
 const runtimeModes={
   fixture:'Fixture model + simulated tools. Real kagent, Substrate, gateway, HTTP traffic, and OTel exports.',
   live:'Live model. Workflow tools return explicitly simulated data.',
@@ -90,21 +90,45 @@ function drawMap() {
     const node=$(`node-${id}`);node.setAttribute('class',`node${nodes.has(id)?' observed':' absent'}${(activeNodes.get(id)||0)>now?' active':''}${filter===id?' selected':''}`);
     $(`sub-${id}`).textContent=nodes.has(id)?sessionGraph()?'Observed in this session':'Observed in this trace':layout[id].sub;
   }
-  for(const card of document.querySelectorAll('.operation-card'))card.classList.toggle('active',(activeOperations.get(card.dataset.spanKey)||0)>now);
+  const activeMcpServices=new Set(scopedSpans().filter(s=>s.toolExecution&&(activeOperations.get(`${s.traceId}/${s.spanId}`)||0)>now).map(s=>s.service));
+  for(const card of document.querySelectorAll('.operation-card, .mcp-server'))card.classList.toggle('active',card.dataset.service?activeMcpServices.has(card.dataset.service):(activeOperations.get(card.dataset.spanKey)||0)>now);
   const hasSubstrate=state.traces.some(t=>t.components.some(c=>['substrate','worker','actor'].includes(c)));
   $('substrate-note').textContent=hasSubstrate?'Native runtime spans received. Session workflow includes related lifecycle traces. Trace details and token counts below stay scoped to the selected trace.':state.runtime?.substrateInstalled?'Installed in this cluster. Waiting for native runtime spans.':'Not installed in this local cluster. Its worker and actor lane stays inactive until runtime spans arrive.';
   if(state.runtime?.substrateInstalled&&!nodes.has('substrate'))$('sub-substrate').textContent='Waiting in this trace';
 }
-function renderOperations(){
+function scopedSpans(){
   const scope=sessionGraph();
-  const spans=scope?state.traces.filter(t=>scope.traceIds.includes(t.traceId)).flatMap(t=>t.spans):selected()?.spans||[];
+  return scope?state.traces.filter(t=>scope.traceIds.includes(t.traceId)).flatMap(t=>t.spans):selected()?.spans||[];
+}
+function toolName(span){return span.attributes['gen_ai.tool.name']||span.attributes['mcp.tool.name']||span.attributes['tool.name'];}
+function toolEvidence(span){
+  if(span.toolExecution)return `${span.toolExecution==='server'?'MCP server completed':'MCP handler completed (internal span)'} · ${span.otelStatus==='unset'?'OTel status not reported':span.otelStatus==='error'?'OTel error':'OTel OK'}`;
+  return span.kind==='client'?'Client attempt · server completion unconfirmed':'Span kind not reported · server completion unconfirmed';
+}
+function renderMcpServers(spans){
+  const servers=new Map(state.runtime?.demoMode==='live-tools'?[['flow-kubernetes-mcp','Kubernetes MCP'],['flow-gitlab-mcp','GitLab MCP']]:[]);
+  const completed=spans.filter(s=>toolName(s)&&s.toolExecution).sort((a,b)=>Number(a.endNs)-Number(b.endNs));
+  for(const span of completed)if(!servers.has(span.service))servers.set(span.service,span.attributes['flow.tool.system']||span.service);
+  $('mcp-servers').replaceChildren(...[...servers].map(([service,label])=>{
+    const calls=completed.filter(s=>s.service===service),latest=calls.at(-1);
+    const card=el('button',undefined,`mcp-server${latest?' observed':''}${calls.some(s=>(activeOperations.get(`${s.traceId}/${s.spanId}`)||0)>Date.now())?' active':''}${latest?.status==='error'?' error':''}`);
+    card.dataset.service=service;
+    card.append(el('strong',label),el('span',latest?toolName(latest):'No MCP execution span received'),el('small',latest?`${calls.length} completed tool call${calls.length===1?'':'s'} · ${time(latest.durationMs)}`:'Waiting in this workflow'));
+    if(latest){card.dataset.spanKey=`${latest.traceId}/${latest.spanId}`;card.append(el('small',toolEvidence(latest)));card.onclick=()=>{stopReplay();follow=false;selectedId=latest.traceId;filter=null;render();inspect(latest);};}
+    else card.disabled=true;
+    return card;
+  }));
+}
+function renderOperations(){
+  const spans=scopedSpans();
+  renderMcpServers(spans);
   const operations=spans.filter(s=>s.attributes['gen_ai.tool.name']||s.attributes['mcp.tool.name']||s.attributes['tool.name']||s.attributes['flow.security.check'])
     .sort((a,b)=>Number(a.startNs)-Number(b.startNs));
   const cards=operations.slice(-40).map(s=>{
     const a=s.attributes,tool=a['gen_ai.tool.name']||a['mcp.tool.name']||a['tool.name']||s.name;
     const card=el('button',undefined,`operation-card ${s.status}${(activeOperations.get(`${s.traceId}/${s.spanId}`)||0)>Date.now()?' active':''}`);
     card.dataset.spanKey=`${s.traceId}/${s.spanId}`;
-    card.append(el('strong',a['flow.tool.system']||s.service),el('span',tool),el('small',`${s.status} · ${time(s.durationMs)} · ${a['flow.simulated']===true?'Simulated data':'Received telemetry'}`));
+    card.append(el('strong',a['flow.tool.system']||s.service),el('span',tool),el('small',`${time(s.durationMs)} · ${toolEvidence(s)}${a['flow.simulated']===true?' · Simulated data':''}`));
     if(a['flow.security.decision']||a['flow.security.check']){
       card.append(el('span',`${a['flow.security.subject']||'Identity unknown'} → ${a['flow.security.resource']||'Resource unknown'} · ${a['flow.security.decision']||'Probe'}`),
         el('small',a['flow.security.authority']||'Enforcement source not reported'));
@@ -169,7 +193,7 @@ function renderTimeline(){
   });$('timeline').replaceChildren(...(rows.length?rows:[el('p','No spans for this component in the selected trace.','empty')]));
 }
 function inspect(span){
-  const pairs=[['Operation',span.name],['Service',span.service],['Status',span.status],['Duration',time(span.durationMs)],['Span ID',span.spanId],['Parent ID',span.parentSpanId||'Root or not exported'],...Object.entries(span.attributes)];
+  const pairs=[['Operation',span.name],['Service',span.service],['Status',span.status],['Span kind',span.kind||'unspecified'],['OTel status',span.otelStatus||'unset'],['Duration',time(span.durationMs)],['Span ID',span.spanId],['Parent ID',span.parentSpanId||'Root or not exported'],...Object.entries(span.attributes)];
   $('inspection').replaceChildren(...pairs.map(([k,v])=>{const row=el('div',undefined,'kv');row.append(el('span',k),el('span',String(v)));return row;}));
 }
 function stopReplay(){for(const timer of replayTimers)clearTimeout(timer);replayTimers=[];replaying=false;activeNodes.clear();activeEdges.clear();$('mode').textContent='LIVE';$('mode').className='mode';}
@@ -210,7 +234,11 @@ async function poll(){
     const r=await fetch('/api/state');if(!r.ok)throw Error('Receiver unavailable');const next=await r.json();
     const fresh=[];for(const t of next.traces)for(const s of t.spans){const key=`${s.traceId}/${s.spanId}`;if(!seen.has(key)&&!initial)fresh.push([s,t]);}
     seen=new Set(next.traces.flatMap(t=>t.spans.map(s=>`${s.traceId}/${s.spanId}`)));state=next;
-    if(state.runtime){$('runtime-label').textContent=state.runtime.label;$('prompt-help').textContent=state.runtime.promptHelp;$('demo-mode').hidden=!state.runtime.demoMode;$('demo-mode').textContent=runtimeModes[state.runtime.demoMode]||'Runtime data mode not specified.';$('workflow').closest('label').hidden=['connected','live-tools'].includes(state.runtime.demoMode);$('workflow').disabled=['connected','live-tools'].includes(state.runtime.demoMode);if(state.runtime.demoMode==='live-tools'){$('prompt-help').textContent='Live read-only Kubernetes and GitLab tools · Each prompt creates a new session.';if(initial&&state.runtime.demoPrompt){$('prompt').value=state.runtime.demoPrompt;$('prompt').oninput();}}}
+    if(state.runtime){$('runtime-label').textContent=state.runtime.label;$('prompt-help').textContent=state.runtime.promptHelp;$('demo-mode').hidden=!state.runtime.demoMode;$('demo-mode').textContent=runtimeModes[state.runtime.demoMode]||'Runtime data mode not specified.';$('workflow').closest('label').hidden=state.runtime.demoMode==='connected';$('workflow').disabled=state.runtime.demoMode==='connected';
+      if(state.runtime.demoMode==='live-tools'&&$('workflow').dataset.mode!=='live-tools'){
+        $('workflow').replaceChildren(...[{id:'custom',label:'Custom prompt'},...(state.runtime.scenarios||[])].map(s=>{const option=el('option',s.label);option.value=s.id;return option;}));
+        $('workflow').dataset.mode='live-tools';$('workflow').value='live-combined';
+      }if(state.runtime.demoMode==='live-tools'){$('prompt-help').textContent='Live read-only Kubernetes and GitLab tools · Each prompt creates a new session.';if(initial&&state.runtime.demoPrompt){$('prompt').value=state.runtime.demoPrompt;$('prompt').oninput();}}}
     if(follow&&state.traces.length)selectedId=state.traces[0].traceId;
     $('connection').textContent='Receiver connected';$('connection-dot').className='online';
     const inv=state.invocation,waitingForAcceptedTrace=!!pendingTraceId&&inv.traceId!==pendingTraceId,busy=submitting||waitingForAcceptedTrace||['starting','running'].includes(inv.status);$('invoke').disabled=busy;$('invoke-label').textContent=busy?'Running…':'Send to agent';
