@@ -1,0 +1,99 @@
+{{- if eq .Values.ingress.mode "local" }}
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: flow-https, namespace: {{ .Release.Namespace }}}
+data:
+  Caddyfile: |
+    {
+      auto_https off
+      admin off
+    }
+    :8443 {
+      tls /tls/tls.crt /tls/tls.key
+      @frontend path / /favicon.svg /style.css /logs.css /app.js /api/state /api/logs /api/invoke /healthz
+      handle @frontend {
+        reverse_proxy flow-dashboard:8787
+      }
+      handle {
+        respond "Not found" 404
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: flow-https, namespace: {{ .Release.Namespace }}}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: flow-https}}
+  template:
+    metadata:
+      labels: {app: flow-https, sidecar.istio.io/inject: "false"}
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, fsGroup: 10001}
+      containers:
+      - name: https
+        image: {{ .Values.ingress.localImage | quote }}
+        command: [caddy]
+        args: [run, --config, /etc/caddy/Caddyfile, --adapter, caddyfile]
+        env: [{name: XDG_DATA_HOME, value: /data}, {name: XDG_CONFIG_HOME, value: /config}]
+        ports: [{name: https, containerPort: 8443}]
+        readinessProbe: {tcpSocket: {port: https}}
+        resources: {requests: {cpu: 25m, memory: 16Mi}, limits: {cpu: 500m, memory: 128Mi}}
+        securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL], add: [NET_BIND_SERVICE]}}
+        volumeMounts:
+        - {name: config, mountPath: /etc/caddy, readOnly: true}
+        - {name: tls, mountPath: /tls, readOnly: true}
+        - {name: data, mountPath: /data}
+        - {name: cache, mountPath: /config}
+      volumes:
+      - {name: config, configMap: {name: flow-https}}
+      - {name: tls, secret: {secretName: {{ .Values.ingress.tlsSecret | quote }}, defaultMode: 288}}
+      - {name: data, emptyDir: {}}
+      - {name: cache, emptyDir: {}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: flow-https, namespace: {{ .Release.Namespace }}}
+spec:
+  selector: {app: flow-https}
+  ports: [{name: https, port: 443, targetPort: 8443}]
+{{- else if eq .Values.ingress.mode "istio" }}
+{{- if not .Values.ingress.istio.existingGateway }}
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: flow-demo
+  namespace: {{ .Values.ingress.istio.namespace | quote }}
+spec:
+  selector:
+    istio: {{ .Values.ingress.istio.selector | quote }}
+  servers:
+  - port: {number: 80, name: http-flow-demo, protocol: HTTP}
+    hosts: [{{ .Values.ingress.host | quote }}]
+    tls: {httpsRedirect: true}
+  - port: {number: 443, name: https-flow-demo, protocol: HTTPS}
+    hosts: [{{ .Values.ingress.host | quote }}]
+    tls: {mode: SIMPLE, credentialName: {{ .Values.ingress.tlsSecret | quote }}}
+{{- end }}
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata: {name: flow-demo, namespace: {{ .Release.Namespace }}}
+spec:
+  hosts: [{{ .Values.ingress.host | quote }}]
+  gateways: [{{ default (printf "%s/flow-demo" .Values.ingress.istio.namespace) .Values.ingress.istio.existingGateway | quote }}]
+  http:
+  - match:
+    {{- range list "/" "/favicon.svg" "/style.css" "/logs.css" "/app.js" "/api/state" "/api/logs" "/api/invoke" "/healthz" }}
+    - uri: {exact: {{ . | quote }}}
+    {{- end }}
+    timeout: 180s
+    route:
+    - destination:
+        host: "flow-dashboard.{{ .Release.Namespace }}.svc.cluster.local"
+        port: {number: 8787}
+{{- end }}

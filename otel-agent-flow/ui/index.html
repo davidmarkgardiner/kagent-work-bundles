@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent flow · kagent</title><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/logs.css"><script src="/app.js" defer></script></head>
+<body>
+<header><a class="brand" href="/" aria-label="kagent agent flow"><img src="/favicon.svg" width="34" height="34" alt=""><strong>kagent</strong><span class="slash">/</span><span>Agent flow</span></a><div class="connection"><span id="connection-dot"></span><span id="connection">Connecting</span></div></header>
+<main>
+  <section class="intro"><div><h1>Watch your agents work.</h1><p>Send a prompt, then follow the components it actually touches.</p></div></section>
+  <div class="agent-workspace">
+  <aside class="prompt-column" aria-label="Agent conversation">
+  <p id="demo-mode" class="demo-mode" hidden></p>
+  <label class="workflow-picker" for="workflow">Demo workflow<select id="workflow"><option value="custom">Custom prompt</option><option value="inventory">Simulated inventory check</option><option value="change-review">Simulated change review</option><option value="dependency-failure">Simulated dependency failure</option></select></label>
+  <form id="prompt-form" class="prompt-form"><div class="prompt-heading"><label for="prompt">Your prompt</label><span id="prompt-count">0 / 4,000</span></div><textarea id="prompt" name="prompt" rows="3" maxlength="4000" required aria-describedby="prompt-help">Check the inventory workload and explain whether it is healthy.</textarea><p id="prompt-help">Read-only inventory agent · Ctrl/⌘ + Enter to send. Each prompt starts a new run.</p><button id="invoke" class="primary" type="submit" form="prompt-form"><span id="invoke-label">Send to agent</span> <span aria-hidden="true">↗</span></button></form>
+  <section id="agent-response" class="agent-response" aria-labelledby="response-title" hidden><h2 id="response-title">Agent response</h2><p id="response-text" role="status"></p><small id="response-trace"></small></section>
+  <div id="notice" class="notice" role="status">Ready to send your prompt to the read-only agent.</div>
+    <aside class="runs-panel" aria-labelledby="runs-title"><div class="panel-head"><h2 id="runs-title">Recent traces</h2><span id="trace-count">0</span></div><div id="runs" class="runs"><p class="empty">Run the agent to see its first trace here.</p></div><p class="retention">Metadata only · up to 200 traces<br>Routine polls expire first. Restart clears history.</p></aside>
+  </aside>
+  <div class="activity-column">
+  <nav class="view-switch" aria-label="Dashboard views"><div role="tablist" aria-label="View"><button id="tab-visual" role="tab" aria-controls="visual-view" aria-selected="true">Visual flow</button><button id="tab-logs" role="tab" aria-controls="logs-view" aria-selected="false" tabindex="-1">Logs</button></div><p id="view-description">Follow the observed request path and inspect its spans.</p></nav>
+  <div id="visual-view" role="tabpanel" aria-labelledby="tab-visual">
+  <div class="workspace">
+    <section class="graph-panel" aria-labelledby="graph-title">
+      <div class="panel-head"><div><h2 id="graph-title">Request path</h2><p id="graph-caption">Waiting for the first OTel trace.</p></div><span id="mode" class="mode">LIVE</span></div>
+      <div class="diagram-wrap">
+      <svg id="diagram" viewBox="0 0 1050 500" role="img" aria-label="Observed agent request topology. Select a component to inspect its spans.">
+        <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/></marker></defs>
+        <g id="edges"></g><g id="nodes"></g>
+      </svg>
+      </div>
+      <div class="legend"><span><i class="key observed"></i><span id="graph-scope">Observed in selected trace</span></span><span><i class="key pulse-key"></i>New span received</span><span><i class="key absent"></i>No telemetry</span></div>
+      <div id="actor-activity" class="actor-activity" hidden><h3>Actor lifecycle</h3><div id="actor-states"></div><p>Linked by native actor identity. Select a state to inspect its original trace.</p><button id="session-flow">View session workflow</button></div>
+      <div class="substrate-note"><strong>Agent Substrate</strong><span id="substrate-note">Not installed in this local cluster. Its worker and actor lane stays inactive until runtime spans arrive.</span></div>
+    </section>
+
+  </div>
+  <section class="detail-panel" aria-labelledby="trace-title">
+    <div class="panel-head"><div><h2 id="trace-title">Trace details</h2><p id="trace-id">Select a received trace to inspect its spans.</p></div><div class="actions"><button id="follow" disabled>Follow latest</button><button id="replay" disabled>Replay trace</button></div></div>
+    <div class="measures"><div><span>Elapsed</span><strong id="duration">—</strong></div><div><span>Observed spans</span><strong id="spans">—</strong></div><div><span>Input / output tokens</span><strong id="tokens">Not reported</strong></div><div><span>Transaction cost</span><strong id="cost">Not reported</strong><small id="cost-source">No price has been assumed.</small></div></div>
+    <div class="trace-body"><div><div class="timeline-head"><h3 id="timeline-title">Workflow timeline</h3><div class="actions"><button id="clear-filter" hidden>Clear filter</button><button id="internal-spans" disabled>Show internal spans</button></div></div><div id="timeline" class="timeline"><p class="empty">Completed spans will appear as the runtime exports them.</p></div></div><div class="inspection"><h3>Selected span</h3><div id="inspection"><p class="empty">Select a span or a component on the map.</p></div></div></div>
+    <details class="pricing"><summary>Estimate cost with your own rates</summary><p>When the provider does not report a per-request USD charge, enter rates to estimate a token cost. These values are for this browser session only and are never labelled as billed cost.</p><form id="pricing"><label>Input USD / 1M tokens<input id="input-rate" inputmode="decimal" type="number" min="0" step="any" placeholder="Your input rate"></label><label>Output USD / 1M tokens<input id="output-rate" inputmode="decimal" type="number" min="0" step="any" placeholder="Your output rate"></label><button type="submit">Apply estimate</button><button id="reset-pricing" type="button">Clear rates</button></form><p id="pricing-status" role="status"></p></details>
+  </section>
+  </div>
+  <section id="logs-view" class="logs-panel" role="tabpanel" aria-labelledby="tab-logs" hidden>
+    <div class="panel-head"><div><h2 id="logs-title">OTel logs</h2><p id="logs-status" role="status">Connecting to the log receiver.</p></div><div class="log-controls"><label>Trace<select id="log-scope"><option value="all">All traces</option><option value="selected">Selected trace</option></select></label><label>Severity<select id="log-severity"><option value="0">All severities</option><option value="9">Info and above</option><option value="13">Warning and above</option><option value="17">Error and above</option></select></label><button id="pause-logs">Pause logs</button></div></div>
+    <div class="log-table-wrap"><table class="log-table"><thead><tr><th>Time</th><th>Severity</th><th>Service</th><th>API call / event</th><th>Trace</th></tr></thead><tbody id="log-rows"><tr><td colspan="5">Waiting for exported OTel log records.</td></tr></tbody></table></div>
+    <details id="log-detail" class="log-detail"><summary>Selected OTel log record</summary><pre id="log-json">Select a log event to inspect its metadata.</pre></details>
+    <p class="logs-footnote">Native OTel log records and gateway access logs. Prompt, response, and tool-result bodies are omitted. Latest 200 matching records shown; up to 1,000 retained.</p>
+  </section>
+  </div>
+  </div>
+  <footer><span>OTel → observed spans → activity map</span><span id="runtime-label">kagent 0.10.1 · agentgateway 1.5.0 · local kind POC</span></footer>
+</main>
+</body></html>

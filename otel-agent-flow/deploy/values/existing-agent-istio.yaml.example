@@ -1,0 +1,23 @@
+# Preferred work profile. Reuse the approved agent, ModelConfig, gateway, and MCP servers.
+image:
+  repository: "{{INTERNAL_REGISTRY}}/otel-agent-flow"
+  digest: "{{REVIEWED_IMAGE_DIGEST}}"
+integration:
+  mode: existing
+  existingAgent: "{{EXISTING_READ_ONLY_AGENT}}"
+  controllerAddress: ''
+agentNamespace: kagent
+workerPool: "{{APPROVED_WORKERPOOL}}"
+collector:
+  sourceNamespaces: [] # Add existing gateway and MCP namespaces if different from kagent/ate-system.
+ingress:
+  mode: istio
+  host: "{{DEMO_FQDN}}"
+  tlsSecret: "{{EXISTING_TLS_SECRET}}"
+  istio:
+    namespace: aks-istio-ingress
+    selector: aks-istio-ingressgateway-internal
+    existingGateway: "{{EXISTING_GATEWAY_NAMESPACE_AND_NAME}}"
+dashboard:
+  identity: "{{APPROVED_DEMO_USER_CONTEXT}}"
+  runtimeLabel: Existing kagent + agentgateway + Substrate · AKS

@@ -1,0 +1,15 @@
+{
+  "url": "https://localhost:9443",
+  "tlsCertificateVerified": true,
+  "servedAssets": true,
+  "actualOtelState": true,
+  "allEightObservedComponents": true,
+  "leftPromptRightActivity": true,
+  "workflowPresets": true,
+  "fixtureLabelAndCost": true,
+  "lifecycleControls": true,
+  "logViewWithNativeError": true,
+  "viewSwitchPreservesSession": true,
+  "browserVisualRecheck": false,
+  "verificationMethod": "Node DOM model of HTTPS-served assets using captured live OTel APIs; select value shim for DOM implementation. No browser visual recheck."
+}

@@ -1,0 +1,39 @@
+image:
+  repository: otel-agent-flow
+  tag: poc-3
+  digest: ''
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+integration:
+  mode: bundled
+  existingAgent: ''
+  controllerAddress: ''
+collector:
+  sourceNamespaces: []
+agentNamespace: kagent
+workerPool: kagent-default
+snapshotLocation: s3://ate-snapshots/kagent/
+agentImage: ghcr.io/kagent-dev/kagent/golang-adk@sha256:10ef1350786b5d21bc002ed54833fd0272ea7cd8182a92977686b7bafa7f67d3
+collectorImage: otel/opentelemetry-collector:0.146.0@sha256:60cf8cfda7086e792450a746953d5ec9579e440ae0d8a1e16608bb9960699844
+gatewayImage: cr.agentgateway.dev/agentgateway:v1.5.0@sha256:bf2f339ef326d32def2aaeb44b1b4549801293c19b89e764a4228667d97d9896
+model:
+  mode: fixture
+  name: fixture-workflow
+  live:
+    host: ''
+    path: /v1/chat/completions
+    tls: true
+    existingSecret: ''
+    secretKey: api-key
+ingress:
+  mode: none
+  host: localhost
+  tlsSecret: flow-demo-tls
+  localImage: caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d
+  istio:
+    namespace: aks-istio-ingress
+    selector: aks-istio-ingressgateway-internal
+    existingGateway: ''
+dashboard:
+  identity: admin@kagent.dev
+  runtimeLabel: kagent 1.0.0-alpha8 · Substrate 0.4.0-alpha1 · single cluster

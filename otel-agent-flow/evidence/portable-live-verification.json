@@ -1,0 +1,90 @@
+{
+  "url": "https://localhost:19443",
+  "tlsCertificateVerified": true,
+  "externalOtlpBlocked": true,
+  "crossOriginBlocked": true,
+  "workflows": [
+    {
+      "workflow": "inventory",
+      "mode": "live",
+      "traceId": "5a4dc96e60ca49cb8e5c17dcff976f84",
+      "sessionId": "01a15a5e-908b-79fe-b76c-bc2f62833505",
+      "status": "completed",
+      "elapsedSeconds": 8.041,
+      "requestSpanCount": 242,
+      "relatedTraceIds": [
+        "bf05efbdb4a2d3aaa59f7ce0372b71d8",
+        "5a4dc96e60ca49cb8e5c17dcff976f84",
+        "225b92cc70960f3bfbbc62c94c3ebb63",
+        "3659569f75302497735bcc601b24452b",
+        "55f281be11aaf51a5937abffaa00f567",
+        "961f4599326283990ae03b9acfeb6177",
+        "3736b3d73f157310ed19a71997901643",
+        "6ff320c1cd3719932de8210764df2ad6",
+        "14cfc7ac4e75258b5fcb0e30c6a9effe",
+        "3b201f1bcb08ff73d197ee5c0fdd7f7f",
+        "23c71c21a6ccbcc35e4202b585c2ab36",
+        "5f5dc4466d7f6a8ac29c854da5e1b0ac",
+        "e3162d8ed43be797804e3d1966d047b9",
+        "c2c5edfa0de98ea8ce81b0602fb880ca",
+        "5ac52a45221c4d26664c944d757f9701",
+        "873e51c0decfcc1b03d8b4c103b57cd5",
+        "3e770c14e646f4bfb40613a6d31ebc3e",
+        "980107f0304457eee8fc4525bf18370f",
+        "a8ea4e56640d2d098e806299115e3b8f",
+        "890582dfe23ceaf163799a1c8f9fe92f",
+        "12164c03d16e377e6bb417de3325f814",
+        "5540c509fb2e5a7ab28c2ba77fb93515",
+        "7f93959be038370628bb2fd2da5c9c31",
+        "b3fa3d5698edb9921225d72af27617af",
+        "435edc8a0ab9460008ea6334638cdb71"
+      ],
+      "observedComponents": [
+        "actor",
+        "agentgateway",
+        "client",
+        "kagent",
+        "mcp",
+        "model",
+        "substrate",
+        "worker"
+      ],
+      "tools": [
+        "get_inventory_status",
+        "get_recent_alerts"
+      ],
+      "actorStates": [
+        "suspended",
+        "resuming",
+        "running",
+        "suspending",
+        "suspended"
+      ],
+      "workerOperations": [
+        "atelet.AteomHerder/Checkpoint",
+        "atelet.AteomHerder/Restore",
+        "ateom.Ateom/CheckpointWorkload",
+        "ateom.Ateom/RestoreWorkload",
+        "fetchFileFromGCSWithZstd",
+        "fetchFromGCS",
+        "prepareOCIDirectory",
+        "sendBytesToGCS",
+        "sendFileToGCSWithZstd"
+      ],
+      "inputTokens": 1844.0,
+      "outputTokens": 219.0,
+      "modelCallCount": 3,
+      "billedUsd": null,
+      "intentionalToolErrorObserved": false
+    }
+  ],
+  "browserVisualRecheck": false,
+  "aksIstioRuntimeTested": false,
+  "networkPolicyEnforcementTested": false,
+  "singleClusterRuntime": {
+    "namespace": "agent-flow-demo",
+    "serviceEndpointsArePods": true,
+    "servicesAreInternal": true,
+    "hostBridgeDependencies": 0
+  }
+}

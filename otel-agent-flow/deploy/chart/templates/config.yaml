@@ -1,0 +1,72 @@
+{{- if not (has .Values.model.mode (list "fixture" "live")) }}{{ fail "model.mode must be fixture or live" }}{{ end -}}
+{{- if not (has .Values.ingress.mode (list "none" "local" "istio")) }}{{ fail "ingress.mode must be none, local, or istio" }}{{ end -}}
+{{- if eq .Values.integration.mode "existing" }}
+{{- $_ := required "integration.existingAgent is required" .Values.integration.existingAgent }}
+{{- end }}
+{{- if and (eq .Values.integration.mode "bundled") (eq .Values.model.mode "live") }}
+{{- $_ := required "model.live.host is required" .Values.model.live.host }}
+{{- $_ := required "model.live.existingSecret is required" .Values.model.live.existingSecret }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flow-collector
+  namespace: {{ .Release.Namespace }}
+data:
+  config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc: {endpoint: "0.0.0.0:4317"}
+          http: {endpoint: "0.0.0.0:4318"}
+    processors:
+      memory_limiter: {check_interval: 1s, limit_mib: 192, spike_limit_mib: 48}
+      batch: {timeout: 200ms, send_batch_size: 64}
+    exporters:
+      otlp_http/dashboard:
+        endpoint: http://flow-dashboard:8787
+        encoding: json
+        compression: none
+        retry_on_failure: {enabled: true, max_elapsed_time: 30s}
+      debug/metrics: {verbosity: basic}
+    service:
+      pipelines:
+        traces: {receivers: [otlp], processors: [memory_limiter, batch], exporters: [otlp_http/dashboard]}
+        logs: {receivers: [otlp], processors: [memory_limiter, batch], exporters: [otlp_http/dashboard]}
+        metrics: {receivers: [otlp], processors: [memory_limiter, batch], exporters: [debug/metrics]}
+{{- if eq .Values.integration.mode "bundled" }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flow-gateway
+  namespace: {{ .Release.Namespace }}
+data:
+  config.yaml: |
+    frontendPolicies:
+      tracing:
+        host: flow-collector:4317
+        protocol: grpc
+        randomSampling: 1
+      accessLog:
+        otlp: {host: "flow-collector:4317", protocol: grpc}
+    binds:
+    - port: 8081
+      listeners:
+      - protocol: HTTP
+        routes:
+        - backends:
+          - ai:
+              name: flow-model
+              provider:
+                openAI: {model: {{ .Values.model.name | quote }}}
+              hostOverride: {{ if eq .Values.model.mode "fixture" }}flow-workflows:8084{{ else }}{{ .Values.model.live.host | quote }}{{ end }}
+              pathOverride: {{ if eq .Values.model.mode "fixture" }}/v1/chat/completions{{ else }}{{ .Values.model.live.path | quote }}{{ end }}
+              {{- if eq .Values.model.mode "live" }}
+              policies:
+                backendAuth: {key: "$MODEL_API_KEY"}
+                {{- if .Values.model.live.tls }}
+                backendTLS: {}
+                {{- end }}
+              {{- end }}
+{{- end }}

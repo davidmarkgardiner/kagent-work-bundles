@@ -1,0 +1,40 @@
+{
+  "applicationArtifact": {
+    "tag": "otel-agent-flow:poc-3",
+    "imageId": "sha256:b96200a5a0d1395e4c6fd5751b50ffdfc11230f53ef620b09303a773ea8dc8ab",
+    "dockerArchive": "otel-agent-flow-linux-amd64-poc-3.tar.gz",
+    "dockerArchiveSha256": "f060cdc7477559a36308d71965f6b014ddccf0f7b57e08c54ea8f80088ea9215"
+  },
+  "unitTestsPassed": 47,
+  "fixtureWorkflowsPassed": [
+    "inventory",
+    "change-review",
+    "dependency-failure"
+  ],
+  "liveModelWorkflowsPassed": [
+    "inventory"
+  ],
+  "httpsCertificateValidated": true,
+  "nativeSubstrateRestoreAndCheckpointObserved": true,
+  "nativeActorFinalSuspendedObserved": true,
+  "hostBridgeDependencies": 0,
+  "runtimeSourceHashesMatch": true,
+  "allEightWorkflowComponentsObserved": true,
+  "substrateHelmStoredManifestRetainsCollectorExport": true,
+  "aksIstioManifestRendered": true,
+  "aksIstioRuntimeTested": false,
+  "networkPolicyEnforcementTested": false,
+  "browserVisualRecheck": false,
+  "receipts": [
+    "portable-fixture-verification.json",
+    "portable-live-verification.json",
+    "portable-ui-verification.json"
+  ],
+  "limitations": [
+    "Pinned alpha platform prerequisites require target validation.",
+    "Local HTTPS uses a test CA and Caddy; it does not emulate Istio.",
+    "Shared single-user POC requires the approved work access layer.",
+    "Fixture model has no billed usage; live cost remains an estimate."
+  ],
+  "scope": "Historical poc-3 single-cluster rehearsal. Existing-agent integration source was added afterward and is not included in runtime proof."
+}

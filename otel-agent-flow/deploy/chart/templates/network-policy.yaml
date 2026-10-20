@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: flow-demo-ingress, namespace: {{ .Release.Namespace }}}
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+  ingress:
+  - from:
+    - podSelector: {}
+    - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: {{ .Values.agentNamespace | quote }}}}
+    - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: ate-system}}
+    ports:
+    - {protocol: TCP, port: 8081}
+    - {protocol: TCP, port: 8084}
+    - {protocol: TCP, port: 4317}
+    - {protocol: TCP, port: 4318}
+  - from:
+    - podSelector: {matchLabels: {app: flow-collector}}
+    - podSelector: {matchLabels: {app: flow-https}}
+    - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: {{ .Values.ingress.istio.namespace | quote }}}}
+    ports: [{protocol: TCP, port: 8787}]
+  - ports: [{protocol: TCP, port: 8443}]
+{{- with .Values.collector.sourceNamespaces }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: flow-collector-approved-sources, namespace: {{ $.Release.Namespace }}}
+spec:
+  podSelector: {matchLabels: {app: flow-collector}}
+  policyTypes: [Ingress]
+  ingress:
+  - from:
+    {{- range . }}
+    - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: {{ . | quote }}}}
+    {{- end }}
+    ports: [{protocol: TCP, port: 4317}, {protocol: TCP, port: 4318}]
+{{- end }}

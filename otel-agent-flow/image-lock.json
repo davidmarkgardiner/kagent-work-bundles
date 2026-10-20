@@ -1,0 +1,38 @@
+{
+  "platform": {
+    "kubernetesLab": "1.37.0",
+    "kagentChart": "1.0.0-alpha8",
+    "substrateChart": "0.4.0-alpha1"
+  },
+  "images": {
+    "applicationBase": "python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258",
+    "agent": "ghcr.io/kagent-dev/kagent/golang-adk@sha256:10ef1350786b5d21bc002ed54833fd0272ea7cd8182a92977686b7bafa7f67d3",
+    "gateway": "cr.agentgateway.dev/agentgateway:v1.5.0@sha256:bf2f339ef326d32def2aaeb44b1b4549801293c19b89e764a4228667d97d9896",
+    "collector": "otel/opentelemetry-collector:0.146.0@sha256:60cf8cfda7086e792450a746953d5ec9579e440ae0d8a1e16608bb9960699844",
+    "localHttpsOnly": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d"
+  },
+  "grpcurl": {
+    "version": "1.9.3",
+    "linuxAmd64ArchiveSha256": "a926b62a85787ccf73ef8736b3ae554f1242e39d92bb8767a79d6dd23b11d1d5",
+    "linuxArm64ArchiveSha256": "b20a00c1cb82ab81ec32696766d4076e99b4cb5ca0823a71767ba64dbea0f263"
+  },
+  "applicationArtifact": {
+    "tag": "otel-agent-flow:poc-3",
+    "imageId": "sha256:b96200a5a0d1395e4c6fd5751b50ffdfc11230f53ef620b09303a773ea8dc8ab",
+    "dockerArchive": "otel-agent-flow-linux-amd64-poc-3.tar.gz",
+    "dockerArchiveSha256": "f060cdc7477559a36308d71965f6b014ddccf0f7b57e08c54ea8f80088ea9215",
+    "scope": "Historical poc-3 rehearsal before the existing-agent source profile. Build current source in work CI and record a new registry digest."
+  },
+  "applicationRuntimeSources": {
+    "backend.py": "1d505fd901465ce5b8824452e791127f2e24c2a13d2103b0a8b4232212740399",
+    "telemetry.py": "f06c7d10f3091f62e5233dd79f6dfb4115669bbb9301a66d9f9de8e0d438a7a2",
+    "substrate_call.py": "3247696dd0b427ca9c63b383bfaba20ca055211a8f0cbebc96612c1aafb707b6",
+    "workflow_demo.py": "fc079b2686a74938e7d48b66e53e99e7410cb8845c7e42eacd1389b1537dbe6f",
+    "ui/app.js": "8fa54ad15245e2c50eb291913281b4d2f49216dddd36ab08b17b5aeccce0beae",
+    "ui/favicon.svg": "c3bd4bf0721aff1103fb18e082b707d0e520abc5e85fbb85655fd3372f720bd6",
+    "ui/index.html": "d659004354ba1c1bed7bf66844a493f136de0c4bc6b9285082e9e45d8e6150a4",
+    "ui/logs.css": "105b21fb974beb116b32be200bd86d24708cdf747316e40caf6ec59e52a32c42",
+    "ui/style.css": "6e0921f07df92a61d7ccf06e343ddc0d96c693b488084b2b30f13c8c9d8a46fd"
+  },
+  "applicationRuntimeSourcesScope": "Hashes of the verified historical poc-3 runtime, not the latest repository source."
+}

@@ -1,0 +1,63 @@
+{{- if eq .Values.integration.mode "bundled" }}
+apiVersion: v1
+kind: Secret
+metadata: {name: flow-demo-client, namespace: {{ .Values.agentNamespace }}}
+type: Opaque
+stringData: {api-key: lab-gateway-authenticates-upstream}
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: ModelConfig
+metadata: {name: flow-demo-model, namespace: {{ .Values.agentNamespace }}}
+spec:
+  provider: OpenAI
+  model: {{ .Values.model.name | quote }}
+  apiKeySecret: flow-demo-client
+  apiKeySecretKey: api-key
+  openAI:
+    apiFormat: chatCompletions
+    baseUrl: "http://flow-gateway.{{ .Release.Namespace }}.svc.cluster.local:8081/v1"
+    maxTokens: 1200
+    timeout: 90
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: RemoteMCPServer
+metadata: {name: flow-demo-tools, namespace: {{ .Values.agentNamespace }}}
+spec:
+  description: Fixed read-only tools returning explicitly simulated workflow data.
+  protocol: STREAMABLE_HTTP
+  url: "http://flow-workflows.{{ .Release.Namespace }}.svc.cluster.local:8084/mcp"
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: Harness
+metadata: {name: flow-demo, namespace: {{ .Values.agentNamespace }}}
+spec:
+  kagent: {}
+  workload: {image: {{ .Values.agentImage | quote }}}
+  substrate:
+    workerPoolRef: {name: {{ .Values.workerPool | quote }}}
+    snapshotPolicy: {location: {{ .Values.snapshotLocation | quote }}}
+  env: [{name: OTEL_BSP_SCHEDULE_DELAY, value: "300"}]
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: AgentTemplate
+metadata: {name: flow-demo, namespace: {{ .Values.agentNamespace }}}
+spec:
+  modelConfig: {name: flow-demo-model}
+  systemPrompt: >-
+    You demonstrate agent workflows in a Substrate sandbox. Follow the requested
+    DEMO_WORKFLOW by calling the named tools in order. All tool data is explicitly
+    simulated. Explain fixture results and intentional dependency failures clearly.
+    Never claim to have inspected or changed the real cluster. Do not retry a simulated
+    failure. Never invent telemetry, token prices, deployments, or approvals.
+  tools:
+  - mcp:
+      server: {kind: RemoteMCPServer, name: flow-demo-tools}
+      tools: [get_inventory_status, get_recent_alerts, review_change, check_dependency]
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: Agent
+metadata: {name: flow-demo-agent, namespace: {{ .Values.agentNamespace }}}
+spec:
+  harnessRef: {name: flow-demo}
+  templateRef: {name: flow-demo}
+{{- end }}

@@ -1,0 +1,158 @@
+#!/usr/bin/env python3
+"""Run actual agent workflows through the HTTPS front door and verify native OTel."""
+import argparse
+import json
+import os
+from pathlib import Path
+import ssl
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+
+CASES = {
+    "inventory": ("Call get_inventory_status, then get_recent_alerts. Summarize the simulated inventory health.", ["get_inventory_status", "get_recent_alerts"]),
+    "change-review": ("Call get_inventory_status, then review_change. Explain the simulated decision. Do not deploy anything.", ["get_inventory_status", "review_change"]),
+    "dependency-failure": ("Call check_dependency once. Explain the intentional simulated failure. Do not retry.", ["check_dependency"]),
+}
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--url", required=True)
+    parser.add_argument("--ca", type=Path)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--case", choices=["all", *CASES], default="all")
+    parser.add_argument("--prompt-file", type=Path)
+    parser.add_argument("--expect-tool", action="append", default=[])
+    parser.add_argument("--tool-service")
+    parser.add_argument("--context")
+    parser.add_argument("--namespace", default="agent-flow-demo")
+    args = parser.parse_args()
+    custom = args.prompt_file is not None
+    if custom != bool(args.expect_tool) or custom != bool(args.tool_service):
+        parser.error("Connected verification requires --prompt-file, --expect-tool, and --tool-service together")
+    if custom and args.case != "all":
+        parser.error("Use a custom prompt or a fixture case, not both")
+    custom_prompt = args.prompt_file.read_text().strip() if custom else None
+    if custom and not custom_prompt:
+        parser.error("The approved prompt file is empty")
+    origin = args.url.rstrip("/")
+    if urllib.parse.urlparse(origin).scheme != "https":
+        parser.error("Verification requires HTTPS; certificate verification cannot be disabled")
+    context = ssl.create_default_context(cafile=str(args.ca) if args.ca else None)
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, *_args, **_kwargs):
+            return None
+
+    opener = urllib.request.build_opener(urllib.request.HTTPSHandler(context=context), NoRedirect())
+    headers = {"Content-Type": "application/json", "Origin": origin}
+    if token := os.getenv("FLOW_AUTH_BEARER"):
+        headers["Authorization"] = "Bearer " + token
+
+    def request(path, payload=None, extra=None):
+        req = urllib.request.Request(origin + path, None if payload is None else json.dumps(payload).encode(),
+                                     {**headers, **(extra or {})})
+        try:
+            with opener.open(req, timeout=15) as response:
+                return response.status, json.loads(response.read(8 * 1024 * 1024))
+        except urllib.error.HTTPError as error:
+            code = error.code
+            with error:
+                error.read(65536)
+            return code, None
+
+    assert request("/healthz")[0] == 200, "HTTPS liveness failed"
+    assert request("/v1/traces", {"resourceSpans": []})[0] == 404, "OTLP traces are exposed at ingress"
+    assert request("/v1/logs", {"resourceLogs": []})[0] == 404, "OTLP logs are exposed at ingress"
+    assert request("/api/invoke", {"prompt": ""})[0] == 400, "Empty prompt accepted"
+    assert request("/api/invoke", {"prompt": "invalid origin"}, {"Origin": "https://untrusted.invalid"})[0] == 403, "Cross-origin submission accepted"
+    _, initial_state = request("/api/state")
+    if (initial_state["runtime"]["demoMode"] == "connected") != custom:
+        parser.error("Use a reviewed custom prompt for connected mode and fixture cases for the bundled demo")
+    cases = {"connected": (custom_prompt, args.expect_tool)} if custom else CASES
+    tool_service = args.tool_service if custom else "flow-demo-tools"
+    results = []
+    for name, (prompt, tools) in cases.items():
+        if args.case != "all" and name != args.case:
+            continue
+        code, accepted = request("/api/invoke", {"prompt": prompt if custom else f"DEMO_WORKFLOW={name}. {prompt}"})
+        assert code == 202, f"{name}: invocation not accepted"
+        trace = accepted["traceId"]
+        deadline = time.monotonic() + 180
+        while time.monotonic() < deadline:
+            _, state = request("/api/state")
+            invocation = state["invocation"]
+            if invocation.get("traceId") != trace:
+                raise AssertionError("Another caller replaced this verification run")
+            if invocation["status"] == "failed":
+                raise AssertionError(f"{name}: agent invocation failed")
+            activity = state.get("sessionActivity") or {}
+            selected = next((t for t in state["traces"] if t["traceId"] == trace), None)
+            related = [t for t in state["traces"] if t["traceId"] in activity.get("traceIds", [])]
+            spans = [s for t in related for s in t["spans"]]
+            worker = {s["name"] for s in spans if s["service"] in {"atelet", "ateom-gvisor"}}
+            server_tools = {(s["attributes"].get("gen_ai.tool.name") or s["attributes"].get("mcp.tool.name") or s["attributes"].get("tool.name")) for s in spans if s["service"] == tool_service}
+            states = [e["state"] for e in activity.get("states", [])]
+            if (invocation["status"] == "completed" and selected and set(tools) <= server_tools
+                    and states and states[-1] == "suspended" and any("CheckpointWorkload" in n for n in worker)
+                    and any("RestoreWorkload" in n for n in worker)
+                    and {"client", "kagent", "substrate", "worker", "actor", "agentgateway", "model", "mcp"} <= set(activity.get("components", []))):
+                break
+            time.sleep(0.5)
+        else:
+            raise AssertionError(f"{name}: native workflow/lifecycle evidence did not arrive before the deadline")
+        expected = {"client", "kagent", "substrate", "worker", "actor", "agentgateway", "model", "mcp"}
+        assert expected <= set(activity["components"]), f"{name}: missing components"
+        assert any("RestoreWorkload" in n for n in worker), "Worker restore is missing"
+        fixture_spans = [s for s in spans if s["service"] == tool_service]
+        if custom:
+            assert not any(s["attributes"].get("flow.simulated") is True for s in fixture_spans), "Connected proof contains simulated tool data"
+        else:
+            assert all(s["attributes"].get("flow.simulated") is True for s in fixture_spans), "Fixture tools are not labelled"
+        failed = [s for s in fixture_spans if s["attributes"].get("gen_ai.tool.name") == "check_dependency" and s["status"] == "error"]
+        if name == "dependency-failure":
+            assert failed, "Intentional dependency failure was not exported as an error"
+        _, log_data = request("/api/logs")
+        assert any(r["event"] == "ate.actor.state_changed" and r["attributes"].get("ate.actor.name") == activity["actorName"]
+                   for r in log_data["logs"]), "Native actor lifecycle log missing"
+        if state["runtime"]["demoMode"] == "fixture":
+            assert "SIMULATED_WORKFLOW_COMPLETE" in invocation["text"], "Fixture result is not labelled"
+            assert selected["costUsd"] is None, "Fixture transaction gained a billed cost"
+        results.append({"workflow": name, "mode": state["runtime"]["demoMode"], "traceId": trace,
+                        "sessionId": invocation["sessionId"], "status": invocation["status"],
+                        "elapsedSeconds": round(invocation["finishedAt"] - invocation["startedAt"], 3),
+                        "requestSpanCount": selected["spanCount"], "relatedTraceIds": activity["traceIds"],
+                        "observedComponents": activity["components"], "tools": tools, "toolService": tool_service,
+                        "actorStates": states, "workerOperations": sorted(worker),
+                        "inputTokens": selected["inputTokens"], "outputTokens": selected["outputTokens"],
+                        "modelCallCount": len(selected["modelCalls"]), "billedUsd": selected["costUsd"],
+                        "intentionalToolErrorObserved": bool(failed)})
+        print(f"PASS {name}: HTTPS, model/tool traffic, worker restore/checkpoint, actor suspended", flush=True)
+    result = {"url": origin, "tlsCertificateVerified": True, "externalOtlpBlocked": True,
+              "crossOriginBlocked": True, "workflows": results, "browserVisualRecheck": False,
+              "aksIstioRuntimeTested": False, "networkPolicyEnforcementTested": False}
+    if args.context:
+        import subprocess
+
+        def get(resource):
+            return json.loads(subprocess.run(["kubectl", "--context", args.context, "-n", args.namespace,
+                                              "get", resource, "-o", "json"], check=True, text=True, capture_output=True).stdout)["items"]
+
+        pods, services, endpoints = get("pods"), get("services"), get("endpointslices")
+        addresses = {a["ip"] for p in pods for a in p["status"].get("podIPs", [])}
+        assert all(s["spec"]["type"] == "ClusterIP" and s["spec"].get("selector") for s in services), "External or manually bridged service found"
+        assert all(a in addresses for ep in endpoints for entry in ep.get("endpoints", []) for a in entry["addresses"]), "A service endpoint is outside this namespace's pods"
+        workloads = get("deployments")
+        assert not any(p["spec"].get("hostNetwork") for p in pods), "Host network dependency found"
+        serialized = json.dumps(workloads)
+        assert not any(value in serialized for value in ["host.docker.internal", "18082", "127.0.0.1:18083"]), "Host bridge dependency found"
+        result["singleClusterRuntime"] = {"namespace": args.namespace, "serviceEndpointsArePods": True,
+                                           "servicesAreInternal": True, "hostBridgeDependencies": 0}
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(result, indent=2) + "\n")
+    print("Saved verification receipt to " + str(args.output))
+
+
+if __name__ == "__main__":
+    main()

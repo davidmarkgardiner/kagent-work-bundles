@@ -1,0 +1,9 @@
+*
+!Dockerfile
+!.build/grpcurl
+!backend.py
+!telemetry.py
+!substrate_call.py
+!workflow_demo.py
+!ui/
+!ui/**

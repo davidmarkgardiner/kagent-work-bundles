@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: flow-dashboard, namespace: {{ .Release.Namespace }}}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app: flow-dashboard}}
+  template:
+    metadata:
+      labels: {app: flow-dashboard, sidecar.istio.io/inject: "false"}
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, fsGroup: 10001}
+      containers:
+      - name: dashboard
+        image: {{ include "flow.image" . | quote }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - {name: AGENT_PROTOCOL, value: grpc}
+        - {name: AGENT_NAME, value: {{ ternary .Values.integration.existingAgent "flow-demo-agent" (eq .Values.integration.mode "existing") | quote }}}
+        - {name: AGENT_NAMESPACE, value: {{ .Values.agentNamespace | quote }}}
+        - {name: KAGENT_GRPC_ADDRESS, value: {{ default (printf "kagent-controller.%s.svc.cluster.local:8083" .Values.agentNamespace) .Values.integration.controllerAddress | quote }}}
+        - {name: KAGENT_USER_ID, value: {{ .Values.dashboard.identity | quote }}}
+        - {name: OTEL_ENDPOINT, value: "http://flow-collector:4318/v1/traces"}
+        - {name: SUBSTRATE_INSTALLED, value: "true"}
+        - {name: DEMO_MODE, value: {{ ternary "connected" .Values.model.mode (eq .Values.integration.mode "existing") | quote }}}
+        - {name: RUNTIME_LABEL, value: {{ .Values.dashboard.runtimeLabel | quote }}}
+        - {name: PROMPT_HELP, value: {{ ternary "Existing agent and its configured tools · Read-only prompts only · Each prompt creates a new session." "Sandboxed agent · Simulated workflow tools · Ctrl/⌘ + Enter to send. Each prompt creates a new session." (eq .Values.integration.mode "existing") | quote }}}
+        ports: [{name: http, containerPort: 8787}]
+        readinessProbe: {httpGet: {path: /healthz, port: http}, periodSeconds: 5}
+        livenessProbe: {httpGet: {path: /healthz, port: http}, periodSeconds: 15}
+        resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: "1", memory: 256Mi}}
+        securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+{{- if eq .Values.integration.mode "bundled" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: flow-workflows, namespace: {{ .Release.Namespace }}}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: flow-workflows}}
+  template:
+    metadata:
+      labels: {app: flow-workflows, sidecar.istio.io/inject: "false"}
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext: {runAsNonRoot: true, runAsUser: 10001}
+      containers:
+      - name: workflows
+        image: {{ include "flow.image" . | quote }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: [python, /app/workflow_demo.py]
+        env: [{name: OTEL_HTTP_ENDPOINT, value: "http://flow-collector:4318"}]
+        ports: [{name: http, containerPort: 8084}]
+        readinessProbe: {httpGet: {path: /healthz, port: http}}
+        resources: {requests: {cpu: 25m, memory: 32Mi}, limits: {cpu: 500m, memory: 128Mi}}
+        securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: flow-collector, namespace: {{ .Release.Namespace }}}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: flow-collector}}
+  template:
+    metadata:
+      labels: {app: flow-collector, sidecar.istio.io/inject: "false"}
+      annotations: {checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}}
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: collector
+        image: {{ .Values.collectorImage | quote }}
+        args: [--config=/config/config.yaml]
+        ports: [{name: grpc, containerPort: 4317}, {name: http, containerPort: 4318}]
+        readinessProbe: {tcpSocket: {port: grpc}}
+        resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: "1", memory: 256Mi}}
+        securityContext: {runAsNonRoot: true, readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+        volumeMounts: [{name: config, mountPath: /config, readOnly: true}]
+      volumes: [{name: config, configMap: {name: flow-collector}}]
+{{- if eq .Values.integration.mode "bundled" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: flow-gateway, namespace: {{ .Release.Namespace }}}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: flow-gateway}}
+  template:
+    metadata:
+      labels: {app: flow-gateway, sidecar.istio.io/inject: "false"}
+      annotations: {checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}}
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext: {runAsNonRoot: true, runAsUser: 10001}
+      containers:
+      - name: gateway
+        image: {{ .Values.gatewayImage | quote }}
+        args: [-f, /config/config.yaml]
+        {{- if eq .Values.model.mode "live" }}
+        env:
+        - name: MODEL_API_KEY
+          valueFrom:
+            secretKeyRef: {name: {{ .Values.model.live.existingSecret | quote }}, key: {{ .Values.model.live.secretKey | quote }}}
+        {{- end }}
+        ports: [{name: http, containerPort: 8081}]
+        readinessProbe: {tcpSocket: {port: http}}
+        resources: {requests: {cpu: 25m, memory: 32Mi}, limits: {cpu: "1", memory: 256Mi}}
+        securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+        volumeMounts: [{name: config, mountPath: /config, readOnly: true}]
+      volumes: [{name: config, configMap: {name: flow-gateway}}]
+{{- end }}
+---
+{{- range $name, $ports := dict "flow-dashboard" (list (dict "name" "http" "port" 8787)) "flow-workflows" (list (dict "name" "http" "port" 8084)) "flow-gateway" (list (dict "name" "http" "port" 8081)) "flow-collector" (list (dict "name" "grpc" "port" 4317) (dict "name" "http" "port" 4318)) }}
+{{- if or (eq $.Values.integration.mode "bundled") (has $name (list "flow-dashboard" "flow-collector")) }}
+apiVersion: v1
+kind: Service
+metadata: {name: {{ $name }}, namespace: {{ $.Release.Namespace }}}
+spec:
+  selector: {app: {{ $name }}}
+  ports: {{ toYaml $ports | nindent 4 }}
+---
+{{- end }}
+{{- end }}

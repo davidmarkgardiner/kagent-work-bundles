@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "image": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tag": {
+          "type": "string"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^$|^sha256:[a-f0-9]{64}$"
+        },
+        "pullPolicy": {
+          "enum": [
+            "Always",
+            "IfNotPresent",
+            "Never"
+          ]
+        }
+      }
+    },
+    "model": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "fixture",
+            "live"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "live": {
+          "type": "object",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "pattern": "^/"
+            },
+            "tls": {
+              "type": "boolean"
+            },
+            "existingSecret": {
+              "type": "string"
+            },
+            "secretKey": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "none",
+            "local",
+            "istio"
+          ]
+        },
+        "host": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tlsSecret": {
+          "type": "string",
+          "minLength": 1
+        },
+        "istio": {
+          "type": "object",
+          "properties": {
+            "namespace": {
+              "type": "string",
+              "minLength": 1
+            },
+            "selector": {
+              "type": "string",
+              "minLength": 1
+            },
+            "existingGateway": {
+              "type": "string",
+              "pattern": "^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?/[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+            }
+          }
+        }
+      }
+    },
+    "agentNamespace": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workerPool": {
+      "type": "string",
+      "minLength": 1
+    },
+    "snapshotLocation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agentImage": {
+      "type": "string",
+      "pattern": "@sha256:[a-f0-9]{64}$"
+    },
+    "integration": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "bundled",
+            "existing"
+          ]
+        },
+        "existingAgent": {
+          "type": "string"
+        },
+        "controllerAddress": {
+          "type": "string"
+        }
+      }
+    },
+    "collector": {
+      "type": "object",
+      "properties": {
+        "sourceNamespaces": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+          }
+        }
+      }
+    }
+  }
+}

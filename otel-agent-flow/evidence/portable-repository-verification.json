@@ -1,0 +1,22 @@
+{
+  "verifiedAt": "2026-10-20T18:16:43.496208+00:00",
+  "scope": "Repository source and offline integration contracts. Local poc-3 runtime receipts have a separate historical scope.",
+  "unitTestsPassed": 50,
+  "bundledProfilesRender": true,
+  "existingAgentProfileRender": true,
+  "existingProfileOwnedDeployments": [
+    "flow-dashboard",
+    "flow-collector"
+  ],
+  "existingProfileCreatesAgentGatewayModelOrTools": false,
+  "existingIstioGatewayReferenceRender": true,
+  "connectedVerifierRejectsSimulatedTools": true,
+  "sourceUiDomChecksPassed": true,
+  "browserVisualRecheck": false,
+  "existingAgentRuntimeTested": false,
+  "realKubernetesMcpWorkplaceTested": false,
+  "explicitSkillInstrumentationImplemented": false,
+  "aksIstioRuntimeTested": false,
+  "currentSourceApplicationImageBuilt": false,
+  "workBuildRequired": true
+}
