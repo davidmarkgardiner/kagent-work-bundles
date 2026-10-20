@@ -1,0 +1,10 @@
+# Merge with the local or AKS ingress values and the reviewed live-model values.
+integration:
+  mode: bundled
+tools:
+  mode: live
+  gitlab:
+    apiUrl: https://gitlab.com/api/v4
+    project: "{{APPROVED_GITLAB_SANDBOX_PROJECT_PATH}}"
+    existingSecret: "{{EXISTING_GITLAB_READ_SECRET}}"
+    secretKey: token

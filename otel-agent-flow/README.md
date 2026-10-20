@@ -11,3 +11,5 @@ The current single-cluster rehearsal passed six fixture workflows, including tri
 Build the backend container from the Dockerfile in work CI. No separate ZIP or image archive is needed. See [IMAGE-IMPORT.md](IMAGE-IMPORT.md).
 
 Use [DEMO-SCENARIOS.md](DEMO-SCENARIOS.md) for triage and SDLC examples. Use [ENTRA-ISOLATION-DEMO.md](ENTRA-ISOLATION-DEMO.md) for the separate identity allow/deny demonstration and its evidence requirements.
+
+For the real-model example with live Kubernetes and GitLab reads, use [LIVE-HOMELAB.md](LIVE-HOMELAB.md). It includes the server scopes, live values, multi-server verifier, and credential lifecycle boundary.

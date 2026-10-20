@@ -11,6 +11,7 @@ $('workflow').onchange=()=>{const prompt=workflowPrompts[$('workflow').value];if
 const runtimeModes={
   fixture:'Fixture model + simulated tools. Real kagent, Substrate, gateway, HTTP traffic, and OTel exports.',
   live:'Live model. Workflow tools return explicitly simulated data.',
+  'live-tools':'Live model and real read-only Kubernetes and GitLab MCP data. OTel shows received calls.',
   connected:'Existing agent and its configured model, gateway, and tools. Activity appears only when OTel is received.'
 };
 const svgNS = 'http://www.w3.org/2000/svg';
@@ -209,7 +210,7 @@ async function poll(){
     const r=await fetch('/api/state');if(!r.ok)throw Error('Receiver unavailable');const next=await r.json();
     const fresh=[];for(const t of next.traces)for(const s of t.spans){const key=`${s.traceId}/${s.spanId}`;if(!seen.has(key)&&!initial)fresh.push([s,t]);}
     seen=new Set(next.traces.flatMap(t=>t.spans.map(s=>`${s.traceId}/${s.spanId}`)));state=next;
-    if(state.runtime){$('runtime-label').textContent=state.runtime.label;$('prompt-help').textContent=state.runtime.promptHelp;$('demo-mode').hidden=!state.runtime.demoMode;$('demo-mode').textContent=runtimeModes[state.runtime.demoMode]||'Runtime data mode not specified.';$('workflow').closest('label').hidden=state.runtime.demoMode==='connected';$('workflow').disabled=state.runtime.demoMode==='connected';}
+    if(state.runtime){$('runtime-label').textContent=state.runtime.label;$('prompt-help').textContent=state.runtime.promptHelp;$('demo-mode').hidden=!state.runtime.demoMode;$('demo-mode').textContent=runtimeModes[state.runtime.demoMode]||'Runtime data mode not specified.';$('workflow').closest('label').hidden=['connected','live-tools'].includes(state.runtime.demoMode);$('workflow').disabled=['connected','live-tools'].includes(state.runtime.demoMode);if(state.runtime.demoMode==='live-tools'){$('prompt-help').textContent='Live read-only Kubernetes and GitLab tools · Each prompt creates a new session.';if(initial&&state.runtime.demoPrompt){$('prompt').value=state.runtime.demoPrompt;$('prompt').oninput();}}}
     if(follow&&state.traces.length)selectedId=state.traces[0].traceId;
     $('connection').textContent='Receiver connected';$('connection-dot').className='online';
     const inv=state.invocation,waitingForAcceptedTrace=!!pendingTraceId&&inv.traceId!==pendingTraceId,busy=submitting||waitingForAcceptedTrace||['starting','running'].includes(inv.status);$('invoke').disabled=busy;$('invoke-label').textContent=busy?'Running…':'Send to agent';
@@ -229,6 +230,12 @@ async function poll(){
 }
 function renderLogs(){
   if(!logData)return;
+  const serviceMenu=$('log-service'),services=logData.services||[];
+  const serviceKey=JSON.stringify(services);
+  if(serviceMenu.dataset.services!==serviceKey){
+    const current=serviceMenu.value;serviceMenu.replaceChildren(...['',...services].map(name=>{const option=el('option',name||'All services');option.value=name;return option;}));
+    serviceMenu.value=services.includes(current)?current:'';serviceMenu.dataset.services=serviceKey;
+  }
   const minimum=Number($('log-severity').value),records=logData.logs.filter(r=>r.severityNumber>=minimum);
   $('logs-status').textContent=`${logsPaused?'Paused':'Live'} · ${records.length} shown · ${logData.matching} matching · ${logData.retained} retained`;
   const rows=records.map(record=>{
@@ -243,13 +250,14 @@ function renderLogs(){
 $('pause-logs').onclick=()=>{logsPaused=!logsPaused;$('pause-logs').textContent=logsPaused?'Resume logs':'Pause logs';renderLogs();};
 $('log-severity').onchange=renderLogs;
 $('log-scope').onchange=()=>{logData=null;lastLogKey='';};
+$('log-service').onchange=()=>{logData=null;lastLogKey='';};
 let lastLogKey='';
 async function pollLogs(){
   if(!logsPaused){
     try{
       const trace=$('log-scope').value==='selected'?selectedId:null;
       if($('log-scope').value==='selected'&&!trace){$('logs-status').textContent='Select a trace to filter its logs.';}
-      else{const response=await fetch(`/api/logs${trace?`?traceId=${encodeURIComponent(trace)}`:''}`);if(!response.ok)throw Error('Logs unavailable');const data=await response.json();const key=`${data.revision}/${trace||'all'}`;if(key!==lastLogKey){logData=data;lastLogKey=key;renderLogs();}}
+      else{const service=$('log-service').value||'',params=[];if(trace)params.push('traceId='+encodeURIComponent(trace));if(service)params.push('service='+encodeURIComponent(service));const response=await fetch('/api/logs'+(params.length?'?'+params.join('&'):''));if(!response.ok)throw Error('Logs unavailable');const data=await response.json();const key=`${data.revision}/${trace||'all'}/${service}`;if(key!==lastLogKey){logData=data;lastLogKey=key;renderLogs();}}
     }catch(e){$('logs-status').textContent='Log receiver disconnected. Reconnecting automatically.';}
   }
   setTimeout(pollLogs,800);

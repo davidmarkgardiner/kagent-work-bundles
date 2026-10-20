@@ -26,15 +26,18 @@ spec:
         - {name: KAGENT_USER_ID, value: {{ .Values.dashboard.identity | quote }}}
         - {name: OTEL_ENDPOINT, value: "http://flow-collector:4318/v1/traces"}
         - {name: SUBSTRATE_INSTALLED, value: "true"}
-        - {name: DEMO_MODE, value: {{ ternary "connected" .Values.model.mode (eq .Values.integration.mode "existing") | quote }}}
+        - {name: DEMO_MODE, value: {{ ternary "connected" (ternary "live-tools" .Values.model.mode (eq .Values.tools.mode "live")) (eq .Values.integration.mode "existing") | quote }}}
+        {{- if eq .Values.tools.mode "live" }}
+        - {name: DEMO_PROMPT, value: "Call k8s_get_resources with resource_type deployment, namespace {{ .Release.Namespace }}, and output wide. Then call gitlab_get_project, gitlab_list_issues, and gitlab_get_latest_pipeline. Summarize the real results and cite the observed names, issue IIDs, and pipeline status. Do not change anything."}
+        {{- end }}
         - {name: RUNTIME_LABEL, value: {{ .Values.dashboard.runtimeLabel | quote }}}
-        - {name: PROMPT_HELP, value: {{ ternary "Existing agent and its configured tools · Read-only prompts only · Each prompt creates a new session." "Sandboxed agent · Simulated workflow tools · Ctrl/⌘ + Enter to send. Each prompt creates a new session." (eq .Values.integration.mode "existing") | quote }}}
+        - {name: PROMPT_HELP, value: {{ ternary "Existing agent and its configured tools · Read-only prompts only · Each prompt creates a new session." (ternary "Live read-only Kubernetes and GitLab tools · Each prompt creates a new session." "Sandboxed agent · Simulated workflow tools · Ctrl/⌘ + Enter to send. Each prompt creates a new session." (eq .Values.tools.mode "live")) (eq .Values.integration.mode "existing") | quote }}}
         ports: [{name: http, containerPort: 8787}]
         readinessProbe: {httpGet: {path: /healthz, port: http}, periodSeconds: 5}
         livenessProbe: {httpGet: {path: /healthz, port: http}, periodSeconds: 15}
         resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: "1", memory: 256Mi}}
         securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
-{{- if eq .Values.integration.mode "bundled" }}
+{{- if and (eq .Values.integration.mode "bundled") (eq .Values.tools.mode "fixture") }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -125,7 +128,7 @@ spec:
 {{- end }}
 ---
 {{- range $name, $ports := dict "flow-dashboard" (list (dict "name" "http" "port" 8787)) "flow-workflows" (list (dict "name" "http" "port" 8084)) "flow-gateway" (list (dict "name" "http" "port" 8081)) "flow-collector" (list (dict "name" "grpc" "port" 4317) (dict "name" "http" "port" 4318)) }}
-{{- if or (eq $.Values.integration.mode "bundled") (has $name (list "flow-dashboard" "flow-collector")) }}
+{{- if or (has $name (list "flow-dashboard" "flow-collector")) (and (eq $.Values.integration.mode "bundled") (or (eq $name "flow-gateway") (eq $.Values.tools.mode "fixture"))) }}
 apiVersion: v1
 kind: Service
 metadata: {name: {{ $name }}, namespace: {{ $.Release.Namespace }}}

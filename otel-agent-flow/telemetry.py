@@ -144,6 +144,10 @@ def parse_logs(payload):
                 if component(service, "", {}) == "agentgateway":
                     request = " ".join(str(v) for v in (method or "HTTP request", values.get("http.path")) if v)
                     message = " · ".join(str(v) for v in (request, status, model) if v is not None)
+                elif tool := values.get("gen_ai.tool.name") or values.get("mcp.tool.name"):
+                    message = "Tool " + str(tool) + (" · " + str(status) if status is not None else "")
+                elif method:
+                    message = str(method) + " request" + (" · " + str(status) if status is not None else "")
                 else:
                     message = event + " · message content omitted"
                 body_digest = hashlib.sha256(json.dumps(raw.get("body"), sort_keys=True, allow_nan=False).encode()).hexdigest()
@@ -266,12 +270,12 @@ class ActivityStore:
                 self.logs.popitem(last=False)
         return len(records)
 
-    def logs_snapshot(self, trace_id=None):
+    def logs_snapshot(self, trace_id=None, service=None):
         with self.lock:
-            records = sorted((r for r in self.logs.values() if not trace_id or r.traceId == trace_id),
+            records = sorted((r for r in self.logs.values() if (not trace_id or r.traceId == trace_id) and (not service or r.service == service)),
                              key=lambda r: int(r.timestampNs), reverse=True)
             return {"revision": self.log_revision, "retained": len(self.logs), "matching": len(records),
-                    "limit": 200, "maxLogs": self.max_logs, "logs": [asdict(r) for r in records[:200]]}
+                    "limit": 200, "maxLogs": self.max_logs, "services": sorted({r.service for r in self.logs.values()}), "logs": [asdict(r) for r in records[:200]]}
 
     def ingest(self, payload):
         spans = parse_otlp(payload)

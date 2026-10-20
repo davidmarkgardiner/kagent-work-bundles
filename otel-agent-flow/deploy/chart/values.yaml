@@ -1,6 +1,6 @@
 image:
   repository: otel-agent-flow
-  tag: poc-6
+  tag: poc-8
   digest: ''
   pullPolicy: IfNotPresent
 imagePullSecrets: []
@@ -37,3 +37,12 @@ ingress:
 dashboard:
   identity: admin@kagent.dev
   runtimeLabel: kagent 1.0.0-alpha8 · Substrate 0.4.0-alpha1 · single cluster
+
+tools:
+  mode: fixture
+  kubernetesImage: ghcr.io/kagent-dev/kagent/tools:0.3.0@sha256:cb89eb76216195a90cac73846b447525b6e6e33e45154d1ded9621bf11340315
+  gitlab:
+    apiUrl: https://gitlab.com/api/v4
+    project: ''
+    existingSecret: ''
+    secretKey: token

@@ -1,0 +1,16 @@
+{
+  "url": "https://localhost:9443",
+  "mode": "live-tools",
+  "tlsCertificateVerified": true,
+  "servedAssets": true,
+  "actualOtelState": true,
+  "allEightObservedComponents": true,
+  "liveDataLabel": true,
+  "fixturePresetsHidden": true,
+  "livePromptLoaded": true,
+  "allFourRealToolNamesShown": true,
+  "logsAndVisualSwitch": true,
+  "logServiceFilterShowsActualToolCalls": true,
+  "browserVisualRecheck": false,
+  "verificationMethod": "Node DOM model of HTTPS-served assets using received OTel API data."
+}

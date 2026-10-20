@@ -9,7 +9,8 @@
     "agent": "ghcr.io/kagent-dev/kagent/golang-adk@sha256:10ef1350786b5d21bc002ed54833fd0272ea7cd8182a92977686b7bafa7f67d3",
     "gateway": "cr.agentgateway.dev/agentgateway:v1.5.0@sha256:bf2f339ef326d32def2aaeb44b1b4549801293c19b89e764a4228667d97d9896",
     "collector": "otel/opentelemetry-collector:0.146.0@sha256:60cf8cfda7086e792450a746953d5ec9579e440ae0d8a1e16608bb9960699844",
-    "localHttpsOnly": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d"
+    "localHttpsOnly": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
+    "kubernetesMcp": "ghcr.io/kagent-dev/kagent/tools:0.3.0@sha256:cb89eb76216195a90cac73846b447525b6e6e33e45154d1ded9621bf11340315"
   },
   "grpcurl": {
     "version": "1.9.3",
@@ -49,6 +50,24 @@
       "ui/style.css": "6e0921f07df92a61d7ccf06e343ddc0d96c693b488084b2b30f13c8c9d8a46fd",
       "ui/index.html": "9adeda944230f2d63d71506d2a8b7e452490f42c32ed7350fb736814a5147035",
       "ui/app.js": "a24057a33a80108d99669eb58441778ddeed6b3548ef0bb0cd2ad1847230284c",
+      "ui/logs.css": "0cd7bf6331a837380925f83e256bda346dc88d87c5a02b366314f389ba3700d8"
+    }
+  },
+  "liveToolsRehearsalArtifact": {
+    "tag": "otel-agent-flow:poc-8",
+    "imageId": "sha256:19a791f9ddfd371a0c47a4a0c5044c4ada81da96cfa1370e711331d4cd00a0d0",
+    "scope": "Verified current live-model Kubernetes and GitLab read-only rehearsal. Work registry image is built from source.",
+    "runtimeSourceHashes": {
+      "backend.py": "f6015b6ce3fcc79ea8e4864aa73363e25b298db2b9298b745686a3c6bd5f86ef",
+      "telemetry.py": "b8e6251c7b0331f94bea494420ad6c1c02af2f58b39e73ae1f3c1e14073451d6",
+      "substrate_call.py": "3247696dd0b427ca9c63b383bfaba20ca055211a8f0cbebc96612c1aafb707b6",
+      "workflow_demo.py": "332d551adb5f37998411f1ed5f1df09e4e99e094832956aa906787ea5138f2b5",
+      "isolation_demo.py": "7454dcc026062feaf9b8e1590ad790aab08b90a2e97b8440b937da166f5f8acb",
+      "live_gitlab.py": "a6f5b0de1740eb86991eb6a3bb97d69d1b9c97592335a72f340d1d870b9e400d",
+      "ui/favicon.svg": "c3bd4bf0721aff1103fb18e082b707d0e520abc5e85fbb85655fd3372f720bd6",
+      "ui/style.css": "6e0921f07df92a61d7ccf06e343ddc0d96c693b488084b2b30f13c8c9d8a46fd",
+      "ui/index.html": "95aba0b26b5b1f2828717064984b9459dcc6336db794dfb3352a0f1684597845",
+      "ui/app.js": "26f3034a0a283ab87b37bfa8c84fc23f6a90244b09f9f4a3b123154c1ff936b4",
       "ui/logs.css": "0cd7bf6331a837380925f83e256bda346dc88d87c5a02b366314f389ba3700d8"
     }
   }

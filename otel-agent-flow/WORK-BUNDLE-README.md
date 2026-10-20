@@ -17,7 +17,7 @@ caller + kagent + Substrate + gateway + tools
 
 All application Services select pods in one namespace. kagent and Substrate run in their platform namespaces on the same cluster. A live model provider may be external. There are no host endpoints, SSH model tunnels, manually populated EndpointSlices, or host-mounted application files in the chart.
 
-The application namespace defaults to `agent-flow-demo`. Platform namespaces default to `kagent` and `ate-system`. Choose the existing-agent profile to reuse the current kagent agent, agentgateway, model route, and MCP tools. Choose the bundled profile for a dedicated demo agent and simulated tools. The application pods have no Kubernetes service-account token. Existing MCP permissions stay with their owning deployment.
+The application namespace defaults to `agent-flow-demo`. Platform namespaces default to `kagent` and `ate-system`. Choose the existing-agent profile to reuse the current kagent agent, agentgateway, model route, and MCP tools. Choose the bundled profile for a dedicated demo agent and simulated tools. The dashboard, collector, gateway, and GitLab pods have no Kubernetes service-account token. The optional live Kubernetes MCP uses its own namespace-scoped read-only ServiceAccount. Existing MCP permissions stay with their owning deployment.
 
 ## Prepare
 
@@ -104,3 +104,5 @@ The Istio profile uses the managed ingress gateway and explicitly leaves demo an
 Follow [ROLLBACK.md](ROLLBACK.md) to restore the previous telemetry destination before uninstalling the demo. Do not delete the platform namespaces, databases, snapshot storage, provider Secrets, or TLS Secret as part of demo cleanup.
 
 Use [DEMO-SCENARIOS.md](DEMO-SCENARIOS.md) for triage and SDLC examples. Use [ENTRA-ISOLATION-DEMO.md](ENTRA-ISOLATION-DEMO.md) for the separate identity allow/deny demonstration and its evidence requirements.
+
+For the real-model example with live Kubernetes and GitLab reads, use [LIVE-HOMELAB.md](LIVE-HOMELAB.md). It includes the server scopes, live values, multi-server verifier, and credential lifecycle boundary.

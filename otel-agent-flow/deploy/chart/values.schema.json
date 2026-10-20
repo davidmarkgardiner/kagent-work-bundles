@@ -142,6 +142,38 @@
           }
         }
       }
+    },
+    "tools": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "fixture",
+            "live"
+          ]
+        },
+        "kubernetesImage": {
+          "type": "string",
+          "pattern": "@sha256:[a-f0-9]{64}$"
+        },
+        "gitlab": {
+          "type": "object",
+          "properties": {
+            "apiUrl": {
+              "type": "string"
+            },
+            "project": {
+              "type": "string"
+            },
+            "existingSecret": {
+              "type": "string"
+            },
+            "secretKey": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
   }
 }

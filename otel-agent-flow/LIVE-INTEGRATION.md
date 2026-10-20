@@ -45,3 +45,5 @@ Demonstrate a skill by asking a task that uses its guidance and inspect the resu
 The local rehearsal proves fixture workflows and one live model using simulated tools. This existing-agent profile is rendered and checked offline. Real workplace Kubernetes MCP traffic, existing Gateway reconciliation, skills events, access controls, and policy enforcement require target-cluster receipts. Keep PASS, FAIL, UNKNOWN, and NOT RUN explicit.
 
 Use a fresh release namespace for each integration mode. Switching an existing bundled release to existing-agent mode would remove its chart-owned demo agent, gateway, and tools. Review a migration separately. Keep the approved single-user audience boundary and private rollback state.
+
+For multiple MCP servers in one invocation, use repeated `--expect-mcp SERVICE:TOOL` pairs instead of `--expect-tool` and `--tool-service`. See LIVE-HOMELAB.md for the combined real Kubernetes and GitLab example.

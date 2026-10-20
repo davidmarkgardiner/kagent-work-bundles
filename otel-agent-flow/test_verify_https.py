@@ -10,7 +10,7 @@ import urllib.error
 
 
 class ConnectedVerificationTests(unittest.TestCase):
-    def run_verifier(self, mode, custom, simulated=False):
+    def run_verifier(self, mode, custom, simulated=False, multiple=False):
         submitted = []
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "receipt.json"
@@ -19,12 +19,16 @@ class ConnectedVerificationTests(unittest.TestCase):
             argv = ["verify-https.py", "--url", "https://flow.example.invalid", "--output", str(output)]
             if custom:
                 argv += ["--prompt-file", str(prompt), "--expect-tool", "read_status", "--tool-service", "kubernetes-mcp"]
+            if multiple:
+                argv = argv[:-4] + ["--expect-mcp", "kubernetes-mcp:read_status", "--expect-mcp", "gitlab-mcp:read_project"]
             invocation = {"traceId": "request", "sessionId": "session", "status": "completed", "text": "Read complete",
                           "startedAt": 1, "finishedAt": 2}
-            spans = [{"service": "atelet", "name": name, "attributes": {}} for name in
+            spans = [{"service": "atelet", "name": name, "attributes": {}, "status": "ok"} for name in
                      ["ateom.Ateom/RestoreWorkload", "ateom.Ateom/CheckpointWorkload"]]
             spans.append({"service": "kubernetes-mcp", "name": "read_status", "status": "ok",
                           "attributes": {"mcp.tool.name": "read_status", "flow.simulated": simulated}})
+            if multiple:
+                spans.append({"service": "gitlab-mcp", "name": "read_project", "status": "ok", "attributes": {"gen_ai.tool.name": "read_project"}})
             trace = {"traceId": "request", "spans": spans, "spanCount": len(spans), "inputTokens": 10,
                      "outputTokens": 5, "modelCalls": [], "costUsd": None}
             state = {"runtime": {"demoMode": mode}, "invocation": invocation, "traces": [trace],
@@ -77,6 +81,12 @@ class ConnectedVerificationTests(unittest.TestCase):
         self.assertNotIn("DEMO_WORKFLOW", submitted[0])
         self.assertEqual(receipt["workflows"][0]["tools"], ["read_status"])
         self.assertEqual(receipt["workflows"][0]["toolService"], "kubernetes-mcp")
+
+    def test_live_tools_receipt_requires_named_tools_from_both_servers(self):
+        submitted, error, receipt = self.run_verifier("live-tools", custom=True, multiple=True)
+        self.assertIsNone(error)
+        self.assertEqual(len(submitted), 1)
+        self.assertEqual(receipt["workflows"][0]["expectedServerTools"], [["kubernetes-mcp", "read_status"], ["gitlab-mcp", "read_project"]])
 
     def test_simulated_tool_cannot_pass_connected_proof(self):
         _, error, receipt = self.run_verifier("connected", custom=True, simulated=True)

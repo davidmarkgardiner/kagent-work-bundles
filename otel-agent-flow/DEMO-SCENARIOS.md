@@ -24,7 +24,7 @@ Prepare a private prompt using the actual allowlisted tool names, target namespa
 
 Ask one tool at a time during the first rehearsal if needed to make each hop clear. The UI shows completed spans as the exporters deliver them, so it does not guarantee animation during every in-flight call. Native actor resume, restore, checkpoint, and suspend remain visible beside the tool sequence.
 
-The current connected verifier expects named tools from one server service per invocation. Run separate bounded Kubernetes, Grafana, and GitLab checks when services differ, then show the combined triage session in the UI. Keep server evidence separate from client tool-attempt evidence. Missing OTel stays unknown. Record reported token usage and explicit price estimates only.
+The connected verifier accepts repeated `--expect-mcp SERVICE:TOOL` pairs for multiple servers. See LIVE-HOMELAB.md for the actual Kubernetes and GitLab example. Grafana needs its own live source and receipt before adding it to that claim. Keep server evidence separate from client tool-attempt evidence. Missing OTel stays unknown. Record reported token usage and explicit price estimates only.
 
 ## Demonstrate real SDLC inspection
 

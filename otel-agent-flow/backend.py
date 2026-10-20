@@ -127,13 +127,17 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(200, {**snapshot, "invocation": invocation, "sessionActivity": activity, "runtime": {
                 "substrateInstalled": os.getenv("SUBSTRATE_INSTALLED") == "true",
                 "demoMode": os.getenv("DEMO_MODE", ""),
+                "demoPrompt": os.getenv("DEMO_PROMPT", ""),
                 "label": os.getenv("RUNTIME_LABEL", "kagent 0.10.1 · agentgateway 1.5.0 · local kind POC"),
                 "promptHelp": os.getenv("PROMPT_HELP", "Read-only inventory agent · Ctrl/⌘ + Enter to send. Each prompt starts a new run.")}})
         if path == "/api/logs":
             trace_id = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("traceId", [""])[0]
             if trace_id and not re.fullmatch(r"[a-fA-F0-9]{32}", trace_id):
                 return self.send(400, {"error": "Invalid trace ID"})
-            return self.send(200, STORE.logs_snapshot(trace_id.lower() or None))
+            service = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("service", [""])[0]
+            if len(service) > 128:
+                return self.send(400, {"error": "Invalid service filter"})
+            return self.send(200, STORE.logs_snapshot(trace_id.lower() or None, service or None))
         files = {"/": ("index.html", "text/html; charset=utf-8"),
                  "/app.js": ("app.js", "text/javascript; charset=utf-8"),
                  "/style.css": ("style.css", "text/css; charset=utf-8"),

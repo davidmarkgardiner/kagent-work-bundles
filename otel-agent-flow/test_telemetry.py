@@ -236,6 +236,24 @@ def log_record(timestamp=1000000000, trace=1):
 
 
 class LogProjectionTests(unittest.TestCase):
+    def test_service_filter_precedes_limit_and_keeps_all_service_choices(self):
+        store = ActivityStore()
+        store.ingest_logs(log_export([log_record(1)], "flow-gitlab-mcp"))
+        store.ingest_logs(log_export([log_record(100+n) for n in range(220)], "agentgateway"))
+        result = store.logs_snapshot(service="flow-gitlab-mcp")
+        self.assertEqual(result["matching"], 1)
+        self.assertEqual(result["logs"][0]["service"], "flow-gitlab-mcp")
+        self.assertEqual(result["services"], ["agentgateway", "flow-gitlab-mcp"])
+
+    def test_tool_log_uses_metadata_and_never_result_body(self):
+        store = ActivityStore()
+        record = log_record()
+        record["attributes"] = [{"key": "gen_ai.tool.name", "value": {"stringValue": "gitlab_get_project"}}]
+        store.ingest_logs(log_export([record], "flow-gitlab-mcp"))
+        result = store.logs_snapshot()["logs"][0]
+        self.assertEqual(result["message"], "Tool gitlab_get_project")
+        self.assertNotIn("PRIVATE CONTENT", json.dumps(result))
+
     def test_gateway_api_details_preserve_path_and_status_without_query(self):
         store = ActivityStore()
         record = log_record()

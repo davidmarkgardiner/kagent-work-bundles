@@ -78,6 +78,11 @@ def main():
         secret = get("-n", args.namespace, "get", "secret", live["existingSecret"])
         if live.get("secretKey", "api-key") not in secret.get("data", {}):
             parser.error("The configured existing model credential key is absent")
+    if not existing and values.get("tools", {}).get("mode") == "live":
+        gitlab = values["tools"]["gitlab"]
+        secret = get("-n", args.namespace, "get", "secret", gitlab["existingSecret"])
+        if gitlab.get("secretKey", "token") not in secret.get("data", {}):
+            parser.error("The configured GitLab credential key is absent")
     releases = json.loads(subprocess.run(["helm", "--kube-context", args.context, "list", "-A", "-o", "json"], check=True, text=True, capture_output=True).stdout)
     for name, namespace, version in [("kagent", agent_ns, "1.0.0-alpha8"), ("substrate", "ate-system", "0.4.0-alpha1")]:
         if not any(r["name"] == name and r["namespace"] == namespace and r["chart"] == name + "-" + version for r in releases):

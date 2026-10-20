@@ -29,12 +29,19 @@ def main():
     parser.add_argument("--prompt-file", type=Path)
     parser.add_argument("--expect-tool", action="append", default=[])
     parser.add_argument("--tool-service")
+    parser.add_argument("--expect-mcp", action="append", default=[], metavar="SERVICE:TOOL")
     parser.add_argument("--context")
     parser.add_argument("--namespace", default="agent-flow-demo")
     args = parser.parse_args()
     custom = args.prompt_file is not None
-    if custom != bool(args.expect_tool) or custom != bool(args.tool_service):
-        parser.error("Connected verification requires --prompt-file, --expect-tool, and --tool-service together")
+    if args.expect_mcp:
+        if not custom or args.expect_tool or args.tool_service or any(value.count(":") != 1 for value in args.expect_mcp):
+            parser.error("Use --prompt-file and SERVICE:TOOL pairs without the single-server options")
+        expected_pairs = [tuple(value.split(":", 1)) for value in args.expect_mcp]
+    else:
+        if custom != bool(args.expect_tool) or custom != bool(args.tool_service):
+            parser.error("Connected verification requires --prompt-file and expected server tools")
+        expected_pairs = [(args.tool_service, name) for name in args.expect_tool]
     if custom and args.case != "all":
         parser.error("Use a custom prompt or a fixture case, not both")
     custom_prompt = args.prompt_file.read_text().strip() if custom else None
@@ -71,10 +78,11 @@ def main():
     assert request("/api/invoke", {"prompt": ""})[0] == 400, "Empty prompt accepted"
     assert request("/api/invoke", {"prompt": "invalid origin"}, {"Origin": "https://untrusted.invalid"})[0] == 403, "Cross-origin submission accepted"
     _, initial_state = request("/api/state")
-    if (initial_state["runtime"]["demoMode"] == "connected") != custom:
+    if (initial_state["runtime"]["demoMode"] in {"connected", "live-tools"}) != custom:
         parser.error("Use a reviewed custom prompt for connected mode and fixture cases for the bundled demo")
-    cases = {"connected": (custom_prompt, args.expect_tool)} if custom else CASES
+    cases = {"connected": (custom_prompt, [tool for _, tool in expected_pairs])} if custom else CASES
     tool_service = args.tool_service if custom else "flow-demo-tools"
+    expected_services = {service for service, _ in expected_pairs} if custom else {tool_service}
     results = []
     for name, (prompt, tools) in cases.items():
         if args.case != "all" and name != args.case:
@@ -95,9 +103,11 @@ def main():
             related = [t for t in state["traces"] if t["traceId"] in activity.get("traceIds", [])]
             spans = [s for t in related for s in t["spans"]]
             worker = {s["name"] for s in spans if s["service"] in {"atelet", "ateom-gvisor"}}
-            server_tools = {(s["attributes"].get("gen_ai.tool.name") or s["attributes"].get("mcp.tool.name") or s["attributes"].get("tool.name")) for s in spans if s["service"] == tool_service}
+            successful_pairs = {(s["service"], s["attributes"].get("gen_ai.tool.name") or s["attributes"].get("mcp.tool.name") or s["attributes"].get("tool.name")) for s in spans if s["status"] == "ok"}
+            server_tools = {tool for service, tool in successful_pairs if service in expected_services}
+            expected_observed = set(expected_pairs) <= successful_pairs if custom else set(tools) <= {s["attributes"].get("gen_ai.tool.name") for s in spans if s["service"] == tool_service}
             states = [e["state"] for e in activity.get("states", [])]
-            if (invocation["status"] == "completed" and selected and set(tools) <= server_tools
+            if (invocation["status"] == "completed" and selected and expected_observed
                     and states and states[-1] == "suspended" and any("CheckpointWorkload" in n for n in worker)
                     and any("RestoreWorkload" in n for n in worker)
                     and {"client", "kagent", "substrate", "worker", "actor", "agentgateway", "model", "mcp"} <= set(activity.get("components", []))):
@@ -108,7 +118,7 @@ def main():
         expected = {"client", "kagent", "substrate", "worker", "actor", "agentgateway", "model", "mcp"}
         assert expected <= set(activity["components"]), f"{name}: missing components"
         assert any("RestoreWorkload" in n for n in worker), "Worker restore is missing"
-        fixture_spans = [s for s in spans if s["service"] == tool_service]
+        fixture_spans = [s for s in spans if s["service"] in expected_services]
         if custom:
             assert not any(s["attributes"].get("flow.simulated") is True for s in fixture_spans), "Connected proof contains simulated tool data"
         else:
@@ -135,7 +145,7 @@ def main():
                         "sessionId": invocation["sessionId"], "status": invocation["status"],
                         "elapsedSeconds": round(invocation["finishedAt"] - invocation["startedAt"], 3),
                         "requestSpanCount": selected["spanCount"], "relatedTraceIds": activity["traceIds"],
-                        "observedComponents": activity["components"], "tools": tools, "toolService": tool_service,
+                        "observedComponents": activity["components"], "tools": tools, "toolService": tool_service, "expectedServerTools": expected_pairs if custom else [],
                         "actorStates": states, "workerOperations": sorted(worker),
                         "inputTokens": selected["inputTokens"], "outputTokens": selected["outputTokens"],
                         "modelCallCount": len(selected["modelCalls"]), "billedUsd": selected["costUsd"],

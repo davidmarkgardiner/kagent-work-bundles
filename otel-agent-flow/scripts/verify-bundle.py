@@ -70,6 +70,28 @@ def main():
         assert env["AGENT_NAME"] == "existing-reader" and env["DEMO_MODE"] == "connected"
         vs = next(d for d in docs if d["kind"] == "VirtualService")
         assert vs["spec"]["gateways"] == ["aks-istio-ingress/current-gateway"]
+        live_values = yaml.safe_load(existing)
+        live_values["integration"] = {"mode": "bundled"}
+        live_values["model"] = {"mode": "live", "name": "approved-model", "live": {"host": "provider.example.invalid:443", "existingSecret": "model-token"}}
+        live_values["tools"] = {"mode": "live", "gitlab": {"project": "approved/project", "existingSecret": "gitlab-read-token"}}
+        operator.write_text(yaml.safe_dump(live_values))
+        live_rendered = subprocess.run(["helm", "template", "flow-demo", str(root / "deploy/chart"), "-n", "agent-flow-demo", "-f", str(operator)], text=True, capture_output=True, check=True).stdout
+        live_docs = [d for d in yaml.safe_load_all(live_rendered) if d]
+        deployments = {d["metadata"]["name"]: d for d in live_docs if d["kind"] == "Deployment"}
+        assert set(deployments) == {"flow-dashboard", "flow-collector", "flow-gateway", "flow-kubernetes-mcp", "flow-gitlab-mcp"}
+        for name, deployment in deployments.items():
+            assert deployment["spec"]["template"]["spec"]["automountServiceAccountToken"] is (name == "flow-kubernetes-mcp")
+        role = next(d for d in live_docs if d["kind"] == "Role")
+        assert role["metadata"]["namespace"] == "agent-flow-demo"
+        assert all(set(rule["verbs"]) == {"get", "list"} for rule in role["rules"])
+        assert not any(d["kind"] in {"ClusterRole", "ClusterRoleBinding"} for d in live_docs)
+        kubernetes_container = deployments["flow-kubernetes-mcp"]["spec"]["template"]["spec"]["containers"][0]
+        assert "--read-only" in kubernetes_container["args"]
+        assert "k8s" in kubernetes_container["args"]
+        agent_template = next(d for d in live_docs if d["kind"] == "AgentTemplate")
+        assert agent_template["spec"]["tools"][0]["mcp"]["tools"] == ["k8s_get_resources", "k8s_get_events"]
+        assert "flow-workflows" not in live_rendered
+        assert subprocess.run(["helm", "template", "flow-demo", str(root / "deploy/chart"), "--set", "tools.mode=live"], capture_output=True).returncode
         for flags in [["--set", "integration.mode=existing"], ["--set", "integration.mode=invalid"],
                       ["--set", "ingress.istio.existingGateway=invalid-reference"]]:
             assert subprocess.run(["helm", "template", "flow-demo", str(root / "deploy/chart"), *flags], capture_output=True).returncode
