@@ -29,28 +29,30 @@ def main():
     def get(*command):
         return json.loads(subprocess.run(kubectl + list(command) + ["-o", "json"], check=True, text=True, capture_output=True).stdout)
 
-    versions = {v["name"] for v in get("get", "crd", "agents.api.kagent.dev")["spec"]["versions"] if v["served"]}
-    if "v1alpha3" not in versions:
-        parser.error("This bundle requires the installed kagent 1.x v1alpha3 API")
     agent_ns = values.get("agentNamespace", "kagent")
     integration = values.get("integration", {})
     existing = integration.get("mode", "bundled") == "existing"
-    if existing:
-        agent = get("-n", agent_ns, "get", "agent", integration["existingAgent"])
-        if not any(c["type"] == "Ready" and c["status"] == "True" for c in agent.get("status", {}).get("conditions", [])):
-            parser.error("The existing demo agent is not Ready")
-        harness_name = agent["spec"].get("harnessRef", {}).get("name")
-        if not harness_name:
-            parser.error("Require an existing Substrate-backed Agent with a Harness reference")
-        harness = get("-n", agent_ns, "get", "harness", harness_name)
-        if harness["spec"].get("substrate", {}).get("workerPoolRef", {}).get("name") != values.get("workerPool", "kagent-default"):
-            parser.error("The existing agent Harness must use the approved WorkerPool in these values")
-    pool = get("-n", agent_ns, "get", "workerpool", values.get("workerPool", "kagent-default"))
-    if pool["spec"].get("sandboxClass") != "gvisor" or pool.get("status", {}).get("readyReplicas", 0) < 1:
-        parser.error("Require a ready approved gVisor WorkerPool")
-    workers = get("-n", agent_ns, "get", "pods", "-l", "ate.dev/worker-pool=" + pool["metadata"]["name"])
-    if any(c["name"] == "istio-proxy" for p in workers["items"] for c in p["spec"]["containers"]):
-        parser.error("Injected Substrate workers are outside this bundle's tested ingress-only mesh contract")
+    standalone_only = not existing and values.get("execution", {}).get("mode", "both") == "standalone"
+    if not standalone_only:
+        versions = {v["name"] for v in get("get", "crd", "agents.api.kagent.dev")["spec"]["versions"] if v["served"]}
+        if "v1alpha3" not in versions:
+            parser.error("This bundle requires the installed kagent 1.x v1alpha3 API")
+        if existing:
+            agent = get("-n", agent_ns, "get", "agent", integration["existingAgent"])
+            if not any(c["type"] == "Ready" and c["status"] == "True" for c in agent.get("status", {}).get("conditions", [])):
+                parser.error("The existing demo agent is not Ready")
+            harness_name = agent["spec"].get("harnessRef", {}).get("name")
+            if not harness_name:
+                parser.error("Require an existing Substrate-backed Agent with a Harness reference")
+            harness = get("-n", agent_ns, "get", "harness", harness_name)
+            if harness["spec"].get("substrate", {}).get("workerPoolRef", {}).get("name") != values.get("workerPool", "kagent-default"):
+                parser.error("The existing agent Harness must use the approved WorkerPool in these values")
+        pool = get("-n", agent_ns, "get", "workerpool", values.get("workerPool", "kagent-default"))
+        if pool["spec"].get("sandboxClass") != "gvisor" or pool.get("status", {}).get("readyReplicas", 0) < 1:
+            parser.error("Require a ready approved gVisor WorkerPool")
+        workers = get("-n", agent_ns, "get", "pods", "-l", "ate.dev/worker-pool=" + pool["metadata"]["name"])
+        if any(c["name"] == "istio-proxy" for p in workers["items"] for c in p["spec"]["containers"]):
+            parser.error("Injected Substrate workers are outside this bundle's tested ingress-only mesh contract")
     ingress = values.get("ingress", {})
     mode = ingress.get("mode", "none")
     if mode not in {"local", "istio"}:
@@ -83,15 +85,16 @@ def main():
         secret = get("-n", args.namespace, "get", "secret", gitlab["existingSecret"])
         if gitlab.get("secretKey", "token") not in secret.get("data", {}):
             parser.error("The configured GitLab credential key is absent")
-    releases = json.loads(subprocess.run(["helm", "--kube-context", args.context, "list", "-A", "-o", "json"], check=True, text=True, capture_output=True).stdout)
-    for name, namespace, version in [("kagent", agent_ns, "1.0.0-alpha8"), ("substrate", "ate-system", "0.4.0-alpha1")]:
-        if not any(r["name"] == name and r["namespace"] == namespace and r["chart"] == name + "-" + version for r in releases):
-            parser.error("Installed platform chart versions must match the pinned bundle before deployment")
+    if not standalone_only:
+        releases = json.loads(subprocess.run(["helm", "--kube-context", args.context, "list", "-A", "-o", "json"], check=True, text=True, capture_output=True).stdout)
+        for name, namespace, version in [("kagent", agent_ns, "1.0.0-alpha8"), ("substrate", "ate-system", "0.4.0-alpha1")]:
+            if not any(r["name"] == name and r["namespace"] == namespace and r["chart"] == name + "-" + version for r in releases):
+                parser.error("Installed platform chart versions must match the pinned bundle before deployment")
     forbidden = ("host.docker.internal", "127.0.0.1:18083", "18082", "EndpointSlice")
     if any(item in rendered for item in forbidden):
         parser.error("Rendered workload contains a host bridge or loopback runtime dependency")
     print(json.dumps({"context": args.context, "resources": len(resources), "ingress": mode,
-                      "platform": "version-matched", "workerPool": "ready", "hostBridgeReferences": 0}))
+                      "platform": "not required" if standalone_only else "version-matched", "workerPool": "not used" if standalone_only else "ready", "hostBridgeReferences": 0}))
 
 
 if __name__ == "__main__":

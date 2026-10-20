@@ -1,5 +1,5 @@
 """Bounded, metadata-only projection of OTLP traces into an activity graph."""
-from collections import OrderedDict
+from collections import OrderedDict, deque
 from dataclasses import asdict, dataclass
 import hashlib
 import json
@@ -15,7 +15,7 @@ COMPONENTS = [
     ("model", "Model provider"), ("mcp", "MCP tools"),
 ]
 ALLOWED = {
-    "service.name", "service.version", "kagent.agent.name", "kagent.name",
+    "flow.execution.mode", "service.name", "service.version", "kagent.agent.name", "kagent.name",
     "gen_ai.operation.name", "gen_ai.request.model", "gen_ai.response.model",
     "gen_ai.system", "gen_ai.provider.name", "gen_ai.tool.name", "tool.name",
     "rpc.method", "mcp.method.name", "mcp.tool.name", "http.request.method",
@@ -255,10 +255,13 @@ class ActivityStore:
         self.log_revision = 0
         self.focus_trace = None
         self.focus_actor = None
+        self.recent_requests = deque(maxlen=8)
 
     def focus(self, trace_id, actor_name=None):
         with self.lock:
             self.focus_trace, self.focus_actor = trace_id, actor_name
+            if trace_id and trace_id not in self.recent_requests:
+                self.recent_requests.append(trace_id)
 
     def actor_activity(self, snapshot, actor_name, request_trace):
         if not actor_name:
@@ -307,7 +310,7 @@ class ActivityStore:
                 self.traces.move_to_end(span.traceId)
                 self.revision += 1
                 self.last_received = span.receivedAt
-            protected = {self.focus_trace} | {record.traceId for record in self.logs.values()
+            protected = set(self.recent_requests) | {self.focus_trace} | {record.traceId for record in self.logs.values()
                          if self.focus_actor and record.attributes.get("ate.actor.name") == self.focus_actor
                          and record.attributes.get("ate.actor.state") and record.traceId}
             while len(self.traces) > self.max_traces or sum(map(len, self.traces.values())) > self.max_spans:
@@ -416,7 +419,7 @@ class ActivityStore:
             edges.pop(("kagent", "model"), None)
         start, end = min(s.startNs for s in spans), max(s.endNs for s in spans)
         root_call = next((s for s in spans if s.component == "client" and not s.parentSpanId), None)
-        return {"traceId": trace_id, "startNs": str(start), "durationMs": (end-start)/1e6,
+        return {"traceId": trace_id, "executionMode": next((s.attributes["flow.execution.mode"] for s in spans if s.attributes.get("flow.execution.mode") in {"standalone", "substrate", "a2a"}), None), "startNs": str(start), "durationMs": (end-start)/1e6,
                 "receivedAt": max(s.receivedAt for s in spans), "spanCount": len(spans),
                 "status": root_call.status if root_call else ("error" if any(s.status == "error" for s in spans) else "ok"),
                 "errorSpanCount": sum(s.status == "error" for s in spans),

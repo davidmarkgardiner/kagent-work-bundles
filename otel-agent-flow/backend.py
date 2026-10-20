@@ -22,7 +22,7 @@ MAX_PROMPT_CHARS = 4000
 
 
 def invocation_prompt(payload):
-    if not isinstance(payload, dict) or set(payload) != {"prompt"} or not isinstance(payload["prompt"], str):
+    if not isinstance(payload, dict) or not {"prompt"} <= set(payload) <= {"prompt", "runtime"} or not isinstance(payload["prompt"], str):
         raise ValueError("Send a JSON object containing your prompt")
     prompt = payload["prompt"].strip()
     if not prompt:
@@ -30,6 +30,35 @@ def invocation_prompt(payload):
     if len(prompt) > MAX_PROMPT_CHARS:
         raise ValueError("The prompt must contain at most 4,000 characters")
     return prompt
+
+
+def execution_targets():
+    targets = json.loads(os.getenv("EXECUTION_TARGETS", "[]"))
+    if not targets:
+        substrate = os.getenv("AGENT_PROTOCOL") == "grpc"
+        return [{"id": "substrate" if substrate else "agent", "mode": "substrate" if substrate else "a2a",
+                 "label": "With Substrate" if substrate else "Configured agent"}]
+    if not isinstance(targets, list) or len(targets) > 4:
+        raise ValueError("Invalid execution target configuration")
+    ids = set()
+    for target in targets:
+        if (not isinstance(target, dict) or not re.fullmatch(r"[a-z][a-z0-9-]{0,31}", target.get("id", ""))
+                or target["id"] in ids or target.get("mode") not in {"substrate", "standalone"}
+                or not isinstance(target.get("label"), str)):
+            raise ValueError("Invalid execution target configuration")
+        if target["mode"] == "standalone":
+            url = urllib.parse.urlparse(target.get("url", ""))
+            if url.scheme not in {"http", "https"} or not url.netloc or url.username or url.password:
+                raise ValueError("Invalid standalone agent route")
+        ids.add(target["id"])
+    return targets
+
+
+def execution_target(runtime_id=None):
+    targets = execution_targets()
+    if runtime_id is None:
+        return targets[0]
+    return next((t for t in targets if t["id"] == runtime_id), None)
 
 
 def terminal_text(response):
@@ -56,11 +85,12 @@ def post(url, payload, headers=None, timeout=90):
         return json.loads(response.read(1024 * 1024))
 
 
-def invoke(prompt, trace):
+def invoke(prompt, trace, target=None):
+    target = target or execution_target()
     span = uuid.uuid4().hex[:16]
     start = time.time_ns()
     INVOCATION.clear()
-    INVOCATION.update(status="running", traceId=trace, startedAt=time.time())
+    INVOCATION.update(status="running", traceId=trace, startedAt=time.time(), runtime=target["id"], executionMode=target["mode"])
     STORE.focus(trace)
     status, text = 1, ""
     try:
@@ -71,7 +101,10 @@ def invoke(prompt, trace):
         headers = {"traceparent": f"00-{trace}-{span}-01"}
         if user_id := os.getenv("KAGENT_USER_ID"):
             headers["X-User-Id"] = user_id
-        if os.getenv("AGENT_PROTOCOL") == "grpc":
+        if target["mode"] == "standalone":
+            from standalone_call import invoke_standalone
+            text = invoke_standalone(prompt, headers, INVOCATION, target["url"])
+        elif target["mode"] == "substrate":
             from substrate_call import invoke_session
             text = invoke_session(prompt, headers["traceparent"], INVOCATION,
                                   on_session=lambda actor_name: STORE.focus(trace, actor_name))
@@ -91,7 +124,8 @@ def invoke(prompt, trace):
             "scopeSpans": [{"scope": {"name": "otel-agent-flow"}, "spans": [{"traceId": trace, "spanId": span,
                 "name": "Agent prompt call", "kind": 3, "startTimeUnixNano": str(start),
                 "endTimeUnixNano": str(time.time_ns()), "status": {"code": status},
-                "attributes": [{"key": "flow.destination", "value": {"stringValue": "kagent"}}]}]}]}]}
+                "attributes": [{"key": "flow.destination", "value": {"stringValue": "kagent"}},
+                               {"key": "flow.execution.mode", "value": {"stringValue": target["mode"]}}]}]}]}]}
         try:
             post(os.getenv("OTEL_ENDPOINT", "http://flow-collector:4318/v1/traces"), payload, timeout=10)
             INVOCATION["exportStatus"] = "exported"
@@ -142,6 +176,7 @@ class Handler(BaseHTTPRequestHandler):
                 "substrateInstalled": os.getenv("SUBSTRATE_INSTALLED") == "true",
                 "demoMode": os.getenv("DEMO_MODE", ""),
                 "demoPrompt": os.getenv("DEMO_PROMPT", ""),
+                "executionTargets": [{k: t[k] for k in ("id", "mode", "label")} for t in execution_targets()],
                 "scenarios": live_scenarios(),
                 "label": os.getenv("RUNTIME_LABEL", "kagent 0.10.1 · agentgateway 1.5.0 · local kind POC"),
                 "promptHelp": os.getenv("PROMPT_HELP", "Read-only inventory agent · Ctrl/⌘ + Enter to send. Each prompt starts a new run.")}})
@@ -176,15 +211,19 @@ class Handler(BaseHTTPRequestHandler):
                 if length <= 0 or length > 32768:
                     return self.send(413, {"error": "Prompt request must be between 1 byte and 32 KiB"})
                 self.connection.settimeout(10)
-                prompt = invocation_prompt(json.loads(self.rfile.read(length)))
+                payload = json.loads(self.rfile.read(length))
+                prompt = invocation_prompt(payload)
+                target = execution_target(payload.get("runtime"))
+                if target is None:
+                    raise ValueError("Unknown execution runtime")
             except (ValueError, TypeError):
                 return self.send(400, {"error": "Enter a non-empty prompt of at most 4,000 characters"})
             if not INVOKING.acquire(blocking=False):
                 return self.send(409, {"error": "An invocation is already running"})
             trace = uuid.uuid4().hex
             INVOCATION.clear()
-            INVOCATION.update(status="starting", traceId=trace)
-            threading.Thread(target=invoke, args=(prompt, trace), daemon=True).start()
+            INVOCATION.update(status="starting", traceId=trace, runtime=target["id"], executionMode=target["mode"])
+            threading.Thread(target=invoke, args=(prompt, trace, target), daemon=True).start()
             return self.send(202, {"status": "started", "traceId": trace})
         if path not in ("/v1/traces", "/v1/logs"):
             return self.send(404, {"error": "Not found"})

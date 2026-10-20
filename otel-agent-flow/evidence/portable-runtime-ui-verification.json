@@ -1,0 +1,16 @@
+{
+  "url": "https://localhost:9443",
+  "image": "otel-agent-flow:poc-13",
+  "servedAssets": true,
+  "actualOtelStateForBothRuntimes": true,
+  "runtimePickerSendsSelectedTarget": true,
+  "standaloneLaneInactive": true,
+  "substrateLaneObserved": true,
+  "exactMcpCallsShownForBoth": true,
+  "historicalTraceKeepsRuntimeLabel": true,
+  "historicalStandaloneDoesNotShowCurrentActorLifecycle": true,
+  "unexpectedSubstrateActivityRemainsVisible": true,
+  "logsViewAvailable": true,
+  "browserVisualRecheck": false,
+  "verificationMethod": "Node DOM behavior checks of HTTPS-served assets with actual received OTel data for each runtime, plus a synthetic unexpected-actor negative control. No fresh interactive browser visual check."
+}

@@ -8,6 +8,7 @@
   <div class="agent-workspace">
   <aside class="prompt-column" aria-label="Agent conversation">
   <p id="demo-mode" class="demo-mode" hidden></p>
+  <label class="workflow-picker" for="execution-runtime">Agent runtime<select id="execution-runtime" aria-describedby="execution-help"><option value="">Configured agent</option></select></label><p id="execution-help">Choose the execution path for your next run.</p>
   <label class="workflow-picker" for="workflow">Demo workflow<select id="workflow"><option value="custom">Custom prompt</option><option value="triage">Simulated incident triage</option><option value="sdlc">Simulated SDLC review</option><option value="identity-isolation">Simulated identity isolation</option><option value="inventory">Simulated inventory check</option><option value="change-review">Simulated change review</option><option value="dependency-failure">Simulated dependency failure</option></select></label>
   <form id="prompt-form" class="prompt-form"><div class="prompt-heading"><label for="prompt">Your prompt</label><span id="prompt-count">0 / 4,000</span></div><textarea id="prompt" name="prompt" rows="3" maxlength="4000" required aria-describedby="prompt-help">Check the inventory workload and explain whether it is healthy.</textarea><p id="prompt-help">Read-only inventory agent · Ctrl/⌘ + Enter to send. Each prompt starts a new run.</p><button id="invoke" class="primary" type="submit" form="prompt-form"><span id="invoke-label">Send to agent</span> <span aria-hidden="true">↗</span></button></form>
   <section id="agent-response" class="agent-response" aria-labelledby="response-title" hidden><h2 id="response-title">Agent response</h2><p id="response-text" role="status"></p><small id="response-trace"></small></section>
@@ -19,7 +20,7 @@
   <div id="visual-view" role="tabpanel" aria-labelledby="tab-visual">
   <div class="workspace">
     <section class="graph-panel" aria-labelledby="graph-title">
-      <div class="panel-head"><div><h2 id="graph-title">Request path</h2><p id="graph-caption">Waiting for the first OTel trace.</p></div><span id="mode" class="mode">LIVE</span></div>
+      <div class="panel-head"><div><h2 id="graph-title">Request path</h2><p id="execution-caption"></p><p id="graph-caption">Waiting for the first OTel trace.</p></div><span id="mode" class="mode">LIVE</span></div>
       <div class="diagram-wrap">
       <svg id="diagram" viewBox="0 0 1050 500" role="img" aria-label="Observed agent request topology. Select a component to inspect its spans.">
         <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/></marker></defs>

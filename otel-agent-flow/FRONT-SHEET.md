@@ -14,7 +14,7 @@ The target ingress instructions are in [AKS-ISTIO.md](AKS-ISTIO.md).
 - A local HTTPS ingress rehearsal and an AKS managed Istio Gateway/VirtualService profile.
 - Build, preflight, deploy, telemetry, HTTPS verification, packaging, and rollback instructions.
 
-The deployed platform prerequisites are kagent **1.0.0-alpha8** and Substrate **0.4.0-alpha1**. The chart uses the installed `api.kagent.dev/v1alpha3` schema. The bundle refuses an automatic platform upgrade. See [PLATFORM-PREREQUISITES.md](PLATFORM-PREREQUISITES.md).
+The Substrate execution paths require kagent **1.0.0-alpha8** and Substrate **0.4.0-alpha1**. Standalone-only mode uses the pinned native Go ADK in a normal Deployment and requires neither control plane. The chart uses the installed `api.kagent.dev/v1alpha3` schema. The bundle refuses an automatic platform upgrade. See [PLATFORM-PREREQUISITES.md](PLATFORM-PREREQUISITES.md).
 
 ## What is proven
 
@@ -36,4 +36,8 @@ Use [DEMO-SCENARIOS.md](DEMO-SCENARIOS.md) for triage and SDLC examples. Use [EN
 
 For the real-model example with live Kubernetes and GitLab reads, use [LIVE-HOMELAB.md](LIVE-HOMELAB.md). It includes the server scopes, live values, multi-server verifier, and credential lifecycle boundary.
 
-The latest MCP scenario rehearsal adds separate Kubernetes and GitLab highlights, live scenario choices, and explicit execution-evidence labels. See [the MCP scenario receipt](evidence/portable-mcp-scenarios-verification.json) and [served UI check](evidence/portable-mcp-ui-verification.json). Kubernetes tool calls are currently observed through spans; GitLab also supplies OTel tool/API logs.
+The poc-11 MCP scenario rehearsal adds separate Kubernetes and GitLab highlights, live scenario choices, and explicit execution-evidence labels. See [the MCP scenario receipt](evidence/portable-mcp-scenarios-verification.json) and [served UI check](evidence/portable-mcp-ui-verification.json). Kubernetes tool calls are currently observed through spans; GitLab also supplies OTel tool/API logs.
+
+Use [RUNTIME-COMPARISON.md](RUNTIME-COMPARISON.md) for the paired demonstrations. The runtime picker selects a normal native kagent ADK Deployment or a Substrate actor. Standalone-only mode creates no kagent/Substrate custom resources and does not require their platform installation.
+
+The current paired runtime rehearsal passed the same live Kubernetes/GitLab prompt without Substrate execution and through a Substrate actor. See [runtime evidence](evidence/portable-runtime-comparison-verification.json) and [served UI behavior](evidence/portable-runtime-ui-verification.json). The standalone run has five observed components and no actor assignment; the Substrate run adds restore/checkpoint and a final suspended actor.

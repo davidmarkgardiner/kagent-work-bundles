@@ -16,7 +16,7 @@ class ConnectedVerificationTests(unittest.TestCase):
         self.assertEqual(pairs([attempt]), set())
         self.assertEqual(pairs([{**attempt, "kind": "server", "toolExecution": "server"}]), {("kubernetes-mcp", "read_status")})
 
-    def run_verifier(self, mode, custom, simulated=False, multiple=False):
+    def run_verifier(self, mode, custom, simulated=False, multiple=False, standalone=False, leaked_actor=False):
         submitted = []
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "receipt.json"
@@ -27,6 +27,8 @@ class ConnectedVerificationTests(unittest.TestCase):
                 argv += ["--prompt-file", str(prompt), "--expect-tool", "read_status", "--tool-service", "kubernetes-mcp"]
             if multiple:
                 argv = argv[:-4] + ["--expect-mcp", "kubernetes-mcp:read_status", "--expect-mcp", "gitlab-mcp:read_project"]
+            if standalone:
+                argv += ["--runtime", "standalone", "--execution-mode", "standalone"]
             invocation = {"traceId": "request", "sessionId": "session", "status": "completed", "text": "Read complete",
                           "startedAt": 1, "finishedAt": 2}
             spans = [{"service": "atelet", "name": name, "attributes": {}, "status": "ok"} for name in
@@ -42,6 +44,12 @@ class ConnectedVerificationTests(unittest.TestCase):
                          ["client", "kagent", "substrate", "worker", "actor", "agentgateway", "model", "mcp"],
                          "states": [{"state": "running"}, {"state": "suspended"}]}}
 
+            if standalone:
+                spans[:] = [s for s in spans if s["service"] != "atelet"]
+                invocation["executionMode"] = "standalone"
+                spans.append({"service": "flow-standalone-kagent", "name": "invoke_agent", "attributes": {}, "status": "ok"})
+                trace["components"] = ["client", "kagent", "agentgateway", "model", "mcp"] + (["actor"] if leaked_actor else [])
+                state["sessionActivity"] = None
             def open_request(request, **_kwargs):
                 path = request.full_url.removeprefix("https://flow.example.invalid")
                 payload = json.loads(request.data) if request.data else None
@@ -73,6 +81,17 @@ class ConnectedVerificationTests(unittest.TestCase):
                 except (SystemExit, AssertionError) as error:
                     return submitted, error, None
             return submitted, None, json.loads(output.read_text())
+
+    def test_standalone_verification_requires_native_runtime_without_actor(self):
+        submitted, error, receipt = self.run_verifier("live-tools", custom=True, standalone=True)
+        self.assertIsNone(error)
+        self.assertEqual(receipt["workflows"][0]["executionMode"], "standalone")
+        self.assertEqual(receipt["workflows"][0]["actorStates"], [])
+
+    def test_standalone_verifier_rejects_actor_activity(self):
+        _, error, receipt = self.run_verifier("live-tools", custom=True, standalone=True, leaked_actor=True)
+        self.assertIsInstance(error, AssertionError)
+        self.assertIsNone(receipt)
 
     def test_connected_mode_requires_reviewed_custom_prompt(self):
         submitted, error, receipt = self.run_verifier("connected", custom=False)

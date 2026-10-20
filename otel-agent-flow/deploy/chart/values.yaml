@@ -1,6 +1,6 @@
 image:
   repository: otel-agent-flow
-  tag: poc-11
+  tag: poc-13
   digest: ''
   pullPolicy: IfNotPresent
 imagePullSecrets: []
@@ -8,6 +8,8 @@ integration:
   mode: bundled
   existingAgent: ''
   controllerAddress: ''
+execution:
+  mode: both # substrate, standalone, or both. Existing-agent integration keeps its configured route.
 collector:
   sourceNamespaces: []
 agentNamespace: kagent

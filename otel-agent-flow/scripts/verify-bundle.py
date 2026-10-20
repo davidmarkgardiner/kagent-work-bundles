@@ -78,7 +78,7 @@ def main():
         live_rendered = subprocess.run(["helm", "template", "flow-demo", str(root / "deploy/chart"), "-n", "agent-flow-demo", "-f", str(operator)], text=True, capture_output=True, check=True).stdout
         live_docs = [d for d in yaml.safe_load_all(live_rendered) if d]
         deployments = {d["metadata"]["name"]: d for d in live_docs if d["kind"] == "Deployment"}
-        assert set(deployments) == {"flow-dashboard", "flow-collector", "flow-gateway", "flow-kubernetes-mcp", "flow-gitlab-mcp"}
+        assert set(deployments) == {"flow-dashboard", "flow-collector", "flow-gateway", "flow-kubernetes-mcp", "flow-gitlab-mcp", "flow-standalone"}
         for name, deployment in deployments.items():
             assert deployment["spec"]["template"]["spec"]["automountServiceAccountToken"] is (name == "flow-kubernetes-mcp")
         role = next(d for d in live_docs if d["kind"] == "Role")
@@ -91,6 +91,22 @@ def main():
         agent_template = next(d for d in live_docs if d["kind"] == "AgentTemplate")
         assert agent_template["spec"]["tools"][0]["mcp"]["tools"] == ["k8s_get_resources", "k8s_get_events"]
         assert "flow-workflows" not in live_rendered
+        standalone_values = {**live_values, "execution": {"mode": "standalone"}}
+        operator.write_text(yaml.safe_dump(standalone_values))
+        standalone_render = subprocess.run(["helm", "template", "flow-demo", str(root / "deploy/chart"), "-n", "agent-flow-demo", "-f", str(operator)], text=True, capture_output=True, check=True).stdout
+        standalone_docs = [d for d in yaml.safe_load_all(standalone_render) if d]
+        assert not any(d["apiVersion"].startswith(("api.kagent.dev/", "ate.dev/")) for d in standalone_docs)
+        native = next(d for d in standalone_docs if d["kind"] == "ConfigMap" and d["metadata"]["name"] == "flow-standalone")
+        native_config = json.loads(native["data"]["agent.json"])
+        assert native_config["instruction"] == agent_template["spec"]["systemPrompt"]
+        assert native_config["http_tools"][0]["tools"] == ["k8s_get_resources", "k8s_get_events"]
+        assert all(t["tools"] and t["require_approval"] is False for t in native_config["http_tools"])
+        native_pod = next(d for d in standalone_docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "flow-standalone")["spec"]["template"]["spec"]
+        native_env = {v["name"] for v in native_pod["containers"][0]["env"]}
+        assert not {"KAGENT_API_URL", "KAGENT_ACTOR_TOKEN", "STS_WELL_KNOWN_URI"} & native_env
+        assert not native_pod["automountServiceAccountToken"]
+        native_policy = next(d for d in standalone_docs if d["kind"] == "NetworkPolicy" and d["metadata"]["name"] == "flow-standalone")
+        assert set(native_policy["spec"]["policyTypes"]) == {"Ingress", "Egress"}
         assert subprocess.run(["helm", "template", "flow-demo", str(root / "deploy/chart"), "--set", "tools.mode=live"], capture_output=True).returncode
         for flags in [["--set", "integration.mode=existing"], ["--set", "integration.mode=invalid"],
                       ["--set", "ingress.istio.existingGateway=invalid-reference"]]:

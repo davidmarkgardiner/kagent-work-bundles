@@ -44,6 +44,19 @@ class TraceProjectionTests(unittest.TestCase):
         with patch.dict(backend.os.environ, {"DEMO_MODE": "connected"}):
             self.assertEqual(backend.live_scenarios(), [])
 
+    def test_recent_requested_runs_survive_unclassified_background_traffic(self):
+        store = ActivityStore(max_traces=10, max_spans=100)
+        for n in (1, 2):
+            store.focus(f"{n:032x}")
+            store.ingest(export([span(trace=n)]))
+        for n in range(3, 50):
+            store.ingest(export([span(trace=n)], "background-runtime"))
+        snapshot = store.snapshot()
+        ids = {t["traceId"] for t in snapshot["traces"]}
+        self.assertTrue({f"{1:032x}", f"{2:032x}"} <= ids)
+        self.assertEqual(len(ids), 10)
+        self.assertEqual(store.recent_requests.maxlen, 8)
+
     def test_otlp_transport_retry_is_deduplicated(self):
         store = ActivityStore()
         payload = export([span()])

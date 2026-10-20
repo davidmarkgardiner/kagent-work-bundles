@@ -1,0 +1,5 @@
+# Both execution paths share the same model, gateway, instructions, and MCP allowlists.
+execution:
+  mode: both
+dashboard:
+  runtimeLabel: kagent Go ADK 1.0.0-alpha8 · Deployment and Substrate comparison

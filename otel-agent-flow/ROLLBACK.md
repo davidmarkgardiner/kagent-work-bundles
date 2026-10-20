@@ -2,7 +2,9 @@
 
 In existing-agent mode, remove the approved telemetry fan-out using its normal delivery configuration, then uninstall the demo release. The installer made no platform changes to restore, and existing agents, gateway resources, and MCP servers are not chart-owned.
 
-For bundled mode, use the same explicit cluster context, namespace, private state directory, and pinned chart sources used during deployment. Stop new demo submissions first. Keep the original private rollback state until the work acceptance period ends.
+For standalone-only bundled mode, uninstall the demo release directly. The installer made no platform telemetry changes, so do not run the platform restore helper.
+
+For bundled `both` or `substrate` mode, use the same explicit cluster context, namespace, private state directory, and pinned chart sources used during deployment. Stop new demo submissions first. Keep the original private rollback state until the work acceptance period ends.
 
 ```bash
 python3 scripts/platform-telemetry.py \

@@ -25,7 +25,11 @@ spec:
         - {name: KAGENT_GRPC_ADDRESS, value: {{ default (printf "kagent-controller.%s.svc.cluster.local:8083" .Values.agentNamespace) .Values.integration.controllerAddress | quote }}}
         - {name: KAGENT_USER_ID, value: {{ .Values.dashboard.identity | quote }}}
         - {name: OTEL_ENDPOINT, value: "http://flow-collector:4318/v1/traces"}
-        - {name: SUBSTRATE_INSTALLED, value: "true"}
+        - {name: SUBSTRATE_INSTALLED, value: {{ ne .Values.execution.mode "standalone" | quote }}}
+        {{- if eq .Values.integration.mode "bundled" }}
+        - name: EXECUTION_TARGETS
+          value: {{ include "flow.executionTargets" . | quote }}
+        {{- end }}
         - {name: DEMO_MODE, value: {{ ternary "connected" (ternary "live-tools" .Values.model.mode (eq .Values.tools.mode "live")) (eq .Values.integration.mode "existing") | quote }}}
         {{- if eq .Values.tools.mode "live" }}
         - {name: DEMO_NAMESPACE, value: {{ .Release.Namespace | quote }}}

@@ -6,8 +6,9 @@ Download the GitHub repository and use this folder as the work-agent bundle. No 
 
 ```text
 HTTPS browser → Istio ingress on AKS, or local TLS proxy
-                  → dashboard → native kagent gRPC API
-                                   → Substrate actor on WorkerPool
+                  → dashboard → selected execution runtime
+                                   → native Go ADK Deployment without Substrate
+                                   → or kagent Session API → Substrate actor on WorkerPool
                                        → agentgateway → fixture or live model
                                        → existing Kubernetes MCP/tools, or fixture tools
 
@@ -40,9 +41,9 @@ export FLOW_STATE_DIR='{{PRIVATE_ROLLBACK_DIRECTORY}}'
 bash scripts/deploy.sh '{{PRIVATE_OPERATOR_VALUES_FILE}}'
 ```
 
-The preflight reads the selected cluster without changing the current kubectl context. It checks served Agent APIs, chart versions, worker readiness, ingress prerequisites, TLS Secret, and a live-model Secret when applicable. Work deployments require an application image digest.
+The preflight reads the selected cluster without changing the current kubectl context. For Substrate execution it checks served Agent APIs, chart versions, and worker readiness. Every mode checks its ingress prerequisites, TLS Secret, and live model/tool Secrets when applicable. Work deployments require an application image digest.
 
-In existing-agent mode, the installer reconciles only the demo release and leaves platform releases and OTel settings unchanged. Configure approved telemetry fan-out before live verification. In bundled mode, it also configures native kagent/Substrate OTel exports. It preserves existing egress authorization and credential policies while enabling the missing egress tracing hop. Original values and egress configuration go into the private state directory. The script does not install or upgrade AKS, Istio, kagent, or Substrate to a new version.
+In existing-agent mode, the installer reconciles only the demo release and leaves platform releases and OTel settings unchanged. Configure approved telemetry fan-out before live verification. In bundled `both` or `substrate` mode, it also configures native kagent/Substrate OTel exports. Standalone-only mode exports directly from its Deployment and leaves those platform releases and telemetry unchanged; it needs no `FLOW_STATE_DIR`. It preserves existing egress authorization and credential policies while enabling the missing egress tracing hop. Original values and egress configuration go into the private state directory. The script does not install or upgrade AKS, Istio, kagent, or Substrate to a new version.
 
 For bundled mode, keep the Substrate egress delta in the platform's normal delivery configuration. The installer uses `scripts/substrate-post-render.py` so Helm's stored manifest includes tracing and a rollout checksum. Future platform upgrades must use that same post-renderer or an equivalent reviewed GitOps patch. An unrelated Helm upgrade without the delta can remove egress export. The helper's additional reconciliation preserves any existing egress policy fields; review manual platform-policy overrides before transferring them into GitOps.
 
@@ -106,3 +107,5 @@ Follow [ROLLBACK.md](ROLLBACK.md) to restore the previous telemetry destination 
 Use [DEMO-SCENARIOS.md](DEMO-SCENARIOS.md) for triage and SDLC examples. Use [ENTRA-ISOLATION-DEMO.md](ENTRA-ISOLATION-DEMO.md) for the separate identity allow/deny demonstration and its evidence requirements.
 
 For the real-model example with live Kubernetes and GitLab reads, use [LIVE-HOMELAB.md](LIVE-HOMELAB.md). It includes the server scopes, live values, multi-server verifier, and credential lifecycle boundary.
+
+Use [RUNTIME-COMPARISON.md](RUNTIME-COMPARISON.md) for the paired demonstrations. The runtime picker selects a normal native kagent ADK Deployment or a Substrate actor. Standalone-only mode creates no kagent/Substrate custom resources and does not require their platform installation.

@@ -15,3 +15,5 @@ Use [DEMO-SCENARIOS.md](DEMO-SCENARIOS.md) for triage and SDLC examples. Use [EN
 For the real-model example with live Kubernetes and GitLab reads, use [LIVE-HOMELAB.md](LIVE-HOMELAB.md). It includes the server scopes, live values, multi-server verifier, and credential lifecycle boundary.
 
 Live mode also offers Kubernetes-only, GitLab-only, and combined presets. Separate MCP panels identify and highlight the tool that actually ran from received execution spans. Kubernetes currently exports tool spans; GitLab additionally exports OTel logs.
+
+Use [RUNTIME-COMPARISON.md](RUNTIME-COMPARISON.md) for the paired demonstrations. The runtime picker selects a normal native kagent ADK Deployment or a Substrate actor. Standalone-only mode creates no kagent/Substrate custom resources and does not require their platform installation.

@@ -9,3 +9,6 @@
 !live_gitlab.py
 !ui/
 !ui/**
+!standalone_call.py
+!standalone/
+!standalone/**

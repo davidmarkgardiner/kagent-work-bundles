@@ -6,10 +6,15 @@ namespace=${FLOW_NAMESPACE:-agent-flow-demo}
 values=${1:?Pass the reviewed Helm values file}
 python3 "$bundle_dir/scripts/preflight.py" --context "$context" --namespace "$namespace" --values "$values"
 integration_mode=$(python3 -c 'import sys,yaml;print(yaml.safe_load(open(sys.argv[1])).get("integration",{}).get("mode","bundled"))' "$values")
-if [[ "$integration_mode" != existing ]]; then
+execution_mode=$(python3 -c 'import sys,yaml;print(yaml.safe_load(open(sys.argv[1])).get("execution",{}).get("mode","both"))' "$values")
+if [[ "$integration_mode" != existing && "$execution_mode" != standalone ]]; then
   : "${FLOW_STATE_DIR:?Set FLOW_STATE_DIR outside the bundle for private rollback state}"
 fi
 helm --kube-context "$context" upgrade --install flow-demo "$bundle_dir/deploy/chart" -n "$namespace" --create-namespace -f "$values" --wait --timeout 5m
+if [[ "$integration_mode" != existing && "$execution_mode" == standalone ]]; then
+  echo "Standalone-only mode uses the native ADK Deployment and leaves platform telemetry unchanged."
+  exit 0
+fi
 agent_namespace=$(python3 -c 'import sys,yaml;print(yaml.safe_load(open(sys.argv[1])).get("agentNamespace","kagent"))' "$values")
 if [[ "$integration_mode" == existing ]]; then
   agent_name=$(python3 -c 'import sys,yaml;print(yaml.safe_load(open(sys.argv[1]))["integration"]["existingAgent"])' "$values")

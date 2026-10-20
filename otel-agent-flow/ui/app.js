@@ -77,6 +77,15 @@ function buildMap() {
     const choose=()=>{filter=id;renderTimeline();drawMap();};g.addEventListener('click',choose);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}});$('nodes').append(g);
   }
 }
+function executionMode(){return selected()?.executionMode||(selectedId===state.invocation?.traceId?state.invocation.executionMode:null);}
+function renderExecutionPicker(){
+  const targets=state.runtime?.executionTargets||[],picker=$('execution-runtime'),key=JSON.stringify(targets);
+  if(picker.dataset.targets!==key){const previous=picker.value;picker.replaceChildren(...targets.map(t=>{const option=el('option',t.label);option.value=t.id;return option;}));picker.value=targets.some(t=>t.id===previous)?previous:targets[0]?.id||'';picker.dataset.targets=key;}
+  const target=targets.find(t=>t.id===picker.value);
+  $('execution-help').textContent=target?.mode==='standalone'?'Native kagent ADK Deployment. No Substrate, worker, or actor is used. Sessions are in memory.':target?.mode==='substrate'?'kagent session in a Substrate actor. Observe worker restore, execution, checkpoint, and suspend.':'Use the configured agent route.';
+  picker.disabled=submitting||['starting','running'].includes(state.invocation?.status);
+}
+$('execution-runtime').onchange=renderExecutionPicker;
 function drawMap() {
   const t=sessionGraph()||selected();const nodes=new Set(t?.components||[]), observed=new Map((t?.edges||[]).map(e=>[`${e.from}-${e.to}`,e]));
   $('graph-scope').textContent=sessionGraph()?'Observed in this session':'Observed in selected trace';
@@ -92,9 +101,11 @@ function drawMap() {
   }
   const activeMcpServices=new Set(scopedSpans().filter(s=>s.toolExecution&&(activeOperations.get(`${s.traceId}/${s.spanId}`)||0)>now).map(s=>s.service));
   for(const card of document.querySelectorAll('.operation-card, .mcp-server'))card.classList.toggle('active',card.dataset.service?activeMcpServices.has(card.dataset.service):(activeOperations.get(card.dataset.spanKey)||0)>now);
-  const hasSubstrate=state.traces.some(t=>t.components.some(c=>['substrate','worker','actor'].includes(c)));
-  $('substrate-note').textContent=hasSubstrate?'Native runtime spans received. Session workflow includes related lifecycle traces. Trace details and token counts below stay scoped to the selected trace.':state.runtime?.substrateInstalled?'Installed in this cluster. Waiting for native runtime spans.':'Not installed in this local cluster. Its worker and actor lane stays inactive until runtime spans arrive.';
-  if(state.runtime?.substrateInstalled&&!nodes.has('substrate'))$('sub-substrate').textContent='Waiting in this trace';
+  const mode=executionMode(),hasSubstrate=t?.components?.some(c=>['substrate','worker','actor'].includes(c));
+  $('execution-caption').textContent=mode==='standalone'?'Without Substrate · native kagent ADK Deployment':mode==='substrate'?'With Substrate · session actor':'';
+  $('substrate-note').textContent=mode==='standalone'?(hasSubstrate?'Unexpected Substrate activity received for this standalone run. Inspect its spans.':'Not used for this run. The agent is a normal Deployment; worker and actor lanes stay inactive.'):hasSubstrate?'Native runtime spans received. Session workflow includes related lifecycle traces. Trace details and token counts below stay scoped to the selected trace.':state.runtime?.substrateInstalled?'Substrate path configured. Waiting for native runtime spans.':'Substrate path is not configured. Its worker and actor lane stays inactive.';
+  if(mode==='standalone'&&!hasSubstrate)for(const id of ['substrate','worker','actor'])$('sub-'+id).textContent='Not used for this run';
+  else if(state.runtime?.substrateInstalled&&!nodes.has('substrate'))$('sub-substrate').textContent='Waiting in this trace';
 }
 function scopedSpans(){
   const scope=sessionGraph();
@@ -150,9 +161,10 @@ function pulse(span,trace) {
 function renderRuns(){
   $('trace-count').textContent=state.traces.length;
   if(!state.traces.length){$('runs').replaceChildren(el('p','Run the agent to see its first trace here.','empty'));return;}
-  const rows=state.traces.map(t=>{
+  const traces=[...state.traces.filter(t=>t.executionMode),...state.traces.filter(t=>!t.executionMode)];
+  const rows=traces.map(t=>{
     const b=el('button',undefined,`run${t.traceId===selectedId?' selected':''}`);b.setAttribute('aria-pressed',String(t.traceId===selectedId));
-    const top=el('div',undefined,'run-top');top.append(el('span',`Trace ${t.traceId.slice(0,8)}`,'run-title'),el('i',undefined,`run-status ${t.status}`));
+    const top=el('div',undefined,'run-top');top.append(el('span',`${t.executionMode==='standalone'?'Without Substrate · ':t.executionMode==='substrate'?'With Substrate · ':''}Trace ${t.traceId.slice(0,8)}`,'run-title'),el('i',undefined,`run-status ${t.status}`));
     const meta=el('div',undefined,'run-meta');meta.append(el('span',`${t.spanCount} spans · ${time(t.durationMs)}`),el('span',new Date(Number(t.startNs)/1e6).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})));
     b.append(top,meta);b.onclick=()=>{stopReplay();follow=false;filter=null;selectedId=t.traceId;render();};return b;
   });$('runs').replaceChildren(...rows);
@@ -164,7 +176,7 @@ function costOf(t){
 }
 function render(){
   renderRuns();drawMap();renderOperations();const t=selected();$('follow').disabled=follow;$('replay').disabled=!t||replaying;
-  const activity=state.sessionActivity;$('actor-activity').hidden=!activity;
+  const activity=state.sessionActivity?.traceIds.includes(selectedId)?state.sessionActivity:null;$('actor-activity').hidden=!activity;
   if(activity){$('actor-states').replaceChildren(...activity.states.map(event=>{const b=el('button',event.state);b.title=`${new Date(Number(event.timestampNs)/1e6).toLocaleTimeString()} · ${event.traceId}`;b.disabled=!state.traces.some(trace=>trace.traceId===event.traceId);b.onclick=()=>{stopReplay();follow=false;filter=null;selectedId=event.traceId;render();};return b;}));}
   if(!t){
     $('graph-caption').textContent=selectedId?`Waiting for trace ${selectedId.slice(0,8)} to arrive.`:'Waiting for the first OTel trace.';
@@ -202,9 +214,9 @@ $('prompt-form').onsubmit=async event=>{
   if(submitting||$('invoke').disabled)return;
   const prompt=$('prompt').value.trim();
   if(!prompt||prompt.length>4000){$('notice').textContent='Enter a prompt of up to 4,000 characters.';$('notice').className='notice error';$('prompt').focus();return;}
-  submitting=true;stopReplay();$('invoke').disabled=true;$('invoke-label').textContent='Running…';$('notice').className='notice';$('notice').textContent='Sending your prompt. The flow will update as spans arrive.';
+  submitting=true;stopReplay();$('execution-runtime').disabled=true;$('invoke').disabled=true;$('invoke-label').textContent='Running…';$('notice').className='notice';$('notice').textContent='Sending your prompt. The flow will update as spans arrive.';
   try{
-    const response=await fetch('/api/invoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+    const response=await fetch('/api/invoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,runtime:$('execution-runtime').value})});
     const result=await response.json();if(!response.ok)throw Error(result.error||'Could not start the agent call.');
     pendingTraceId=result.traceId;selectedId=result.traceId;follow=false;filter=null;setView('visual');render();
     $('agent-response').hidden=false;$('response-text').textContent='Waiting for the agent response…';$('response-trace').textContent=`Trace ${result.traceId}`;
@@ -220,7 +232,7 @@ $('replay').onclick=()=>{
   for(const s of t.spans)replayTimers.push(setTimeout(()=>pulse(s,t),Math.max(0,(Number(s.endNs)-Number(t.startNs))/1e6*scale)));
   replayTimers.push(setTimeout(()=>{stopReplay();render();},t.durationMs*scale+2400));
 };
-$('follow').onclick=()=>{stopReplay();follow=true;filter=null;selectedId=state.traces[0]?.traceId||null;render();};
+$('follow').onclick=()=>{stopReplay();follow=true;filter=null;selectedId=state.invocation?.traceId||state.traces[0]?.traceId||null;render();};
 $('clear-filter').onclick=()=>{filter=null;renderTimeline();drawMap();};
 $('internal-spans').onclick=()=>{showInternal=!showInternal;filter=null;renderTimeline();drawMap();};
 $('pricing').onsubmit=e=>{
@@ -234,12 +246,13 @@ async function poll(){
     const r=await fetch('/api/state');if(!r.ok)throw Error('Receiver unavailable');const next=await r.json();
     const fresh=[];for(const t of next.traces)for(const s of t.spans){const key=`${s.traceId}/${s.spanId}`;if(!seen.has(key)&&!initial)fresh.push([s,t]);}
     seen=new Set(next.traces.flatMap(t=>t.spans.map(s=>`${s.traceId}/${s.spanId}`)));state=next;
+    renderExecutionPicker();
     if(state.runtime){$('runtime-label').textContent=state.runtime.label;$('prompt-help').textContent=state.runtime.promptHelp;$('demo-mode').hidden=!state.runtime.demoMode;$('demo-mode').textContent=runtimeModes[state.runtime.demoMode]||'Runtime data mode not specified.';$('workflow').closest('label').hidden=state.runtime.demoMode==='connected';$('workflow').disabled=state.runtime.demoMode==='connected';
       if(state.runtime.demoMode==='live-tools'&&$('workflow').dataset.mode!=='live-tools'){
         $('workflow').replaceChildren(...[{id:'custom',label:'Custom prompt'},...(state.runtime.scenarios||[])].map(s=>{const option=el('option',s.label);option.value=s.id;return option;}));
         $('workflow').dataset.mode='live-tools';$('workflow').value='live-combined';
       }if(state.runtime.demoMode==='live-tools'){$('prompt-help').textContent='Live read-only Kubernetes and GitLab tools · Each prompt creates a new session.';if(initial&&state.runtime.demoPrompt){$('prompt').value=state.runtime.demoPrompt;$('prompt').oninput();}}}
-    if(follow&&state.traces.length)selectedId=state.traces[0].traceId;
+    if(follow&&state.traces.length)selectedId=state.invocation?.traceId||state.traces[0].traceId;
     $('connection').textContent='Receiver connected';$('connection-dot').className='online';
     const inv=state.invocation,waitingForAcceptedTrace=!!pendingTraceId&&inv.traceId!==pendingTraceId,busy=submitting||waitingForAcceptedTrace||['starting','running'].includes(inv.status);$('invoke').disabled=busy;$('invoke-label').textContent=busy?'Running…':'Send to agent';
     if(initial&&inv.traceId){selectedId=inv.traceId;follow=false;}

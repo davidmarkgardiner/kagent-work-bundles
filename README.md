@@ -26,7 +26,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 
 | Bundle | Capability | Primary outcome |
 |---|---|---|
-| [`otel-agent-flow/`](otel-agent-flow/FRONT-SHEET.md) | OTel workflow UI over Istio HTTPS | Reuses existing agents, agentgateway, and MCP tools, with a separate fixture profile and native Substrate lifecycle evidence |
+| [`otel-agent-flow/`](otel-agent-flow/FRONT-SHEET.md) | OTel workflow UI over Istio HTTPS | Native ADK Deployment versus Substrate actor comparison, real Kubernetes/GitLab MCP calls, fixture profiles, and Istio HTTPS integration |
 | [`radar-topology-mcp/`](radar-topology-mcp/README.md) | Radar topology plus existing vector KB; air-gapped OCI handoff | Resolves workload identity before cited KB lookup, with pinned artifact imports and live evaluation boundaries |
 | [`agent-substrate/`](agent-substrate/WORK-AGENT-RUNSC-EQUIVALENCE-HANDOFF.md) | AKS Substrate 0.0.9 gVisor/runsc equivalence | Cross-check the work cluster, node, images, charts, and runsc mount against the tested AKS path before retrying installation |
 | `team-handover-pack/` | Human handover, tickets, Teams messages, game-day planning | Provides GitLab ticket templates, Teams messages, game-day plan, and an HTML presentation for SRE/stakeholder handover |

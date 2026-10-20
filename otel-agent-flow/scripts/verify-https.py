@@ -35,6 +35,8 @@ def main():
     parser.add_argument("--expect-tool", action="append", default=[])
     parser.add_argument("--tool-service")
     parser.add_argument("--expect-mcp", action="append", default=[], metavar="SERVICE:TOOL")
+    parser.add_argument("--runtime")
+    parser.add_argument("--execution-mode", choices=["substrate", "standalone"], default="substrate")
     parser.add_argument("--context")
     parser.add_argument("--namespace", default="agent-flow-demo")
     args = parser.parse_args()
@@ -52,6 +54,7 @@ def main():
     custom_prompt = args.prompt_file.read_text().strip() if custom else None
     if custom and not custom_prompt:
         parser.error("The approved prompt file is empty")
+    standalone = args.execution_mode == "standalone"
     origin = args.url.rstrip("/")
     if urllib.parse.urlparse(origin).scheme != "https":
         parser.error("Verification requires HTTPS; certificate verification cannot be disabled")
@@ -92,7 +95,10 @@ def main():
     for name, (prompt, tools) in cases.items():
         if args.case != "all" and name != args.case:
             continue
-        code, accepted = request("/api/invoke", {"prompt": prompt if custom else f"DEMO_WORKFLOW={name}. {prompt}"})
+        invocation_payload = {"prompt": prompt if custom else f"DEMO_WORKFLOW={name}. {prompt}"}
+        if args.runtime:
+            invocation_payload["runtime"] = args.runtime
+        code, accepted = request("/api/invoke", invocation_payload)
         assert code == 202, f"{name}: invocation not accepted"
         trace = accepted["traceId"]
         deadline = time.monotonic() + 180
@@ -105,24 +111,30 @@ def main():
                 raise AssertionError(f"{name}: agent invocation failed")
             activity = state.get("sessionActivity") or {}
             selected = next((t for t in state["traces"] if t["traceId"] == trace), None)
-            related = [t for t in state["traces"] if t["traceId"] in activity.get("traceIds", [])]
+            related = [selected] if standalone and selected else [t for t in state["traces"] if t["traceId"] in activity.get("traceIds", [])]
             spans = [s for t in related for s in t["spans"]]
             worker = {s["name"] for s in spans if s["service"] in {"atelet", "ateom-gvisor"}}
             successful_pairs = server_tool_pairs(spans)
             server_tools = {tool for service, tool in successful_pairs if service in expected_services}
             expected_observed = set(expected_pairs) <= successful_pairs if custom else set(tools) <= {s["attributes"].get("gen_ai.tool.name") for s in spans if s["service"] == tool_service}
             states = [e["state"] for e in activity.get("states", [])]
+            components = selected["components"] if standalone and selected else activity.get("components", [])
+            expected_components = {"client", "kagent", "agentgateway", "model", "mcp"} | (set() if standalone else {"substrate", "worker", "actor"})
+            lifecycle_ready = standalone or (states and states[-1] == "suspended" and any("CheckpointWorkload" in n for n in worker) and any("RestoreWorkload" in n for n in worker))
             if (invocation["status"] == "completed" and selected and expected_observed
-                    and states and states[-1] == "suspended" and any("CheckpointWorkload" in n for n in worker)
-                    and any("RestoreWorkload" in n for n in worker)
-                    and {"client", "kagent", "substrate", "worker", "actor", "agentgateway", "model", "mcp"} <= set(activity.get("components", []))):
+                    and lifecycle_ready and expected_components <= set(components)):
                 break
             time.sleep(0.5)
         else:
             raise AssertionError(f"{name}: native workflow/lifecycle evidence did not arrive before the deadline")
-        expected = {"client", "kagent", "substrate", "worker", "actor", "agentgateway", "model", "mcp"}
-        assert expected <= set(activity["components"]), f"{name}: missing components"
-        assert any("RestoreWorkload" in n for n in worker), "Worker restore is missing"
+        assert expected_components <= set(components), f"{name}: missing components"
+        if standalone:
+            assert not {"substrate", "worker", "actor"} & set(components), "Standalone run contains Substrate activity"
+            assert not activity and not invocation.get("actorName"), "Standalone run acquired an actor"
+            assert any(s["service"] == "flow-standalone-kagent" for s in spans), "Native standalone runtime span missing"
+            assert invocation.get("executionMode") == "standalone", "Wrong runtime executed"
+        else:
+            assert any("RestoreWorkload" in n for n in worker), "Worker restore is missing"
         fixture_spans = [s for s in spans if s["service"] in expected_services]
         if custom:
             assert not any(s["attributes"].get("flow.simulated") is True for s in fixture_spans), "Connected proof contains simulated tool data"
@@ -141,21 +153,22 @@ def main():
         if name == "dependency-failure":
             assert failed, "Intentional dependency failure was not exported as an error"
         _, log_data = request("/api/logs")
-        assert any(r["event"] == "ate.actor.state_changed" and r["attributes"].get("ate.actor.name") == activity["actorName"]
-                   for r in log_data["logs"]), "Native actor lifecycle log missing"
+        if not standalone:
+            assert any(r["event"] == "ate.actor.state_changed" and r["attributes"].get("ate.actor.name") == activity["actorName"]
+                       for r in log_data["logs"]), "Native actor lifecycle log missing"
         if state["runtime"]["demoMode"] == "fixture":
             assert "SIMULATED_WORKFLOW_COMPLETE" in invocation["text"], "Fixture result is not labelled"
             assert selected["costUsd"] is None, "Fixture transaction gained a billed cost"
         results.append({"workflow": name, "mode": state["runtime"]["demoMode"], "traceId": trace,
                         "sessionId": invocation["sessionId"], "status": invocation["status"],
                         "elapsedSeconds": round(invocation["finishedAt"] - invocation["startedAt"], 3),
-                        "requestSpanCount": selected["spanCount"], "relatedTraceIds": activity["traceIds"],
-                        "observedComponents": activity["components"], "tools": tools, "toolService": tool_service, "expectedServerTools": expected_pairs if custom else [],
+                        "requestSpanCount": selected["spanCount"], "relatedTraceIds": [trace] if standalone else activity["traceIds"], "executionMode": args.execution_mode, "runtime": args.runtime,
+                        "observedComponents": components, "tools": tools, "toolService": tool_service, "expectedServerTools": expected_pairs if custom else [],
                         "actorStates": states, "workerOperations": sorted(worker),
                         "inputTokens": selected["inputTokens"], "outputTokens": selected["outputTokens"],
                         "modelCallCount": len(selected["modelCalls"]), "billedUsd": selected["costUsd"],
                         "intentionalToolErrorObserved": bool(failed)})
-        print(f"PASS {name}: HTTPS, model/tool traffic, worker restore/checkpoint, actor suspended", flush=True)
+        print(f"PASS {name}: HTTPS, model/tool traffic, " + ("standalone native Deployment, no actor activity" if standalone else "worker restore/checkpoint, actor suspended"), flush=True)
     result = {"url": origin, "tlsCertificateVerified": True, "externalOtlpBlocked": True,
               "crossOriginBlocked": True, "workflows": results, "browserVisualRecheck": False,
               "aksIstioRuntimeTested": False, "networkPolicyEnforcementTested": False}

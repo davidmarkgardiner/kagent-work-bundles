@@ -1,6 +1,6 @@
 # Platform prerequisites
 
-The bundle adds the demo to an existing, approved kagent/Substrate installation on the same cluster. It does not bootstrap a cloud cluster, identity authorities, PostgreSQL, object storage, or a gVisor worker runtime.
+The `both` and `substrate` execution modes add the demo to an existing, approved kagent/Substrate installation on the same cluster. `execution.mode: standalone` runs the native ADK in an ordinary Deployment and requires neither platform installation. Its preflight and installer skip their CRDs, WorkerPools, chart-version checks, and telemetry configuration. See RUNTIME-COMPARISON.md. It does not bootstrap a cloud cluster, identity authorities, PostgreSQL, object storage, or a gVisor worker runtime.
 
 The verified compatibility line is:
 
@@ -20,4 +20,4 @@ For a fresh workplace platform, use the approved pinned Substrate bootstrap proc
 
 AKS regional availability, support status, add-on compatibility, node OS/architecture, admission policy, runtime permissions, storage authentication, and registry access must be verified on the target. Do not assume Kubernetes 1.37 or these alpha releases are approved or available merely because the Linux lab ran them. A version mismatch is an explicit port/review task, not a reason to upgrade the work cluster automatically.
 
-The installer currently expects Helm releases named `kagent` and `substrate`, with the default platform namespaces. The demo chart supports an agent namespace/WorkerPool/snapshot location override. Review the installer if the approved deployment uses different release names or Substrate namespace conventions.
+For Substrate execution, the installer expects Helm releases named `kagent` and `substrate`, with the default platform namespaces. The demo chart supports an agent namespace/WorkerPool/snapshot location override. Review the installer if the approved deployment uses different release names or Substrate namespace conventions.

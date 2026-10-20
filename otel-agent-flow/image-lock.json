@@ -10,7 +10,8 @@
     "gateway": "cr.agentgateway.dev/agentgateway:v1.5.0@sha256:bf2f339ef326d32def2aaeb44b1b4549801293c19b89e764a4228667d97d9896",
     "collector": "otel/opentelemetry-collector:0.146.0@sha256:60cf8cfda7086e792450a746953d5ec9579e440ae0d8a1e16608bb9960699844",
     "localHttpsOnly": "caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d",
-    "kubernetesMcp": "ghcr.io/kagent-dev/kagent/tools:0.3.0@sha256:cb89eb76216195a90cac73846b447525b6e6e33e45154d1ded9621bf11340315"
+    "kubernetesMcp": "ghcr.io/kagent-dev/kagent/tools:0.3.0@sha256:cb89eb76216195a90cac73846b447525b6e6e33e45154d1ded9621bf11340315",
+    "standaloneGoBuilder": "golang:1.27-bookworm@sha256:5c3e9b43cfd3bb95c7937462e29d87ada57b481a96fa23ad0eb61778d7a00110"
   },
   "grpcurl": {
     "version": "1.9.3",
@@ -56,7 +57,7 @@
   "liveToolsRehearsalArtifact": {
     "tag": "otel-agent-flow:poc-11",
     "imageId": "sha256:2e876db25a2134b57784ea8c636960a910f58c18deba86659e614a4d0e156770",
-    "scope": "Live read-only Kubernetes and GitLab scenario rehearsal with separate MCP execution highlights. Local image ID; build a work registry image from source and record its manifest digest.",
+    "scope": "Historical poc-11 live MCP scenario rehearsal; source hashes apply to that image, not the current runtime-comparison source.",
     "runtimeSourceHashes": {
       "backend.py": "2655a27e92bede6b68bbc09d7279c21171e8f5c4705fb5c6b383bdf629ceaff8",
       "telemetry.py": "47234b56b4e21e93a41375c2e97a7b7cd23306bd30f30d4ab4efeef0d346bd61",
@@ -69,6 +70,28 @@
       "ui/index.html": "4fea1184595de108ef7760b304c4a02f8245945ae241b36985205a6fc9f91fa4",
       "ui/app.js": "b660c4bd313adccea3ea8ece8cef9a8eb4cbbfe00a2c5903e8fca75ed0ddb025",
       "ui/logs.css": "0cd7bf6331a837380925f83e256bda346dc88d87c5a02b366314f389ba3700d8"
+    }
+  },
+  "runtimeComparisonRehearsalArtifact": {
+    "tag": "otel-agent-flow:poc-13",
+    "imageId": "sha256:92957e4d30debdb7be54b080ff9985c86a95aa662016e1637a0b6aa9648e8c34",
+    "scope": "Current native Deployment versus Substrate actor comparison. Local Docker image ID; work CI must build source and record its own registry manifest digest.",
+    "nativeSourceCommit": "b8d8b5ca7dd2cc4fba9ab1cc5c2b4b40536d0bf2",
+    "nativeWrapperSourceSha256": "058d2d8f4a739f88984c4c352c991778802ef2e4686d1cafe2235309ca3f76a5",
+    "nativeBinarySha256": "3645ebc12fa55a3621ad34ce21fde0bdc8da23ecc5c87fe27c5a2ded4d412dc9",
+    "runtimeSourceHashes": {
+      "backend.py": "e3d1b339ddb27fbb844fd4c46ca4fa931f83273298190455187d8aa77dc77803",
+      "telemetry.py": "0454c5a8be85bdb2d5539636e5ddd4f10575aa00e02570cbc0f9ecfe5e51090d",
+      "substrate_call.py": "3247696dd0b427ca9c63b383bfaba20ca055211a8f0cbebc96612c1aafb707b6",
+      "standalone_call.py": "687d7e684457dd6ffb122a4ef6c3dd555f4cfd5696d3ced4c69dd1294b1289dc",
+      "workflow_demo.py": "332d551adb5f37998411f1ed5f1df09e4e99e094832956aa906787ea5138f2b5",
+      "isolation_demo.py": "7454dcc026062feaf9b8e1590ad790aab08b90a2e97b8440b937da166f5f8acb",
+      "live_gitlab.py": "a6f5b0de1740eb86991eb6a3bb97d69d1b9c97592335a72f340d1d870b9e400d",
+      "ui/app.js": "bef2e6158d4018092827fcbae8f1c23cbe3ad0e5196f21d8acf68b0f5bd79e6d",
+      "ui/index.html": "81d6cc6af5fb518b656d83bf50c9337a98773228e14e3f85cb4d37deb4f3edcb",
+      "ui/style.css": "4c07af896007b2a7f6f23a7eeebf43a36a0e2458fd1c1e0f1684318b4153788a",
+      "ui/logs.css": "0cd7bf6331a837380925f83e256bda346dc88d87c5a02b366314f389ba3700d8",
+      "ui/favicon.svg": "c3bd4bf0721aff1103fb18e082b707d0e520abc5e85fbb85655fd3372f720bd6"
     }
   }
 }

@@ -1,3 +1,4 @@
+{{- if not (has .Values.execution.mode (list "substrate" "standalone" "both")) }}{{ fail "execution.mode must be substrate, standalone, or both" }}{{ end -}}
 {{- if and (eq .Values.tools.mode "live") (eq .Values.integration.mode "bundled") }}
 {{- if ne .Values.model.mode "live" }}{{ fail "Live tools require a live model" }}{{ end }}
 {{- $_ := required "tools.gitlab.project is required" .Values.tools.gitlab.project }}

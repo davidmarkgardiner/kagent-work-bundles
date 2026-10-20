@@ -1,0 +1,5 @@
+# Overlay on the same reviewed model, tools, image, and HTTPS operator values.
+execution:
+  mode: standalone
+dashboard:
+  runtimeLabel: Native kagent Go ADK 1.0.0-alpha8 · normal Deployment · without Substrate

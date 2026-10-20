@@ -1,4 +1,4 @@
-{{- if eq .Values.integration.mode "bundled" }}
+{{- if and (eq .Values.integration.mode "bundled") (ne .Values.execution.mode "standalone") }}
 apiVersion: v1
 kind: Secret
 metadata: {name: flow-demo-client, namespace: {{ .Values.agentNamespace }}}
@@ -56,33 +56,13 @@ kind: AgentTemplate
 metadata: {name: flow-demo, namespace: {{ .Values.agentNamespace }}}
 spec:
   modelConfig: {name: flow-demo-model}
-{{- if eq .Values.tools.mode "live" }}
-  systemPrompt: >-
-    You inspect actual Kubernetes and GitLab data using only the registered read tools.
-    Call only the tools requested by the user. Kubernetes scope is namespace {{ .Release.Namespace }}. When requested, call k8s_get_resources
-    with resource_type deployment, namespace {{ .Release.Namespace }}, and output wide.
-    GitLab tools are fixed to one approved project. Read current project metadata,
-    up to five recent issues, and latest pipeline status when requested. Never invent
-    results or claim that fixture data is live. State tool errors clearly. Do not
-    mutate Kubernetes, create issues, trigger pipelines, or write GitLab content.
+  systemPrompt: |-
+{{ include "flow.instruction" . | indent 4 }}
   tools:
+{{- range (include "flow.toolConnections" . | fromJsonArray) }}
   - mcp:
-      server: {kind: RemoteMCPServer, name: flow-kubernetes-tools}
-      tools: [k8s_get_resources, k8s_get_events]
-  - mcp:
-      server: {kind: RemoteMCPServer, name: flow-gitlab-tools}
-      tools: [gitlab_get_project, gitlab_list_issues, gitlab_get_latest_pipeline]
-{{- else }}
-  systemPrompt: >-
-    You demonstrate agent workflows in a Substrate sandbox. Follow the requested
-    DEMO_WORKFLOW by calling the named tools in order. All tool data is explicitly
-    simulated. Explain fixture results and intentional dependency failures clearly.
-    Never claim to have inspected or changed the real cluster. Do not retry a simulated
-    failure. Never invent telemetry, token prices, deployments, or approvals.
-  tools:
-  - mcp:
-      server: {kind: RemoteMCPServer, name: flow-demo-tools}
-      tools: [get_inventory_status, get_recent_alerts, review_change, check_dependency, get_kubernetes_workloads, query_grafana_alerts, get_gitlab_issue, get_gitlab_pipeline, read_team_a_resource, attempt_cross_team_resource, read_team_b_resource]
+      server: {kind: RemoteMCPServer, name: {{ .server }}}
+      tools: {{ .tools | toJson }}
 {{- end }}
 ---
 apiVersion: api.kagent.dev/v1alpha3
