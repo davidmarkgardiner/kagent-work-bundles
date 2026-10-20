@@ -32,7 +32,9 @@ ALLOWED = {
     "ate.actor.name", "ate.actor.uid", "ate.atespace", "ate.actor.state",
     "ate.template.name", "ate.template.atespace", "ate.worker.name", "ate.worker.uid",
     "ate.worker_pool.name", "kagent.session.id", "kagent.agent.namespace",
-    "flow.simulated", "flow.workflow",
+    "flow.simulated", "flow.workflow", "flow.tool.system",
+    "flow.security.subject", "flow.security.resource", "flow.security.decision", "flow.security.authority",
+    "flow.security.expected_status", "flow.security.observed_status", "flow.security.backend_delta", "flow.security.check",
 }
 
 

@@ -8,7 +8,7 @@
   <div class="agent-workspace">
   <aside class="prompt-column" aria-label="Agent conversation">
   <p id="demo-mode" class="demo-mode" hidden></p>
-  <label class="workflow-picker" for="workflow">Demo workflow<select id="workflow"><option value="custom">Custom prompt</option><option value="inventory">Simulated inventory check</option><option value="change-review">Simulated change review</option><option value="dependency-failure">Simulated dependency failure</option></select></label>
+  <label class="workflow-picker" for="workflow">Demo workflow<select id="workflow"><option value="custom">Custom prompt</option><option value="triage">Simulated incident triage</option><option value="sdlc">Simulated SDLC review</option><option value="identity-isolation">Simulated identity isolation</option><option value="inventory">Simulated inventory check</option><option value="change-review">Simulated change review</option><option value="dependency-failure">Simulated dependency failure</option></select></label>
   <form id="prompt-form" class="prompt-form"><div class="prompt-heading"><label for="prompt">Your prompt</label><span id="prompt-count">0 / 4,000</span></div><textarea id="prompt" name="prompt" rows="3" maxlength="4000" required aria-describedby="prompt-help">Check the inventory workload and explain whether it is healthy.</textarea><p id="prompt-help">Read-only inventory agent · Ctrl/⌘ + Enter to send. Each prompt starts a new run.</p><button id="invoke" class="primary" type="submit" form="prompt-form"><span id="invoke-label">Send to agent</span> <span aria-hidden="true">↗</span></button></form>
   <section id="agent-response" class="agent-response" aria-labelledby="response-title" hidden><h2 id="response-title">Agent response</h2><p id="response-text" role="status"></p><small id="response-trace"></small></section>
   <div id="notice" class="notice" role="status">Ready to send your prompt to the read-only agent.</div>
@@ -26,6 +26,7 @@
         <g id="edges"></g><g id="nodes"></g>
       </svg>
       </div>
+      <section class="observed-operations" aria-labelledby="observed-tools-title"><h3 id="observed-tools-title">Observed tool calls and access probes</h3><p>Received OTel only. Simulation labels describe fixture data. Probe results alone do not prove Entra enforcement.</p><div id="observed-tools" class="observed-tools"><p class="empty">Waiting for tool or access-probe spans.</p></div></section>
       <div class="legend"><span><i class="key observed"></i><span id="graph-scope">Observed in selected trace</span></span><span><i class="key pulse-key"></i>New span received</span><span><i class="key absent"></i>No telemetry</span></div>
       <div id="actor-activity" class="actor-activity" hidden><h3>Actor lifecycle</h3><div id="actor-states"></div><p>Linked by native actor identity. Select a state to inspect its original trace.</p><button id="session-flow">View session workflow</button></div>
       <div class="substrate-note"><strong>Agent Substrate</strong><span id="substrate-note">Not installed in this local cluster. Its worker and actor lane stays inactive until runtime spans arrive.</span></div>

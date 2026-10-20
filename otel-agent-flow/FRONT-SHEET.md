@@ -18,7 +18,7 @@ The deployed platform prerequisites are kagent **1.0.0-alpha8** and Substrate **
 
 ## What is proven
 
-The single-cluster Linux rehearsal served HTTPS with certificate validation. Inventory, change review, and intentional dependency failure traversed real HTTP/MCP calls and a real Substrate sandbox. A live Kimi model also completed the inventory workflow through the in-cluster gateway, with the old host bridge disabled. See [evidence/portable-fixture-verification.json](evidence/portable-fixture-verification.json) and [evidence/portable-live-verification.json](evidence/portable-live-verification.json).
+The single-cluster Linux rehearsal served HTTPS with certificate validation. Triage, SDLC review, simulated identity isolation, inventory, change review, and intentional dependency failure traversed real HTTP/MCP calls and a real Substrate sandbox. See [the current scenario receipt](evidence/portable-demo-scenarios-verification.json). A live Kimi model also completed the inventory workflow through the in-cluster gateway, with the old host bridge disabled. See [evidence/portable-fixture-verification.json](evidence/portable-fixture-verification.json) and [evidence/portable-live-verification.json](evidence/portable-live-verification.json).
 
 AKS, the managed Istio ingress runtime, enterprise certificate delivery, corporate access controls, and network-policy enforcement still require target-cluster verification. The local proxy rehearses HTTPS termination and route selection. It does not emulate the Istio control plane or prove Azure networking.
 
@@ -29,3 +29,5 @@ Fill the AKS values example with the internal image repository/digest, approved 
 This is a shared, single-user demonstration. The configured user ID selects a kagent data partition and is not authentication. Put the demo behind the work environment's approved authenticated edge/access policy before admitting an audience. TLS alone does not provide user authorization.
 
 Each prompt starts a fresh session. Fixture mode labels its model and tool data as simulated. Live mode uses a real provider with simulated read-only tools. No UI animation is triggered by the prompt itself; component activity comes from received OTel spans. Replay is labelled separately.
+
+Use [DEMO-SCENARIOS.md](DEMO-SCENARIOS.md) for triage and SDLC examples. Use [ENTRA-ISOLATION-DEMO.md](ENTRA-ISOLATION-DEMO.md) for the separate identity allow/deny demonstration and its evidence requirements.

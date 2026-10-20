@@ -13,28 +13,47 @@ TOOLS = {
     "review_change": ("Read the simulated deployment change review. Does not deploy.", {"change": "demo-release", "decision": "human_review_required", "mutatedResources": 0}),
     "check_dependency": ("Exercise a simulated unavailable dependency. Returns an intentional tool error.", {"dependency": "demo-stock", "status": "unavailable", "simulatedFailure": True}),
 }
+TOOLS.update({
+    "get_kubernetes_workloads": ("Read simulated Kubernetes workload conditions.", {"namespace": "demo", "workload": "inventory", "readyReplicas": 0, "reason": "ImagePullBackOff"}),
+    "query_grafana_alerts": ("Read simulated Grafana alerts and error-rate summary.", {"alert": "InventoryUnavailable", "state": "firing", "errorRate": "fixture 18%"}),
+    "get_gitlab_issue": ("Read a simulated GitLab incident issue. Does not create an issue.", {"issue": "DEMO-42", "title": "Inventory rollout investigation", "state": "opened"}),
+    "get_gitlab_pipeline": ("Read simulated GitLab pipeline status. Does not trigger a pipeline.", {"pipeline": "demo-pipeline", "status": "failed", "stage": "image-validation"}),
+    "read_team_a_resource": ("Exercise a simulated allow decision for agent A and team A.", {"subjectAlias": "agent-a", "resourceAlias": "team-a", "decision": "allow"}),
+    "attempt_cross_team_resource": ("Exercise a simulated deny decision for agent A and team B. No real identity token is used.", {"subjectAlias": "agent-a", "resourceAlias": "team-b", "decision": "deny"}),
+    "read_team_b_resource": ("Exercise a simulated allow decision for agent B and team B.", {"subjectAlias": "agent-b", "resourceAlias": "team-b", "decision": "allow"}),
+})
+TOOL_SYSTEMS = {
+    "get_kubernetes_workloads": "Kubernetes MCP", "query_grafana_alerts": "Grafana MCP",
+    "get_gitlab_issue": "GitLab MCP", "get_gitlab_pipeline": "GitLab MCP",
+    "read_team_a_resource": "Identity policy", "attempt_cross_team_resource": "Identity policy", "read_team_b_resource": "Identity policy",
+}
 WORKFLOWS = {
+    "triage": ["get_kubernetes_workloads", "query_grafana_alerts", "get_gitlab_issue"],
+    "sdlc": ["get_gitlab_issue", "get_gitlab_pipeline", "review_change"],
+    "identity-isolation": ["read_team_a_resource", "attempt_cross_team_resource", "read_team_b_resource"],
     "inventory": ["get_inventory_status", "get_recent_alerts"],
     "change-review": ["get_inventory_status", "review_change"],
     "dependency-failure": ["check_dependency"],
 }
 
 
-def export_event(service, trace, span, parent, name, start, status, values):
-    attributes = [{"key": k, "value": {"boolValue" if isinstance(v, bool) else "stringValue": v}}
+def export_event(service, trace, span, parent, name, start, status, values, kind=2):
+    attributes = [{"key": k, "value": {"boolValue": v} if isinstance(v, bool) else
+                   {"intValue": str(v)} if isinstance(v, int) else {"stringValue": str(v)}}
                   for k, v in values.items()]
     resource = {"attributes": [{"key": "service.name", "value": {"stringValue": service}}]}
     end = str(time.time_ns())
     records = {
         "traces": {"resourceSpans": [{"resource": resource, "scopeSpans": [{"spans": [{
             "traceId": trace, "spanId": span, "parentSpanId": parent, "name": name,
-            "kind": 2, "startTimeUnixNano": str(start), "endTimeUnixNano": end,
+            "kind": kind, "startTimeUnixNano": str(start), "endTimeUnixNano": end,
             "status": {"code": status}, "attributes": attributes}]}]}]},
         "logs": {"resourceLogs": [{"resource": resource, "scopeLogs": [{"logRecords": [{
             "timeUnixNano": end, "traceId": trace, "spanId": span,
             "severityNumber": 17 if status == 2 else 9, "eventName": "demo.workflow.operation",
             "attributes": attributes}]}]}]},
     }
+    delivered = True
     for signal, payload in records.items():
         try:
             request = urllib.request.Request(os.environ["OTEL_HTTP_ENDPOINT"] + "/v1/" + signal,
@@ -42,7 +61,9 @@ def export_event(service, trace, span, parent, name, start, status, values):
             with urllib.request.urlopen(request, timeout=5) as response:
                 response.read(1024)
         except (OSError, KeyError):
-            print("OTel fixture export failed", flush=True)
+            delivered = False
+            print("OTel export failed", flush=True)
+    return delivered
 
 
 def model_reply(payload):
@@ -109,11 +130,16 @@ class Handler(BaseHTTPRequestHandler):
                     if name not in TOOLS or payload.get("params", {}).get("arguments", {}) not in ({}, None):
                         return self.reply(400, {"error": "Unknown fixture tool or arguments"})
                     time.sleep(0.35)
-                    failed = name == "check_dependency"
+                    failed = name in {"check_dependency", "attempt_cross_team_resource"}
                     status = 2 if failed else 1
                     operation = "execute_tool " + name
                     values.update({"gen_ai.tool.name": name, "flow.workflow": name,
                                    "flow.result": "simulated_failure" if failed else "fixture_success"})
+                    values["flow.tool.system"] = TOOL_SYSTEMS.get(name, "Workflow MCP")
+                    if "subjectAlias" in TOOLS[name][1]:
+                        access = TOOLS[name][1]
+                        values.update({"flow.security.subject": access["subjectAlias"], "flow.security.resource": access["resourceAlias"],
+                                       "flow.security.decision": access["decision"], "flow.security.authority": "simulated-policy"})
                     result = {"content": [{"type": "text", "text": json.dumps({"simulated": True, **TOOLS[name][1]})}],
                               "isError": failed}
                 elif str(method).startswith("notifications/"):
@@ -150,7 +176,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 status = 2
                 self.reply(404, {"error": "Not found"})
-        except (OSError, ValueError):
+        except (OSError, ValueError, KeyError, TypeError):
             status = 2
         finally:
             export_event(service, trace, span, parent, operation, start, status, values)

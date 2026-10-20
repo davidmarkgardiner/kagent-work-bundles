@@ -1,0 +1,21 @@
+{
+  "url": "https://localhost:9443",
+  "tlsCertificateVerified": true,
+  "servedAssets": true,
+  "actualOtelState": true,
+  "allEightObservedComponents": true,
+  "leftPromptRightActivity": true,
+  "workflowPresets": true,
+  "fixtureLabelAndCost": true,
+  "lifecycleControls": true,
+  "logViewWithNativeError": true,
+  "viewSwitchPreservesSession": true,
+  "browserVisualRecheck": false,
+  "triageSdlcIsolationPresets": true,
+  "simulationLabels": true,
+  "perSpanPulseIsolation": true,
+  "originalSpanInspection": true,
+  "verificationMethod": "Node DOM model of actual HTTPS-served assets and received OTel APIs. Select value shim used. No browser visual recheck.",
+  "simulatedPolicyDecisionsInReceivedOtel": true,
+  "entraRuntimeTested": false
+}

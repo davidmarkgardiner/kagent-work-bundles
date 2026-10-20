@@ -14,10 +14,10 @@ def main():
     root = Path(__file__).resolve().parents[1]
     if args.output.exists():
         parser.error("Output already exists; choose a new path")
-    names = ["FRONT-SHEET.md", "WORK-BUNDLE-README.md", "WORK-AGENT-PROMPT.md", "AKS-ISTIO.md",
+    names = ["FRONT-SHEET.md", "DEMO-SCENARIOS.md", "ENTRA-ISOLATION-DEMO.md", "WORK-BUNDLE-README.md", "WORK-AGENT-PROMPT.md", "AKS-ISTIO.md",
              "PLATFORM-PREREQUISITES.md", "IMAGE-IMPORT.md", "LIVE-INTEGRATION.md", "ROLLBACK.md", "Dockerfile", ".dockerignore", ".gitignore",
              "requirements-ops.txt", "image-lock.json", "backend.py", "telemetry.py", "substrate_call.py",
-             "workflow_demo.py", "test_telemetry.py", "test_substrate_call.py", "test_workflow_demo.py", "test_verify_https.py"]
+             "workflow_demo.py", "isolation_demo.py", "test_isolation_demo.py", "test_telemetry.py", "test_substrate_call.py", "test_workflow_demo.py", "test_verify_https.py"]
     files = [root / name for name in names]
     for directory in ["ui", "deploy", "scripts"]:
         files.extend(p for p in (root / directory).rglob("*") if p.is_file() and "__pycache__" not in p.parts)

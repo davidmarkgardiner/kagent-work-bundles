@@ -5,5 +5,6 @@
 !telemetry.py
 !substrate_call.py
 !workflow_demo.py
+!isolation_demo.py
 !ui/
 !ui/**

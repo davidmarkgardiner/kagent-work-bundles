@@ -57,7 +57,7 @@ Installed release names are `substrate` and `kagent`. Their namespaces and versi
 
 ## Use the demo
 
-In existing-agent mode, enter a reviewed prompt for the existing read-only tools. Fixture presets are hidden. In bundled mode, choose **Simulated inventory check**, **Simulated change review**, or **Simulated dependency failure**, then select **Send to agent**. The selector fills the prompt; it does not generate telemetry or animate the diagram. In fixture mode the deterministic model calls the named tools and returns a labelled simulated result. Custom fixture prompts default to the inventory workflow unless they contain a supported workflow marker.
+In existing-agent mode, enter a reviewed prompt for the existing read-only tools. Fixture presets are hidden. In bundled mode, choose the triage, SDLC, identity-isolation, inventory, change-review, or dependency-failure fixture, then select **Send to agent**. The selector fills the prompt; it does not generate telemetry or animate the diagram. In fixture mode the deterministic model calls the named tools and returns a labelled simulated result. Custom fixture prompts default to the inventory workflow unless they contain a supported workflow marker.
 
 The map combines native traces for the current actor by exact identity. Lifecycle buttons open original traces. Token and cost details stay scoped to the selected original trace. Select **Logs** to see API calls and actor state events. The intentionally failed dependency emits an error span while the assistant can still complete its explanation.
 
@@ -102,3 +102,5 @@ The dashboard is one replica with bounded in-memory history. A rollout clears hi
 The Istio profile uses the managed ingress gateway and explicitly leaves demo and sandbox workloads outside sidecar injection. Full mesh interception of Substrate workers is a separate compatibility task. The local kind CNI does not prove enforcement of the included ingress NetworkPolicy.
 
 Follow [ROLLBACK.md](ROLLBACK.md) to restore the previous telemetry destination before uninstalling the demo. Do not delete the platform namespaces, databases, snapshot storage, provider Secrets, or TLS Secret as part of demo cleanup.
+
+Use [DEMO-SCENARIOS.md](DEMO-SCENARIOS.md) for triage and SDLC examples. Use [ENTRA-ISOLATION-DEMO.md](ENTRA-ISOLATION-DEMO.md) for the separate identity allow/deny demonstration and its evidence requirements.

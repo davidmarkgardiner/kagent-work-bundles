@@ -11,6 +11,9 @@ import urllib.parse
 import urllib.request
 
 CASES = {
+    "triage": ("Call get_kubernetes_workloads, query_grafana_alerts, then get_gitlab_issue. Explain the simulated incident without changing anything.", ["get_kubernetes_workloads", "query_grafana_alerts", "get_gitlab_issue"]),
+    "sdlc": ("Call get_gitlab_issue, get_gitlab_pipeline, then review_change. Do not write, deploy, or trigger anything.", ["get_gitlab_issue", "get_gitlab_pipeline", "review_change"]),
+    "identity-isolation": ("Call read_team_a_resource, attempt_cross_team_resource, then read_team_b_resource. Explain the simulated policy results without claiming real Entra validation.", ["read_team_a_resource", "attempt_cross_team_resource", "read_team_b_resource"]),
     "inventory": ("Call get_inventory_status, then get_recent_alerts. Summarize the simulated inventory health.", ["get_inventory_status", "get_recent_alerts"]),
     "change-review": ("Call get_inventory_status, then review_change. Explain the simulated decision. Do not deploy anything.", ["get_inventory_status", "review_change"]),
     "dependency-failure": ("Call check_dependency once. Explain the intentional simulated failure. Do not retry.", ["check_dependency"]),
@@ -110,7 +113,16 @@ def main():
             assert not any(s["attributes"].get("flow.simulated") is True for s in fixture_spans), "Connected proof contains simulated tool data"
         else:
             assert all(s["attributes"].get("flow.simulated") is True for s in fixture_spans), "Fixture tools are not labelled"
+        if not custom:
+            for server_span in fixture_spans:
+                tool_name = server_span["attributes"].get("gen_ai.tool.name")
+                if tool_name in tools and tool_name not in {"check_dependency", "attempt_cross_team_resource"}:
+                    assert server_span["status"] == "ok", "A required fixture tool failed"
         failed = [s for s in fixture_spans if s["attributes"].get("gen_ai.tool.name") == "check_dependency" and s["status"] == "error"]
+        if name == "identity-isolation":
+            decisions = {(s["attributes"].get("flow.security.subject"), s["attributes"].get("flow.security.resource"), s["attributes"].get("flow.security.decision")) for s in fixture_spans}
+            assert {("agent-a", "team-a", "allow"), ("agent-a", "team-b", "deny"), ("agent-b", "team-b", "allow")} <= decisions
+            assert any(s["status"] == "error" and s["attributes"].get("flow.security.decision") == "deny" for s in fixture_spans)
         if name == "dependency-failure":
             assert failed, "Intentional dependency failure was not exported as an error"
         _, log_data = request("/api/logs")

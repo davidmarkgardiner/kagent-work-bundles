@@ -6,6 +6,8 @@ The app has prompt entry on the left and switchable workflow/log views on the ri
 
 Use [WORK-BUNDLE-README.md](WORK-BUNDLE-README.md) to deploy. Use [LIVE-INTEGRATION.md](LIVE-INTEGRATION.md) to reuse the existing agentgateway, agents, Kubernetes MCP tools, and skills. AKS serves the app through an Istio VirtualService and the existing HTTPS Gateway.
 
-The local single-cluster rehearsal passed three fixture workflows and one live-model workflow with simulated tools. The existing-agent work profile has offline manifest checks. Actual workplace integrations still require target receipts.
+The current single-cluster rehearsal passed six fixture workflows, including triage, SDLC review, and simulated identity isolation. An earlier live-model workflow used simulated tools. The existing-agent work profile has offline manifest checks. Actual workplace integrations still require target receipts.
 
 Build the backend container from the Dockerfile in work CI. No separate ZIP or image archive is needed. See [IMAGE-IMPORT.md](IMAGE-IMPORT.md).
+
+Use [DEMO-SCENARIOS.md](DEMO-SCENARIOS.md) for triage and SDLC examples. Use [ENTRA-ISOLATION-DEMO.md](ENTRA-ISOLATION-DEMO.md) for the separate identity allow/deny demonstration and its evidence requirements.

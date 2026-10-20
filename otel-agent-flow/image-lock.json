@@ -34,5 +34,22 @@
     "ui/logs.css": "105b21fb974beb116b32be200bd86d24708cdf747316e40caf6ec59e52a32c42",
     "ui/style.css": "6e0921f07df92a61d7ccf06e343ddc0d96c693b488084b2b30f13c8c9d8a46fd"
   },
-  "applicationRuntimeSourcesScope": "Hashes of the verified historical poc-3 runtime, not the latest repository source."
+  "applicationRuntimeSourcesScope": "Hashes of the verified historical poc-3 runtime, not the latest repository source.",
+  "scenarioRehearsalArtifact": {
+    "tag": "otel-agent-flow:poc-6",
+    "imageId": "sha256:eb26091ec0953a76b8dc7e294b670b5d516f84074ebf3d322e33168a554957b4",
+    "scope": "Current application sources verified in the running single-cluster fixture rehearsal. Build the work registry image from repository source.",
+    "runtimeSourceHashes": {
+      "backend.py": "1d505fd901465ce5b8824452e791127f2e24c2a13d2103b0a8b4232212740399",
+      "telemetry.py": "3e4525509ca80051c74192ee57831badcb9cde6ea7092dbc72bf3d1558562eea",
+      "substrate_call.py": "3247696dd0b427ca9c63b383bfaba20ca055211a8f0cbebc96612c1aafb707b6",
+      "workflow_demo.py": "332d551adb5f37998411f1ed5f1df09e4e99e094832956aa906787ea5138f2b5",
+      "isolation_demo.py": "7454dcc026062feaf9b8e1590ad790aab08b90a2e97b8440b937da166f5f8acb",
+      "ui/favicon.svg": "c3bd4bf0721aff1103fb18e082b707d0e520abc5e85fbb85655fd3372f720bd6",
+      "ui/style.css": "6e0921f07df92a61d7ccf06e343ddc0d96c693b488084b2b30f13c8c9d8a46fd",
+      "ui/index.html": "9adeda944230f2d63d71506d2a8b7e452490f42c32ed7350fb736814a5147035",
+      "ui/app.js": "a24057a33a80108d99669eb58441778ddeed6b3548ef0bb0cd2ad1847230284c",
+      "ui/logs.css": "0cd7bf6331a837380925f83e256bda346dc88d87c5a02b366314f389ba3700d8"
+    }
+  }
 }

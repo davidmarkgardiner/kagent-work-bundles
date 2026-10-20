@@ -13,3 +13,7 @@ When a named AKS cluster is authorized, deploy this folder using the existing ka
 9. Record target AKS/Istio versions, Gateway reconciliation, certificate trust, access policy, CNI enforcement, image digests, and rollback location. Report PASS, FAIL, UNKNOWN, and NOT RUN. Local kind/Caddy receipts do not prove AKS acceptance.
 
 The application is a shared single-user POC with bounded in-memory telemetry. Each prompt creates a fresh session. Full sidecar interception and multi-turn restoration are not proven. Do not send messages, publish externally, or change unrelated resources as part of the work deployment.
+
+Implement and present the examples in DEMO-SCENARIOS.md. Start with bounded Kubernetes, Grafana, and GitLab read-only tool checks, then show the combined triage flow. Rehearse the labelled isolation fixture separately. For live Entra isolation, follow ENTRA-ISOLATION-DEMO.md, use the approved identities and protected gateway path, and retain both native gateway denial and zero-backend-delta evidence. Do not treat the UI's internal gRPC prompt call as a protected-front-door test.
+
+For the full identity-isolation showcase, verify two actual agents use their own existing broker-bound identities on MCP egress. Join native actor and gateway principal evidence without exporting bearer values. The standalone initialize probe checks the front door and is not proof that an agent runtime used its assigned identity.

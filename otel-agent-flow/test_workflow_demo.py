@@ -8,7 +8,7 @@ import urllib.error
 import urllib.request
 from unittest.mock import patch
 from http.server import ThreadingHTTPServer
-from workflow_demo import Handler, model_reply
+from workflow_demo import Handler, model_reply, TOOLS, WORKFLOWS
 import yaml
 
 
@@ -42,6 +42,46 @@ class WorkflowTests(unittest.TestCase):
         final, reason = model_reply(payload)
         self.assertEqual(reason, "stop")
         self.assertIn("SIMULATED_WORKFLOW_COMPLETE", final["content"])
+
+    def test_new_scenarios_call_each_declared_tool_in_order(self):
+        for workflow in ["triage", "sdlc", "identity-isolation"]:
+            payload = {"messages": [{"role": "user", "content": "DEMO_WORKFLOW=" + workflow}],
+                       "tools": [{"function": {"name": name}} for name in TOOLS]}
+            for expected in WORKFLOWS[workflow]:
+                message, reason = model_reply(payload)
+                self.assertEqual(reason, "tool_calls")
+                self.assertEqual(message["tool_calls"][0]["function"]["name"], expected)
+                payload["messages"].append(message)
+            final, reason = model_reply(payload)
+            self.assertEqual(reason, "stop")
+            self.assertIn("SIMULATED_WORKFLOW_COMPLETE", final["content"])
+
+    def test_every_fixture_tool_returns_valid_result_and_expected_decision(self):
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        try:
+            with patch("workflow_demo.export_event") as exported, patch("workflow_demo.time.sleep"):
+                for name in TOOLS:
+                    body = json.dumps({"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": name, "arguments": {}}}).encode()
+                    request = urllib.request.Request(f"http://127.0.0.1:{server.server_port}/mcp", body, {"Content-Type": "application/json"})
+                    with urllib.request.urlopen(request) as response:
+                        result = json.load(response)["result"]
+                    self.assertEqual(result["isError"], name in {"check_dependency", "attempt_cross_team_resource"})
+                    data = json.loads(result["content"][0]["text"])
+                    self.assertTrue(data["simulated"])
+                    if name == "review_change":
+                        self.assertEqual(data["decision"], "human_review_required")
+                server.shutdown()
+                server.server_close()
+                calls = {call.args[4]: call.args for call in exported.call_args_list}
+                self.assertEqual(calls["execute_tool review_change"][6], 1)
+                self.assertNotIn("flow.security.subject", calls["execute_tool review_change"][7])
+                denied = calls["execute_tool attempt_cross_team_resource"]
+                self.assertEqual(denied[6], 2)
+                self.assertEqual(denied[7]["flow.security.decision"], "deny")
+        finally:
+            server.shutdown()
+            server.server_close()
 
     def test_real_mcp_error_call_emits_error_span_with_received_parent(self):
         server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)

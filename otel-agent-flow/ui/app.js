@@ -1,5 +1,8 @@
 const $ = id => document.getElementById(id);
 const workflowPrompts={
+  triage:'DEMO_WORKFLOW=triage. Call get_kubernetes_workloads, query_grafana_alerts, then get_gitlab_issue. Correlate the simulated symptoms and propose a read-only triage plan. Do not change the cluster or create an issue.',
+  sdlc:'DEMO_WORKFLOW=sdlc. Call get_gitlab_issue, get_gitlab_pipeline, then review_change. Explain the simulated failed pipeline and review decision. Do not trigger a pipeline, write to GitLab, or deploy.',
+  'identity-isolation':'DEMO_WORKFLOW=identity-isolation. Call read_team_a_resource, attempt_cross_team_resource, then read_team_b_resource. Explain the simulated allow/deny decisions. This is a policy simulation without Entra tokens, not proof of Entra isolation.',
   inventory:'DEMO_WORKFLOW=inventory. Call get_inventory_status, then get_recent_alerts. Summarize the simulated inventory health and identify the fixture data.',
   'change-review':'DEMO_WORKFLOW=change-review. Call get_inventory_status, then review_change. Explain the simulated change decision. Do not deploy or modify anything.',
   'dependency-failure':'DEMO_WORKFLOW=dependency-failure. Call check_dependency and explain its intentional simulated failure and a safe next step. Do not retry or modify anything.'
@@ -25,6 +28,7 @@ const expectedEdges = [['client','kagent'],['kagent','agentgateway'],['agentgate
 let state = {traces:[]}, selectedId = null, filter = null, follow = true, initial = true;
 let seen = new Set(), activeNodes = new Map(), activeEdges = new Map(), replayTimers = [], replaying = false;
 let manualPrices = null, lastRevision = -1;
+const activeOperations=new Map();
 let showInternal = false;
 let logsPaused = false, logData = null;
 let submitting = false, pendingTraceId = null;
@@ -85,16 +89,38 @@ function drawMap() {
     const node=$(`node-${id}`);node.setAttribute('class',`node${nodes.has(id)?' observed':' absent'}${(activeNodes.get(id)||0)>now?' active':''}${filter===id?' selected':''}`);
     $(`sub-${id}`).textContent=nodes.has(id)?sessionGraph()?'Observed in this session':'Observed in this trace':layout[id].sub;
   }
+  for(const card of document.querySelectorAll('.operation-card'))card.classList.toggle('active',(activeOperations.get(card.dataset.spanKey)||0)>now);
   const hasSubstrate=state.traces.some(t=>t.components.some(c=>['substrate','worker','actor'].includes(c)));
   $('substrate-note').textContent=hasSubstrate?'Native runtime spans received. Session workflow includes related lifecycle traces. Trace details and token counts below stay scoped to the selected trace.':state.runtime?.substrateInstalled?'Installed in this cluster. Waiting for native runtime spans.':'Not installed in this local cluster. Its worker and actor lane stays inactive until runtime spans arrive.';
   if(state.runtime?.substrateInstalled&&!nodes.has('substrate'))$('sub-substrate').textContent='Waiting in this trace';
 }
+function renderOperations(){
+  const scope=sessionGraph();
+  const spans=scope?state.traces.filter(t=>scope.traceIds.includes(t.traceId)).flatMap(t=>t.spans):selected()?.spans||[];
+  const operations=spans.filter(s=>s.attributes['gen_ai.tool.name']||s.attributes['mcp.tool.name']||s.attributes['tool.name']||s.attributes['flow.security.check'])
+    .sort((a,b)=>Number(a.startNs)-Number(b.startNs));
+  const cards=operations.slice(-40).map(s=>{
+    const a=s.attributes,tool=a['gen_ai.tool.name']||a['mcp.tool.name']||a['tool.name']||s.name;
+    const card=el('button',undefined,`operation-card ${s.status}${(activeOperations.get(`${s.traceId}/${s.spanId}`)||0)>Date.now()?' active':''}`);
+    card.dataset.spanKey=`${s.traceId}/${s.spanId}`;
+    card.append(el('strong',a['flow.tool.system']||s.service),el('span',tool),el('small',`${s.status} · ${time(s.durationMs)} · ${a['flow.simulated']===true?'Simulated data':'Received telemetry'}`));
+    if(a['flow.security.decision']||a['flow.security.check']){
+      card.append(el('span',`${a['flow.security.subject']||'Identity unknown'} → ${a['flow.security.resource']||'Resource unknown'} · ${a['flow.security.decision']||'Probe'}`),
+        el('small',a['flow.security.authority']||'Enforcement source not reported'));
+      if(a['flow.security.check'])card.append(el('small',`HTTP ${a['flow.security.observed_status']??'unknown'} / expected ${a['flow.security.expected_status']??'unknown'} · Backend requests ${a['flow.security.backend_delta']??'unknown'}`));
+    }
+    card.onclick=()=>{if(!state.traces.some(t=>t.traceId===s.traceId))return;stopReplay();follow=false;selectedId=s.traceId;filter=null;render();inspect(s);};return card;
+  });
+  $('observed-tools').replaceChildren(...(cards.length?cards:[el('p','Waiting for tool or access-probe spans.','empty')]));
+}
 function pulse(span,trace) {
   const until=Date.now()+2100;activeNodes.set(span.component,until);
+  for(const [key,expiry] of activeOperations)if(expiry<Date.now())activeOperations.delete(key);
+  activeOperations.set(`${span.traceId}/${span.spanId}`,until);
   for(const e of trace.edges.filter(e=>e.spanIds.includes(span.spanId))){
     activeNodes.set(e.from,until);activeNodes.set(e.to,until);activeEdges.set(`${e.from}-${e.to}`,until);
   }
-  drawMap();
+  drawMap();renderOperations();
 }
 function renderRuns(){
   $('trace-count').textContent=state.traces.length;
@@ -112,7 +138,7 @@ function costOf(t){
   return {value:t.costUsd,label:t.costSource==='unknown'?'No per-request USD charge or configured rate.':`${t.costSource==='reported'?'Reported by telemetry':t.costSource==='partial'?'Partial cost; some calls have no price':'Estimated from configured rates'}.`};
 }
 function render(){
-  renderRuns();drawMap();const t=selected();$('follow').disabled=follow;$('replay').disabled=!t||replaying;
+  renderRuns();drawMap();renderOperations();const t=selected();$('follow').disabled=follow;$('replay').disabled=!t||replaying;
   const activity=state.sessionActivity;$('actor-activity').hidden=!activity;
   if(activity){$('actor-states').replaceChildren(...activity.states.map(event=>{const b=el('button',event.state);b.title=`${new Date(Number(event.timestampNs)/1e6).toLocaleTimeString()} · ${event.traceId}`;b.disabled=!state.traces.some(trace=>trace.traceId===event.traceId);b.onclick=()=>{stopReplay();follow=false;filter=null;selectedId=event.traceId;render();};return b;}));}
   if(!t){
@@ -133,7 +159,7 @@ function renderTimeline(){
   const t=selected();if(!t)return;$('timeline-title').textContent=filter?`${layout[filter]?.label||filter} spans`:showInternal?'All spans':'Workflow timeline';$('clear-filter').hidden=!filter;
   $('internal-spans').disabled=false;$('internal-spans').textContent=showInternal?'Show workflow spans':`All ${t.spanCount} spans`;
   const callIds=new Set(t.modelCalls.map(c=>c.spanId));
-  const spans=t.spans.filter(s=>filter?(s.component===filter||t.edges.some(e=>e.spanIds.includes(s.spanId)&&(e.from===filter||e.to===filter))):(showInternal||s.component==='client'||callIds.has(s.spanId)||s.attributes['gen_ai.tool.name']||s.name.startsWith('invoke_agent ')||['substrate','worker','actor'].includes(s.component)));
+  const spans=t.spans.filter(s=>filter?(s.component===filter||t.edges.some(e=>e.spanIds.includes(s.spanId)&&(e.from===filter||e.to===filter))):(showInternal||s.component==='client'||callIds.has(s.spanId)||s.attributes['gen_ai.tool.name']||s.attributes['mcp.tool.name']||s.attributes['tool.name']||s.attributes['flow.security.check']||s.name.startsWith('invoke_agent ')||['substrate','worker','actor'].includes(s.component)));
   const rows=spans.map(s=>{
     const b=el('button',undefined,`span-row ${s.status}`),track=el('span',undefined,'bar-track'),bar=el('span',undefined,'bar');
     bar.style.left=`${Math.max(0,(Number(s.startNs)-Number(t.startNs))/1e6/Math.max(1,t.durationMs)*100)}%`;
