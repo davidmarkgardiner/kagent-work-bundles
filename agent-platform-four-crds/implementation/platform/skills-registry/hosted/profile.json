@@ -1,0 +1,46 @@
+{
+  "runtimeProfile": "lab-native-v1",
+  "modelProfile": "skills-demo-gateway-v1",
+  "modelConfig": {
+    "name": "skills-demo-gateway",
+    "specSha256": "34bfb5fa61fe78d5cfb71e340262661e91ca8def3e5b57a90267166926191428"
+  },
+  "deployment": {
+    "env": [
+      {
+        "name": "KAGENT_SKILLS_FOLDER",
+        "value": "/skills"
+      }
+    ],
+    "nodeSelector": {
+      "node-role.kubernetes.io/control-plane": ""
+    },
+    "resources": {
+      "limits": {
+        "cpu": "500m",
+        "memory": "512Mi"
+      },
+      "requests": {
+        "cpu": "50m",
+        "memory": "192Mi"
+      }
+    },
+    "securityContext": {
+      "allowPrivilegeEscalation": false,
+      "capabilities": {
+        "drop": [
+          "ALL"
+        ]
+      },
+      "privileged": false
+    },
+    "tolerations": [
+      {
+        "effect": "NoSchedule",
+        "key": "node-role.kubernetes.io/control-plane",
+        "operator": "Exists"
+      }
+    ],
+    "replicas": 1
+  }
+}

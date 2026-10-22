@@ -1,0 +1,65 @@
+{
+  "mode": "liveNativeSkill",
+  "inputOrigin": "synthetic",
+  "phase": "Passed",
+  "namespace": "skills-demo",
+  "scenario": "aks-oras-212-v1",
+  "invocationAttempted": true,
+  "liveAzureInvestigation": false,
+  "sandboxExecuted": false,
+  "limits": [
+    "Manual acceptance test; no reconciliation controller.",
+    "Tool allowlisting checks observed calls; it does not restrict runtime permissions.",
+    "Stable Pod identity does not attest which Pod served the A2A request.",
+    "Answer validation checks configured terms and citation, not general semantic correctness."
+  ],
+  "missingAnswerTerms": [],
+  "taskID": "1c4a805d-a776-4c8d-aa9f-9724e0318969",
+  "contextID": "golden-534affd2cfff473882297bb6aabfa0db",
+  "toolCalls": [
+    {
+      "args": {
+        "command": "aks-known-issues"
+      },
+      "id": "tool_INc3cejgof0bNu485lacBQTV",
+      "name": "skills"
+    },
+    {
+      "args": {
+        "file_path": "/skills/aks-known-issues/references/error-code-map.md"
+      },
+      "id": "tool_XHDPvtQSe98i7SAha8ijC4Ds",
+      "name": "read_file"
+    }
+  ],
+  "toolResultSha256": {
+    "tool_INc3cejgof0bNu485lacBQTV": "41d9424355e658091e79a90edbb02abc2972009a1f12038a8fba8fa784813ede",
+    "tool_XHDPvtQSe98i7SAha8ijC4Ds": "a2b56fd1136dcff37896a3568a078aa791fd20714630d6fc1d07226759052579"
+  },
+  "answerSha256": "053e578ee044c557d6a78e808517f23158b363ebfb6101750bd66df91435878a",
+  "deployment": {
+    "scenarioUID": "c635c71f-d8d6-49f9-baab-990f9c362c01",
+    "scenarioGeneration": 1,
+    "scenarioSpecSha256": "ea5b48912c74df2f7e9525c821e7681ef69486826587c31a91628acf2d31d7ac",
+    "agentUID": "fe79fcd4-e7b8-4519-a8b0-b85bbddab281",
+    "agentGeneration": 3,
+    "agentSpecSha256": "4a43cf79c42a506e9778ac62339c6720c9d527e8fea559c4777712325e88da14",
+    "skillUID": "8c295e65-82a4-438c-b36c-824d4a083dd5",
+    "skillGeneration": 1,
+    "skillContentSha256": "1906dd0e228bcbc5d08d792d318917f0f9a6e1f663fc3ee0075df68dda2bb07e",
+    "configMapUID": "6a4a829f-f1c3-4810-bd1d-0543ed3b9596",
+    "podUID": "5c200b78-842b-40e9-8adf-264358fce26b",
+    "containerID": "containerd://97c1a2b296d6ef652adeea5fa771b740e7c22fd037bfc0e4b3a7c72fbec4abcb",
+    "restartCount": 0,
+    "imageID": "ghcr.io/kagent-dev/kagent/app@sha256:40bd6430363b33b3ec686621beb5cb8ce915653ba20c8b653e68ac07b42a8c6b",
+    "mountedFileHashes": {
+      "LICENSE": "92b556ec5ae47bb5ba07e2ebfe1c5dba656d65beabcf1a3f129e48b1e6855ccb",
+      "SKILL.md": "a7c484cf36fe1f9bb6741c29ef0007e71c9d6abfc74e83da150e2d89485768a6",
+      "references/error-code-map.md": "22fd4350d803c8ab6e00f41bc50d03a4f49aef879e6ac99e351c06800d1e0f45",
+      "upstream-frontmatter.yaml": "b0eca659ebae3456738df4a7a653150acc25225ed63953c32a26aafc0dd12814",
+      "upstream-provenance.json": "3c2401fe7bdba0670e5732e5671b780f9d9aa16412ed3b5c8d45dc8374c8cdd9"
+    }
+  },
+  "a2aResponseSha256": "3344b77879c349f3c90b057e41d75b19ecc89558dcac4295fd5fed548cc177bd",
+  "completedAt": "2026-10-21T16:47:37.581992+00:00"
+}

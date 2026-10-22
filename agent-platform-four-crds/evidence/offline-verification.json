@@ -1,0 +1,21 @@
+{
+  "mode": "offlinePackaging",
+  "targetVerified": false,
+  "gitlabPushed": false,
+  "clusterMutated": false,
+  "testsPassed": 122,
+  "kustomizeStagesPassed": 4,
+  "standaloneCopy": "Passed",
+  "cliStagesPassed": 3,
+  "configuredRunnerImportsPassed": 2,
+  "publicSafetyScan": {
+    "hits": 0,
+    "excluded": "unchanged hash-locked shared scanner self-pattern"
+  },
+  "sha256": {
+    "snapshot.lock.json": "5022939b8e8946bd79113a0bf742af68714233a6f056f2cff35dc311bc143bd8",
+    "package.py": "f083a652e842ac98d96afb0a93d900de22c6e0bb9417844b7e3948684745f2aa",
+    "test_package.py": "6a30648c58e85ea7487a0c494b957f51b15d1151d0ba94d989a7dbccb2122f18",
+    "verify.py": "555335b39628135100fe3f199c0eb5e9188185b103bd2763edac07457d925293"
+  }
+}

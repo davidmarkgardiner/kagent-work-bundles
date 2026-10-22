@@ -26,6 +26,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 
 | Bundle | Capability | Primary outcome |
 |---|---|---|
+| [`agent-platform-four-crds/`](agent-platform-four-crds/FRONT-SHEET.md) | CRD onboarding without Substrate | Reviewed skill/knowledge, controller-managed Agent, one fixed read-only MCP capability and correlated OTel; exact workplace compatibility remains a target gate |
 | [`otel-agent-flow/`](otel-agent-flow/FRONT-SHEET.md) | OTel workflow UI over Istio HTTPS | Native ADK Deployment versus Substrate actor comparison, real Kubernetes/GitLab MCP calls, fixture profiles, and Istio HTTPS integration |
 | [`radar-topology-mcp/`](radar-topology-mcp/README.md) | Radar topology plus existing vector KB; air-gapped OCI handoff | Resolves workload identity before cited KB lookup, with pinned artifact imports and live evaluation boundaries |
 | [`agent-substrate/`](agent-substrate/WORK-AGENT-RUNSC-EQUIVALENCE-HANDOFF.md) | AKS Substrate 0.0.9 gVisor/runsc equivalence | Cross-check the work cluster, node, images, charts, and runsc mount against the tested AKS path before retrying installation |

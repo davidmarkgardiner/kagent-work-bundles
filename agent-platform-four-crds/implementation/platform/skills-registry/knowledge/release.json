@@ -1,0 +1,25 @@
+{
+  "name": "aks-bootstrap-v1",
+  "knowledgeBaseName": "aks-bootstrap",
+  "namespace": "skills-demo",
+  "agent": "knowledge-demo-agent",
+  "contentCommit": "60759b4f808f783c36ffd4d4dad8fd69ca3b3eae",
+  "gitopsCommit": "7b26327acfcdac6c8103b72a75ad71ec790af40a",
+  "contentSha256": "d4d8813c621f3e4ab96804616250da1571ae9b4ca79e0594e89c1bdc0251790f",
+  "configMap": "kb-aks-bootstrap-v1-d4d8813c621f3e4a",
+  "files": {
+    "oras-pull-unauthorized.md": "2c4cc4b89a8a4141d65ced9c42cdc099f17637bd9151fa8d7f495d29582b1282"
+  },
+  "documents": [
+    {
+      "path": "oras-pull-unauthorized.md",
+      "title": "AKS bootstrap registry authorization",
+      "sourceURL": "https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/error-codes/vmextensionerror-oraspullunauthorized",
+      "reviewedAt": "2026-10-21"
+    }
+  ],
+  "agentSpecSha256": "9a58f45638b30d97e5ca20386da646da70a7b8fdf696504690d2f6d631bfdbd4",
+  "contentOrigin": "syntheticSanitizedSummary",
+  "sourceLastUpdated": "2026-01-15",
+  "branch": "aks-knowledge-v1"
+}

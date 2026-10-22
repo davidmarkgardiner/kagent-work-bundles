@@ -1,0 +1,199 @@
+{
+  "formatVersion": 1,
+  "status": "proposedSyntheticContract",
+  "transport": "MCP Streamable HTTP, no batches or streaming result bodies",
+  "fixedTarget": "Resolved exclusively from protected backend profile and approval scope; never caller arguments",
+  "operations": [
+    {
+      "name": "get_deployment_health",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "deploymentName"
+        ],
+        "properties": {
+          "deploymentName": {
+            "type": "string",
+            "pattern": "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$",
+            "minLength": 1,
+            "maxLength": 253
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "deploymentName",
+          "generation",
+          "observedGeneration",
+          "desiredReplicas",
+          "readyReplicas",
+          "availableReplicas",
+          "conditions"
+        ],
+        "properties": {
+          "deploymentName": {
+            "type": "string",
+            "pattern": "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$",
+            "minLength": 1,
+            "maxLength": 253
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "observedGeneration": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "desiredReplicas": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "readyReplicas": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "availableReplicas": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "conditions": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "status"
+              ],
+              "properties": {
+                "type": {
+                  "enum": [
+                    "Available",
+                    "Progressing",
+                    "ReplicaFailure"
+                  ]
+                },
+                "status": {
+                  "enum": [
+                    "True",
+                    "False",
+                    "Unknown"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "apiReads": [
+        {
+          "verb": "get",
+          "apiGroup": "apps",
+          "resource": "deployments"
+        }
+      ],
+      "projection": "Only fields in outputSchema. Omit message, reason, annotations, environment and full manifests."
+    },
+    {
+      "name": "list_deployment_warning_summaries",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "deploymentName",
+          "limit"
+        ],
+        "properties": {
+          "deploymentName": {
+            "type": "string",
+            "pattern": "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$",
+            "minLength": 1,
+            "maxLength": 253
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "deploymentName",
+          "warnings",
+          "truncated"
+        ],
+        "properties": {
+          "deploymentName": {
+            "type": "string",
+            "pattern": "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$",
+            "minLength": 1,
+            "maxLength": 253
+          },
+          "warnings": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "category",
+                "count",
+                "lastObservedAt"
+              ],
+              "properties": {
+                "category": {
+                  "enum": [
+                    "FailedCreate",
+                    "FailedScheduling",
+                    "BackOff",
+                    "Other"
+                  ]
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "lastObservedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "apiReads": [
+        {
+          "verb": "get",
+          "apiGroup": "apps",
+          "resource": "deployments"
+        },
+        {
+          "verb": "list",
+          "apiGroup": "",
+          "resource": "events"
+        }
+      ],
+      "projection": "Server constructs involvedObject.uid selector from the observed Deployment. Map known warning reasons to category enum, all others to Other. Never return message, note or free-form reason."
+    }
+  ],
+  "limits": {
+    "maxRows": 50,
+    "maxFieldCharacters": 512,
+    "maxEnvelopeBytes": 32768,
+    "wholeCallSeconds": 5,
+    "maxClockUncertaintySeconds": 2
+  },
+  "pagination": "Read a bounded page once with explicit truncation if more exists. No caller page token or automatic continuation."
+}

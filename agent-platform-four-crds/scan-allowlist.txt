@@ -1,0 +1,8 @@
+# The unchanged shared scanner matches its own literal detection pattern.
+# Its copied bytes are checked against snapshot.lock.json by verify.py.
+**/implementation/scripts/public-safe-scan.sh
+
+# Reviewed false positives: a semantic version matches the broad RFC1918 pattern.
+# These two hash-locked files contain no target endpoint or credential.
+**/implementation/work-agent-bundles/otel-agent-flow/backend.py
+**/implementation/work-agent-bundles/otel-agent-flow/ui/index.html

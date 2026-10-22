@@ -1,0 +1,19 @@
+{
+  "knowledgeBaseUID": "f4d66df0-e999-4841-a964-098e5d2c121e",
+  "knowledgeBaseGeneration": 1,
+  "knowledgeBaseSpecSha256": "a999cbe7961c3e62a20667fa2aa61b332f6459493fd5a3d35b62452ea72e8153",
+  "contentSha256": "d4d8813c621f3e4ab96804616250da1571ae9b4ca79e0594e89c1bdc0251790f",
+  "sourceUID": "c3ccf6a1-08a9-4a71-84d4-c5e8c0240af4",
+  "sourceRevision": "sha1:60759b4f808f783c36ffd4d4dad8fd69ca3b3eae",
+  "agentUID": "bf04145d-f7df-4e72-ae64-2a6a9dec70dd",
+  "agentGeneration": 1,
+  "agentSpecSha256": "9a58f45638b30d97e5ca20386da646da70a7b8fdf696504690d2f6d631bfdbd4",
+  "configMapUID": "2cbb55da-75cc-4787-a257-2d8ca0b531b0",
+  "podUID": "2f0bfb8f-cf3e-4edb-a16b-8ca9ea3c01ea",
+  "imageID": "ghcr.io/kagent-dev/kagent/app@sha256:40bd6430363b33b3ec686621beb5cb8ce915653ba20c8b653e68ac07b42a8c6b",
+  "containerID": "containerd://af797054ce1a791c1bbd6d166430164af9bd7a5584b29bbb761433500c27b747",
+  "restartCount": 0,
+  "mountedFileHashes": {
+    "oras-pull-unauthorized.md": "2c4cc4b89a8a4141d65ced9c42cdc099f17637bd9151fa8d7f495d29582b1282"
+  }
+}

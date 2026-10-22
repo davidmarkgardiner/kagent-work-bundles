@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 2,
+  "observedAt": "2026-10-22T11:44:36.399160+00:00",
+  "scope": "ordinary controller-managed lab execution and portable package; workplace unverified",
+  "readyForWorkplaceAdaptation": true,
+  "workplaceVerified": false,
+  "substrateRequired": false,
+  "runtime": {
+    "api": "kagent.dev/v1alpha2",
+    "controllerManaged": true,
+    "ordinaryDeployment": true,
+    "agentRuntimeImage": "ghcr.io/kagent-dev/kagent/app:0.7.13"
+  },
+  "combinedAcceptance": {
+    "phase": "Passed",
+    "toolCalls": 4,
+    "categories": {
+      "skill": 2,
+      "knowledge": 1,
+      "mcp": 1
+    },
+    "dependenciesUnchanged": true,
+    "pinnedObserverObjects": 24,
+    "receiptSha256": "6e89972c03fa90df9dd4f363573f337692376f084476e3dc03bda7f19579a6f4",
+    "nativeToolSpans": 4,
+    "modelSpans": 3,
+    "backendTraceIndependent": true,
+    "backendCorrelation": "execution ID and independently audited result hash; exact SDK task/context/tool-call IDs",
+    "inputTokens": 18588,
+    "outputTokens": 823,
+    "reportedCostUsd": null,
+    "browserVerified": true,
+    "viewerReceiptAppliesToCurrent": true
+  },
+  "authorityChecks": [
+    {
+      "check": "get-approved",
+      "status": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "check": "get-other",
+      "status": 403,
+      "expected": 403,
+      "passed": true
+    },
+    {
+      "check": "list-configmaps",
+      "status": 403,
+      "expected": 403,
+      "passed": true
+    },
+    {
+      "check": "read-secrets",
+      "status": 403,
+      "expected": 403,
+      "passed": true
+    },
+    {
+      "check": "cross-namespace",
+      "status": 403,
+      "expected": 403,
+      "passed": true
+    },
+    {
+      "check": "create-dryrun",
+      "status": 403,
+      "expected": 403,
+      "passed": true
+    },
+    {
+      "check": "patch-dryrun",
+      "status": 403,
+      "expected": 403,
+      "passed": true
+    },
+    {
+      "check": "delete-dryrun",
+      "status": 403,
+      "expected": 403,
+      "passed": true
+    }
+  ],
+  "viewer": {
+    "noKubernetesToken": true,
+    "invokeStatus": 403,
+    "negativeProtocolRequests": 3,
+    "negativeRequestsRejected": true,
+    "backendAuditUnchanged": true,
+    "crossNamespaceProbeBlocked": true,
+    "sameNamespaceTrafficAllowedByExistingPolicy": true,
+    "probeCleanupRequested": true
+  },
+  "preservation": {
+    "unchangedProtectedResources": 11,
+    "originalHostedRuntimeAndContentUnchanged": true,
+    "sharedControllerHelmUnchanged": true,
+    "newerSubstrateVMStarted": false
+  },
+  "offlineChecks": {
+    "portableTests": 250,
+    "groups": 6,
+    "otelSourceTests": 143,
+    "hostedSourceTests": 52,
+    "newerNativeAdapterTests": 11,
+    "helperSmoke": "passed",
+    "targetVerified": false
+  },
+  "reviews": {
+    "claudeImplementation": {
+      "reportedModel": "claude-opus-5-5",
+      "modelVerified": true,
+      "verdict": "approve lab scope after two correlation fixes"
+    },
+    "kimiImplementation": {
+      "requestedRoute": "kimi-code/k3",
+      "reportedModel": null,
+      "modelVerified": false,
+      "verdict": "approve declared lab scope"
+    },
+    "closure": {
+      "claude": "correlation fixes confirmed; final receipt and live-state/GitOps guard findings fixed with regression checks",
+      "kimi": "approved stated boundary; earlier correlation findings confirmed closed",
+      "targetExecutionByReviewers": false
+    }
+  },
+  "retainedFailures": [
+    {
+      "gate": "strict answer text",
+      "observed": "Markdown split the exact exit phrase",
+      "action": "preserved failed receipt; explicitly requested contiguous phrase; new fresh request passed"
+    },
+    {
+      "gate": "same-namespace network isolation assumption",
+      "observed": "existing additive namespace allow policy permits peers",
+      "action": "preserved shared policy; documented actual boundary; cross-namespace probe blocked"
+    }
+  ],
+  "remainingGates": [
+    "exact workplace version/API/runtime and bootstrap-hook compatibility",
+    "workplace GitLab/Flux/artifact/model integration",
+    "workplace authorized delivery and fresh combined acceptance",
+    "separate approved Substrate profile after Azure Policy clearance"
+  ],
+  "earlierReview": {
+    "observedAt": "2026-10-22T09:22:47.114876+00:00",
+    "readyForCompleteWorkplaceReplication": false,
+    "liveKubernetes": "unreachable",
+    "archiveReplay": {
+      "extractor": "system unzip",
+      "groupsPassed": 5,
+      "testsPassed": 122,
+      "targetVerified": false,
+      "shellExecutableModesPreserved": true,
+      "initialTimeoutCleanupPermissionError": "unresolved intermittent failure; isolated source and extracted checks and later full replay passed",
+      "pythonExtractallCheck": "failed executable-bit assertion because that extractor discarded stored Unix modes"
+    }
+  }
+}

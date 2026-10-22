@@ -1,0 +1,19 @@
+apiVersion: skills.platform.kagent.dev/v1alpha1
+kind: KnowledgeBase
+metadata:
+  name: aks-bootstrap-v1
+  namespace: skills-demo
+spec:
+  knowledgeBaseName: aks-bootstrap
+  sourceRef:
+    name: aks-knowledge-content-v1
+  sourceCommit: 60759b4f808f783c36ffd4d4dad8fd69ca3b3eae
+  path: knowledge/aks-bootstrap
+  files:
+    oras-pull-unauthorized.md: 2c4cc4b89a8a4141d65ced9c42cdc099f17637bd9151fa8d7f495d29582b1282
+  contentSha256: d4d8813c621f3e4ab96804616250da1571ae9b4ca79e0594e89c1bdc0251790f
+  documents:
+  - path: oras-pull-unauthorized.md
+    title: AKS bootstrap registry authorization
+    sourceURL: https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/error-codes/vmextensionerror-oraspullunauthorized
+    reviewedAt: '2026-10-21'

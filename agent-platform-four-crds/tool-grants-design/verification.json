@@ -1,0 +1,27 @@
+{
+  "completedAt": "2026-10-21T17:49:06.492092+00:00",
+  "mode": "designOnly",
+  "fixtureValidation": "Passed",
+  "closedOperationSchemas": 2,
+  "negativeFixturesRejected": 12,
+  "localLinks": "Passed",
+  "publicSafetyScan": {
+    "hits": 0,
+    "exclusion": "unchanged hash-locked shared scanner self-pattern"
+  },
+  "independentReview": "Completed; conservative notBefore rule corrected",
+  "targetContacted": false,
+  "runtimeChanged": false,
+  "runtimeEnforcementVerified": false,
+  "sha256": {
+    "ACCEPTANCE.md": "16a0017c91af6e28c4a6f06d53e3acd55e31ae4c2108e6b86cc58fdab323c38c",
+    "DECISION.md": "69fc3e55bed341e0c456f4c368b657eb7c91ec5a3bc55803c878762bcc9bd970",
+    "EVIDENCE.md": "7fd5c47fef2a3531260ad6fc2ecb605e4ca63956f1b1527beef94f16964e1126",
+    "README.md": "ecdf2b685692598cb9c7a9e2a264d86c17c3f6e522c0a5fcdc1bf9e2659fedd6",
+    "examples/runtime-record.json": "2e8241f2ab459ae9f08898ddff4b0e31204081bc6e10a119a171f9d949073ab4",
+    "examples/toolgrant-request.yaml": "f08af5c52a3e359c0f38dc7376abc816bedb12a6794fc395af558b7be493db3e",
+    "operation-contract.json": "ae26c8694d59aa945a3ff23ca7d5b2ed4792d1351357963d97e3dc8c511ac7de",
+    "runtime-record.schema.json": "299ecd1f2b54eb3bcff19ce9c6e44229405edb3559b99c622745f69e4d4e04a5",
+    "verify-design.py": "4ae7935ad933658236a3a9b04c5cc463b8c57e8849f48924b15c2337037634b0"
+  }
+}

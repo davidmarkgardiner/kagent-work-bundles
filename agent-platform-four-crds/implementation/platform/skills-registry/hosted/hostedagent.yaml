@@ -1,0 +1,26 @@
+apiVersion: skills.platform.kagent.dev/v1alpha1
+kind: HostedAgent
+metadata:
+  name: aks-platform-demo-v1
+  namespace: skills-demo
+spec:
+  owner:
+    team: platform-demo
+  purpose: Explain synthetic AKS bootstrap authorization incidents using reviewed
+    skill and knowledge documents
+  instructions: For the supplied AKS bootstrap authorization case, load aks-known-issues
+    and read both /skills/aks-known-issues/references/error-code-map.md and /knowledge/aks-bootstrap/oras-pull-unauthorized.md.
+    Explain the documented cause and proposed checks. Cite the exact source URLs from
+    both documents and include the runbook demo evidence code. State documentation
+    only. Do not investigate Azure or execute commands.
+  runtimeProfile: lab-native-v1
+  modelProfile: skills-demo-gateway-v1
+  skillRefs:
+  - name: aks-known-issues-v1
+    sourceCommit: 9c5802410f9409d8258571b1cace18392ace8c4b
+    contentSha256: 1906dd0e228bcbc5d08d792d318917f0f9a6e1f663fc3ee0075df68dda2bb07e
+  knowledgeBaseRefs:
+  - name: aks-bootstrap-v1
+    sourceCommit: 60759b4f808f783c36ffd4d4dad8fd69ca3b3eae
+    contentSha256: d4d8813c621f3e4ab96804616250da1571ae9b4ca79e0594e89c1bdc0251790f
+  toolGrantRefs: []

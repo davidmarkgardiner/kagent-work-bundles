@@ -1,0 +1,9 @@
+{
+  "gitopsCommit": "4404046e556cfec339744de0f8789d8939d0ad77",
+  "branch": "aks-golden-v1",
+  "source": "aks-golden-v1",
+  "kustomization": "aks-golden-v1",
+  "scenario": "aks-oras-212-v1",
+  "agentSpecSha256": "4a43cf79c42a506e9778ac62339c6720c9d527e8fea559c4777712325e88da14",
+  "skillContentSha256": "1906dd0e228bcbc5d08d792d318917f0f9a6e1f663fc3ee0075df68dda2bb07e"
+}

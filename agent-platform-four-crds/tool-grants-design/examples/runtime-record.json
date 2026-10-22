@@ -1,0 +1,77 @@
+{
+  "formatVersion": 1,
+  "id": "demo-approval-v1",
+  "revision": 1,
+  "state": "Staged",
+  "request": {
+    "namespace": "team-a-demo",
+    "namespaceUID": "synthetic-team-namespace-uid",
+    "name": "deployment-observer-v1",
+    "uid": "synthetic-toolgrant-uid",
+    "specSha256": "c0be3800e8d2fc9e2f2a4647eeaf4ac2d2991052204a288d226a9aff42b1b29c"
+  },
+  "subject": {
+    "namespace": {
+      "name": "team-a-demo",
+      "uid": "synthetic-team-namespace-uid"
+    },
+    "hostedAgent": {
+      "name": "aks-reader-v1",
+      "uid": "synthetic-hosted-uid"
+    },
+    "agent": {
+      "name": "hosted-aks-reader-v1",
+      "uid": "synthetic-agent-uid"
+    },
+    "serviceAccount": {
+      "name": "hosted-aks-reader-v1",
+      "uid": "synthetic-account-uid"
+    },
+    "hostedSpecSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "agentSpecSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "caller": {
+    "issuer": "https://issuer.example.invalid",
+    "audience": "api://agent-tools-demo",
+    "principal": "synthetic-workload-principal",
+    "trustDomain": "team-a-demo-administrators",
+    "mode": "namespaceAdminDomain",
+    "identityProofSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "a2aProofSha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  },
+  "capability": {
+    "catalog": {
+      "name": "deployment-health-v1-0",
+      "uid": "synthetic-catalog-uid",
+      "specSha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    "operationContractSha256": "9089d9f9a8447bb4011d07feebeef576770efa24bf79333fd5e636706a779084",
+    "adapterImage": "registry.example.invalid/deployment-reader@sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "backendProfileSha256": "2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "scope": {
+    "cluster": "demo-target",
+    "namespace": {
+      "name": "demo-workload",
+      "uid": "synthetic-target-namespace-uid"
+    }
+  },
+  "operations": [
+    "get_deployment_health",
+    "list_deployment_warning_summaries"
+  ],
+  "limits": {
+    "maxRows": 50,
+    "maxFieldCharacters": 512,
+    "maxEnvelopeBytes": 32768,
+    "wholeCallSeconds": 5,
+    "maxClockUncertaintySeconds": 2
+  },
+  "notBefore": "2026-10-22T08:00:00Z",
+  "expiresAt": "2026-10-22T12:00:00Z",
+  "approval": {
+    "gitCommit": "3333333333333333333333333333333333333333",
+    "reviewerRef": "synthetic-platform-reviewer",
+    "receiptSha256": "4444444444444444444444444444444444444444444444444444444444444444"
+  }
+}

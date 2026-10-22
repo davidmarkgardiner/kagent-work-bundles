@@ -1,0 +1,111 @@
+{
+  "phase": "Passed",
+  "mode": "liveHostedAgentAcceptance",
+  "inputOrigin": "synthetic",
+  "hostedAgent": "aks-platform-demo-v1",
+  "agent": "hosted-aks-platform-demo-v1",
+  "invocationAttempted": true,
+  "liveAzureInvestigation": false,
+  "sandboxExecuted": false,
+  "limits": [
+    "Manual acceptance, separate from reconciliation readiness.",
+    "Answer checks verify required text and citations, not general semantic correctness.",
+    "Tool checks are retrospective and do not enforce runtime permissions.",
+    "Stable Pod identity does not attest which Pod served A2A.",
+    "A pinned ModelConfig spec does not freeze gateway configuration or credentials.",
+    "Documentation-only native profile; arbitrary BYO images and operational grants are unsupported."
+  ],
+  "missingAnswerTerms": [],
+  "taskID": "fbd7ce5b-980e-42f8-bcbc-e9f3cb36d7c0",
+  "contextID": "hosted-ba04b932fff84235933ed2f51e337c24",
+  "toolCalls": [
+    {
+      "args": {
+        "command": "aks-known-issues"
+      },
+      "id": "tool_J48kfzqNxRN1GjaHo4oSIpPS",
+      "name": "skills"
+    },
+    {
+      "args": {
+        "file_path": "/skills/aks-known-issues/references/error-code-map.md"
+      },
+      "id": "tool_BkeCPx2SYC3vBkkwLJTGs9m8",
+      "name": "read_file"
+    },
+    {
+      "args": {
+        "file_path": "/knowledge/aks-bootstrap/oras-pull-unauthorized.md"
+      },
+      "id": "tool_ka1EHSG3rAJ1dQHQUuZEWXU1",
+      "name": "read_file"
+    }
+  ],
+  "toolResultSha256": {
+    "tool_J48kfzqNxRN1GjaHo4oSIpPS": "41d9424355e658091e79a90edbb02abc2972009a1f12038a8fba8fa784813ede",
+    "tool_BkeCPx2SYC3vBkkwLJTGs9m8": "a2b56fd1136dcff37896a3568a078aa791fd20714630d6fc1d07226759052579",
+    "tool_ka1EHSG3rAJ1dQHQUuZEWXU1": "112843128f7289e181f15918319f03517a866bfdace941d635684974ef91585d"
+  },
+  "answerSha256": "19525ad596a8a1e90c503d43944086f64cf4eaa4a19858f3e0e3422e58a3dff9",
+  "policies": {
+    "skill": "Passed",
+    "knowledge": "Passed"
+  },
+  "deployment": {
+    "hostedAgentUID": "f0812999-2852-4995-86a4-adb6aa4805e6",
+    "hostedAgentGeneration": 1,
+    "hostedAgentSpecSha256": "69c735b7be0ed3b7c73d88b7477eec7c0554a3b49f003eb9366c458664dc1850",
+    "agentUID": "5f11105c-7c0b-4676-9307-1c9584c26d70",
+    "agentGeneration": 9,
+    "agentSpecSha256": "5f614b4b6f2a4c77f530d00711b52e78edac2f1d27ea40966f5c78b7d977eb12",
+    "accountUID": "2791ad60-36a8-4b4c-a217-ed3d78701757",
+    "policyUID": "54c8d4ca-1bb5-4f82-baaa-38eb860825e9",
+    "policySpecSha256": "0cd2552b68d0b283bf34b34ad80e200591ea41e516d7e02f39a0a9326125ccb3",
+    "modelConfigUID": "a53a9d3d-f54d-4b00-8c6e-47ddb37c810b",
+    "modelConfigSpecSha256": "34bfb5fa61fe78d5cfb71e340262661e91ca8def3e5b57a90267166926191428",
+    "bindings": [
+      {
+        "kind": "Skill",
+        "name": "aks-known-issues-v1",
+        "uid": "8c295e65-82a4-438c-b36c-824d4a083dd5",
+        "configMapName": "aks-known-issues-v1-1906dd0e228bcbc5",
+        "configMapUID": "6a4a829f-f1c3-4810-bd1d-0543ed3b9596",
+        "sourceCommit": "9c5802410f9409d8258571b1cace18392ace8c4b",
+        "contentSha256": "1906dd0e228bcbc5d08d792d318917f0f9a6e1f663fc3ee0075df68dda2bb07e",
+        "sourceUID": "48556141-27ae-42f5-9d3e-a0b62de77f00",
+        "sourceSpecSha256": "9501310f58bbd49ea2ded9f733c97b2044e4e47f9f108261e371e2486fa2cd39",
+        "sourceRevision": "sha1:9c5802410f9409d8258571b1cace18392ace8c4b"
+      },
+      {
+        "kind": "KnowledgeBase",
+        "name": "aks-bootstrap-v1",
+        "uid": "f4d66df0-e999-4841-a964-098e5d2c121e",
+        "configMapName": "kb-aks-bootstrap-v1-d4d8813c621f3e4a",
+        "configMapUID": "2cbb55da-75cc-4787-a257-2d8ca0b531b0",
+        "sourceCommit": "60759b4f808f783c36ffd4d4dad8fd69ca3b3eae",
+        "contentSha256": "d4d8813c621f3e4ab96804616250da1571ae9b4ca79e0594e89c1bdc0251790f",
+        "sourceUID": "c3ccf6a1-08a9-4a71-84d4-c5e8c0240af4",
+        "sourceSpecSha256": "a776b9d6c3c575e8816730efa432cedcfbe355e919f02325940b928077814fd9",
+        "sourceRevision": "sha1:60759b4f808f783c36ffd4d4dad8fd69ca3b3eae"
+      }
+    ],
+    "podUID": "153b193c-b603-4856-b25a-85a7f9bd0721",
+    "imageID": "ghcr.io/kagent-dev/kagent/app@sha256:40bd6430363b33b3ec686621beb5cb8ce915653ba20c8b653e68ac07b42a8c6b",
+    "containerID": "containerd://67b6e82d9e61695a5777841de896b6f863940cba9c749f73ad0d42cd888e537f",
+    "restartCount": 0,
+    "mountedFileHashes": {
+      "skill": {
+        "upstream-provenance.json": "3c2401fe7bdba0670e5732e5671b780f9d9aa16412ed3b5c8d45dc8374c8cdd9",
+        "upstream-frontmatter.yaml": "b0eca659ebae3456738df4a7a653150acc25225ed63953c32a26aafc0dd12814",
+        "SKILL.md": "a7c484cf36fe1f9bb6741c29ef0007e71c9d6abfc74e83da150e2d89485768a6",
+        "LICENSE": "92b556ec5ae47bb5ba07e2ebfe1c5dba656d65beabcf1a3f129e48b1e6855ccb",
+        "references/error-code-map.md": "22fd4350d803c8ab6e00f41bc50d03a4f49aef879e6ac99e351c06800d1e0f45"
+      },
+      "knowledge": {
+        "oras-pull-unauthorized.md": "2c4cc4b89a8a4141d65ced9c42cdc099f17637bd9151fa8d7f495d29582b1282"
+      }
+    }
+  },
+  "a2aResponseSha256": "0484c8f49e4d42451715628ad9851b8842bd35654b919606afa62caaa6a1a234",
+  "completedAt": "2026-10-21T17:20:29.520967+00:00"
+}

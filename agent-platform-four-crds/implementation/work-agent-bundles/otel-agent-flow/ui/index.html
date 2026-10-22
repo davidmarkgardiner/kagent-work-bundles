@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent flow · kagent</title><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/logs.css"><script src="/app.js" defer></script></head>
+<body>
+<header><a class="brand" href="/" aria-label="kagent agent flow"><img src="/favicon.svg" width="34" height="34" alt=""><strong>kagent</strong><span class="slash">/</span><span>Agent flow</span></a><div class="connection"><span id="connection-dot"></span><span id="connection">Connecting</span></div></header>
+<main>
+  <section id="demo-intro" class="intro"><div><h1>Watch your agents work.</h1><p id="intro-description">Send a prompt, then follow the components it actually touches.</p></div></section>
+  <div id="agent-workspace" class="agent-workspace">
+  <aside id="prompt-column" class="prompt-column" aria-label="Agent conversation">
+  <div id="invocation-controls">
+  <p id="demo-mode" class="demo-mode" hidden></p>
+  <label class="workflow-picker" for="execution-runtime">Agent runtime<select id="execution-runtime" aria-describedby="execution-help"><option value="">Configured agent</option></select></label><p id="execution-help">Choose the execution path for your next run.</p>
+  <label class="workflow-picker" for="workflow">Demo workflow<select id="workflow"><option value="custom">Custom prompt</option><option value="triage">Simulated incident triage</option><option value="sdlc">Simulated SDLC review</option><option value="identity-isolation">Simulated identity isolation</option><option value="inventory">Simulated inventory check</option><option value="change-review">Simulated change review</option><option value="dependency-failure">Simulated dependency failure</option></select></label>
+  <form id="prompt-form" class="prompt-form"><div class="prompt-heading"><label for="prompt">Your prompt</label><span id="prompt-count">0 / 4,000</span></div><textarea id="prompt" name="prompt" rows="3" maxlength="4000" required aria-describedby="prompt-help">Check the inventory workload and explain whether it is healthy.</textarea><p id="prompt-help">Read-only inventory agent · Ctrl/⌘ + Enter to send. Each prompt starts a new run.</p><button id="invoke" class="primary" type="submit" form="prompt-form"><span id="invoke-label">Send to agent</span> <span aria-hidden="true">↗</span></button></form>
+  </div>
+  <section id="agent-response" class="agent-response" aria-labelledby="response-title" hidden><h2 id="response-title">Agent response</h2><p id="response-text" role="status"></p><small id="response-trace"></small></section>
+  <div id="notice" class="notice" role="status">Ready to send your prompt to the read-only agent.</div>
+    <aside class="runs-panel" aria-labelledby="runs-title"><div class="panel-head"><h2 id="runs-title">Recent traces</h2><span id="trace-count">0</span></div><div id="runs" class="runs"><p class="empty">Run the agent to see its first trace here.</p></div><p class="retention">Metadata only · up to 200 traces<br>Routine polls expire first. Restart clears history.</p></aside>
+  </aside>
+  <div class="activity-column">
+  <nav class="view-switch" aria-label="Dashboard views"><div role="tablist" aria-label="View"><button id="tab-visual" role="tab" aria-controls="visual-view" aria-selected="true">Visual flow</button><button id="tab-logs" role="tab" aria-controls="logs-view" aria-selected="false" tabindex="-1">Logs</button><button id="tab-onboarding" role="tab" aria-controls="onboarding-view" aria-selected="false" tabindex="-1">Onboarding</button></div><p id="view-description">Follow the observed request path and inspect its spans.</p></nav>
+  <div id="visual-view" role="tabpanel" aria-labelledby="tab-visual">
+  <div id="visual-flow-slot">
+  <div id="runtime-flow">
+  <div class="workspace">
+    <section class="graph-panel" aria-labelledby="graph-title">
+      <div class="panel-head"><div><h2 id="graph-title">Request path</h2><p id="execution-caption"></p><p id="graph-caption">Waiting for the first OTel trace.</p></div><span id="mode" class="mode">LIVE</span></div>
+      <div class="diagram-wrap">
+      <svg id="diagram" viewBox="0 0 1050 500" role="img" aria-label="Observed agent request topology. Select a component to inspect its spans.">
+        <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/></marker></defs>
+        <g id="edges"></g><g id="nodes"></g>
+      </svg>
+      </div>
+      <section class="mcp-activity" aria-label="MCP server activity"><div id="mcp-servers" class="mcp-servers"></div><p id="mcp-explanation">MCP server spans provide execution evidence. Client spans show attempts. Native skill activity appears separately below.</p></section>
+      <section class="observed-operations" aria-labelledby="observed-skills-title"><h3 id="observed-skills-title">Skills and knowledge</h3><p id="observed-skills-help">Skills and knowledge share the native skill executor. Spans omit arguments, so individual calls cannot be attributed to a skill or knowledge package. Select a call to inspect its metadata.</p><div id="observed-skills" class="observed-tools"><p class="empty">Waiting for native skill execution spans.</p></div></section>
+      <section class="observed-operations" aria-labelledby="observed-tools-title"><h3 id="observed-tools-title">Observed tool calls and access probes</h3><p>Received OTel only. Simulation labels describe fixture data. Probe results alone do not prove Entra enforcement.</p><div id="observed-tools" class="observed-tools"><p class="empty">Waiting for tool or access-probe spans.</p></div></section>
+      <div class="legend"><span><i class="key observed"></i><span id="graph-scope">Observed in selected trace</span></span><span><i class="key pulse-key"></i>New span received</span><span><i class="key absent"></i>No telemetry</span></div>
+      <div id="actor-activity" class="actor-activity" hidden><h3>Actor lifecycle</h3><div id="actor-states"></div><p>Linked by native actor identity. Select a state to inspect its original trace.</p><button id="session-flow">View session workflow</button></div>
+      <div class="substrate-note"><strong>Agent Substrate</strong><span id="substrate-note">Not installed in this local cluster. Its worker and actor lane stays inactive until runtime spans arrive.</span></div>
+    </section>
+
+  </div>
+  <section class="detail-panel" aria-labelledby="trace-title">
+    <div class="panel-head"><div><h2 id="trace-title">Trace details</h2><p id="trace-id">Select a received trace to inspect its spans.</p></div><div class="actions"><button id="follow" disabled>Follow latest</button><button id="replay" disabled>Replay trace</button></div></div>
+    <div class="measures"><div><span>Elapsed</span><strong id="duration">—</strong></div><div><span>Observed spans</span><strong id="spans">—</strong></div><div><span>Input / output tokens</span><strong id="tokens">Not reported</strong><small id="model-usage-source">No model reports received.</small></div><div><span>Transaction cost</span><strong id="cost">Not reported</strong><small id="cost-source">No price has been assumed.</small></div></div>
+    <div class="trace-body"><div><div class="timeline-head"><h3 id="timeline-title">Workflow timeline</h3><div class="actions"><button id="clear-filter" hidden>Clear filter</button><button id="internal-spans" disabled>Show internal spans</button></div></div><div id="timeline" class="timeline"><p class="empty">Completed spans will appear as the runtime exports them.</p></div></div><div class="inspection"><h3>Selected span</h3><div id="inspection"><p class="empty">Select a span or a component on the map.</p></div></div></div>
+    <details class="pricing"><summary>Estimate cost with your own rates</summary><p>When the provider does not report a per-request USD charge, enter rates to estimate a token cost. These values are for this browser session only and are never labelled as billed cost.</p><form id="pricing"><label>Input USD / 1M tokens<input id="input-rate" inputmode="decimal" type="number" min="0" step="any" placeholder="Your input rate"></label><label>Output USD / 1M tokens<input id="output-rate" inputmode="decimal" type="number" min="0" step="any" placeholder="Your output rate"></label><button type="submit">Apply estimate</button><button id="reset-pricing" type="button">Clear rates</button></form><p id="pricing-status" role="status"></p></details>
+  </section>
+  </div>
+  </div>
+  </div>
+  <section id="onboarding-view" class="onboarding-panel" role="tabpanel" aria-labelledby="tab-onboarding" hidden>
+    <div class="panel-head onboarding-heading"><div><h2>See your onboarded agent work.</h2><p>Follow the received calls from the agent to its model, gateway, and native skill / knowledge executor.</p></div><span id="onboarding-freshness" class="onboarding-badge unknown">Unavailable</span></div>
+    <p id="onboarding-readiness" class="onboarding-readiness" role="status"></p>
+    <div class="onboarding-flow-heading"><h3>Observed runtime flow</h3><p id="onboarding-flow-scope" role="status"></p></div>
+    <div id="onboarding-flow-slot"></div>
+    <details id="onboarding-readiness-details" class="onboarding-card readiness-details"><summary>Onboarding readiness and package delivery</summary><p id="onboarding-summary"></p><div id="onboarding-pipeline" class="onboarding-pipeline"></div><p class="onboarding-explainer">Our golden path is the approved onboarding recipe. Skills supply instructions; knowledge supplies reference content. Both arrive as separately reviewed OCI packages through native skill loading. Package readiness shows delivery; the runtime flow shows received calls, without inferring which package was read.</p></details>
+    <div class="onboarding-evidence"><section class="onboarding-card"><h3>Observed content reads</h3><p id="onboarding-runtime"></p><button id="onboarding-trace" disabled>View recorded test trace</button><div id="onboarding-other-traces"></div></section><section class="onboarding-card"><h3 id="onboarding-test-title">Recorded GoldenScenario test</h3><div id="onboarding-golden"></div><p id="onboarding-test-help">A GoldenScenario tests the agent produced by our golden path. This recorded result does not automatically publish an agent.</p></section></div>
+    <details class="onboarding-card"><summary>Recorded observations</summary><p>Sampled state changes, not OTel span replay or a complete reconciliation audit.</p><div id="onboarding-history"></div></details>
+    <details class="onboarding-card"><summary>Reviewed resource identities</summary><div id="onboarding-pins"></div></details>
+    <section class="onboarding-card"><h3>Connect through the native client</h3><p id="onboarding-connection"></p><p id="onboarding-client-help">Native CLI session create → invoke → session get. A2A over gRPC, namespace/name routing, internal controller port 8083. No public endpoint is provisioned here.</p></section>
+    <details class="onboarding-card proposed"><summary>Proposed conversational onboarding · no creator active</summary><p>An onboarding agent could turn that request into approved catalog choices and declarative resources.</p><p>Request → review and Git → Flux → platform controllers → independent test → connection details.</p><p>The current demo uses one fixed reviewed model and harness profile, one skill, one knowledge package, and no operational tool grants. Conversational requests, automatic publication, and arbitrary bring-your-own runtimes are future work.</p></details>
+  </section>
+  <section id="logs-view" class="logs-panel" role="tabpanel" aria-labelledby="tab-logs" hidden>
+    <div class="panel-head"><div><h2 id="logs-title">OTel logs</h2><p id="logs-status" role="status">Connecting to the log receiver.</p></div><div class="log-controls"><label>Service<select id="log-service"><option value="">All services</option></select></label><label>Trace<select id="log-scope"><option value="all">All traces</option><option value="selected">Selected trace</option></select></label><label>Severity<select id="log-severity"><option value="0">All severities</option><option value="9">Info and above</option><option value="13">Warning and above</option><option value="17">Error and above</option></select></label><button id="pause-logs">Pause logs</button></div></div>
+    <div class="log-table-wrap"><table class="log-table"><thead><tr><th>Time</th><th>Severity</th><th>Service</th><th>API call / event</th><th>Trace</th></tr></thead><tbody id="log-rows"><tr><td colspan="5">Waiting for exported OTel log records.</td></tr></tbody></table></div>
+    <details id="log-detail" class="log-detail"><summary>Selected OTel log record</summary><pre id="log-json">Select a log event to inspect its metadata.</pre></details>
+    <p class="logs-footnote">Native OTel log records and gateway access logs. Prompt, response, and tool-result bodies are omitted. Latest 200 matching records shown; up to 1,000 retained.</p>
+  </section>
+  </div>
+  </div>
+  <footer><span>OTel → observed spans → activity map</span><span id="runtime-label">kagent 0.10.1 · agentgateway 1.5.0 · local kind POC</span></footer>
+</main>
+</body></html>

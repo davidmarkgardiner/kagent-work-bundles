@@ -1,0 +1,13 @@
+{
+  "upstreamURL": "https://github.com/Azure/AKS-Skills",
+  "upstreamCommit": "20bf35201a79b324d2ca3e00e5c82020ff362024",
+  "originalSkillSha256": "5ea1438388f941ce94662ec730611996ec60a356a17dddd781034d6d9c792c0f",
+  "normalization": "Only the SKILL.md frontmatter was reduced to name and description. Body and reference bytes are unchanged. Original metadata and MIT licence are included.",
+  "originalBodySha256": "f2b411249ed3b2e6d9ac0d2ed028d1ff47dab7b8230d0912cc2f313f52a7de6e",
+  "packagedBodySha256": "f2b411249ed3b2e6d9ac0d2ed028d1ff47dab7b8230d0912cc2f313f52a7de6e",
+  "upstreamFileHashes": {
+    "skills/aks-known-issues/SKILL.md": "5ea1438388f941ce94662ec730611996ec60a356a17dddd781034d6d9c792c0f",
+    "skills/aks-known-issues/references/error-code-map.md": "22fd4350d803c8ab6e00f41bc50d03a4f49aef879e6ac99e351c06800d1e0f45",
+    "LICENSE": "92b556ec5ae47bb5ba07e2ebfe1c5dba656d65beabcf1a3f129e48b1e6855ccb"
+  }
+}

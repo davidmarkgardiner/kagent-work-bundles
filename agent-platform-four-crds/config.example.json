@@ -1,0 +1,19 @@
+{
+  "namespace": "agent-platform",
+  "fluxNamespace": "flux-system",
+  "kagentNamespace": "kagent",
+  "fluxServiceAccount": "kustomize-controller",
+  "platformServiceAccount": "{{EXISTING_APPROVED_FLUX_PLATFORM_SA}}",
+  "artifactOrigin": "http://source-controller.flux-system.svc.cluster.local",
+  "controllerImage": "{{APPROVED_PYTHON_3_12_CONTROLLER_IMAGE_AT_SHA256}}",
+  "expectedRuntimeImage": "{{EXACT_INSTALLED_NATIVE_AGENT_IMAGE}}",
+  "imageRegistry": "{{APPROVED_NATIVE_AGENT_IMAGE_REGISTRY}}",
+  "modelConfig": "{{EXISTING_NAMESPACED_MODEL_CONFIG_NAME}}",
+  "modelSpecSha256": "{{CANONICAL_MODEL_CONFIG_SPEC_SHA256}}",
+  "nodeSelector": {},
+  "contentURL": "https://{{GITLAB_HOST}}/{{GROUP}}/agent-content.git",
+  "contentCommit": "{{REVIEWED_CONTENT_FULL_COMMIT}}",
+  "contentSecret": "agent-content-git-auth",
+  "gitopsURL": "https://{{GITLAB_HOST}}/{{GROUP}}/agent-platform-gitops.git",
+  "gitopsSecret": "agent-platform-git-auth"
+}

@@ -1,0 +1,32 @@
+{
+  "skillName": "aks-known-issues",
+  "releaseName": "aks-known-issues-v1",
+  "contentCommit": "9c5802410f9409d8258571b1cace18392ace8c4b",
+  "gitopsCommit": "bbc2e63907e29c89616227297ce8a5990ee07666",
+  "contentSha256": "1906dd0e228bcbc5d08d792d318917f0f9a6e1f663fc3ee0075df68dda2bb07e",
+  "files": {
+    "LICENSE": "92b556ec5ae47bb5ba07e2ebfe1c5dba656d65beabcf1a3f129e48b1e6855ccb",
+    "SKILL.md": "a7c484cf36fe1f9bb6741c29ef0007e71c9d6abfc74e83da150e2d89485768a6",
+    "references/error-code-map.md": "22fd4350d803c8ab6e00f41bc50d03a4f49aef879e6ac99e351c06800d1e0f45",
+    "upstream-frontmatter.yaml": "b0eca659ebae3456738df4a7a653150acc25225ed63953c32a26aafc0dd12814",
+    "upstream-provenance.json": "3c2401fe7bdba0670e5732e5671b780f9d9aa16412ed3b5c8d45dc8374c8cdd9"
+  },
+  "configMap": "aks-known-issues-v1-1906dd0e228bcbc5",
+  "sourceRef": "aks-known-issues-content-v1",
+  "declarationsSourceRef": "aks-known-issues-declarations-v1",
+  "contentKustomization": "aks-known-issues-content-v1",
+  "agentKustomization": "skills-agent",
+  "provenance": {
+    "upstreamURL": "https://github.com/Azure/AKS-Skills",
+    "upstreamCommit": "20bf35201a79b324d2ca3e00e5c82020ff362024",
+    "originalSkillSha256": "5ea1438388f941ce94662ec730611996ec60a356a17dddd781034d6d9c792c0f",
+    "normalization": "Only the SKILL.md frontmatter was reduced to name and description. Body and reference bytes are unchanged. Original metadata and MIT licence are included.",
+    "originalBodySha256": "f2b411249ed3b2e6d9ac0d2ed028d1ff47dab7b8230d0912cc2f313f52a7de6e",
+    "packagedBodySha256": "f2b411249ed3b2e6d9ac0d2ed028d1ff47dab7b8230d0912cc2f313f52a7de6e",
+    "upstreamFileHashes": {
+      "skills/aks-known-issues/SKILL.md": "5ea1438388f941ce94662ec730611996ec60a356a17dddd781034d6d9c792c0f",
+      "skills/aks-known-issues/references/error-code-map.md": "22fd4350d803c8ab6e00f41bc50d03a4f49aef879e6ac99e351c06800d1e0f45",
+      "LICENSE": "92b556ec5ae47bb5ba07e2ebfe1c5dba656d65beabcf1a3f129e48b1e6855ccb"
+    }
+  }
+}

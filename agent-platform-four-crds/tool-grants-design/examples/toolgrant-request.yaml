@@ -1,0 +1,16 @@
+# Design fixture only. This does not approve access or enable the HostedAgent profile.
+apiVersion: platform.kagent.dev/v1alpha1
+kind: ToolGrant
+metadata:
+  name: deployment-observer-v1
+  namespace: team-a-demo
+spec:
+  agentRef:
+    name: hosted-aks-reader-v1
+    namespace: team-a-demo
+  toolCatalogRef: deployment-health@v1.0
+  allowedToolNames:
+    - get_deployment_health
+    - list_deployment_warning_summaries
+  expiresAt: '2026-10-22T12:00:00Z'
+  reason: Explain the supplied synthetic deployment incident using approved summaries
