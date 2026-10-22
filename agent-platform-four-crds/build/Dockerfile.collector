@@ -1,0 +1,5 @@
+ARG APPROVED_RUNTIME_BASE
+FROM ${APPROVED_RUNTIME_BASE}
+COPY --chmod=0555 otelcol /usr/local/bin/otelcol
+USER 10001:10001
+ENTRYPOINT ["/usr/local/bin/otelcol"]

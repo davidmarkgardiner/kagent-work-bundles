@@ -150,11 +150,13 @@ def projection(release, kind):
     return {'contentSha256': spec['contentSha256'], 'projection': {'configMap': {'name': name, 'items': items}}}
 
 
-def render(c, output):
+def render(c, output, deployment_override=None):
     profile = contract.load_profile()
     profile.update(runtimeProfile='work-native-v1', modelProfile='work-gateway-v1', kagentNamespace=c['kagentNamespace'],
                    modelConfig={'name': c['modelConfig'], 'specSha256': c['modelSpecSha256']})
     profile['deployment'].update(nodeSelector=c['nodeSelector'], tolerations=[], imageRegistry=c['imageRegistry'])
+    if deployment_override is not None:
+        profile['deployment'].update(copy.deepcopy(deployment_override))
     content_resources.NAMESPACE = c['namespace']
     content_resources.DEMO_SCHEDULING = {'nodeSelector': c['nodeSelector'], 'tolerations': []}
     hosted_resources.NS = c['namespace']

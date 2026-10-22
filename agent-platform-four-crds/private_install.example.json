@@ -1,0 +1,16 @@
+{
+  "platformConfig": "config.work.json",
+  "registry": "{{INTERNAL_REGISTRY_HOST}}",
+  "helperImage": "{{INTERNAL_REGISTRY_HOST}}/platform/onboarding-helper@sha256:{{APPROVED_HELPER_DIGEST}}",
+  "collectorImage": "{{INTERNAL_REGISTRY_HOST}}/platform/otel-collector@sha256:{{APPROVED_COLLECTOR_DIGEST}}",
+  "expectedRuntimeImage": "{{INTERNAL_REGISTRY_HOST}}/platform/kagent/app:{{INSTALLED_CONTROLLER_RUNTIME_TAG}}",
+  "approvedRuntimeDigest": "{{INTERNAL_REGISTRY_HOST}}/platform/kagent/app@sha256:{{APPROVED_RUNTIME_DIGEST}}",
+  "ownerName": "aks-platform-mcp-v1",
+  "network": {
+    "api": {"peer": {"ipBlock": {"cidr": "{{APPROVED_API_IPV4}}/32"}}, "ports": [{"protocol": "TCP", "port": 443}]},
+    "dns": {"peer": {"namespaceSelector": {"matchLabels": {"kubernetes.io/metadata.name": "kube-system"}}, "podSelector": {"matchLabels": {"k8s-app": "kube-dns"}}}, "ports": [{"protocol": "UDP", "port": 53}, {"protocol": "TCP", "port": 53}]},
+    "model": {"peer": {"namespaceSelector": {"matchLabels": {"kubernetes.io/metadata.name": "model-gateway"}}, "podSelector": {"matchLabels": {"app": "model-gateway"}}}, "ports": [{"protocol": "TCP", "port": 8080}]},
+    "source": {"peer": {"namespaceSelector": {"matchLabels": {"kubernetes.io/metadata.name": "flux-system"}}, "podSelector": {"matchLabels": {"app": "source-controller"}}}, "ports": [{"protocol": "TCP", "port": 80}]},
+    "controller": {"peer": {"namespaceSelector": {"matchLabels": {"kubernetes.io/metadata.name": "kagent"}}, "podSelector": {"matchLabels": {"app.kubernetes.io/component": "controller"}}}, "ports": [{"protocol": "TCP", "port": 8080}]}
+  }
+}

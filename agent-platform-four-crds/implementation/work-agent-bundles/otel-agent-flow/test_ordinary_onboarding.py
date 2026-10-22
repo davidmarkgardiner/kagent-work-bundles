@@ -53,6 +53,23 @@ class OrdinaryObserverTests(unittest.TestCase):
         self.assertEqual(len(calls),48)
         self.assertTrue(all(s['state']=='ready' for s in value['stages']))
         self.assertNotIn('NEVER-EXPORT',json.dumps(value));self.assertNotIn('DO-NOT-EXPORT',json.dumps(value))
+    def test_local_owner_missing_then_ready_latches_uid_and_keeps_flux_unconfigured(self):
+        value=copy.deepcopy(self.plan.value)
+        value['objects']=[ref for ref in value['objects'] if ref['role'] not in {'declarations','flux'}]
+        for ref in value['objects']:
+            if ref['role'] in {'hosted','agent','account','policy'}:ref.pop('uid')
+        plan=ReviewedPlan.parse(value)
+        def missing(ref):
+            if ref['role'] in {'hosted','agent','account','policy'}:raise urllib.error.HTTPError('fixed',404,'Missing',{},None)
+            return self.reader(ref)
+        pending=observe(plan,missing,NOW)
+        self.assertEqual(pending['sampleErrors']['hosted'],'Missing')
+        ready=observe(plan,self.reader,NOW+1,pending)
+        self.assertEqual(ready['uidPins']['hosted'],'hosted-uid')
+        self.assertEqual(next(s for s in ready['stages'] if s['key']=='declarations')['reasonCode'],'NotConfigured')
+        self.objects['hosted']['metadata']['uid']='replacement'
+        self.assertEqual(observe(plan,self.reader,NOW+2,ready)['sampleErrors']['hosted'],'UIDChanged')
+
     def test_permission_read_failure_immediately_replaces_ready_state(self):
         first=observe(self.plan,self.reader,NOW)
         def denied(ref):
@@ -104,6 +121,15 @@ class ReceiptTests(unittest.TestCase):
         changed=copy.deepcopy(self.record);changed['observations'][-1]['toolName']='delete_configmap';variants.append(changed)
         for changed in variants:
             with self.subTest(observations=changed['observations']),self.assertRaises(ValueError):self.validate(changed)
+
+    def test_local_receipt_requires_all_runtime_pins_and_no_partial_flux_pair(self):
+        for role in ('declarations','flux'):
+            self.record['pins'].pop(role)
+        self.validate(self.record)
+        missing=copy.deepcopy(self.record);missing['pins'].pop('mcpRole')
+        with self.assertRaises(ValueError):self.validate(missing)
+        partial=copy.deepcopy(self.record);partial['pins']['flux']=next(iter(self.record['pins'].values()))
+        with self.assertRaises(ValueError):self.validate(partial)
 
 class OrdinaryUiTests(unittest.TestCase):
     def test_independent_backend_is_joined_only_by_an_applicable_receipt_and_exact_execution(self):

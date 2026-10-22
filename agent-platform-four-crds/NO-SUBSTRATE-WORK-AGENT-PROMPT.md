@@ -1,5 +1,7 @@
 # Replicate the onboarding flow without Substrate
 
+The workplace requires an air-gapped, backend-first installation and permits local owner-file delivery. Follow AIRGAP-INSTALL.md and build/README.md before the original GitOps instructions below. Use private_install.py for the opt-in private baseline and VSCODE-AGENT-AUTHORING.md for the constrained Copilot or Codex task. Owner YAML can be local while content ingestion still uses internal source-controller artifacts. Prove effective Pod security, permissions, network enforcement, image provenance and offline dependency closure in the actual target. Never describe offline rendering as those runtime results.
+
 Read this entire package's README.md, DESIGN.md, and WORK-AGENT-PROMPT.md. This prompt adds the workplace runtime requirement. It does not authorize deployment, publication, upgrades, Azure Policy changes, or credential changes. Use the target environment's existing authorization and delivery process.
 
 ## Establish the supported runtime first

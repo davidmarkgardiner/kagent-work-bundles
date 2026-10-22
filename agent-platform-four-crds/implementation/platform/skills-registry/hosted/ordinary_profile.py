@@ -21,6 +21,13 @@ def compile_profile(base,objects,namespace,runtime_name='work-configmap-read-v1'
             raise Rejected('MCPDependencyScopeMismatch')
         pins.append({'role':role,'kind':kind,'name':obj['metadata']['name'],
             'uid':obj['metadata']['uid'],'sha256':canonical(mcp_projection(obj))})
+    # New profiles bind the owner name to the exact agent admitted by the backend policy.
+    selectors = [peer.get('podSelector', {}).get('matchLabels', {}).get('kagent')
+        for rule in objects['policy'].get('spec', {}).get('ingress', []) for peer in rule.get('from', [])]
+    targets = {name for name in selectors if name}
+    if len(targets) != 1 or not next(iter(targets)).startswith('hosted-'):
+        raise Rejected('RequireExactMCPAgentPolicyTarget')
+    variant['approvedHostedName'] = next(iter(targets))[len('hosted-'):]
     variant['approvedMcp']={'toolName':'get_demo_status','pins':pins}
     mcp_pins(variant)
     expected=Path(__file__).with_name('sitecustomize.py').read_text()

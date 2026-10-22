@@ -387,8 +387,9 @@ function renderOnboarding(now=Date.now()/1000){
   $('onboarding-summary').textContent=view?.capturedAt?`${view.namespace}/${view.hostedName} · sampled ${new Date(view.capturedAt*1000).toLocaleString()} · expires ${new Date(view.expiresAt*1000).toLocaleTimeString()}`:'Waiting for the named GET observer. Current readiness is unknown.';
   $('onboarding-pipeline').replaceChildren(...(view?.schemaVersion===2?Object.keys(onboardingLabels):Object.keys(onboardingLabels).filter(key=>key!=='tools')).map(key=>{
     const observed=view?.stages?.find(s=>s.key===key),status=fresh?observed?.state||'unknown':'unknown';
-    const card=el('article',undefined,`onboarding-stage ${status}`),name=el('h3',onboardingLabels[key]);
-    card.append(el('span',status,'onboarding-badge '+status),name,el('p',fresh?onboardingReasons[observed?.reasonCode]||'Observation unavailable':'Current readiness unknown'));
+    const localOwner=ordinary&&key==='declarations'&&observed?.reasonCode==='NotConfigured';
+    const card=el('article',undefined,`onboarding-stage ${status}`),name=el('h3',localOwner?'Local owner YAML':onboardingLabels[key]);
+    card.append(el('span',status,'onboarding-badge '+status),name,el('p',fresh?(localOwner?'Owner delivery is local; Flux delivery is not observed.':onboardingReasons[observed?.reasonCode]||'Observation unavailable'):'Current readiness unknown'));
     const role=key==='profile'?'model':key,pin=view?.pins?.[role];if(pin)card.append(el('small',pin.name));
     if(key==='profile'&&view?.profile)card.append(el('small',`${view.profile.modelName} · ${view.profile.modelProfile} · 0 ToolGrants${view.profile.mcpCapabilityCount===1?'; 1 fixed profile capability':''}`));
     card.append(el('small',fresh?`Kubernetes metadata · ${Math.max(0,Math.floor(now-view.capturedAt))} s ago`:'Kubernetes metadata · unavailable'));
@@ -408,7 +409,7 @@ function renderOnboarding(now=Date.now()/1000){
   $('onboarding-other-traces').replaceChildren(...traces.slice(1).map(trace=>{const link=el('button',`View trace ${trace.traceId.slice(0,10)}`);link.onclick=()=>openGoldenTrace(trace.traceId);return link;}));
   $('onboarding-history').replaceChildren(...(view?.history||[]).map(item=>el('p',`${new Date(item.observedAt*1000).toLocaleTimeString()} · ${item.stages.map(s=>`${onboardingLabels[s.key]}: ${s.state}`).join(' · ')}`)));
   $('onboarding-pins').replaceChildren(...Object.entries(view?.pins||{}).map(([role,pin])=>el('p',`${role}: ${pin.kind}/${pin.name} · UID ${pin.uid} · generation ${pin.generation??'n/a'} · body SHA-256 ${pin.bodySha256||pin.specSha256}`)));
-  $('onboarding-connection').textContent=view?.agentName?`Tenant ${view.namespace}/${view.agentName} · internal controller http://kagent-controller.kagent.svc.cluster.local:8083`:'Native connection identity is unavailable until an observation is published.';
+  $('onboarding-connection').textContent=view?.agentName?`Tenant ${view.namespace}/${view.agentName} · native kagent controller in the approved target namespace`:'Native connection identity is unavailable until an observation is published.';
 }
 globalThis.onhashchange=()=>setView(location.hash.slice(1));
 buildMap();setView(location.hash.slice(1));render();poll();pollLogs();setInterval(()=>drawMap(),700);

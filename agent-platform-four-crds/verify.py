@@ -14,7 +14,7 @@ groups = [(source, ['test_controller.py', 'test_knowledge.py', 'test_portability
           (source / 'knowledge', ['test_evidence.py', 'test_runner.py']),
           (source / 'hosted', ['test_onboarding.py', 'test_acceptance.py', 'test_fixed_profile.py', 'test_fixed_mcp.py', 'test_trace_bootstrap.py', 'test_combined_acceptance.py', 'test_ordinary_viewer.py']),
           (root / 'implementation/work-agent-bundles/otel-agent-flow', ['test_telemetry.py', 'test_ui.py', 'test_onboarding.py', 'test_ordinary_telemetry.py', 'test_ordinary_onboarding.py']),
-          (root, ['test_package.py'])]
+          (root, ['test_package.py','test_private_install.py'])]
 for cwd, tests in groups:
     result = subprocess.run([sys.executable, '-B', '-m', 'unittest', *tests], cwd=cwd)
     if result.returncode:

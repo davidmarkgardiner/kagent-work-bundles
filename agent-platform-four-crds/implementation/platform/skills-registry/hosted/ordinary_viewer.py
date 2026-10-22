@@ -10,7 +10,7 @@ FLOW=REPO/'work-agent-bundles/otel-agent-flow'
 COLLECTOR_IMAGE='otel/opentelemetry-collector:0.146.0@sha256:60cf8cfda7086e792450a746953d5ec9579e440ae0d8a1e16608bb9960699844'
 
 
-def resources(plan,python_image,node_selector,model_url,identities,collector_node_selector=None,lab_sizing=False):
+def resources(plan,python_image,node_selector,model_url,identities,collector_node_selector=None,lab_sizing=False,collector_image=COLLECTOR_IMAGE):
     import sys
     sys.path.insert(0,str(FLOW))
     from onboarding_ordinary import ROLES,ReviewedPlan
@@ -18,6 +18,8 @@ def resources(plan,python_image,node_selector,model_url,identities,collector_nod
     ns=plan['namespace'];name='ordinary-flow-dashboard';collector='ordinary-flow-collector';account='ordinary-flow-observer'
     if not re.fullmatch(r'[a-zA-Z0-9._:/-]+@sha256:[a-f0-9]{64}',python_image):
         raise ValueError('RequireReviewedPythonImageDigest')
+    if not re.fullmatch(r'[a-zA-Z0-9._:/-]+@sha256:[a-f0-9]{64}',collector_image):
+        raise ValueError('RequireReviewedCollectorImageDigest')
     parsed=urllib.parse.urlsplit(model_url)
     if parsed.scheme not in {'http','https'} or not parsed.hostname or any((parsed.username,parsed.password,parsed.query,parsed.fragment)):
         raise ValueError('RequireCredentialFreeModelRoute')
@@ -81,7 +83,7 @@ def resources(plan,python_image,node_selector,model_url,identities,collector_nod
     collector_pod={'terminationGracePeriodSeconds':5,'automountServiceAccountToken':False,
         'nodeSelector':collector_node_selector or node_selector,
         'securityContext':{'runAsNonRoot':True,'runAsUser':10001,'seccompProfile':{'type':'RuntimeDefault'}},
-        'containers':[{'name':'collector','image':COLLECTOR_IMAGE,'args':['--config=/config/config.json'],
+        'containers':[{'name':'collector','image':collector_image,'args':['--config=/config/config.json'],
             'resources':{'requests':{'cpu':'20m' if lab_sizing else '50m','memory':'48Mi' if lab_sizing else '128Mi'},'limits':{'cpu':'500m','memory':'192Mi'}},
             'securityContext':security(),'ports':[{'containerPort':4317,'name':'grpc'},{'containerPort':4318,'name':'http'}],
             'volumeMounts':[mount('config','/config')]}],'volumes':[{'name':'config','configMap':{'name':config['metadata']['name']}}]}

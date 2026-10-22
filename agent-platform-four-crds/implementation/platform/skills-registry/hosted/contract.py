@@ -108,6 +108,8 @@ def parse_intent(document, profile):
     if spec['modelProfile'] != approved['modelProfile']:
         raise Rejected('UnsupportedProfile')
     mcp_pins(approved)
+    if approved.get('approvedHostedName') is not None and document.get('metadata', {}).get('name') != approved['approvedHostedName']:
+        raise Rejected('HostedNameNotApprovedForMCPProfile')
     if spec['toolGrantRefs'] != []:
         raise Rejected('OperationalToolsNotSupported')
     owner = spec['owner']
@@ -150,7 +152,8 @@ def desired_children(document, intent, bindings, profile):
                       'podSelector': {'matchLabels': {'app.kubernetes.io/component': 'controller'}}}],
             'ports': [{'protocol': 'TCP', 'port': 8080}]}]}}
     deployment = copy.deepcopy(profile['deployment'])
-    deployment.update(serviceAccountName=name, volumes=[], volumeMounts=[], annotations={})
+    deployment.update(serviceAccountName=name, annotations={})
+    deployment.setdefault('volumes', []); deployment.setdefault('volumeMounts', [])
     for binding, mount, volume in zip(bindings, ['/skills', '/knowledge'], ['reviewed-skills', 'reviewed-knowledge']):
         deployment['volumes'].append({'name': volume, 'projected': {'sources': [binding['projection']]}})
         deployment['volumeMounts'].append({'name': volume, 'mountPath': mount, 'readOnly': True})

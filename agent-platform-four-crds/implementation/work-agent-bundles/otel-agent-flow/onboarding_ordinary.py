@@ -30,7 +30,7 @@ ROLES = {
 CAPABILITY = {'server': 'mcpServer', 'backend': 'mcpBackend', 'role': 'mcpRole', 'binding': 'mcpBinding',
               'account': 'mcpAccount', 'code': 'mcpCode', 'data': 'mcpData', 'telemetry': 'telemetry',
               'service': 'mcpService', 'policy': 'mcpPolicy'}
-REQUIRED = set(ROLES)
+REQUIRED = set(ROLES) - {'declarations', 'flux'}
 STAGES = ('declarations', 'hosted', 'profile', 'skill', 'knowledge', 'tools', 'agent')
 REASONS = {'Current', 'NotConfigured', 'Missing', 'ReadDenied', 'Unavailable', 'Deleting', 'PinMismatch',
            'UIDChanged', 'TornSample', 'InvalidMetadata', 'AwaitingConditions', 'StaleGeneration', 'BindingMismatch', 'Expired'}
@@ -230,7 +230,9 @@ def validate_receipt(record):
         if field in record:
             checked(record[field], r'[a-z0-9][a-z0-9._-]{0,252}')
     validate_pins(record['pins'])
-    if set(record['pins']) != set(ROLES) or not isinstance(record['observations'], list) or not 4 <= len(record['observations']) <= 6:
+    roles=set(record['pins'])
+    if (not REQUIRED <= roles or ('flux' in roles) != ('declarations' in roles)
+            or not isinstance(record['observations'], list) or not 4 <= len(record['observations']) <= 6):
         raise ValueError('InvalidMetadata')
     calls = set()
     categories = {'skill': [], 'knowledge': [], 'mcp': []}
@@ -364,7 +366,7 @@ def read_view(path, now=None):
         record = value['golden']
         if record:
             record['appliesToCurrent'] = bool(fresh and not value['sampleErrors'] and record['recordedAt'] <= now
-                and all(s['state'] == 'ready' for s in value['stages']) and record['pins'] == value['pins']
+                and all(s['state'] == 'ready' or (s['key']=='declarations' and s['reasonCode']=='NotConfigured' and not {'declarations','flux'} & set(value['pins'])) for s in value['stages']) and record['pins'] == value['pins']
                 and record['profileSha256'] == value['profileSha256'] and record['agentSpecSha256'] == value['agentSpecSha256']
                 and record['namespace'] == value['namespace'] and record['agentName'] == value['agentName'])
         return value

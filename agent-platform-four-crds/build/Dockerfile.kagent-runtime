@@ -1,0 +1,9 @@
+ARG APPROVED_PYTHON_BASE
+FROM ${APPROVED_PYTHON_BASE}
+COPY wheelhouse/ /wheels/
+COPY requirements.lock /build/requirements.lock
+RUN python -m pip install --no-cache-dir --no-index --find-links=/wheels --require-hashes -r /build/requirements.lock
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 HOME=/tmp/home
+USER 1000:1000
+WORKDIR /app
+ENTRYPOINT ["kagent-adk", "run"]

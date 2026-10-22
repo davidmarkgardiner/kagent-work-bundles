@@ -128,7 +128,12 @@ class FixedProfileTests(unittest.TestCase):
         objects['code']['data'] = {'fixed_mcp.py': Path(__file__).with_name('fixed_mcp.py').read_text()}
         objects['binding']['roleRef']['apiGroup'] = 'rbac.authorization.k8s.io'
         objects['binding']['subjects'][0]['namespace'] = 'skills-demo'
+        objects['policy']['spec']={'ingress':[{'from':[{'podSelector':{'matchLabels':{'kagent':'hosted-aks-platform-mcp-v1'}}}]}]}
         result = compile_profile(base,objects,'skills-demo')
+        self.assertEqual(result['mcpProfile']['approvedHostedName'],'aks-platform-mcp-v1')
+        from contract import parse_intent
+        request={'metadata':{'name':'different-agent'},'spec':{'owner':{},'purpose':'demo','instructions':'demo','runtimeProfile':result['mcpProfile']['runtimeProfile'],'modelProfile':result['mcpProfile']['modelProfile'],'skillRefs':[],'knowledgeBaseRefs':[],'toolGrantRefs':[]}}
+        with self.assertRaisesRegex(Rejected,'HostedNameNotApproved'):parse_intent(request,result)
         self.assertEqual(result['runtimeProfile'],base['runtimeProfile'])
         self.assertEqual(result['mcpProfile']['runtimeProfile'],'work-configmap-read-v1')
         preserve_crd_profiles(crd(base),crd(result))

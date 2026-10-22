@@ -1,5 +1,7 @@
 # Four-CRD GitLab handoff
 
+For the backend-first private installation with local owner files, start with [AIRGAP-INSTALL.md](AIRGAP-INSTALL.md), [build/README.md](build/README.md), and [VSCODE-AGENT-AUTHORING.md](VSCODE-AGENT-AUTHORING.md). `private_install.py` is an opt-in offline renderer. It does not deploy or establish workplace security or air-gap closure. The original GitOps path below remains available.
+
 For the workplace requirement to run without Substrate, start with
 [NO-SUBSTRATE-WORK-AGENT-PROMPT.md](NO-SUBSTRATE-WORK-AGENT-PROMPT.md).
 This package generates ordinary `kagent.dev/v1alpha2` Agents and has no Substrate
@@ -9,6 +11,8 @@ See [the 22 October readiness review](READINESS-REVIEW-2026-10-22.md) for Claude
 This self-contained package reproduces the AKS documentation demo through an existing Flux installation. It contains the controller source, four CRDs, Microsoft AKS skill, a cited knowledge article, a local renderer, acceptance runners and historical Proxmox evidence. Nothing has been pushed to GitLab or deployed to a workplace cluster by this package.
 
 Start a work agent with [FRONT-SHEET.md](FRONT-SHEET.md) and the no-Substrate prompt. [WORK-AGENT-PROMPT.md](WORK-AGENT-PROMPT.md) retains the original documentation-only handoff. Read [DESIGN.md](DESIGN.md) for the ownership boundaries and design review.
+
+For a presentation using local files, follow [PRESENTER-WALKTHROUGH.md](PRESENTER-WALKTHROUGH.md). It includes frontend and panel commands, a demo prompt, local HostedAgent submission, and the remaining live-rehearsal boundaries.
 
 The [general read-only MCP grant proposal](tool-grants-design/README.md) remains design-only. The implemented optional demo instead provides one fixed platform-profile capability, with `toolGrantRefs: []`; it does not implement a general ToolGrant catalog.
 

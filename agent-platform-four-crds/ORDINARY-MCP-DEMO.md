@@ -1,5 +1,7 @@
 # Ordinary kagent onboarding with a fixed MCP capability
 
+For backend-first private installation and local owner delivery, follow [AIRGAP-INSTALL.md](AIRGAP-INSTALL.md). The explicit `observe --delivery local` mode omits owner Flux references. With `--owner-manifest`, it uses server dry-run creates to prepare anticipated children, which requires the matching create authorization but persists nothing. Without that flag it captures fully live UID pins. The default Flux path below is unchanged.
+
 This optional path adds the combined demo to the ordinary Deployment profile. It needs no Substrate. The original `package.py` default remains the documentation-only profile. An owner submits a **HostedAgent instance**, selecting reviewed Skill and KnowledgeBase releases and an approved runtime/model profile; the platform installs the CRDs and supplies the deployment details.
 
 The lab uses ordinary controller-managed `kagent.dev/v1alpha2` Agents on kagent 0.7.13. Discover the exact workplace controller image, served Agent schema and runtime first. “kagent 10” is not a sufficient version pin. Use the existing workplace controller and approved model route. Do not install Substrate or change Azure Policy. If the target only serves the newer Harness/Substrate API, this ordinary controller profile is incompatible; report that gate rather than relabelling a standalone container as controller-managed onboarding.
