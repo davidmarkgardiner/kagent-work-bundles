@@ -41,6 +41,13 @@ This is a design handoff, not a deployed or load-tested replacement.
 helpers from custom language adapters, records the 0.x and 1.x contracts, and
 explains native task persistence. It is documentation, not a runnable adapter.
 
+## CVE exposure discovery proposal
+
+[CVE exposure finder](cve-exposure-finder/README.md) describes mapping an advisory
+to affected image digests, running workloads, traffic paths and owners. It includes
+a PHP example, read-only fleet scope and load controls. This is a design handoff,
+not a deployed scanner or a completed vulnerability assessment.
+
 ## Bundle Map
 
 Each bundle now has the same human handover layer:
