@@ -35,6 +35,12 @@ Kafka-to-Argo route after control-plane overload. It covers bounded intake,
 durable incident state, kagent integration, load acceptance, cutover and rollback.
 This is a design handoff, not a deployed or load-tested replacement.
 
+## BYO languages and frameworks
+
+[BYO language support](kagent-byo-language-support/README.md) distinguishes official
+helpers from custom language adapters, records the 0.x and 1.x contracts, and
+explains native task persistence. It is documentation, not a runnable adapter.
+
 ## Bundle Map
 
 Each bundle now has the same human handover layer:
