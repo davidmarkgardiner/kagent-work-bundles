@@ -1,0 +1,25 @@
+{
+  "repository": "{{ABSOLUTE_TRUSTED_REPOSITORY}}",
+  "base_commit": "{{FULL_REVIEWED_BASE_COMMIT}}",
+  "report": {
+    "path": "{{ABSOLUTE_PRIVATE_REDACTED_REPORT}}",
+    "producer_label": "Claude Mythos, as identified by the supplied report",
+    "source_commit": "{{REPORTED_SOURCE_COMMIT_OR_UNKNOWN}}"
+  },
+  "output_dir": "{{ABSOLUTE_NEW_PRIVATE_OUTPUT_DIRECTORY}}",
+  "scope_paths": ["{{APPROVED_SCOPE_PATH}}"],
+  "approved_finding_ids": ["{{REPORT_FINDING_ID}}"],
+  "max_findings_to_fix": 3,
+  "delivery": "local-branch",
+  "branch_name": "security/report-remediation-{{UNIQUE_RUN_ID}}",
+  "execution": {
+    "authorized": false,
+    "sandbox": null,
+    "allowed_commands": [],
+    "approved_network_destinations": [],
+    "timeout_seconds_per_command": 120
+  },
+  "publish": false,
+  "merge": false,
+  "deploy": false
+}

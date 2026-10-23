@@ -17,6 +17,337 @@ def span(n=1, parent=None, values=None, trace=1):
             "attributes": [{"key": k, "value": {"intValue" if isinstance(v, int) else "stringValue": v}} for k, v in (values or {}).items()]}
 
 
+def native_export(spans, service="hosted-aks-docs-v1", resource_values=None):
+    payload = export(spans, service)
+    values = {"kagent.runtime": "adk-go", "gen_ai.main_agent.id": "kagent/hosted-aks-docs-v1",
+              "gen_ai.main_agent.name": "hosted-aks-docs-v1", "gen_ai.request.model": "test-model",
+              **(resource_values or {})}
+    payload["resourceSpans"][0]["resource"]["attributes"] += [
+        {"key": key, "value": {"stringValue": value}} for key, value in values.items()]
+    return payload
+
+
+class NativeProjectionTests(unittest.TestCase):
+    def test_native_request_survives_background_eviction_and_late_transport(self):
+        store = ActivityStore(max_traces=4, max_spans=20)
+        model = span(values={"gen_ai.operation.name": "generate_content", "gen_ai.request.model": "test-model", "gen_ai.usage.input_tokens": 12,
+                             "gen_ai.usage.output_tokens": 3, "gen_ai.conversation.id": "session-1", "a2a.task.id": "task-1"})
+        model["name"] = "generate_content test-model"
+        store.ingest(native_export([model], "kagent", {"gen_ai.request.model": ""}))
+        self.assertEqual(len(store.snapshot()["traces"][0]["modelCalls"]), 1)
+        for trace_id in range(2, 6):
+            store.ingest(export([span(trace=trace_id)], "background-runtime"))
+        late = span(2)
+        late["name"] = "UpdateTask"
+        transport = span(3)
+        transport["name"] = "a2a.request"
+        store.ingest(native_export([late, transport], "kagent", {"gen_ai.request.model": ""}))
+        request = next(t for t in store.snapshot()["traces"] if t["traceId"] == f"{1:032x}")
+        self.assertEqual(len(request["modelCalls"]), 1)
+        self.assertEqual(request["inputTokens"], 12)
+        self.assertEqual(request["spanCount"], 3)
+        self.assertTrue(request["nativeRequest"])
+        self.assertIsNone(store.focus_trace)
+
+    def test_native_resource_identity_is_independent_of_arbitrary_service_name(self):
+        for service in ("hosted-aks-docs-v1", "some-agent", "contains-mcp-but-is-an-agent"):
+            with self.subTest(service=service):
+                store = ActivityStore()
+                store.ingest(native_export([span(values={"gen_ai.operation.name": "generate_content"})], service))
+                trace = store.snapshot()["traces"][0]
+                self.assertIn("kagent", trace["components"])
+                self.assertNotIn("mcp", trace["components"])
+                self.assertEqual(trace["nativeRuntimeIdentity"], {"runtime": "adk-go", "agentId": "kagent/hosted-aks-docs-v1", "agentName": "hosted-aks-docs-v1"})
+
+    def test_agent_name_without_typed_runtime_does_not_establish_native_identity(self):
+        for runtime in ("", "unknown-future-runtime"):
+            store = ActivityStore()
+            store.ingest(native_export([span(values={"gen_ai.operation.name": "generate_content"})], resource_values={"kagent.runtime": runtime}))
+            trace = store.snapshot()["traces"][0]
+            self.assertIsNone(trace["nativeRuntimeIdentity"])
+            self.assertFalse(trace["nativeRequest"])
+            self.assertEqual(trace["modelCalls"], [])
+
+    def test_resource_model_does_not_manufacture_model_calls_for_transport_or_tools(self):
+        model = span(1, values={"gen_ai.operation.name": "generate_content"})
+        skill = span(2, values={"gen_ai.operation.name": "execute_tool", "gen_ai.tool.name": "load_skill"})
+        transport = span(3)
+        transport["name"] = "a2a.request"
+        store = ActivityStore()
+        store.ingest(native_export([model, skill, transport]))
+        trace = store.snapshot()["traces"][0]
+        self.assertEqual([c["spanId"] for c in trace["modelCalls"]], [model["spanId"]])
+        self.assertIsNone(trace["costUsd"])
+        self.assertFalse(trace["usageComplete"])
+
+    def test_native_reports_own_usage_with_missing_gateway_parents(self):
+        observations = [
+            (1, 10, "native", "1000000000", "2951116312", "2040", "95"),
+            (2, 1, "http", "1007186613", "2950935942", None, None),
+            (3, 11, "gateway", "1036295812", "2950121118", "2040", "95"),
+            (4, 10, "native", "2960267832", "5579845347", "4956", "242"),
+            (5, 4, "http", "2973170056", "5579655619", None, None),
+            (6, 12, "gateway", "2976552082", "5578995972", "4956", "242"),
+            (7, 10, "native", "5586313471", "19091468573", "8697", "970"),
+            (8, 7, "http", "5586911429", "19021158100", None, None),
+            (9, 13, "gateway", "5591541422", "14057901656", "8697", "970"),
+        ]
+        store = ActivityStore()
+        observed_attributes = {}
+        for span_id, parent_id, report, start, end, inp, out in observations:
+            native = report != "gateway"
+            values = {"kagent.runtime": "adk-go", "gen_ai.main_agent.id": "kagent/native-agent",
+                      "gen_ai.main_agent.name": "native-agent"} if native else {}
+            if inp is not None:
+                values.update({"gen_ai.operation.name": "generate_content" if native else "chat",
+                               "gen_ai.request.model": "test-model", "gen_ai.usage.input_tokens": inp,
+                               "gen_ai.usage.output_tokens": out, "gen_ai.usage.cache_read.input_tokens": "0" if native else inp})
+            else:
+                values.update({"http.request.method": "POST", "http.response.status_code": "200"})
+            raw = span(span_id, parent=parent_id, values=values)
+            raw.update(startTimeUnixNano=start, endTimeUnixNano=end,
+                       name="HTTP POST" if report == "http" else "generate_content test-model" if native else "POST request",
+                       kind=3 if report == "http" else 1 if native else 2)
+            store.ingest(export([raw], "native-agent" if native else "agentgateway"))
+            observed_attributes[raw["spanId"]] = values
+        trace = store.snapshot()["traces"][0]
+        self.assertEqual(len(trace["modelCalls"]), 3)
+        self.assertEqual(trace["modelUsageSource"], "native-runtime")
+        self.assertEqual({c["spanId"] for c in trace["modelCalls"]},
+                         {f"{n:016x}" for n in (1, 4, 7)})
+        self.assertEqual((trace["inputTokens"], trace["outputTokens"]), (15693, 1307))
+        self.assertTrue(trace["usageComplete"])
+        self.assertIsNone(trace["costUsd"])
+        self.assertEqual(trace["costSource"], "unknown")
+        self.assertEqual(trace["spanCount"], 9)
+        self.assertEqual({s["spanId"]: s["parentSpanId"] for s in trace["spans"]},
+                         {f"{row[0]:016x}": f"{row[1]:016x}" for row in observations})
+        for observed in trace["spans"]:
+            self.assertTrue(observed_attributes[observed["spanId"]].items() <= observed["attributes"].items())
+        self.assertEqual({(e["from"], e["to"]): set(e["spanIds"]) for e in trace["edges"]},
+                         {("kagent", "model"): {f"{n:016x}" for n in (1, 4, 7)},
+                          ("agentgateway", "model"): {f"{n:016x}" for n in (3, 6, 9)}})
+
+    def test_native_model_owns_usage_with_correlated_gateway_child(self):
+        usage = {"gen_ai.operation.name": "generate_content", "gen_ai.request.model": "test-model",
+                 "gen_ai.usage.input_tokens": 12, "gen_ai.usage.output_tokens": 3}
+        store = ActivityStore(prices={"test-model": {"inputPerMillion": 2, "outputPerMillion": 6}})
+        store.ingest(native_export([span(values=usage), span(3)]))
+        store.ingest(export([span(2, parent=1, values={**usage, "gen_ai.usage.cost_usd": "0.2"})], "agentgateway"))
+        trace = store.snapshot()["traces"][0]
+        self.assertEqual(len(trace["modelCalls"]), 1)
+        self.assertEqual(trace["inputTokens"], 12)
+        self.assertEqual(trace["outputTokens"], 3)
+        self.assertEqual(trace["modelUsageSource"], "native-runtime")
+        self.assertEqual(trace["modelCalls"][0]["spanId"], f"{1:016x}")
+        self.assertIsNone(trace["costUsd"])
+        self.assertEqual(trace["costSource"], "unknown")
+        self.assertIsNone(trace["modelCalls"][0]["pricingSource"])
+        self.assertEqual(trace["spanCount"], 3)
+        self.assertIn(("kagent", "agentgateway"), [(e["from"], e["to"]) for e in trace["edges"]])
+
+    def test_native_missing_usage_is_not_filled_from_gateway_reports(self):
+        for values in ({}, {"gen_ai.usage.input_tokens": 12}):
+            with self.subTest(values=values):
+                store = ActivityStore()
+                native = span(1, parent=2, values={"gen_ai.operation.name": "generate_content", **values})
+                gateway_usage = {"gen_ai.request.model": "test-model", "gen_ai.usage.input_tokens": 999,
+                                 "gen_ai.usage.output_tokens": 999, "gen_ai.usage.cost_usd": "0.2"}
+                store.ingest(native_export([native]))
+                store.ingest(export([span(2, values=gateway_usage), span(3, parent=1, values=gateway_usage),
+                                     span(4, values=gateway_usage)], "agentgateway"))
+                trace = store.snapshot()["traces"][0]
+                self.assertEqual([c["spanId"] for c in trace["modelCalls"]], [f"{1:016x}"])
+                self.assertEqual(trace["inputTokens"], values.get("gen_ai.usage.input_tokens"))
+                self.assertIsNone(trace["outputTokens"])
+                self.assertIsNone(trace["costUsd"])
+                self.assertFalse(trace["usageComplete"])
+                self.assertEqual(trace["spanCount"], 4)
+
+    def test_native_model_name_is_not_required_for_source_ownership(self):
+        store = ActivityStore()
+        store.ingest(native_export([span(values={"gen_ai.operation.name": "generate_content"})],
+                                   resource_values={"gen_ai.request.model": ""}))
+        store.ingest(export([span(2, values={"gen_ai.request.model": "test-model", "gen_ai.usage.input_tokens": 999,
+                                           "gen_ai.usage.output_tokens": 999})], "agentgateway"))
+        trace = store.snapshot()["traces"][0]
+        self.assertEqual(trace["modelUsageSource"], "native-runtime")
+        self.assertEqual([c["spanId"] for c in trace["modelCalls"]], [f"{1:016x}"])
+        self.assertIsNone(trace["modelCalls"][0]["model"])
+        self.assertIsNone(trace["inputTokens"])
+        self.assertIsNone(trace["outputTokens"])
+        self.assertFalse(trace["usageComplete"])
+        self.assertEqual(trace["spanCount"], 2)
+
+    def test_nested_native_reports_reconcile_only_within_native_source(self):
+        store = ActivityStore()
+        store.ingest(native_export([
+            span(values={"gen_ai.operation.name": "generate_content", "gen_ai.usage.input_tokens": 12,
+                         "gen_ai.usage.output_tokens": 3, "gen_ai.usage.cost_usd": "0.1"}),
+            span(2, parent=1, values={"gen_ai.operation.name": "generate_content", "gen_ai.usage.input_tokens": 12})]))
+        store.ingest(export([span(3, parent=2, values={"gen_ai.request.model": "test-model", "gen_ai.usage.input_tokens": 999,
+                                                    "gen_ai.usage.output_tokens": 999, "gen_ai.usage.cost_usd": "0.2"})], "agentgateway"))
+        trace = store.snapshot()["traces"][0]
+        self.assertEqual(trace["modelUsageSource"], "native-runtime")
+        self.assertEqual(len(trace["modelCalls"]), 1)
+        self.assertEqual(trace["modelCalls"][0]["spanId"], f"{2:016x}")
+        self.assertEqual((trace["inputTokens"], trace["outputTokens"]), (12, 3))
+        self.assertEqual(trace["costUsd"], .1)
+        self.assertEqual(trace["costSource"], "reported")
+        self.assertEqual(trace["spanCount"], 3)
+
+    def test_equal_native_siblings_are_independent_reports(self):
+        store = ActivityStore()
+        usage = {"gen_ai.operation.name": "generate_content", "gen_ai.usage.input_tokens": 12, "gen_ai.usage.output_tokens": 3}
+        store.ingest(native_export([span(1, values=usage), span(2, values=usage)]))
+        store.ingest(export([span(3, values={**usage, "gen_ai.request.model": "test-model"})], "agentgateway"))
+        trace = store.snapshot()["traces"][0]
+        self.assertEqual([c["spanId"] for c in trace["modelCalls"]], [f"{1:016x}", f"{2:016x}"])
+        self.assertEqual((trace["inputTokens"], trace["outputTokens"]), (24, 6))
+        self.assertEqual(trace["spanCount"], 3)
+
+    def test_native_skills_and_local_tools_do_not_claim_mcp_execution(self):
+        tools = [span(n, values={"gen_ai.operation.name": "execute_tool", "gen_ai.tool.name": name})
+                 for n, name in enumerate(("load_skill", "load_skill_resource", "read_file"), 1)]
+        for tool in tools:
+            tool.update(kind=1, name="execute_tool " + tool["attributes"][1]["value"]["stringValue"])
+        store = ActivityStore()
+        store.ingest(native_export(tools))
+        trace = store.snapshot()["traces"][0]
+        self.assertIn("skills", trace["components"])
+        self.assertNotIn("mcp", trace["components"])
+        self.assertEqual([(s["toolCategory"], s["toolExecution"]) for s in trace["spans"]],
+                         [("skill", "native-skill"), ("skill", "native-skill"), ("native", "native-internal")])
+        skill_edge = next(e for e in trace["edges"] if e["to"] == "skills")
+        self.assertEqual(skill_edge["spanIds"], [tools[0]["spanId"], tools[1]["spanId"]])
+
+    def test_actual_mcp_metadata_remains_mcp_for_a_native_caller(self):
+        tool = span(values={"gen_ai.operation.name": "execute_tool", "gen_ai.tool.name": "search_docs", "mcp.tool.name": "search_docs"})
+        tool["kind"] = 3
+        store = ActivityStore()
+        store.ingest(native_export([tool]))
+        trace = store.snapshot()["traces"][0]
+        self.assertIn("mcp", trace["components"])
+        self.assertEqual(trace["spans"][0]["toolCategory"], "mcp")
+        self.assertEqual(trace["spans"][0]["toolExecution"], "")
+
+    def test_untyped_tool_names_do_not_establish_mcp(self):
+        for service in ("kagent", "agentgateway"):
+            with self.subTest(service=service):
+                tools = [span(n, values={"gen_ai.operation.name": "execute_tool", "gen_ai.tool.name": tool})
+                         for n, tool in enumerate(("skills", "read_file", "search_docs"), 1)]
+                for tool in tools:
+                    tool["kind"] = 1
+                store = ActivityStore()
+                store.ingest(export(tools, service))
+                trace = store.snapshot()["traces"][0]
+                self.assertNotIn("mcp", trace["components"])
+                self.assertEqual([s["toolCategory"] for s in trace["spans"]], ["", "", ""])
+
+    def test_explicit_mcp_metadata_identifies_an_untyped_tool(self):
+        tool = span(values={"gen_ai.operation.name": "execute_tool", "gen_ai.tool.name": "read_file",
+                            "mcp.tool.name": "read_file"})
+        tool["kind"] = 2
+        store = ActivityStore()
+        store.ingest(export([tool]))
+        trace = store.snapshot()["traces"][0]
+        self.assertIn("mcp", trace["components"])
+        self.assertEqual(trace["spans"][0]["toolCategory"], "mcp")
+        self.assertEqual(trace["spans"][0]["toolExecution"], "server")
+
+    def test_native_unset_status_is_not_reported_as_explicit_success(self):
+        tool = span(values={"gen_ai.operation.name": "execute_tool", "gen_ai.tool.name": "load_skill"})
+        tool.update(kind=1, status={"code": 0})
+        store = ActivityStore()
+        store.ingest(native_export([tool]))
+        trace = store.snapshot()["traces"][0]
+        self.assertEqual(trace["spans"][0]["otelStatus"], "unset")
+        self.assertEqual(trace["spans"][0]["status"], "unknown")
+        self.assertEqual(trace["status"], "unknown")
+
+    def test_native_fragment_with_gateway_span_has_no_task_success_status(self):
+        store = ActivityStore()
+        store.ingest(native_export([span(values={"rpc.method": "UpdateTask"})]))
+        store.ingest(export([span(2, values={"http.response.status_code": 200})], "agentgateway"))
+        trace = store.snapshot()["traces"][0]
+        self.assertFalse(trace["nativeRequest"])
+        self.assertIsNotNone(trace["nativeRuntimeIdentity"])
+        self.assertEqual(trace["status"], "unknown")
+
+    def test_native_totals_disclose_excluded_mixed_runtime_reports(self):
+        store = ActivityStore()
+        store.ingest(native_export([span(values={"gen_ai.operation.name": "generate_content",
+            "gen_ai.request.model": "native-model", "gen_ai.usage.input_tokens": 10,
+            "gen_ai.usage.output_tokens": 2, "gen_ai.usage.cost_usd": "0.1"})]))
+        store.ingest(export([span(2, parent=1, values={"gen_ai.operation.name": "chat",
+            "gen_ai.request.model": "other-model", "gen_ai.usage.input_tokens": 500,
+            "gen_ai.usage.output_tokens": 50, "gen_ai.usage.cost_usd": "0.5"})], "kagent-python-subagent"))
+        trace = store.snapshot()["traces"][0]
+        self.assertEqual((trace["inputTokens"], trace["outputTokens"]), (10, 2))
+        self.assertEqual(len(trace["modelCalls"]), 1)
+        self.assertFalse(trace["usageComplete"])
+        self.assertEqual(trace["excludedModelReports"], 1)
+        self.assertEqual(trace["costUsd"], .1)
+        self.assertEqual(trace["costSource"], "partial")
+        self.assertEqual(trace["spanCount"], 2)
+
+    def test_native_priority_does_not_change_manual_focus_or_hard_bounds(self):
+        store = ActivityStore(max_traces=4, max_spans=6)
+        store.focus(f"{99:032x}", "manual-actor")
+        store.ingest(export([span(trace=99)]))
+        for trace_id in range(1, 20):
+            store.ingest(native_export([span(trace=trace_id, values={"gen_ai.operation.name": "generate_content"})]))
+            snapshot = store.snapshot()
+            self.assertLessEqual(len(snapshot["traces"]), 4)
+            self.assertLessEqual(sum(t["spanCount"] for t in snapshot["traces"]), 6)
+        self.assertEqual(store.focus_trace, f"{99:032x}")
+        self.assertEqual(store.focus_actor, "manual-actor")
+        self.assertIn(f"{99:032x}", [t["traceId"] for t in snapshot["traces"]])
+        self.assertEqual(len(store.recent_native_requests), 8)
+        self.assertIn(f"{19:032x}", [t["traceId"] for t in snapshot["traces"]])
+        store.ingest(native_export([span(n, trace=30, values={"gen_ai.operation.name": "generate_content"}) for n in range(1, 8)]))
+        self.assertLessEqual(sum(t["spanCount"] for t in store.snapshot()["traces"]), 6)
+
+    def test_native_metadata_allowlist_retains_identity_but_not_content(self):
+        safe = {"gen_ai.agent.name": "subagent", "gen_ai.agent.id": "kagent/subagent", "gen_ai.conversation.id": "session-id",
+                "a2a.task.id": "task-id", "a2a.method": "SendMessage", "a2a.task.state": "completed", "kagent.genai.producer": "runtime"}
+        content = {key: "PRIVATE_MARKER" for key in ("enduser.id", "gen_ai.input.messages", "gen_ai.output.messages", "gen_ai.tool.call.arguments", "gen_ai.tool.call.result", "http.request.header.authorization")}
+        store = ActivityStore()
+        store.ingest(native_export([span(values={**safe, **content})]))
+        result = store.snapshot()
+        attributes = result["traces"][0]["spans"][0]["attributes"]
+        self.assertTrue(safe.items() <= attributes.items())
+        self.assertNotIn("PRIVATE_MARKER", json.dumps(result))
+
+    def test_external_lifecycle_requires_shared_observed_actor_identity(self):
+        store = ActivityStore()
+        store.ingest(native_export([span(values={"gen_ai.operation.name": "generate_content"})]))
+        unrelated = span(trace=2, values={"ate.actor.name": "other-actor"})
+        store.ingest(export([unrelated], "ateapi"))
+        self.assertIsNone(store.observed_activity(store.snapshot(), f"{1:032x}"))
+        store.ingest(native_export([span(2, values={"ate.actor.name": "observed-actor", "ate.actor.uid": "actor-uid"})]))
+        for n, actor in ((3, "observed-actor"), (4, "other-actor")):
+            record = log_record(trace=n)
+            record["attributes"] = [{"key": key, "value": {"stringValue": value}} for key, value in {
+                "ate.actor.name": actor, "ate.actor.uid": "actor-uid" if n == 3 else "other-uid", "ate.actor.state": "suspended"}.items()]
+            store.ingest_logs(log_export([record], "ateapi"))
+            store.ingest(export([span(trace=n, values={"ate.actor.name": actor, "ate.actor.uid": "actor-uid" if n == 3 else "other-uid"})], "ateapi"))
+        activity = store.observed_activity(store.snapshot(), f"{1:032x}")
+        self.assertEqual(activity["actorName"], "observed-actor")
+        self.assertEqual(set(activity["traceIds"]), {f"{1:032x}", f"{3:032x}"})
+        self.assertEqual(activity["requestTraceId"], f"{1:032x}")
+        self.assertEqual([s["traceId"] for s in activity["states"]], [f"{3:032x}"])
+
+    def test_external_lifecycle_rejects_reused_names_and_conflicting_request_identity(self):
+        store = ActivityStore()
+        identity = {"ate.actor.name": "actor", "ate.actor.uid": "original-uid", "ate.atespace": "space"}
+        store.ingest(native_export([span(values={"gen_ai.operation.name": "generate_content", **identity})]))
+        store.ingest(export([span(trace=2, values={**identity, "ate.actor.uid": "replacement-uid"})], "ateapi"))
+        self.assertEqual(store.observed_activity(store.snapshot(), f"{1:032x}")["traceIds"], [f"{1:032x}"])
+        store.ingest(native_export([span(2, values={"ate.actor.name": "actor", "ate.actor.uid": "conflicting-uid"})]))
+        self.assertIsNone(store.observed_activity(store.snapshot(), f"{1:032x}"))
+
+
 class TraceProjectionTests(unittest.TestCase):
     def test_pinned_kubernetes_internal_handler_is_execution_but_client_is_not(self):
         values = {"mcp.tool.name": "k8s_get_resources"}

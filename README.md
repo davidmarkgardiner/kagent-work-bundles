@@ -14,6 +14,20 @@ Before live implementation, fill in
 That sheet lists the common namespaces, MCP server names, datasource UIDs,
 GitLab project values, approval routes, and demo targets needed across bundles.
 
+## Office demo and security handoff
+
+Download this full repository as a ZIP, extract it, and copy the required folders
+into the workplace repository. No separate release asset or local package is needed.
+Start with [the office handoff](office-demo-security-2026-10-23/README.md).
+
+| Folder | Entry point |
+| --- | --- |
+| CRDs, skills, knowledge and combined dashboard | [agent-platform-four-crds/](agent-platform-four-crds/FRONT-SHEET.md) |
+| Wider OTel dashboard | [otel-agent-flow/](otel-agent-flow/FRONT-SHEET.md) |
+| Cluster security reviewer | [cluster-security-review/](cluster-security-review/README.md) |
+| Source security auditor and evidence reviewer | [source-security-audit/](source-security-audit/FRONT-SHEET.md) |
+| Repository remediation for supplied security reports | [repository-security-remediation/](repository-security-remediation/README.md) |
+
 ## Bundle Map
 
 Each bundle now has the same human handover layer:

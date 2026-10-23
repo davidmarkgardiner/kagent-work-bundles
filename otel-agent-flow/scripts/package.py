@@ -17,7 +17,8 @@ def main():
     names = ["FRONT-SHEET.md", "DEMO-SCENARIOS.md", "ENTRA-ISOLATION-DEMO.md", "WORK-BUNDLE-README.md", "WORK-AGENT-PROMPT.md", "AKS-ISTIO.md",
              "PLATFORM-PREREQUISITES.md", "IMAGE-IMPORT.md", "RUNTIME-COMPARISON.md", "LIVE-INTEGRATION.md", "LIVE-HOMELAB.md", "ROLLBACK.md", "Dockerfile", ".dockerignore", ".gitignore",
              "requirements-ops.txt", "image-lock.json", "backend.py", "telemetry.py", "substrate_call.py", "standalone_call.py",
-             "workflow_demo.py", "live_gitlab.py", "test_live_gitlab.py", "isolation_demo.py", "test_isolation_demo.py", "test_telemetry.py", "test_execution.py", "test_substrate_call.py", "test_workflow_demo.py", "test_verify_https.py"]
+             "workflow_demo.py", "live_gitlab.py", "onboarding.py", "onboarding_ordinary.py", "test_live_gitlab.py", "isolation_demo.py", "test_isolation_demo.py", "test_telemetry.py", "test_execution.py", "test_substrate_call.py", "test_workflow_demo.py", "test_verify_https.py",
+             "test_package.py", "test_ui.py", "test_onboarding.py", "test_ordinary_onboarding.py", "test_ordinary_telemetry.py"]
     files = [root / name for name in names]
     for directory in ["ui", "deploy", "scripts", "standalone"]:
         files.extend(p for p in (root / directory).rglob("*") if p.is_file() and "__pycache__" not in p.parts)

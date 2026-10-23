@@ -1,0 +1,36 @@
+{
+  "verifiedAt": "2026-10-20T09:33:03.482715+00:00",
+  "traceId": "d3d1d139388a44909298331af7d8517b",
+  "response": "PROMPT_FLOW_OK \u2014 1 ready inventory replica.",
+  "spanCount": 90,
+  "components": [
+    "agentgateway",
+    "client",
+    "kagent",
+    "mcp",
+    "model"
+  ],
+  "inputTokens": 1084.0,
+  "outputTokens": 132.0,
+  "correlatedLogs": 18,
+  "unitTestsPassed": 38,
+  "httpChecks": {
+    "blankPrompt": 400,
+    "oversizePrompt": 400,
+    "unknownAgentField": 400,
+    "concurrentPrompt": 409,
+    "validPrompt": 202
+  },
+  "domChecks": {
+    "customPromptPosted": true,
+    "automaticVisualView": true,
+    "tracePinned": true,
+    "noStaleDiagram": true,
+    "responseDisplayed": true,
+    "submitReenabled": true,
+    "sharedPromptAcrossViews": true
+  },
+  "servedAssetsMatchTestedFiles": true,
+  "initialFailure": "Direct request without the lab user context timed out before model traffic. Same prompt succeeded with the existing local controller user context; caller now supplies it via KAGENT_USER_ID.",
+  "browserScope": "Prompt UI behavior checked in a DOM test. Real prompt transport, response, logs and trace verified against the running service. No new Chrome interaction attempted after earlier URL-policy rejection."
+}

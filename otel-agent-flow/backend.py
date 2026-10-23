@@ -12,6 +12,12 @@ import urllib.parse
 import urllib.request
 import uuid
 from telemetry import ActivityStore
+if os.getenv('ONBOARDING_RUNTIME') == 'ordinary':
+    if os.getenv('READ_ONLY_VIEWER', '').lower() != 'true':
+        raise ValueError('Ordinary runtime observation requires the read-only viewer')
+    from onboarding_ordinary import read_view
+else:
+    from onboarding import read_view
 
 ROOT = Path(os.path.abspath(__file__)).parent
 price_path = os.getenv("PRICING_FILE")
@@ -19,6 +25,11 @@ STORE = ActivityStore(prices=json.loads(Path(price_path).read_text()) if price_p
 INVOKING = threading.Lock()
 INVOCATION = {"status": "idle"}
 MAX_PROMPT_CHARS = 4000
+MAX_NATIVE_ACTIVITIES = 8
+
+
+def read_only_viewer():
+    return os.getenv("READ_ONLY_VIEWER", "").lower() == "true"
 
 
 def invocation_prompt(payload):
@@ -172,11 +183,19 @@ class Handler(BaseHTTPRequestHandler):
             snapshot = STORE.snapshot()
             invocation = dict(INVOCATION)
             activity = STORE.actor_activity(snapshot, invocation.get("actorName"), invocation.get("traceId"))
-            return self.send(200, {**snapshot, "invocation": invocation, "sessionActivity": activity, "runtime": {
+            native_requests = [trace for trace in snapshot["traces"] if trace["nativeRequest"]][:MAX_NATIVE_ACTIVITIES]
+            native_activities = {trace["traceId"]: native_activity for trace in native_requests
+                                 if (native_activity := STORE.observed_activity(snapshot, trace["traceId"]))}
+            viewer = read_only_viewer()
+            return self.send(200, {**snapshot, "invocation": invocation, "sessionActivity": activity,
+                "nativeActivities": native_activities,
+                "onboarding": read_view(os.getenv("ONBOARDING_SNAPSHOT", "/observer/onboarding.json")), "runtime": {
+                "readOnlyViewer": viewer,
+                "ordinaryObservationOnly": os.getenv('ONBOARDING_RUNTIME') == 'ordinary',
                 "substrateInstalled": os.getenv("SUBSTRATE_INSTALLED") == "true",
                 "demoMode": os.getenv("DEMO_MODE", ""),
                 "demoPrompt": os.getenv("DEMO_PROMPT", ""),
-                "executionTargets": [{k: t[k] for k in ("id", "mode", "label")} for t in execution_targets()],
+                "executionTargets": [] if viewer else [{k: t[k] for k in ("id", "mode", "label")} for t in execution_targets()],
                 "scenarios": live_scenarios(),
                 "label": os.getenv("RUNTIME_LABEL", "kagent 0.10.1 · agentgateway 1.5.0 · local kind POC"),
                 "promptHelp": os.getenv("PROMPT_HELP", "Read-only inventory agent · Ctrl/⌘ + Enter to send. Each prompt starts a new run.")}})
@@ -204,6 +223,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(403, {"error": "Cross-origin requests are disabled"})
         path = urllib.parse.urlparse(self.path).path
         if path == "/api/invoke":
+            if read_only_viewer():
+                return self.send(403, {"error": "This read-only viewer accepts telemetry only; invoke the agent through its existing client"})
             if self.headers.get_content_type() != "application/json":
                 return self.send(415, {"error": "Send your prompt as JSON"})
             try:

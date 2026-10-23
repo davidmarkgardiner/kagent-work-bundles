@@ -1,0 +1,19 @@
+{
+  "target": "/ABSOLUTE/PATH/TO/PRIVATE/TARGET",
+  "source_ref": "{{FULL_TARGET_HEAD_COMMIT}}",
+  "output_dir": "/ABSOLUTE/PRIVATE/AUDIT-OUTPUT/NEW-RUN",
+  "profile": "quick",
+  "scope_paths": [
+    "src"
+  ],
+  "execution_mode": "source-only",
+  "require_clean": true,
+  "model_policy": {
+    "hunter": "{{HUNTER_MODEL}}",
+    "verifier": "{{VERIFIER_MODEL}}",
+    "require_different_models": true
+  },
+  "agent_budget": 12,
+  "prior_runs": [],
+  "scanner_reports": []
+}

@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "namespace": "kagent",
+  "hostedName": "aks-onboarding-v1",
+  "agentName": "hosted-aks-onboarding-v1",
+  "profileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "objects": [
+    {
+      "role": "hosted",
+      "apiVersion": "skills.platform.kagent.dev/v1alpha1",
+      "kind": "HostedAgent",
+      "namespace": "kagent",
+      "name": "aks-onboarding-v1",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "skill",
+      "apiVersion": "skills.platform.kagent.dev/v1alpha1",
+      "kind": "Skill",
+      "namespace": "kagent",
+      "name": "aks-known-issues-v1",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "knowledge",
+      "apiVersion": "skills.platform.kagent.dev/v1alpha1",
+      "kind": "KnowledgeBase",
+      "namespace": "kagent",
+      "name": "aks-bootstrap-v1",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "golden",
+      "apiVersion": "skills.platform.kagent.dev/v1alpha1",
+      "kind": "GoldenScenario",
+      "namespace": "kagent",
+      "name": "aks-onboarding-v1",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "agent",
+      "apiVersion": "api.kagent.dev/v1alpha3",
+      "kind": "Agent",
+      "namespace": "kagent",
+      "name": "hosted-aks-onboarding-v1",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "template",
+      "apiVersion": "api.kagent.dev/v1alpha3",
+      "kind": "AgentTemplate",
+      "namespace": "kagent",
+      "name": "hosted-aks-onboarding-v1-reviewedhash",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "model",
+      "apiVersion": "api.kagent.dev/v1alpha3",
+      "kind": "ModelConfig",
+      "namespace": "kagent",
+      "name": "flow-demo-model",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "harness",
+      "apiVersion": "api.kagent.dev/v1alpha3",
+      "kind": "Harness",
+      "namespace": "kagent",
+      "name": "aks-docs-v1",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "profile",
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "namespace": "kagent",
+      "name": "hosted-native-profile",
+      "dataSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "skillConfigMap",
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "namespace": "kagent",
+      "name": "reviewed-skill-configmap",
+      "dataSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "knowledgeConfigMap",
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "namespace": "kagent",
+      "name": "reviewed-kb-configmap",
+      "dataSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "skillSource",
+      "apiVersion": "source.toolkit.fluxcd.io/v1",
+      "kind": "GitRepository",
+      "namespace": "kagent",
+      "name": "aks-known-issues-v1-source",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "knowledgeSource",
+      "apiVersion": "source.toolkit.fluxcd.io/v1",
+      "kind": "GitRepository",
+      "namespace": "kagent",
+      "name": "aks-bootstrap-v1-source",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "declarations",
+      "apiVersion": "source.toolkit.fluxcd.io/v1",
+      "kind": "GitRepository",
+      "namespace": "kagent",
+      "name": "reviewed-declarations",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "role": "flux",
+      "apiVersion": "kustomize.toolkit.fluxcd.io/v1",
+      "kind": "Kustomization",
+      "namespace": "kagent",
+      "name": "reviewed-native-platform",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ]
+}

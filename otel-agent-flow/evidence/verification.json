@@ -1,0 +1,157 @@
+{
+  "verifiedAt": "2026-10-20T08:08:00.683609+00:00",
+  "url": "http://127.0.0.1:8787",
+  "context": "kind-agent-cage-health",
+  "result": "Local kagent and agentgateway path verified. Substrate remains unconnected.",
+  "trace": {
+    "traceId": "19ac5afe027c45b3a0c9e3868b2281e7",
+    "spanCount": 90,
+    "status": "ok",
+    "durationMs": 5422.632947,
+    "components": [
+      "agentgateway",
+      "client",
+      "kagent",
+      "mcp",
+      "model"
+    ],
+    "inputTokens": 1072.0,
+    "outputTokens": 103.0,
+    "costUsd": null,
+    "costSource": "unknown",
+    "usageComplete": true,
+    "errorSpanCount": 2,
+    "edges": [
+      {
+        "from": "kagent",
+        "to": "mcp",
+        "basis": "tool span",
+        "spanIds": [
+          "6c3ad6b69c5d7609"
+        ]
+      },
+      {
+        "from": "kagent",
+        "to": "agentgateway",
+        "basis": "parent span",
+        "spanIds": [
+          "94a566866b88cf09",
+          "3208f86dc1b07374"
+        ]
+      },
+      {
+        "from": "agentgateway",
+        "to": "model",
+        "basis": "model span",
+        "spanIds": [
+          "94a566866b88cf09",
+          "3208f86dc1b07374"
+        ]
+      },
+      {
+        "from": "client",
+        "to": "kagent",
+        "basis": "instrumented destination",
+        "spanIds": [
+          "2eebec97a41a4620",
+          "98dbb761632cddf5"
+        ]
+      }
+    ],
+    "modelCalls": [
+      {
+        "spanId": "94a566866b88cf09",
+        "model": "kimi-for-coding",
+        "inputTokens": 437.0,
+        "outputTokens": 56.0,
+        "costUsd": null,
+        "costSource": "unknown",
+        "pricingSource": null
+      },
+      {
+        "spanId": "3208f86dc1b07374",
+        "model": "kimi-for-coding",
+        "inputTokens": 635.0,
+        "outputTokens": 47.0,
+        "costUsd": null,
+        "costSource": "unknown",
+        "pricingSource": null
+      }
+    ]
+  },
+  "services": [
+    "flow-client",
+    "kimi-lab-gateway",
+    "otel_flow_reader"
+  ],
+  "toolSpans": [
+    {
+      "traceId": "19ac5afe027c45b3a0c9e3868b2281e7",
+      "spanId": "6c3ad6b69c5d7609",
+      "name": "execute_tool get_demo_inventory_status",
+      "service": "otel_flow_reader",
+      "status": "ok",
+      "durationMs": 16.335292
+    }
+  ],
+  "gatewayPolicy": {
+    "Accepted": "True",
+    "Attached": "True"
+  },
+  "unitTests": {
+    "passed": 38
+  },
+  "httpBoundaryChecks": {
+    "malformedOtlp": 400,
+    "protobufRejected": 415,
+    "crossOriginInvoke": 403,
+    "healthAfterInvalidRequests": 200
+  },
+  "browserChecks": {
+    "liveInvoke": "passed",
+    "replayLabel": "REPLAY",
+    "componentFilter": "passed",
+    "spanInspection": "passed",
+    "estimateAtInput1Output3PerMillion": "$0.001381",
+    "clearEstimate": "Not reported",
+    "consoleErrors": [],
+    "responsivePageOverflow": "none at narrow and desktop viewports",
+    "finalReload": "Blocked by browser URL policy while the tab was on a Chrome error document after a port-forward restart. No workaround attempted. Earlier live invocation and interaction checks passed."
+  },
+  "substrate": {
+    "installedLocally": false,
+    "remoteSsh": "unreachable",
+    "activationProven": false
+  },
+  "security": {
+    "gitleaks": "no leaks found",
+    "publicSafeScan": {
+      "rawHits": 7,
+      "adjudication": "Five public version-string matches and two literal synthetic secret-redaction test cases. No real private values identified."
+    }
+  },
+  "sourceSha256": {
+    "backend.py": "535064707ac468896a88c031951ab1d86b953031fda5132d437d3c7f34c33cce",
+    "manifests.yaml": "14538d5c27d50ee284d670fb2b9e2027b0083b92c6fa4cd147246a4f13bb4248",
+    "start.sh": "a945fe1b24c95ff59f6e65d4b7d64ac80ca12e6c1d7161356a129fb39a8fab7a",
+    "telemetry.py": "88fd43587f40cb9867d2eb3e5f953ef6b2cc54d9a4abdff79277c0ee97ff3b4b",
+    "test_telemetry.py": "f04dfe5a6dc58c22652f491f0be5cf17a521bc5dc379c58ee1da4b19d94077a7",
+    "ui/app.js": "891da70bf8463ea987280570d80e6888ff856c211f6406bff8108aea2a914f69",
+    "ui/index.html": "d049007b022eba45022a233c2c89151e19f748a904850244b4673fdf796693c2",
+    "ui/logs.css": "ea33a97966947a46520d82628b9fe55f4cf0dc447a4311cc875892c2723adb2e",
+    "ui/style.css": "6e0921f07df92a61d7ccf06e343ddc0d96c693b488084b2b30f13c8c9d8a46fd"
+  },
+  "independentReview": "Six initial findings were fixed and independently verified. A subsequent distinct-model nested-call finding was fixed and covered by test_distinct_nested_models_are_independent_calls.",
+  "finalAccountingReprojection": {
+    "source": "Previously captured real trace; no new invocation",
+    "traceId": "19ac5afe027c45b3a0c9e3868b2281e7",
+    "inputTokens": 1072.0,
+    "outputTokens": 103.0,
+    "modelCalls": 2,
+    "passed": true
+  },
+  "finalRuntimeHealth": 200,
+  "logsEvidence": "logs-verification.json",
+  "viewSwitchEvidence": "view-switch-verification.json",
+  "promptEvidence": "prompt-verification.json"
+}

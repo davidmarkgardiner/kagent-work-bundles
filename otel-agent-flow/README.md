@@ -17,3 +17,7 @@ For the real-model example with live Kubernetes and GitLab reads, use [LIVE-HOME
 Live mode also offers Kubernetes-only, GitLab-only, and combined presets. Separate MCP panels identify and highlight the tool that actually ran from received execution spans. Kubernetes currently exports tool spans; GitLab additionally exports OTel logs.
 
 Use [RUNTIME-COMPARISON.md](RUNTIME-COMPARISON.md) for the paired demonstrations. The runtime picker selects a normal native kagent ADK Deployment or a Substrate actor. Standalone-only mode creates no kagent/Substrate custom resources and does not require their platform installation.
+
+Use [NATIVE-KAGENT-OTEL.md](NATIVE-KAGENT-OTEL.md) for the separate KAgent 1.x
+documentation-agent viewer, native skill/knowledge spans, bounded request
+retention, and observation-only mode.

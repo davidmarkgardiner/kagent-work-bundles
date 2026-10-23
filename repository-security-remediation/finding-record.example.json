@@ -1,0 +1,18 @@
+{
+  "id": "{{REPORT_FINDING_ID}}",
+  "report_location": "{{SECTION_OR_ITEM_REFERENCE}}",
+  "reported_severity": "{{CLAIMED_SEVERITY_OR_UNSPECIFIED}}",
+  "assessment": "candidate",
+  "assessment_reason": "{{SOURCE_EVIDENCE_OR_EXACT_MISSING_EVIDENCE}}",
+  "source_locations": [],
+  "disposition": "blocked",
+  "disposition_reason": "{{REPAIR_SCOPE_AND_REASON}}",
+  "changed_files": [],
+  "validation": {
+    "status": "pending",
+    "commands": [],
+    "results": [],
+    "missing_gates": []
+  },
+  "remediation_status": "not_changed"
+}

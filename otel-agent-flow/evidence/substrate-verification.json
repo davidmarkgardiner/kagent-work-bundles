@@ -1,0 +1,111 @@
+{
+  "verifiedAt": "2026-10-20",
+  "endpoint": "http://127.0.0.1:8788",
+  "runtime": {
+    "kubernetes": "1.37.0",
+    "kagent": "1.0.0-alpha8",
+    "substrate": "0.4.0-alpha1",
+    "modelGateway": "1.5.0"
+  },
+  "agent": "kagent/otel-substrate-reader",
+  "traceId": "c14c373dc6bf407a97136571a3577e64",
+  "sessionId": "01a15a17-9917-71c4-bd37-c944e678b436",
+  "actorName": "session-01a15a17-9917-71c4-bd37-c944e678b436",
+  "status": "completed",
+  "replyMarker": "SUBSTRATE_OTEL_LIVE_OK",
+  "elapsedSeconds": 4.388,
+  "requestSpanCount": 176,
+  "relatedTraceIds": [
+    "c14c373dc6bf407a97136571a3577e64",
+    "0c3571f5ac91f3edd11d64921b66151f",
+    "47ef51a8a5c18add9d7f48cd12b7b2eb",
+    "ed453a686909e606856ab88e0b3728b0",
+    "afcb00664022b8f261ab1c2eaf0e247a",
+    "37382b94b5463411c03e7a13588b7b7f",
+    "9af8e76328b9fff12e096880eb73f777",
+    "6624c7bb07499ab16993bb6e40ab2e8a",
+    "1164fca8a36b28da60784254825a2297",
+    "779f0324876914491c27fb2feff08114",
+    "c8cb0f09c48e0c5329aaddb1ce2fe260"
+  ],
+  "observedSessionComponents": [
+    "actor",
+    "agentgateway",
+    "client",
+    "kagent",
+    "model",
+    "substrate",
+    "worker"
+  ],
+  "workerOperations": [
+    "atelet.AteomHerder/Checkpoint",
+    "atelet.AteomHerder/Restore",
+    "ateom.Ateom/CheckpointWorkload",
+    "ateom.Ateom/RestoreWorkload",
+    "fetchFileFromGCSWithZstd",
+    "fetchFromGCS",
+    "prepareOCIDirectory",
+    "sendBytesToGCS",
+    "sendFileToGCSWithZstd"
+  ],
+  "actorStates": [
+    {
+      "state": "suspended",
+      "timestampNs": "1792512858405822421",
+      "traceId": "c14c373dc6bf407a97136571a3577e64"
+    },
+    {
+      "state": "resuming",
+      "timestampNs": "1792512858456238334",
+      "traceId": "c8cb0f09c48e0c5329aaddb1ce2fe260"
+    },
+    {
+      "state": "running",
+      "timestampNs": "1792512858562673735",
+      "traceId": "c8cb0f09c48e0c5329aaddb1ce2fe260"
+    },
+    {
+      "state": "suspending",
+      "timestampNs": "1792512862767906220",
+      "traceId": "0c3571f5ac91f3edd11d64921b66151f"
+    },
+    {
+      "state": "suspended",
+      "timestampNs": "1792512862829790248",
+      "traceId": "0c3571f5ac91f3edd11d64921b66151f"
+    }
+  ],
+  "modelCalls": [
+    {
+      "spanId": "f77563359e8c31a0",
+      "model": "kimi-for-coding",
+      "inputTokens": 340.0,
+      "outputTokens": 96.0,
+      "costUsd": null,
+      "costSource": "unknown",
+      "pricingSource": null
+    }
+  ],
+  "nativeLogRecordsRetained": 68,
+  "checks": {
+    "realPromptCompleted": true,
+    "callerTracePropagation": true,
+    "nativeActorIdentityCorrelation": true,
+    "restoreAndCheckpointObserved": true,
+    "suspendedStateObserved": true,
+    "modelGatewayTrafficObserved": true,
+    "oneModelCallAfterParentChainReconciliation": true,
+    "providerCredentialCopied": false,
+    "apiAndServedDomChecks": true,
+    "pythonTestsPassed": 43,
+    "secretScanPassed": true,
+    "interactiveBrowserRecheck": false
+  },
+  "limitations": [
+    "Remote agent has no MCP tools.",
+    "Each prompt creates a new session; multi-turn resume is not proven.",
+    "Per-request billed USD cost is not reported.",
+    "Host units and SSH tunnels are temporary.",
+    "Interactive browser recheck remains blocked by the earlier browser policy refusal."
+  ]
+}

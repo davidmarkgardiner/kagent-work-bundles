@@ -1,0 +1,68 @@
+{
+  "verifiedAt": "2026-10-20T09:14:32.903046+00:00",
+  "records": 18,
+  "services": {
+    "otel_flow_reader": 16,
+    "kimi-lab-gateway": 2
+  },
+  "traceId": "9e697e13684411a4de97f6c60f9c1c47",
+  "allRecordsCorrelated": true,
+  "traceFilteredQuery": "passed",
+  "source": "Real kagent GenAI OTLP logs and agentgateway OTLP access logs from one completed read-only inventory call",
+  "sampleMetadata": [
+    {
+      "id": "4fb138bf8bc9e1607da852d5",
+      "timestampNs": "1792487571259648420",
+      "traceId": "9e697e13684411a4de97f6c60f9c1c47",
+      "spanId": "fe6aceeba7c5d4bd",
+      "service": "otel_flow_reader",
+      "severity": "UNSPECIFIED",
+      "severityNumber": 0,
+      "event": "gen_ai.choice",
+      "message": "gen_ai.choice \u00b7 message content omitted",
+      "attributes": {
+        "service.name": "otel_flow_reader",
+        "gen_ai.system": "gemini"
+      }
+    },
+    {
+      "id": "53ccec13e96162dc305651bd",
+      "timestampNs": "1792487571259270837",
+      "traceId": "9e697e13684411a4de97f6c60f9c1c47",
+      "spanId": "7db0cdeb4eac8633",
+      "service": "otel_flow_reader",
+      "severity": "UNSPECIFIED",
+      "severityNumber": 0,
+      "event": "gen_ai.choice",
+      "message": "gen_ai.choice \u00b7 message content omitted",
+      "attributes": {
+        "service.name": "otel_flow_reader",
+        "gen_ai.system": "openai"
+      }
+    },
+    {
+      "id": "216ddde7ba998518640d2122",
+      "timestampNs": "1792487571255008587",
+      "traceId": "9e697e13684411a4de97f6c60f9c1c47",
+      "spanId": "00581b133e95fa00",
+      "service": "kimi-lab-gateway",
+      "severity": "INFO",
+      "severityNumber": 9,
+      "event": "OTel event",
+      "message": "POST \u00b7 kimi-for-coding",
+      "attributes": {
+        "service.name": "kimi-lab-gateway",
+        "service.version": "1.5.0",
+        "http.method": "POST",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.provider.name": "openai",
+        "gen_ai.request.model": "kimi-for-coding",
+        "gen_ai.response.model": "kimi-for-coding",
+        "gen_ai.usage.input_tokens": "635",
+        "gen_ai.usage.output_tokens": "72"
+      }
+    }
+  ],
+  "unitTestsPassed": 33,
+  "browserLimitation": "Log panel served successfully; interactive browser recheck unavailable after prior URL-policy rejection on Chrome error page. No alternate browser path used."
+}

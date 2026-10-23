@@ -6,7 +6,11 @@ from pathlib import Path
 import runpy
 import subprocess
 import tempfile
+import threading
 import unittest
+import urllib.error
+import urllib.request
+from http.server import ThreadingHTTPServer
 from unittest.mock import patch
 import backend
 from standalone_call import invoke_standalone
@@ -15,6 +19,58 @@ TARGETS = [
     {"id": "substrate", "mode": "substrate", "label": "With Substrate"},
     {"id": "standalone", "mode": "standalone", "label": "Without Substrate", "url": "http://standalone.invalid:8080/"},
 ]
+
+
+class ReadOnlyViewerTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.server = ThreadingHTTPServer(("127.0.0.1", 0), backend.Handler)
+        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
+        cls.thread.start()
+        cls.url = f"http://127.0.0.1:{cls.server.server_port}"
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.shutdown()
+        cls.server.server_close()
+        cls.thread.join()
+
+    def test_read_only_viewer_rejects_invoke_before_starting_any_execution(self):
+        request = urllib.request.Request(self.url + "/api/invoke", b'{"prompt":"must not execute"}', {"Content-Type": "application/json"})
+        with patch.dict(backend.os.environ, {"READ_ONLY_VIEWER": "true"}), patch("backend.invoke") as invoke:
+            with self.assertRaises(urllib.error.HTTPError) as error:
+                urllib.request.urlopen(request, timeout=5)
+            self.assertEqual(error.exception.code, 403)
+            self.assertIn("read-only", json.load(error.exception)["error"].lower())
+            invoke.assert_not_called()
+            self.assertFalse(backend.INVOKING.locked())
+
+    def test_passive_viewer_advertises_no_execution_targets(self):
+        with patch.dict(backend.os.environ, {"READ_ONLY_VIEWER": "true", "EXECUTION_TARGETS": "invalid configuration unused by viewer"}):
+            with urllib.request.urlopen(self.url + "/api/state", timeout=5) as response:
+                state = json.load(response)
+        self.assertTrue(state["runtime"]["readOnlyViewer"])
+        self.assertEqual(state["runtime"]["executionTargets"], [])
+        self.assertIn("nativeActivities", state)
+
+    def test_actor_activity_response_is_bounded_for_many_native_requests(self):
+        store = backend.ActivityStore()
+        attributes = [{"key": k, "value": {"stringValue": v}} for k, v in {
+            "service.name": "native-agent", "kagent.runtime": "adk-go",
+            "gen_ai.main_agent.id": "demo/native-agent", "gen_ai.main_agent.name": "native-agent"}.items()]
+        spans = [{"traceId": f"{n:032x}", "spanId": f"{n:016x}", "name": "generate_content test",
+            "startTimeUnixNano": "1000000000", "endTimeUnixNano": "1200000000",
+            "attributes": [{"key": k, "value": {"stringValue": v}} for k, v in {
+                "gen_ai.operation.name": "generate_content", "gen_ai.request.model": "test",
+                "ate.actor.name": "shared-actor"}.items()]} for n in range(1, 201)]
+        store.ingest({"resourceSpans": [{"resource": {"attributes": attributes}, "scopeSpans": [{"spans": spans}]}]})
+        with patch("backend.STORE", store):
+            with urllib.request.urlopen(self.url + "/api/state", timeout=5) as response:
+                payload = response.read()
+        state = json.loads(payload)
+        self.assertEqual(len(state["traces"]), 200)
+        self.assertLessEqual(len(state["nativeActivities"]), 8)
+        self.assertLess(len(payload), 1024 * 1024)
 
 
 class ExecutionTests(unittest.TestCase):

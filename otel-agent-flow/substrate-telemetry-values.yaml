@@ -1,0 +1,4 @@
+otel:
+  endpoint: http://flow-collector.otel-agent-flow.svc.cluster.local:4317
+  traces:
+    samplingRatio: 1

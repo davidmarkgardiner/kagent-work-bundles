@@ -2,6 +2,8 @@
 !Dockerfile
 !.build/grpcurl
 !backend.py
+!onboarding.py
+!onboarding_ordinary.py
 !telemetry.py
 !substrate_call.py
 !workflow_demo.py

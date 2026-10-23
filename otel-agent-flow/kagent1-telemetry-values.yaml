@@ -1,0 +1,11 @@
+otel:
+  exporter:
+    otlp:
+      endpoint: http://flow-collector.otel-agent-flow.svc.cluster.local:4317
+  traces:
+    enabled: true
+  logs:
+    enabled: true
+  capture:
+    messageContent: false
+    rawApiBodies: false

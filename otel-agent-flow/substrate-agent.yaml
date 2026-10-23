@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: otel-flow-gateway-client
+  namespace: kagent
+type: Opaque
+stringData:
+  api-key: lab-gateway-authenticates-upstream
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: ModelConfig
+metadata:
+  name: otel-flow-kimi
+  namespace: kagent
+spec:
+  provider: OpenAI
+  model: kimi-for-coding
+  apiKeySecret: otel-flow-gateway-client
+  apiKeySecretKey: api-key
+  openAI:
+    apiFormat: chatCompletions
+    baseUrl: http://flow-model.otel-agent-flow.svc.cluster.local:8081/kimi/v1
+    maxTokens: 1200
+    timeout: 90
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: Harness
+metadata:
+  name: otel-substrate-reader
+  namespace: kagent
+spec:
+  kagent: {}
+  workload:
+    image: ghcr.io/kagent-dev/kagent/golang-adk@sha256:10ef1350786b5d21bc002ed54833fd0272ea7cd8182a92977686b7bafa7f67d3
+  substrate:
+    workerPoolRef:
+      name: kagent-default
+    snapshotPolicy:
+      location: s3://ate-snapshots/kagent/
+  env:
+  - name: OTEL_BSP_SCHEDULE_DELAY
+    value: '300'
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: AgentTemplate
+metadata:
+  name: otel-substrate-reader
+  namespace: kagent
+spec:
+  modelConfig:
+    name: otel-flow-kimi
+  systemPrompt: You are the kagent Substrate observability demo assistant. Answer
+    user prompts briefly. You have no cluster mutation tools. Explain that your conversation
+    runs in a Substrate sandbox when asked. Do not invent telemetry, billing, or tool
+    execution.
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: Agent
+metadata:
+  name: otel-substrate-reader
+  namespace: kagent
+spec:
+  harnessRef:
+    name: otel-substrate-reader
+  templateRef:
+    name: otel-substrate-reader

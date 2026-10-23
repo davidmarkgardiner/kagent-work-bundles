@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flow-collector
+  namespace: otel-agent-flow
+data:
+  config.yaml: "receivers:\n  otlp:\n    protocols:\n      grpc:\n        endpoint:\
+    \ 0.0.0.0:4317\n      http:\n        endpoint: 0.0.0.0:4318\nprocessors:\n  memory_limiter:\n\
+    \    check_interval: 1s\n    limit_mib: 192\n    spike_limit_mib: 48\n  batch:\n\
+    \    timeout: 200ms\n    send_batch_size: 64\nexporters:\n  otlp_http/dashboard:\n\
+    \    endpoint: http://flow-dashboard:8787\n    encoding: json\n    compression:\
+    \ none\n    retry_on_failure:\n      enabled: true\n      max_elapsed_time: 30s\n\
+    \  otlp_http/substrate_dashboard:\n    endpoint: http://host.docker.internal:8788\n\
+    \    encoding: json\n    compression: none\n    retry_on_failure:\n      enabled:\
+    \ true\n      max_elapsed_time: 30s\nservice:\n  pipelines:\n    traces:\n   \
+    \   receivers:\n      - otlp\n      processors:\n      - memory_limiter\n    \
+    \  - batch\n      exporters:\n      - otlp_http/dashboard\n      - otlp_http/substrate_dashboard\n\
+    \    logs:\n      receivers:\n      - otlp\n      processors:\n      - memory_limiter\n\
+    \      - batch\n      exporters:\n      - otlp_http/dashboard\n      - otlp_http/substrate_dashboard\n"

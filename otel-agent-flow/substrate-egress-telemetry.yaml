@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atenet-egress-agentgateway-config
+  namespace: ate-system
+data:
+  config.yaml: "frontendPolicies:\n  accessLog:\n    add:\n      substrate.connect.authority:\
+    \ source.connectHeaders[\"host\"]\n    otlp:\n      host: flow-collector.otel-agent-flow.svc.cluster.local:4317\n\
+    \      protocol: grpc\n  substrateEgressActorResolution:\n    host: api.ate-system.svc:443\n\
+    \    policies:\n      backendTLS:\n        cert: /run/podidentity.podcert.ate.dev/credential-bundle.pem\n\
+    \        key: /run/podidentity.podcert.ate.dev/credential-bundle.pem\n       \
+    \ root: /run/servicedns.podcert.ate.dev/trust-bundle.pem\n  tracing:\n    host:\
+    \ flow-collector.otel-agent-flow.svc.cluster.local:4317\n    protocol: grpc\n\
+    \    randomSampling: 1\nbinds:\n- port: 8443\n  tunnelProtocol: connect\n  listeners:\n\
+    \  - protocol: HTTPS\n    tls:\n      cert: /run/servicedns.podcert.ate.dev/credential-bundle.pem\n\
+    \      key: /run/servicedns.podcert.ate.dev/credential-bundle.pem\n      root:\
+    \ /run/actor-id-ca-certs/ca.crt\n    routes: []\n- mode: internal\n  protocol:\
+    \ AUTO\n  listeners:\n  - protocol: HTTPS\n    tls:\n      mode: dynamicCa\n \
+    \     cert: /run/egress-mitm/tls.crt\n      key: /run/egress-mitm/tls.key\n  \
+    \  routes:\n    - backends:\n      - dynamic: {}\n        policies:\n        \
+    \  backendTLS: {}\n      policies:\n        substrateEgress:\n          host:\
+    \ api.ate-system.svc:443\n          policies:\n            backendTLS:\n     \
+    \         cert: /run/podidentity.podcert.ate.dev/credential-bundle.pem\n     \
+    \         key: /run/podidentity.podcert.ate.dev/credential-bundle.pem\n      \
+    \        root: /run/servicedns.podcert.ate.dev/trust-bundle.pem\n          credentialProviders:\n\
+    \          - uriAuthority: k8s.io\n            target:\n              host: k8s-credential-provider.ate-system.svc:50051\n\
+    \              policies:\n                backendTLS:\n                  cert:\
+    \ /run/podidentity.podcert.ate.dev/credential-bundle.pem\n                  key:\
+    \ /run/podidentity.podcert.ate.dev/credential-bundle.pem\n                  root:\
+    \ /run/servicedns.podcert.ate.dev/trust-bundle.pem\n  - protocol: TLS\n    hostname:\
+    \ '*'\n    tcpRoutes:\n    - backends:\n      - dynamic: {}\n  - protocol: HTTP\n\
+    \    routes:\n    - backends:\n      - dynamic:\n          target: source.connectHeaders[\"\
+    host\"]\n      policies:\n        substrateEgress:\n          host: api.ate-system.svc:443\n\
+    \          policies:\n            backendTLS:\n              cert: /run/podidentity.podcert.ate.dev/credential-bundle.pem\n\
+    \              key: /run/podidentity.podcert.ate.dev/credential-bundle.pem\n \
+    \             root: /run/servicedns.podcert.ate.dev/trust-bundle.pem\n       \
+    \   credentialProviders:\n          - uriAuthority: k8s.io\n            target:\n\
+    \              host: k8s-credential-provider.ate-system.svc:50051\n          \
+    \    policies:\n                backendTLS:\n                  cert: /run/podidentity.podcert.ate.dev/credential-bundle.pem\n\
+    \                  key: /run/podidentity.podcert.ate.dev/credential-bundle.pem\n\
+    \                  root: /run/servicedns.podcert.ate.dev/trust-bundle.pem\n  -\
+    \ protocol: TCP\n    tcpRoutes:\n    - backends:\n      - dynamic:\n         \
+    \ target: source.connectHeaders[\"host\"]\n"

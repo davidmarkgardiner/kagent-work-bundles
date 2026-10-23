@@ -1,0 +1,5 @@
+Run your quick evidence-backed configuration review of your own configured local cluster now.
+First list namespaces. Exclude every namespace whose name begins with AT, case-insensitively; include all remaining namespaces, including system namespaces.
+Use only your three configured local Kubernetes read tools and exact included namespaces. Follow the immutable system scope and data-minimisation rules.
+Review cluster-wide configuration and round-robin across included namespaces. Aim for about ten minutes and at most 120 tool calls; explicitly mark any incomplete coverage.
+Return the required Markdown report: five-bullet executive summary, cluster summary, severity-sorted evidence-backed findings, complete per-namespace/check-family coverage ledger, Not assessed, local tools/scanners status and sanitised evidence records. Do not run scanners or claim a compliance pass.
