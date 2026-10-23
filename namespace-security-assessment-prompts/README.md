@@ -5,6 +5,12 @@ They produce evidence-backed findings, bounded validation and proposed fixes.
 Replace every placeholder before use. No assessment, boundary test or remediation
 was performed while preparing this document.
 
+For an explicitly authorised active exercise, use
+[ACTIVE-NAMESPACE-ESCAPE-PROMPT.md](ACTIVE-NAMESPACE-ESCAPE-PROMPT.md).
+It adds temporary restricted probe pods, bounded API/network/admission checks,
+Kyverno permission analysis and GitOps remediation mapping. Its node and
+cross-tenant impact boundaries are separate from the three baseline prompts.
+
 Download the full repository ZIP and copy this folder into the workplace repo.
 Its GitHub location is
 https://github.com/davidmarkgardiner/kagent-work-bundles/tree/main/namespace-security-assessment-prompts.

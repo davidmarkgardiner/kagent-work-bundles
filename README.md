@@ -51,9 +51,9 @@ not a deployed scanner or a completed vulnerability assessment.
 ## Namespace security assessment prompts
 
 [Namespace security assessment prompts](namespace-security-assessment-prompts/README.md)
-provides three copyable Mythos prompts for evidence gathering, bounded boundary
-validation, and reviewable Kubernetes/Helm fixes. It includes the identity and
-scope boundaries for an on-call assessment.
+provides three baseline Mythos prompts and a separate active namespace exercise.
+They cover evidence, bounded probe/API/admission tests, Kyverno permissions,
+Kubernetes/Helm ownership and GitOps fixes with explicit identity and scope.
 
 ## Bundle Map
 
