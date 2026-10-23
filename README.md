@@ -48,6 +48,13 @@ to affected image digests, running workloads, traffic paths and owners. It inclu
 a PHP example, read-only fleet scope and load controls. This is a design handoff,
 not a deployed scanner or a completed vulnerability assessment.
 
+## Namespace security assessment prompts
+
+[Namespace security assessment prompts](namespace-security-assessment-prompts/README.md)
+provides three copyable Mythos prompts for evidence gathering, bounded boundary
+validation, and reviewable Kubernetes/Helm fixes. It includes the identity and
+scope boundaries for an on-call assessment.
+
 ## Bundle Map
 
 Each bundle now has the same human handover layer:
