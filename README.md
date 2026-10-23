@@ -28,6 +28,13 @@ Start with [the office handoff](office-demo-security-2026-10-23/README.md).
 | Source security auditor and evidence reviewer | [source-security-audit/](source-security-audit/FRONT-SHEET.md) |
 | Repository remediation for supplied security reports | [repository-security-remediation/](repository-security-remediation/README.md) |
 
+## Kafka triage replacement proposal
+
+[Dapr triage replacement](dapr-kagent-triage/README.md) describes replacing the
+Kafka-to-Argo route after control-plane overload. It covers bounded intake,
+durable incident state, kagent integration, load acceptance, cutover and rollback.
+This is a design handoff, not a deployed or load-tested replacement.
+
 ## Bundle Map
 
 Each bundle now has the same human handover layer:
