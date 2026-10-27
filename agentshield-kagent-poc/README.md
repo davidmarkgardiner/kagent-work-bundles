@@ -4,6 +4,9 @@ This planning bundle explains where AgentShield fits our kagent, agentgateway, A
 
 ## Start here
 
+- [Read the simple explanation](SIMPLE-EXPLANATION.md) for what AgentShield is, what our demonstration showed, and its security benefit.
+- [Rebuild the demonstration in the office](OFFICE-REBUILD.md) for image availability, the patched build, prerequisites, and proof steps.
+
 - [Open the recorded live demonstration](live-demo.html), [read its results](LIVE-DEMO.md), or [run the bounded native PoC](runtime/README.md).
 
 - [Read the one-page benefits and security posture summary](ONE-PAGE-SUMMARY.md), or [open the printable HTML version](one-page-summary.html).
@@ -16,7 +19,7 @@ GitHub displays HTML source. Download the repository ZIP, extract this folder, a
 
 ## Recommendation
 
-Start with the upstream disposable detector-only eval stack on a capacity-checked Proxmox executor. Keep its CNI and mesh changes separate from the existing native kagent cluster. Then install a read-only observer beside native kagent and prove one bounded findings handoff.
+The native lab proof is complete. Use its owned fixture and dedicated database to reproduce configuration-drift detection and one bounded, operator-triggered kagent handoff in a reviewed lower environment. Test actual traffic detection and enforcement separately in an isolated stack before changing the existing CNI or mesh.
 
 The proposed integration is infrastructure observations, AgentShield findings, an authenticated read-only adapter, a kagent security specialist, external human review, and scoped Argo/Flux delivery. The adapter is proposed work. The current reasoning MCP binary serves a saved packet, rather than a continuously refreshed graph.
 
@@ -42,7 +45,7 @@ The API has no built-in authentication. Restrict API and collector access with v
 
 Carry the reviewed source/image pin, chart adaptation, evidence contract, dummy fixtures, and test receipts. Configure the internal registry, database, TLS, cluster/source IDs, telemetry, enterprise model endpoint, permissions, and existing kagent registration locally. Preserve deployed object names, authentication, and delivery flow. Do not copy lab credentials, kubeconfig, or database state.
 
-The assessment includes proposed success criteria for attack and benign controls, source evidence, duplicate/stale findings, policy enforcement, and rollback. No live workplace or homelab integration is claimed.
+The assessment preserves the original research proposal. The [live results](LIVE-DEMO.md) record the completed homelab configuration-drift integration and its limits. Workplace compatibility, traffic blocking, an automatic findings adapter, and autonomous remediation remain unproven.
 
 ## Primary sources
 
