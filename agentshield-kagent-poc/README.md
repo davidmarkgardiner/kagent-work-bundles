@@ -4,6 +4,8 @@ This planning bundle explains where AgentShield fits our kagent, agentgateway, A
 
 ## Start here
 
+- [Read the one-page benefits and security posture summary](ONE-PAGE-SUMMARY.md), or [open the printable HTML version](one-page-summary.html).
+
 - [Open the HTML presentation](presentation.html) for a 13-slide explanation with diagrams, a concrete investigation example, installation footprint, tests, and workplace transfer.
 - [Read the detailed assessment](assessment.html) for the proposed installation recipe, current limitations, and proof gates.
 - [Read the validation record](validation.json) for checks performed and unproven runtime behavior.

@@ -6,14 +6,15 @@
   "upstream_chart_template": "passed with placeholder image during source investigation",
   "public_safety_scan": "passed strict public-safe-scan.sh",
   "html_checks": {
-    "html_parse": "passed for both HTML files",
+    "html_parse": "passed for assessment, presentation, and one-page summary",
     "relative_links": "all internal anchors and relative file links resolve",
     "scripts": "none",
     "presentation_slides": 13,
     "desktop_layout": "1440 px viewport and document width; all slides fit 946 px content height",
     "mobile_layout": "360 px viewport and document width; no section overflow",
     "navigation": "Next link reaches slide 2 at 54 px below fixed navigation",
-    "visual_review": "cover, architecture, coverage, proof gates, and workplace slides inspected"
+    "visual_review": "cover, architecture, coverage, proof gates, and workplace slides inspected",
+    "one_page_summary": "print-media content 966 px fits A4 printable height 1024 px at 184 mm width; 360 px mobile viewport has no horizontal overflow"
   },
   "github_readback": "separate post-push verification; not part of these offline checks",
   "runtime_proof": "not performed; native cluster versions and model behavior require fresh verification",
