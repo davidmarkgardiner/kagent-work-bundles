@@ -1,0 +1,21 @@
+{
+  "research_date": "2026-10-27",
+  "upstream_commit": "b179824e455401783f031a370b8794358a10dd8c",
+  "artifact_scope": "documentation and presentation only",
+  "upstream_chart_lint": "passed during source investigation",
+  "upstream_chart_template": "passed with placeholder image during source investigation",
+  "public_safety_scan": "passed strict public-safe-scan.sh",
+  "html_checks": {
+    "html_parse": "passed for both HTML files",
+    "relative_links": "all internal anchors and relative file links resolve",
+    "scripts": "none",
+    "presentation_slides": 13,
+    "desktop_layout": "1440 px viewport and document width; all slides fit 946 px content height",
+    "mobile_layout": "360 px viewport and document width; no section overflow",
+    "navigation": "Next link reaches slide 2 at 54 px below fixed navigation",
+    "visual_review": "cover, architecture, coverage, proof gates, and workplace slides inspected"
+  },
+  "github_readback": "separate post-push verification; not part of these offline checks",
+  "runtime_proof": "not performed; native cluster versions and model behavior require fresh verification",
+  "integration_status": "proposed; adapter not implemented; no installation performed"
+}
