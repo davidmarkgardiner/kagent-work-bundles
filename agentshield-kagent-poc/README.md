@@ -4,6 +4,7 @@ This planning bundle explains where AgentShield fits our kagent, agentgateway, A
 
 ## Start here
 
+- [Read the manager-facing value summary](BUSINESS-VALUE.md) for what AgentShield adds, what the lab proved, and what a workplace PoC needs to measure.
 - [Read the simple explanation](SIMPLE-EXPLANATION.md) for what AgentShield is, what our demonstration showed, and its security benefit.
 - [Rebuild the demonstration in the office](OFFICE-REBUILD.md) for image availability, the patched build, prerequisites, and proof steps.
 
