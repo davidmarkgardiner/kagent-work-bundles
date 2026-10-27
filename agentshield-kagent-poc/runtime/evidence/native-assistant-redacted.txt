@@ -1,0 +1,14 @@
+**Finding review (evidence only)**
+
+- Finding: `finding:sha256:f81f1746812057433baa7ddd2a1b64556d34496d775174eb52a5c112c2fcd495`
+- Rule: `lab-sensitive-backend-attachment` rev 1; status `active`, severity `high`, origin `detection_rule`
+- Graph SHA256: packet-level `d46335364f2feac3dbe9665592ea8d26fafe4fd85d70b18ee9c05bc24133d3a9` (note: embedded graph object lists `0a1d51dd48a38f3eca48a51f7ecb8f21b72a24186773340537466d85a9d6445b`; `graphDigestMatchesCurrent:false`)
+- Signal: `signal:sha256:5297ed77bf0e5d75645086aae3097f59775fb3c1d4ca48b1e44d6adfeceedc03`; phase `drift`
+
+**What the evidence establishes:** The `report-api` Service (owned fixture ID omitted) acquired a selector edge matching the `sensitive-backend` pod (owned fixture ID omitted) in namespace `agentshield-demo`[owned upsert evidence IDs omitted]`…d3496db2…:185526:upsert`.
+
+**Currentness:** fresh (31s age, max 300s), `currentness: target_edge_present` — the edge is currently present, assessed from the separately captured selector edge, not the retained `active` status (native rule findings keep match-history status after rollback; `graphDigestMatchesCurrent:false`).
+
+**Limits:** packet proves no live traffic (`trafficObserved:false`), no NetworkPolicy enforcement, no malicious intent or exfiltration.
+
+**Response:** Human review requested. Any selector change or NetworkPolicy rollout requires separate scoped execution.

@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "agentshield.native-poc-result/v1",
+  "verifiedAt": "2026-10-27",
+  "status": "PASS",
+  "proofClass": "native_configuration_drift_and_operator_triggered_handoff",
+  "sourceCommit": "b179824e455401783f031a370b8794358a10dd8c",
+  "patchSha256": "3fb93b18d26a513efccf04b849d35336c7fa4e8693bbb2af9aaaefb79ea431e2",
+  "binarySha256": "4c56005d965a18ab9011cd6d0f6ae13460a658ab27023c484e8c99aebb57e87e",
+  "versions": {
+    "kagent": "1.0.0-alpha17",
+    "kubernetes": "v1.35.0",
+    "substrate": "0.6.0-alpha3",
+    "agentgateway": "v1.5.0",
+    "postgres": "16-alpine"
+  },
+  "phases": [
+    {
+      "phase": "baseline",
+      "findingRecords": 0,
+      "currentSensitivePath": false,
+      "httpMarker": "AGENTSHIELD_REPORT_DUMMY",
+      "packetBytes": 1854,
+      "packetSha256": "550f51336dcca72a1578bc5e51eb8e76ca08bb2ea1a4644d59a832bcb8c02566",
+      "capturedAt": "2026-10-27T11:00:38.776846Z"
+    },
+    {
+      "phase": "benign",
+      "findingRecords": 0,
+      "currentSensitivePath": false,
+      "httpMarker": "AGENTSHIELD_REPORT_DUMMY",
+      "packetBytes": 1850,
+      "packetSha256": "8d68b9e488d405a4c2ec7876f6b63e9efb6cce05715c6f636a6924a209e702ef",
+      "capturedAt": "2026-10-27T11:01:24.468673Z"
+    },
+    {
+      "phase": "drift",
+      "findingRecords": 1,
+      "currentSensitivePath": true,
+      "httpMarker": "AGENTSHIELD_SENSITIVE_DUMMY_NO_REAL_DATA",
+      "packetBytes": 2558,
+      "packetSha256": "202d31b80da23f7f268016c68cc299959cb31567c9ac5534548a8ec161ef4405",
+      "capturedAt": "2026-10-27T11:02:23.648184Z"
+    },
+    {
+      "phase": "rollback",
+      "findingRecords": 1,
+      "currentSensitivePath": false,
+      "httpMarker": "AGENTSHIELD_REPORT_DUMMY",
+      "packetBytes": 2579,
+      "packetSha256": "5e5a60e933e0b49f51a34c7b329b297be5381b35805155b8124c02844fbe37d7",
+      "capturedAt": "2026-10-27T11:14:02.446789Z"
+    }
+  ],
+  "finding": {
+    "id": "finding:sha256:f81f1746812057433baa7ddd2a1b64556d34496d775174eb52a5c112c2fcd495",
+    "rule": "lab-sensitive-backend-attachment",
+    "origin": "detection_rule",
+    "nativeStatusAfterRollback": "active",
+    "currentnessAfterRollback": "historical_match_target_edge_absent",
+    "findingGraphSha256": "d46335364f2feac3dbe9665592ea8d26fafe4fd85d70b18ee9c05bc24133d3a9",
+    "handoffGraphSha256": "0a1d51dd48a38f3eca48a51f7ecb8f21b72a24186773340537466d85a9d6445b"
+  },
+  "native": {
+    "taskState": "TASK_STATE_COMPLETED",
+    "exactFindingCitation": true,
+    "exactRuleCitation": true,
+    "exactCurrentGraphCitation": true,
+    "observedToolCalls": [],
+    "externalMcpBindings": 0,
+    "runtimeBuiltinToolCount": 6,
+    "model": "kimi-for-coding",
+    "modelRequestsObserved": 1,
+    "inputTokens": 2216,
+    "outputTokens": 463,
+    "handoffPacketBytes": 2560
+  },
+  "checks": {
+    "native-cni-unchanged": true,
+    "native-gateway-unchanged": true,
+    "native-gateway-config-unchanged": true,
+    "observerReadOnly": true,
+    "apiAndDatabaseLoopbackOnly": true,
+    "patchStartupTestWithDedicatedPostgres": "PASS",
+    "packetBoundaryTests": 10
+  },
+  "recovery": {
+    "initialInputRejected": true,
+    "oldSessionPersistedTasks": 0,
+    "oldWorkerRegistrationStaleAfterReboot": true,
+    "sharedWorkerRestarted": false,
+    "dedicatedWorkerPoolCreated": true,
+    "nativeWorkerSelectorLabelsRequired": true
+  },
+  "boundaries": {
+    "agentShieldHttpTrafficTelemetry": false,
+    "networkPolicyEnforcementProven": false,
+    "automaticMcpHandoff": false,
+    "autonomousRemediation": false,
+    "workplaceDeployment": false,
+    "builtInToolIsolationProven": false
+  },
+  "privateRawEvidenceRetainedOnExecutor": true
+}

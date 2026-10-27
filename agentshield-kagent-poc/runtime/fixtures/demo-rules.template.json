@@ -1,0 +1,18 @@
+{
+  "id": "lab-sensitive-backend-attachment-v1",
+  "rules": [
+    {
+      "id": "lab-sensitive-backend-attachment",
+      "revision": 1,
+      "inputVersion": "v1",
+      "pluginId": "kubernetes",
+      "workloadResourceId": "{{SENSITIVE_POD_RESOURCE_ID}}",
+      "type": "relationship",
+      "kind": "exposes",
+      "expression": "true",
+      "risk": "high",
+      "reasons": ["unexpected_dummy_sensitive_backend_attachment"],
+      "windowSeconds": 300
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+diff --git a/cmd/agentshield/main.go b/cmd/agentshield/main.go
+index c60d83f..5051350 100644
+--- a/cmd/agentshield/main.go
++++ b/cmd/agentshield/main.go
+@@ -94,6 +94,7 @@ type options struct {
+ 	detectionInterval           time.Duration
+ 	detectionSignalRetention    time.Duration
+ 	detectorReloadInterval      time.Duration
++	detectorOnly                bool
+ 	agenticInvestigation        bool
+ 	investigationRetrieval      string
+ 	investigationBatchWindow    time.Duration
+@@ -200,10 +201,11 @@ func parseOptions(args []string) (options, error) {
+ 	flags.StringVar(&config.modelProviderName, "model-provider", "openai", "model API provider: openai or anthropic. --agentic-investigation requires openai (the Responses API)")
+ 	flags.StringVar(&config.model, "model", envString("AGENTSHIELD_MODEL", reasoning.Model), "model name")
+ 	flags.StringVar(&config.modelReasoningEffort, "model-reasoning-effort", os.Getenv("AGENTSHIELD_MODEL_REASONING_EFFORT"), "reasoning effort for model calls, for compatible providers")
+-	flags.StringVar(&config.detectionConsumer, "detection-consumer", "reasoning/default", "stable durable detection cursor ID; detection runs when --agentic-investigation or --deployment-rule-authoring is enabled")
++	flags.StringVar(&config.detectionConsumer, "detection-consumer", "reasoning/default", "stable durable detection cursor ID; detection runs with --detector-only, --agentic-investigation or --deployment-rule-authoring")
+ 	flags.DurationVar(&config.detectionInterval, "detection-interval", time.Second, "detection graph polling interval")
+ 	flags.DurationVar(&config.detectionSignalRetention, "detection-signal-retention", 7*24*time.Hour, "how long recorded detection signals and finished investigation jobs are kept")
+ 	flags.DurationVar(&config.detectorReloadInterval, "detector-reload-interval", 10*time.Second, "detector ruleset and Deployment rule polling interval")
++	flags.BoolVar(&config.detectorOnly, "detector-only", false, "run deterministic detection and persist rule findings without model workers; cannot be combined with --agentic-investigation or --deployment-rule-authoring")
+ 	flags.BoolVar(&config.agenticInvestigation, "agentic-investigation", envBool("AGENTSHIELD_AGENTIC_INVESTIGATION", false), "investigate built-in novelty signals with a model agent that may promote findings; calls --model-endpoint (OpenAI Responses API) at most once per admitted investigation job")
+ 	flags.StringVar(&config.investigationRetrieval, "agentic-investigation-retrieval", envString("AGENTSHIELD_AGENTIC_INVESTIGATION_RETRIEVAL", reasoning.RetrievalModelSelected), "agentic investigation context retrieval: model_selected or deterministic")
+ 	flags.DurationVar(&config.investigationBatchWindow, "agentic-investigation-batch-window", 30*time.Second, "how long a queued investigation waits so later change windows that share a resource join it")
+@@ -253,16 +255,18 @@ func parseOptions(args []string) (options, error) {
+ 	return config, nil
+ }
+ 
+-// detectionEnabled reports whether the detection service runs. Detection serves
+-// the model-calling features: it gates agentic investigation and runs the rules
+-// that authoring produces, so it has no standalone mode.
++// detectionEnabled includes standalone deterministic detection and the
++// detection required by either model-calling feature.
+ func (config options) detectionEnabled() bool {
+-	return config.agenticInvestigation || config.deploymentRuleAuthoring
++	return config.detectorOnly || config.agenticInvestigation || config.deploymentRuleAuthoring
+ }
+ 
+ // validateDetectionFeatures checks that each model-calling feature is explicitly
+ // enabled and has what it needs; nothing calls a model implicitly.
+ func (config options) validateDetectionFeatures() error {
++	if config.detectorOnly && (config.agenticInvestigation || config.deploymentRuleAuthoring) {
++		return errors.New("--detector-only cannot be combined with --agentic-investigation or --deployment-rule-authoring")
++	}
+ 	if config.detectorReloadInterval <= 0 || config.detectionInterval <= 0 {
+ 		return errors.New("detection and detector reload intervals must be positive")
+ 	}
+@@ -458,8 +462,8 @@ func newAPIServer(config options, store *state.Store, manager *discovery.Manager
+ 	return api.NewServerWithRemediations(store, otlpReceiver, executor, rules)
+ }
+ 
+-// detectionServices are the detection components. All are nil unless
+-// --agentic-investigation or --deployment-rule-authoring is enabled.
++// detectionServices are nil unless deterministic detection or a model-calling
++// feature is enabled. Model workers require their respective feature flags.
+ type detectionServices struct {
+ 	engine           *detector.Engine
+ 	detection        *reasoning.Service
+@@ -472,7 +476,7 @@ type detectionServices struct {
+ func newDetectionServices(ctx context.Context, config options, store *state.Store) (detectionServices, error) {
+ 	var services detectionServices
+ 	if !config.detectionEnabled() {
+-		log.Printf("detection is disabled; pass --agentic-investigation and/or --deployment-rule-authoring to enable it")
++		log.Printf("detection is disabled; pass --detector-only, --agentic-investigation or --deployment-rule-authoring to enable it")
+ 		return services, nil
+ 	}
+ 	if err := store.EnsureDefaultDetectorRuleset(ctx); err != nil {
+@@ -533,8 +537,8 @@ func newDetectionServices(ctx context.Context, config options, store *state.Stor
+ 		}
+ 	}
+ 	status := engine.Status()
+-	log.Printf("detection enabled (ruleset=%s, Deployment rules active=%d shadow=%d); agentic investigation=%t, Deployment rule authoring=%t",
+-		status.RulesetID, status.ActiveWorkloadRules, status.ShadowWorkloadRules, config.agenticInvestigation, config.deploymentRuleAuthoring)
++	log.Printf("detection enabled (ruleset=%s, Deployment rules active=%d shadow=%d); detector only=%t, agentic investigation=%t, Deployment rule authoring=%t",
++		status.RulesetID, status.ActiveWorkloadRules, status.ShadowWorkloadRules, config.detectorOnly, config.agenticInvestigation, config.deploymentRuleAuthoring)
+ 	return services, nil
+ }
+ 
+diff --git a/cmd/agentshield/main_test.go b/cmd/agentshield/main_test.go
+index 6673292..8a3afac 100644
+--- a/cmd/agentshield/main_test.go
++++ b/cmd/agentshield/main_test.go
+@@ -1,6 +1,7 @@
+ package main
+ 
+ import (
++	"context"
+ 	"errors"
+ 	"fmt"
+ 	"os"
+@@ -78,6 +79,9 @@ func TestValidateDetectionFeatures(t *testing.T) {
+ 		valid  bool
+ 	}{
+ 		{name: "everything disabled", modify: func(config *options) { config.modelEndpoint = "" }, valid: true},
++		{name: "detector only without endpoint", modify: func(config *options) { config.detectorOnly, config.modelEndpoint = true, "" }, valid: true},
++		{name: "detector only with investigation", modify: func(config *options) { config.detectorOnly, config.agenticInvestigation = true, true }},
++		{name: "detector only with authoring", modify: func(config *options) { config.detectorOnly, config.deploymentRuleAuthoring = true, true }},
+ 		{name: "agentic investigation", modify: func(config *options) { config.agenticInvestigation = true }, valid: true},
+ 		{name: "authoring only", modify: func(config *options) { config.deploymentRuleAuthoring = true }, valid: true},
+ 		{name: "both model features", modify: func(config *options) { config.agenticInvestigation, config.deploymentRuleAuthoring = true, true }, valid: true},
+@@ -123,12 +127,13 @@ func TestValidateDetectionFeatures(t *testing.T) {
+ 	}
+ }
+ 
+-func TestDetectionRunsOnlyForModelFeatures(t *testing.T) {
++func TestDetectionRequiresExplicitFeature(t *testing.T) {
+ 	for _, test := range []struct {
+ 		config options
+ 		want   bool
+ 	}{
+ 		{config: options{}, want: false},
++		{config: options{detectorOnly: true}, want: true},
+ 		{config: options{agenticInvestigation: true}, want: true},
+ 		{config: options{deploymentRuleAuthoring: true}, want: true},
+ 		{config: options{agenticInvestigation: true, deploymentRuleAuthoring: true}, want: true},
+@@ -139,6 +144,64 @@ func TestDetectionRunsOnlyForModelFeatures(t *testing.T) {
+ 	}
+ }
+ 
++func TestParseOptionsDetectorOnly(t *testing.T) {
++	for _, key := range []string{
++		"AGENTSHIELD_AGENTIC_INVESTIGATION", "AGENTSHIELD_DEPLOYMENT_RULE_AUTHORING",
++		"AGENTSHIELD_MODEL_ENDPOINT", "AGENTSHIELD_MODEL_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
++	} {
++		t.Setenv(key, "")
++	}
++	config, err := parseOptions([]string{"--detector-only"})
++	if err != nil {
++		t.Fatal(err)
++	}
++	if !config.detectionEnabled() || config.agenticInvestigation || config.deploymentRuleAuthoring || config.modelEndpoint != "" || config.modelAPIKey != "" {
++		t.Fatal("detector-only must enable detection without a model feature, endpoint or key")
++	}
++	config, err = parseOptions(nil)
++	if err != nil || config.detectionEnabled() {
++		t.Fatalf("default detection enabled=%t, err=%v", config.detectionEnabled(), err)
++	}
++	for _, feature := range []string{"--agentic-investigation", "--deployment-rule-authoring"} {
++		if _, err := parseOptions([]string{"--detector-only", feature, "--model-endpoint=http://model.invalid"}); err == nil {
++			t.Fatalf("detector-only accepted %s", feature)
++		}
++	}
++	t.Setenv("AGENTSHIELD_AGENTIC_INVESTIGATION", "true")
++	if _, err := parseOptions([]string{"--detector-only"}); err == nil {
++		t.Fatal("detector-only accepted an environment-enabled model feature")
++	}
++}
++
++func TestPostgreSQLDetectorOnlyStartsWithoutModelWorkers(t *testing.T) {
++	databaseURL := os.Getenv("AGENTSHIELD_TEST_DATABASE_URL")
++	if databaseURL == "" {
++		t.Skip("set AGENTSHIELD_TEST_DATABASE_URL to run PostgreSQL integration tests")
++	}
++	config := options{
++		detectorOnly: true, databaseURL: databaseURL, databaseMaxConns: 2,
++		detectionConsumer: "test/detector-only", detectionInterval: time.Second,
++		detectionSignalRetention: time.Hour, detectorReloadInterval: time.Second,
++	}
++	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
++	defer cancel()
++	store, err := openStore(ctx, config)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer store.Close()
++	services, err := newDetectionServices(ctx, config, store)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if services.engine == nil || services.detection == nil {
++		t.Fatal("detector-only did not start the deterministic engine and detection service")
++	}
++	if services.investigation != nil || services.deploymentAuthor != nil {
++		t.Fatal("detector-only started a model worker")
++	}
++}
++
+ func TestResolveModelAPIKeyPrecedence(t *testing.T) {
+ 	t.Setenv("AGENTSHIELD_MODEL_API_KEY", "")
+ 	t.Setenv("OPENAI_API_KEY", "openai")

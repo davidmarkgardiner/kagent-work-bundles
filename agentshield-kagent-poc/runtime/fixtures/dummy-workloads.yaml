@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentshield-demo
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    agentshield.demo/owner: native-poc-v1
+    app.kubernetes.io/part-of: agentshield-native-poc
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: report-backend
+  namespace: agentshield-demo
+  labels:
+    agentshield.demo/owner: native-poc-v1
+    app.kubernetes.io/part-of: agentshield-native-poc
+    app.kubernetes.io/name: agentshield-demo-report
+spec:
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: http
+      image: hashicorp/http-echo:1.0.0@sha256:fcb75f691c8b0414d670ae570240cbf95502cc18a9ba57e982ecac589760a186
+      args: ["-listen=:8080", "-text=AGENTSHIELD_REPORT_DUMMY"]
+      ports:
+        - name: http
+          containerPort: 8080
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: [ALL]
+      resources:
+        requests: {cpu: 5m, memory: 8Mi}
+        limits: {cpu: 100m, memory: 32Mi}
+      readinessProbe:
+        httpGet: {path: /, port: http}
+        periodSeconds: 2
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sensitive-backend
+  namespace: agentshield-demo
+  labels:
+    agentshield.demo/owner: native-poc-v1
+    app.kubernetes.io/part-of: agentshield-native-poc
+    app.kubernetes.io/name: agentshield-demo-sensitive
+spec:
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: http
+      image: hashicorp/http-echo:1.0.0@sha256:fcb75f691c8b0414d670ae570240cbf95502cc18a9ba57e982ecac589760a186
+      args: ["-listen=:8080", "-text=AGENTSHIELD_SENSITIVE_DUMMY_NO_REAL_DATA"]
+      ports:
+        - name: http
+          containerPort: 8080
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: [ALL]
+      resources:
+        requests: {cpu: 5m, memory: 8Mi}
+        limits: {cpu: 100m, memory: 32Mi}
+      readinessProbe:
+        httpGet: {path: /, port: http}
+        periodSeconds: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: report-api
+  namespace: agentshield-demo
+  labels:
+    agentshield.demo/owner: native-poc-v1
+    app.kubernetes.io/part-of: agentshield-native-poc
+    app.kubernetes.io/name: agentshield-demo-service
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: agentshield-demo-report
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: caller
+  namespace: agentshield-demo
+  labels:
+    agentshield.demo/owner: native-poc-v1
+    app.kubernetes.io/part-of: agentshield-native-poc
+    app.kubernetes.io/name: agentshield-demo-caller
+spec:
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: curl
+      image: curlimages/curl:8.12.1@sha256:94e9e444bcba979c2ea12e27ae39bee4cd10bc7041a472c4727a558e213744e6
+      command: ["/bin/sh", "-c", "exec sleep 86400"]
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: [ALL]
+      resources:
+        requests: {cpu: 5m, memory: 8Mi}
+        limits: {cpu: 100m, memory: 32Mi}

@@ -1,8 +1,10 @@
 # AgentShield with kagent: architecture and PoC plan
 
-This planning bundle explains where AgentShield fits our kagent, agentgateway, Argo, and Flux platform. It contains a source-backed assessment and an offline HTML presentation. It does not contain an implemented findings adapter or a validated deployment package.
+This planning bundle explains where AgentShield fits our kagent, agentgateway, Argo, and Flux platform. It contains a source-backed assessment, an offline HTML presentation, and a lab-proven native configuration-drift PoC. The handoff is operator-triggered. An automatic MCP adapter and workplace deployment remain unproven.
 
 ## Start here
+
+- [Open the recorded live demonstration](live-demo.html), [read its results](LIVE-DEMO.md), or [run the bounded native PoC](runtime/README.md).
 
 - [Read the one-page benefits and security posture summary](ONE-PAGE-SUMMARY.md), or [open the printable HTML version](one-page-summary.html).
 

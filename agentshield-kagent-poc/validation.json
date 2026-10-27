@@ -1,7 +1,7 @@
 {
   "research_date": "2026-10-27",
   "upstream_commit": "b179824e455401783f031a370b8794358a10dd8c",
-  "artifact_scope": "documentation and presentation only",
+  "artifact_scope": "research, presentation, locally patched native runtime PoC, and sanitized live receipt",
   "upstream_chart_lint": "passed during source investigation",
   "upstream_chart_template": "passed with placeholder image during source investigation",
   "public_safety_scan": "passed strict public-safe-scan.sh",
@@ -14,9 +14,20 @@
     "mobile_layout": "360 px viewport and document width; no section overflow",
     "navigation": "Next link reaches slide 2 at 54 px below fixed navigation",
     "visual_review": "cover, architecture, coverage, proof gates, and workplace slides inspected",
-    "one_page_summary": "print-media content 966 px fits A4 printable height 1024 px at 184 mm width; 360 px mobile viewport has no horizontal overflow"
+    "one_page_summary": "including link to live proof, print-media body 1004 px fits A4 printable height 1024 px",
+    "live_demo": "4 actual phases; 1440 px desktop and 360 px mobile have no horizontal overflow"
   },
   "github_readback": "separate post-push verification; not part of these offline checks",
-  "runtime_proof": "not performed; native cluster versions and model behavior require fresh verification",
-  "integration_status": "proposed; adapter not implemented; no installation performed"
+  "runtime_proof": "PASS for native Service selector configuration drift, persisted rule finding, operator-triggered native handoff through existing gateway, and rollback; see runtime/evidence/proxmox-native-2026-10-27.json",
+  "integration_status": "lab-proven bounded operator-triggered handoff; automatic MCP adapter, NetworkPolicy enforcement, and workplace deployment unproven",
+  "runtime_tests": {
+    "python_packet_boundary_tests": 10,
+    "upstream_command_package": "passed locally",
+    "postgres_startup_without_model_workers": "passed on executor with dedicated test database",
+    "native_template_server_dry_run": "passed on installed alpha17/alpha3 CRDs"
+  },
+  "review": {
+    "independent_native_codex": "passed after matching semantic-source flags and external-tool-binding wording corrected",
+    "multi_provider_review": "not established; Claude reported session usage limit and Grok CLI unavailable"
+  }
 }

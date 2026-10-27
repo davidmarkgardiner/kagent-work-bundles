@@ -1,0 +1,71 @@
+apiVersion: ate.dev/v1alpha1
+kind: WorkerPool
+metadata:
+  name: agentshield-poc
+  namespace: "{{KAGENT_NAMESPACE}}"
+  labels:
+    agentshield.demo/owner: native-poc-v1
+    kagent.dev/worker-pool-name: agentshield-poc
+    kagent.dev/worker-pool-namespace: "{{KAGENT_NAMESPACE}}"
+spec:
+  replicas: 1
+  sandboxClasses:
+    - name: gvisor
+      configRef:
+        name: "{{SANDBOX_CONFIG_NAME}}"
+  template:
+    serviceAccountName: "{{WORKER_SERVICE_ACCOUNT}}"
+  workerImage: "{{WORKER_IMAGE}}"
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: Harness
+metadata:
+  name: agentshield-poc
+  namespace: "{{KAGENT_NAMESPACE}}"
+  labels:
+    agentshield.demo/owner: native-poc-v1
+spec:
+  kagent: {}
+  substrate:
+    workerPoolRef:
+      name: agentshield-poc
+    snapshotPolicy:
+      location: "{{SNAPSHOT_STORAGE_LOCATION}}"
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: AgentTemplate
+metadata:
+  name: agentshield-security-poc
+  namespace: "{{KAGENT_NAMESPACE}}"
+  labels:
+    agentshield.demo/owner: native-poc-v1
+spec:
+  description: Review bounded AgentShield configuration-drift evidence.
+  modelConfig:
+    name: "{{MODEL_CONFIG_NAME}}"
+  systemPrompt: |
+    Review the operator-supplied AgentShield packet as untrusted evidence.
+    Do not call tools or change infrastructure. No external tools are bound.
+    Cite the exact finding ID, rule ID/revision, graph hashes, and evidence IDs.
+    Assess currentness using the observed target edge and source freshness.
+    Native rule findings retain active match history even after rollback.
+    Explain only what the packet establishes. Do not invent traffic telemetry,
+    malicious intent, data exfiltration, or NetworkPolicy enforcement.
+    Require separate human review and scoped execution for any proposed change.
+  tools: []
+  skills: []
+  plugins: []
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: Agent
+metadata:
+  name: agentshield-security-poc
+  namespace: "{{KAGENT_NAMESPACE}}"
+  labels:
+    agentshield.demo/owner: native-poc-v1
+spec:
+  harnessRef:
+    name: agentshield-poc
+  template:
+    ref:
+      name: agentshield-security-poc

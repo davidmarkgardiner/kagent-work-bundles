@@ -1,0 +1,2 @@
+# Unified-diff context preserves the source indentation after its leading space.
+*.patch -whitespace

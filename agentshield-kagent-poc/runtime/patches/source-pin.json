@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/agentshield-dev/agentshield",
+  "sourceCommit": "b179824e455401783f031a370b8794358a10dd8c",
+  "patch": "agentshield-detector-only.patch",
+  "patchSha256": "3fb93b18d26a513efccf04b849d35336c7fa4e8693bbb2af9aaaefb79ea431e2",
+  "buildClass": "locally_patched_upstream"
+}
