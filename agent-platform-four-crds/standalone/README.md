@@ -4,6 +4,10 @@ This is a **standalone reference agent**, driven by the four custom resource con
 
 The Job has exactly two model tools: `load_skill` and `load_skill_resource`. These are actual OpenAI function calls executed inside the worker. The worker validates every mounted source byte, requires instruction loads for both packages, reads of the selected reference and knowledge files plus both generated release proofs, and an answer containing the proofs, selected terms, and exact citations. Any failed gate exits nonzero. There are no retries or fallback answers. `backoffLimit: 0`, `restartPolicy: Never`, an execution deadline, and bounded calls, tokens, request bytes, and response bytes make failures visible. There is no TTL cleanup before receipt capture.
 
+## Start here when the target has no content
+
+The current workplace report has no verified releases, immutable content ConfigMaps or content adapter. Follow [CONTENT-BOOTSTRAP-SHEET.md](../CONTENT-BOOTSTRAP-SHEET.md) first. `bootstrap_content.py` generates source/releases and matching requests from the actual committed sample bytes. This guide's full snapshot and Job steps begin only after real source/controller readiness.
+
 ## Private configuration
 
 Copy `private.example.json` outside the public repository. Replace every placeholder with an approved value; placeholders deliberately fail validation. Use the existing digest-pinned Python helper image, not a runtime image. Use the explicit full OpenAI-compatible chat completions URL and model ID resolved from the existing approved model route. `endpoint` must end in `/chat/completions`; it cannot contain URL credentials, queries, or fragments. HTTP is supported for an explicitly approved internal route; HTTPS uses certificate verification with the system trust store and optional CA ConfigMap. Redirects, proxies, and TLS bypass are disabled.

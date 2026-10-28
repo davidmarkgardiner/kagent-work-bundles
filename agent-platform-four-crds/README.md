@@ -2,6 +2,8 @@
 
 **Today's target is no Substrate.** Resume from the four established CRDs and existing images. Start with [NO-SUBSTRATE-TODAY.md](NO-SUBSTRATE-TODAY.md) and the runnable [standalone Job guide](standalone/README.md). Give the work agent [KAGENT-1.0-WORK-AGENT-PROMPT.md](KAGENT-1.0-WORK-AGENT-PROMPT.md).
 
+**The current content bootstrap blocker is covered by [CONTENT-BOOTSTRAP-SHEET.md](CONTENT-BOOTSTRAP-SHEET.md).** Publish and pin the sample through approved internal Git, run the content-only adapter and wait for verified releases/ConfigMaps before preparing the Job.
+
 The standalone execution adapter consumes Skill, KnowledgeBase, HostedAgent and GoldenScenario and prepares an ordinary Kubernetes Job. Its worker calls the configured real model and reads the verified content through two bounded tools. It requires no Harness, WorkerPool, snapshots, native Agent compiler or kagent/Substrate upgrade. Reuse the compatible Python helper image and immutable content ConfigMaps. The Job's Pod should complete; the content-adapter Deployment remains running.
 
 Choose any permitted namespace. Configure the existing Qwen-compatible model route explicitly, based on its resolved ModelConfig. This path does not require a ModelConfig in the Job namespace. Secret/CA references, DNS and network access must still work there. Preserve the installed CRDs; use the reviewed additive standalone profile patches rather than replacing their schemas.

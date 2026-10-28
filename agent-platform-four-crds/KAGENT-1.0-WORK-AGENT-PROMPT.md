@@ -10,6 +10,10 @@ Keep established CRDs, built images, private configuration, credentials and prio
 
 The report mentions kagent alpha8 and a Substrate chart version, while the operator says no usable Substrate exists. Record actual served APIs/workloads if needed, but this inconsistency must not turn into a Substrate installation task.
 
+## Bootstrap missing content first
+
+The current target has no verified Skill/KnowledgeBase releases, immutable content ConfigMaps or content adapter. Execute [CONTENT-BOOTSTRAP-SHEET.md](CONTENT-BOOTSTRAP-SHEET.md) before Job preparation. Export the provided sample, publish it through an approved internal Git destination using existing authorized access, pin the actual published commit and generate matching source/releases with `standalone/bootstrap_content.py`. Run the content-only adapter and require actual current-generation readiness and immutable owned ConfigMaps. Do not stop merely because no release preexists: this is the bootstrap task. If publication access is unavailable, return the specific repository/permission/credential-reference input required. Do not manufacture approval, Ready fields, UIDs or source artifact metadata.
+
 ## Execute the bounded Job path
 
 1. Choose any permitted namespace. Keep the four custom requests and verified source/ConfigMap references namespace-local. A native namespace-local Harness, WorkerPool or ModelConfig is not required for this standalone execution.

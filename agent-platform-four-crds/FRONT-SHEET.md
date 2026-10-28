@@ -2,6 +2,8 @@
 
 **Today's requirement is no Substrate.** Resume from the four established CRDs and the already-built images. Use [NO-SUBSTRATE-TODAY.md](NO-SUBSTRATE-TODAY.md) and the runnable [standalone Job guide](standalone/README.md).
 
+**No content releases yet?** Start with [CONTENT-BOOTSTRAP-SHEET.md](CONTENT-BOOTSTRAP-SHEET.md). It covers publication to internal Git, the real commit pin, content-adapter installation, readiness and fresh snapshots.
+
 The native Harness route is not today's execution path. The standalone adapter consumes the custom Skill, KnowledgeBase, HostedAgent and GoldenScenario requests and creates an ordinary Kubernetes Job. The worker calls the configured real model and reads verified content. A passing run ends with a Completed Pod and a sanitized receipt.
 
 Choose any permitted namespace. Use the existing Qwen-compatible endpoint identified from its resolved ModelConfig; this path does not require a namespace-local ModelConfig, Harness, WorkerPool or snapshot location. Secret/CA references and network access still have to work from the Job's namespace.
