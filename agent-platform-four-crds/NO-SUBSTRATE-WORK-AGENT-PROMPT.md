@@ -1,4 +1,6 @@
-# Replicate the onboarding flow without Substrate
+# Legacy kagent 0.7 work-agent prompt without Substrate
+
+**The requested build target is now kagent 1.0.0-alpha17. Use [KAGENT-1.0-WORK-AGENT-PROMPT.md](KAGENT-1.0-WORK-AGENT-PROMPT.md).** This older Substrate-free task is retained as a 0.7 reference. Alpha17's managed Harness requires Substrate.
 
 The workplace requires an air-gapped, backend-first installation and permits local owner-file delivery. Follow AIRGAP-INSTALL.md and build/README.md before the original GitOps instructions below. Use private_install.py for the opt-in private baseline and VSCODE-AGENT-AUTHORING.md for the constrained Copilot or Codex task. Owner YAML can be local while content ingestion still uses internal source-controller artifacts. Prove effective Pod security, permissions, network enforcement, image provenance and offline dependency closure in the actual target. Never describe offline rendering as those runtime results.
 

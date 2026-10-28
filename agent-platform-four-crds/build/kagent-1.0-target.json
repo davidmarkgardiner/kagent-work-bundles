@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-28",
+  "purpose": "Native kagent 1.0 build and import target; legacy deployment adapter requires a port",
+  "kagent": {
+    "version": "1.0.0-alpha17",
+    "tag": "v1.0.0-alpha17",
+    "sourceCommit": "8392184232e9c78196433a34b1fd3b33db5fcb97",
+    "releaseUrl": "https://github.com/kagent-dev/kagent/releases/tag/v1.0.0-alpha17",
+    "apiVersion": "api.kagent.dev/v1alpha3",
+    "runtime": "native-go-adk",
+    "goVersion": "1.27.3"
+  },
+  "substrate": {
+    "version": "0.6.0-alpha3",
+    "evidence": "kagent go/go.mod at v1.0.0-alpha17",
+    "requiredByManagedHarness": true
+  },
+  "runtime": {
+    "image": "ghcr.io/kagent-dev/kagent/golang-adk@sha256:d20d411759d7bb549f00b7d6e8d669b91694aeb57dce847dcd2cbb68aa0d45f3",
+    "digestKind": "oci-image-index",
+    "platforms": [
+      "linux/amd64",
+      "linux/arm64"
+    ],
+    "evidence": "kagent-1.0.0-alpha17.tgz: kagent/files/builtin-harness-images.json; GHCR manifest read-back"
+  },
+  "charts": [
+    {
+      "name": "kagent-1.0.0-alpha17.tgz",
+      "url": "https://github.com/kagent-dev/kagent/releases/download/v1.0.0-alpha17/kagent-1.0.0-alpha17.tgz",
+      "sha256": "9260dad01ef544c684ca7d749e31b46443100192c318281c4fdffe8e79d86543"
+    },
+    {
+      "name": "kagent-crds-1.0.0-alpha17.tgz",
+      "url": "https://github.com/kagent-dev/kagent/releases/download/v1.0.0-alpha17/kagent-crds-1.0.0-alpha17.tgz",
+      "sha256": "8c236ee9cd3730a2275814d048fccf51a35d197ff5e8f624623bdf4cc415c431"
+    }
+  ],
+  "deployment": {
+    "implementation": "legacy-kagent-0.7.13",
+    "portRequired": true,
+    "nativeRenderVerified": false,
+    "targetRuntimeVerified": false
+  }
+}

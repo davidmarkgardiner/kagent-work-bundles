@@ -1,4 +1,10 @@
-# Four-CRD GitLab handoff
+# Four-CRD handoff for kagent 1.0
+
+The requested build target is **kagent 1.0.0-alpha17**, verified as the latest published 1.0 release on 28 October 2026. Start with [FRONT-SHEET.md](FRONT-SHEET.md), [build/README.md](build/README.md) and [KAGENT-1.0-WORK-AGENT-PROMPT.md](KAGENT-1.0-WORK-AGENT-PROMPT.md). The source commit, chart checksums and native runtime digest are in [build/kagent-1.0-target.json](build/kagent-1.0-target.json).
+
+**The copied controllers, renderer and acceptance runners below still implement the legacy 0.7.13 profile.** The 1.0 build target is pinned, but its deployment adapter must be ported and verified before installation. Existing offline tests and historical lab receipts are not 1.0 proof.
+
+## Legacy kagent 0.7 implementation reference
 
 For the backend-first private installation with local owner files, start with [AIRGAP-INSTALL.md](AIRGAP-INSTALL.md), [build/README.md](build/README.md), and [VSCODE-AGENT-AUTHORING.md](VSCODE-AGENT-AUTHORING.md). `private_install.py` is an opt-in offline renderer. It does not deploy or establish workplace security or air-gap closure. The original GitOps path below remains available.
 

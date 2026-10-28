@@ -1,4 +1,6 @@
-# Install the private backend before the agent demonstration
+# Legacy kagent 0.7 air-gap installation
+
+**For the requested kagent 1.0.0-alpha17 target, use [KAGENT-1.0-WORK-AGENT-PROMPT.md](KAGENT-1.0-WORK-AGENT-PROMPT.md) and [build/README.md](build/README.md).** The procedure below requires the legacy renderer and ordinary Agent runtime. It does not install the native 1.0 profile.
 
 Prepare the platform once, then use Copilot or Codex in VS Code to draft the local owner definition. An authorized operator submits that file with `kubectl apply`. The onboarding controller creates the native Agent, and the existing kagent controller deploys it. Invoke through the native API or UI and inspect received OTel activity in the private panel.
 

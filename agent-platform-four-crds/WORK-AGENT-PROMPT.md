@@ -1,4 +1,6 @@
-# Work agent starting prompt
+# Legacy kagent 0.7 documentation-only work-agent prompt
+
+**For the requested kagent 1.0.0-alpha17 target, use [KAGENT-1.0-WORK-AGENT-PROMPT.md](KAGENT-1.0-WORK-AGENT-PROMPT.md).** This task describes the older 0.7 implementation.
 
 Use this entire directory as the standalone four-CRD handoff. Read README.md and DESIGN.md, verify snapshot.lock.json through verify.py, and inspect package.py before generating anything. The user's current authorization is local packaging and review only. Start with read-only target discovery if separately authorized; do not push, deploy, upgrade, merge or send messages based solely on this prompt.
 
