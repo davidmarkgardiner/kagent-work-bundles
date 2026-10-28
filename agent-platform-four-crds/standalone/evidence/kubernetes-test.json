@@ -1,0 +1,101 @@
+{
+  "scope": "isolated Kubernetes test; synthetic content and deterministic test-only model backend",
+  "realWorkplaceModelVerified": false,
+  "kubernetesVersion": "v1.35.0",
+  "kagentInstalled": false,
+  "substrateInstalled": false,
+  "customCRDsEstablished": 4,
+  "contentAdapterIngestionTested": false,
+  "contentSource": "synthetic test snapshots and real immutable ConfigMaps",
+  "guardedSchemaPatchesApplied": true,
+  "jobServerDryRunPassed": true,
+  "workerKubernetesTokenMounted": false,
+  "cases": [
+    {
+      "case": "success",
+      "jobCondition": "Complete",
+      "podPhase": "Succeeded",
+      "exitCode": 0,
+      "receipt": {
+        "answerSha256": "daaa4ac993a719cb53630a25c4235ae92322c76580adeef9ee3f62f1e7117cda",
+        "contentSha256": [
+          "e14092eaea308176aaa219161ca5b982349765e19817017f753806cd271254ed",
+          "24f3e7e333919ade932af9c5cd423cef1d54989640f059cb4b0d84ec4dce7e0e"
+        ],
+        "inputSha256": "87be278f326c5224051f26c0334bd8a0aa68d012a4a09dbc65801673c886afbc",
+        "intentSha256": "0eb45f84e9e651db6f33af2f51b1ef2202dfd2ebebbdea0c35449741c49f9602",
+        "modelCalls": 2,
+        "proofScope": "standalone reference agent; not native kagent runtime or Harness proof",
+        "reason": "RequiredToolsAndAnswerVerified",
+        "responseBytes": 1455,
+        "result": "Passed",
+        "runtime": "standalone-reference-v1",
+        "scenarioSha256": "7abb012839dd676758ea10f68699873e20a5a7177c8e9450dc360b446f489444",
+        "toolCalls": 6,
+        "toolEvidence": [
+          {
+            "argumentsSha256": "e108034461c4399d24192f330005c4359d97c7b2fb38714683e9f2a3ec8e18c4",
+            "name": "load_skill",
+            "resultSha256": "a177cd572a9e0ee3e59ddca8e4e71785b1bf2ac37b648798550997a16e3300b7"
+          },
+          {
+            "argumentsSha256": "870d34fd554aa54ba816baa43d0223150d083154dbcbccf75b8a165b627d52bc",
+            "name": "load_skill",
+            "resultSha256": "f7e038352978f0bd5c51bd2d8f253fcdecbea897bbb8bc5a7394ba8b3ef17329"
+          },
+          {
+            "argumentsSha256": "2f153984e76b64cb9d1119075c017ea61d67af24902d3df2db3de3637073dee2",
+            "name": "load_skill_resource",
+            "resultSha256": "0fffa68971038de44f0be6240bb0f8cc3a2ce2fbc08c7cfdf18e50d69239e18c"
+          },
+          {
+            "argumentsSha256": "574e4ff258e32f9f0ca0888426cb06a4f49b3ca2120e992416c4f62d3aa40b9c",
+            "name": "load_skill_resource",
+            "resultSha256": "5b88581a24f83bd144fbb56dd3188b3b4a65b04e7445c90f6182d74a075d3991"
+          },
+          {
+            "argumentsSha256": "184c80b13167c7a0e38570fc09839a42141a33921a4ecdc9fc15cb4fd83ad9a5",
+            "name": "load_skill_resource",
+            "resultSha256": "20428234ce51c296648bf17d8af924847a25920542adf0d0fea67d8b5afbcf16"
+          },
+          {
+            "argumentsSha256": "88360a84c4ed88e1b2dbc8028e88a0bf8b2edba2169450b9cfec86e5332ffe36",
+            "name": "load_skill_resource",
+            "resultSha256": "55f7e50b027c505d962b1b1c9db02265489f5a478a74ac0b70c219b4a296afc5"
+          }
+        ],
+        "workerSha256": "40e23b80969ff18d54e4250224a1fde62ba96055e8aaa22a95bce9ca55af9367"
+      }
+    },
+    {
+      "case": "provider-failure",
+      "jobCondition": "Failed",
+      "podPhase": "Failed",
+      "exitCode": 1,
+      "receipt": {
+        "contentSha256": [
+          "e14092eaea308176aaa219161ca5b982349765e19817017f753806cd271254ed",
+          "24f3e7e333919ade932af9c5cd423cef1d54989640f059cb4b0d84ec4dce7e0e"
+        ],
+        "inputSha256": "9e0b63ced8effb9a5dab7f5d702602ef09cd43f1972f26703ab1de10a4f2ef7b",
+        "intentSha256": "0eb45f84e9e651db6f33af2f51b1ef2202dfd2ebebbdea0c35449741c49f9602",
+        "modelCalls": 1,
+        "proofScope": "standalone reference agent; not native kagent runtime or Harness proof",
+        "reason": "ProviderHTTP503",
+        "responseBytes": 0,
+        "result": "Failed",
+        "runtime": "standalone-reference-v1",
+        "scenarioSha256": "7abb012839dd676758ea10f68699873e20a5a7177c8e9450dc360b446f489444",
+        "toolCalls": 0,
+        "toolEvidence": [],
+        "workerSha256": "40e23b80969ff18d54e4250224a1fde62ba96055e8aaa22a95bce9ca55af9367"
+      }
+    }
+  ],
+  "verifiedAt": "2026-10-28",
+  "implementationSha256": {
+    "prepare.py": "70828374eb246bdf3eac775eebec68c8f551039ef6e57a199b8a8f5887035889",
+    "worker.py": "40e23b80969ff18d54e4250224a1fde62ba96055e8aaa22a95bce9ca55af9367",
+    "test_standalone.py": "7451b0377e159c810e34990c83533ac1966944587bafc6708e6f92d072189438"
+  }
+}

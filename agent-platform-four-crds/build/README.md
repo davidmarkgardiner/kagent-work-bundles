@@ -1,4 +1,16 @@
-# Build and import for kagent 1.0
+# Reuse the existing images for today's no-Substrate POC
+
+Start with [NO-SUBSTRATE-TODAY.md](../NO-SUBSTRATE-TODAY.md) and [standalone/README.md](../standalone/README.md). Reuse the already-built compatible Python 3.12 helper image at its internal digest. The Job runs standard-library Python mounted from a ConfigMap. No native Go ADK binary, Harness, WorkerPool, snapshots, new collector or new OCI publication is required for this path.
+
+The two content releases are read from their verified immutable ConfigMaps. Keep existing native runtime and content OCI images for later use. Check image-pull access, architecture and the `python` entrypoint before rebuilding anything.
+
+The content adapter's Deployment is long-running. The model execution is a one-shot `batch/v1` Job whose Pod must terminate successfully after actual skill/knowledge reads. See the standalone guide for exact render, dry-run, apply and proof commands.
+
+## Optional native track image inventory
+
+The following pinned inputs are retained for the separate native Harness track. They do not authorize installing Substrate or upgrading the workplace platform as part of today's POC.
+
+# Native kagent 1.0 image reference
 
 The POC targets **kagent 1.0.0-alpha17**, the latest published 1.0 release checked on 28 October 2026. Its source pin, chart checksums and native runtime image are recorded in [kagent-1.0-target.json](kagent-1.0-target.json). Use fixed versions and digests, not a moving `latest` tag.
 

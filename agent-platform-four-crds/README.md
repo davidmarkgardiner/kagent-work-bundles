@@ -1,14 +1,14 @@
-# Native kagent skills and knowledge POC
+# CRD POC without Substrate
 
-Start with [POC-QUICKSTART.md](POC-QUICKSTART.md). The native implementation is included under [implementation/platform/skills-registry/native/](implementation/platform/skills-registry/native/). Saved lab receipts prove the documentation flow on **kagent 1.0.0-alpha17**, **API `api.kagent.dev/v1alpha3`**, and **Substrate 0.6.0-alpha3**. They record loading both packages and reading the exact skill, knowledge and release-proof files. This is lab proof, not an already completed workplace installation.
+**Today's target is no Substrate.** Resume from the four established CRDs and existing images. Start with [NO-SUBSTRATE-TODAY.md](NO-SUBSTRATE-TODAY.md) and the runnable [standalone Job guide](standalone/README.md). Give the work agent [KAGENT-1.0-WORK-AGENT-PROMPT.md](KAGENT-1.0-WORK-AGENT-PROMPT.md).
 
-**The work agent can choose any permitted namespace.** There is no required namespace name. Keep the native Agent, AgentTemplate, Harness, ModelConfig, requests and content sources namespace-local. Reusing a namespace with suitable Harness/model dependencies is quickest. The existing controller must watch it; CRDs remain cluster-scoped.
+The standalone execution adapter consumes Skill, KnowledgeBase, HostedAgent and GoldenScenario and prepares an ordinary Kubernetes Job. Its worker calls the configured real model and reads the verified content through two bounded tools. It requires no Harness, WorkerPool, snapshots, native Agent compiler or kagent/Substrate upgrade. Reuse the compatible Python helper image and immutable content ConfigMaps. The Job's Pod should complete; the content-adapter Deployment remains running.
 
-The first milestone is build/import, deploy the native adapters and four CRDs, and pass one fresh skill/knowledge request. The OTel dashboard and a new CI pipeline are optional. Bringing an owner-authored agent definition and new content is the next milestone. Give the work agent [KAGENT-1.0-WORK-AGENT-PROMPT.md](KAGENT-1.0-WORK-AGENT-PROMPT.md).
+Choose any permitted namespace. Configure the existing Qwen-compatible model route explicitly, based on its resolved ModelConfig. This path does not require a ModelConfig in the Job namespace. Secret/CA references, DNS and network access must still work there. Preserve the installed CRDs; use the reviewed additive standalone profile patches rather than replacing their schemas.
 
-Use [build/README.md](build/README.md) for images and [build/kagent-1.0-target.json](build/kagent-1.0-target.json) for release pins. The recorded native [functional proof](implementation/platform/skills-registry/native/verification.json) and [OTel follow-up](implementation/platform/skills-registry/native/verification-native-otel.json) state their limits. Namespace rendering is configurable; a different namespace still needs fresh deployment proof.
+The native alpha17 source and saved lab receipts remain included for a separate Substrate-backed track. Those receipts prove the native documentation flow on kagent `1.0.0-alpha17`, API `api.kagent.dev/v1alpha3`, and Substrate `0.6.0-alpha3`. They do not prove the standalone Job or the workplace installation. The native instructions are retained in [NATIVE-POC-QUICKSTART.md](NATIVE-POC-QUICKSTART.md).
 
-The native renderer is `implementation/platform/skills-registry/native/resources.py`. The root `package.py render`, `private_install.py` and ordinary MCP demo remain legacy 0.7 paths. `package.py content` can export the shared sample content. Run `python3 -B verify.py` for the packaged native and legacy offline checks.
+The root `package.py render`, `private_install.py` and ordinary MCP demo remain legacy 0.7 paths. Do not fall back to them on an alpha8-only cluster. `package.py content` can still export the shared sample content.
 
 ## Legacy kagent 0.7 implementation reference
 

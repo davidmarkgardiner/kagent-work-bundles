@@ -1,0 +1,37 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "skills.platform.kagent.dev/v1alpha1",
+      "kind": "HostedAgent",
+      "metadata": {"name": "{{NEW_HOSTED_NAME}}", "namespace": "{{NAMESPACE}}"},
+      "spec": {
+        "owner": {"team": "{{TEAM_SLUG}}"},
+        "purpose": "Explain a synthetic incident using reviewed pinned documentation",
+        "instructions": "Load both reviewed skills, read the requested reference and knowledge files, and cite exact source URLs. Explain proposed checks. State that this is documentation analysis and no operational investigation or changes were performed.",
+        "runtimeProfile": "standalone-reference-v1",
+        "modelProfile": "standalone-qwen-v1",
+        "skillRefs": [{"name": "{{READY_SKILL_RELEASE}}", "sourceCommit": "{{SKILL_40_HEX_COMMIT}}", "contentSha256": "{{SKILL_64_HEX_CONTENT_SHA256}}"}],
+        "knowledgeBaseRefs": [{"name": "{{READY_KNOWLEDGE_RELEASE}}", "sourceCommit": "{{KNOWLEDGE_40_HEX_COMMIT}}", "contentSha256": "{{KNOWLEDGE_64_HEX_CONTENT_SHA256}}"}],
+        "toolGrantRefs": []
+      }
+    },
+    {
+      "apiVersion": "skills.platform.kagent.dev/v1alpha1",
+      "kind": "GoldenScenario",
+      "metadata": {"name": "{{NEW_GOLDEN_NAME}}", "namespace": "{{NAMESPACE}}"},
+      "spec": {
+        "policy": "aks-docs-standalone-v1",
+        "inputOrigin": "synthetic",
+        "hostedAgentRef": {"name": "{{NEW_HOSTED_NAME}}"},
+        "hostedAgentSpecSha256": "{{RECOMPUTE_FROM_FINAL_HOSTED_SPEC}}",
+        "prompt": "Synthetic documentation case: {{REVIEWED_INCIDENT_DETAILS}}. Load the instructions for BOTH reviewed skills. Read references/error-code-map.md from the skill, references/oras-pull-unauthorized.md from the knowledge package, and references/release-proof.txt from EACH. Include both complete release proof values, the reviewed evidence code, and exact source URLs. Describe proposed checks and state that no operational investigation or changes were performed.",
+        "referenceFile": "references/error-code-map.md",
+        "knowledgeFile": "references/oras-pull-unauthorized.md",
+        "answerTerms": ["{{EXACT_REVIEWED_EVIDENCE_CODE}}"],
+        "citations": ["{{EXACT_REVIEWED_HTTPS_SOURCE_URL}}"]
+      }
+    }
+  ]
+}

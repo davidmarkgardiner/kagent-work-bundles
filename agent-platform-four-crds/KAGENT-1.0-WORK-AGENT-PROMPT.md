@@ -1,30 +1,23 @@
-# Work agent: get the native CRD POC running
+# Work agent: finish the CRD POC without Substrate
 
-Use [POC-QUICKSTART.md](POC-QUICKSTART.md) as the execution sheet. This is a small POC. First get one skill and one knowledge package working with one generated native agent on the existing cluster. Demonstrating a new owner-authored agent definition is the next milestone.
+Resume from the installed four CRDs and completed image builds. The operator explicitly requires a no-Substrate deployment today. Follow [NO-SUBSTRATE-TODAY.md](NO-SUBSTRATE-TODAY.md) and [standalone/README.md](standalone/README.md).
 
-Target **kagent 1.0.0-alpha17**, API **`api.kagent.dev/v1alpha3`**, with the matching **Substrate 0.6.0-alpha3** platform. The included native implementation has saved passing Proxmox receipts on those versions. Inspect the installed platform and report concrete incompatibilities. Reuse it rather than reinstalling shared services.
+Do not create Harness, WorkerPool or snapshots. Do not install or upgrade Substrate/kagent, remove required fields from native schemas, switch to a presumed legacy ordinary-Agent API, or wait for platform setup. Use the explicit standalone custom-CRD execution profile supplied here.
 
-## Resume the work already completed
+## Preserve the work already completed
 
-Resume using the updated full bundle and this handover. Preserve completed image builds and existing cluster resources. Keep private configuration, credentials and earlier receipts outside the downloaded bundle.
+Keep established CRDs, built images, private configuration, credentials and prior receipts. Check the compatible Python helper image by digest and reuse it. Build/import only genuinely missing or incompatible inputs. Existing OCI content images and native runtime images can stay for later work; this path reads the verified content ConfigMaps and does not need more OCI publication.
 
-Check the installed kagent/Substrate versions and each existing image's source revision, architecture and manifest digest against `build/kagent-1.0-target.json` and its intended role. Reuse matching images. Build or import only missing or incompatible images. Publish the two skill/knowledge content OCI images only if matching content images are not already available. The old Python Agent runtime is not the native Go ADK runtime.
+The report mentions kagent alpha8 and a Substrate chart version, while the operator says no usable Substrate exists. Record actual served APIs/workloads if needed, but this inconsistency must not turn into a Substrate installation task.
 
-Use the included native implementation, not the legacy renderer. Choose a permitted namespace, deploy the POC and run fresh native acceptance. Report any concrete mismatch without rebuilding everything or reinstalling the shared platform. Updating this bundle did not change the workplace cluster; verify its actual configuration before proceeding.
+## Execute the bounded Job path
 
-## Namespace and authority
+1. Choose any permitted namespace. Keep the four custom requests and verified source/ConfigMap references namespace-local. A native namespace-local Harness, WorkerPool or ModelConfig is not required for this standalone execution.
+2. Inspect the existing resolved Qwen ModelConfig without printing Secret values. Identify its real OpenAI-compatible chat-completions URL, model ID, auth mechanism and CA requirements. Configure the Job with that fixed route. Verify DNS, endpoint path, TLS, tool-calling support and allowed network access from the selected namespace.
+3. Put required Secret and CA ConfigMap references in the Job's namespace through the existing approved process. Cross-namespace volume/Secret references do not work. Do not mount a kubeconfig or service-account token into the model worker.
+4. Follow the standalone guide to render the content-only adapter, compatible additive CRD enum patches, private standalone requests and the one-shot Job. Preserve existing native profiles and installed schemas. Do not deploy the native HostedAgent adapter for this profile.
+5. Verify current source revision, immutable release/ConfigMap ownership and file hashes. Use fresh live snapshots for Job preparation. The Job must consume the selected HostedAgent and GoldenScenario and load both complete content packages through its bounded read tools.
+6. Review the bounded manifests, server-dry-run them, deploy through the authorized workplace process, and wait for the Job Complete condition and Pod exit code 0. Read the sanitized model/tool receipt. On an actual backend error, report the error and fix that concrete cause; do not substitute fixtures, weaken proof checks or rebuild unrelated images.
+7. Return the exact namespace, reused image digest, custom CRD/content checks, Job name/status, exit code, passing receipt or current concrete failure, plus cleanup instructions.
 
-Choose any namespace your work account is permitted to use. There is no required POC namespace name. Prefer one already containing suitable Harness and ModelConfig dependencies. Configure namespace-local requests, GitRepository, native AgentTemplate/Agent, model and Harness references consistently. Verify the existing controller watches it. Keep cluster-scoped CRD changes compatible with any existing installation.
-
-## Execute
-
-1. Read `build/README.md`. Reuse the native runtime if already available internally. Build or reuse one Python helper image. Publish the Skill and KnowledgeBase as two data-only OCI content images using the included native publisher. No new dashboard, collector or CI pipeline is required for this first proof.
-2. Use `implementation/platform/skills-registry/native/`. It already implements deterministic content packaging, the native HostedAgent adapter and the native GoldenScenario runner. Do not rewrite it as a new port or substitute the old ordinary-Agent renderer.
-3. Prepare private target copies of the sample requests/profile with the real content commit, registry digests, source spec hashes and current namespace-local Harness/ModelConfig pins. Use the existing Flux source-controller for verified Git content. Lab fixture commits and hashes must be regenerated for the target.
-4. Render `native/resources.py --profile ... --namespace ...`. Select the approved internal helper image in both adapter Deployments, remove lab-only control-plane scheduling, and set the exact `SOURCE_CONTROLLER_ORIGIN`. Preserve existing platform routes and credentials.
-5. Review and deploy the four CRDs/adapters through the authorized workplace process. Wait for adapters and content readiness, then submit HostedAgent and GoldenScenario. Preserve immutable input validation, ownership checks and bounded content. No operational tools are needed.
-6. Use `native/run_golden.py` with the chosen `--namespace`, matching native CLI/config and a new evidence directory. Require a fresh completed session that actually loads both packages, reads the pinned reference and proof files and cites the knowledge source.
-
-Stop the first milestone when the adapters, content and generated agent are Ready and the fresh native GoldenScenario receipt passes. Return the image/artifact inventory, exact namespace and invocation, receipt, remaining target-specific gaps and cleanup instructions. Report saved lab proof, current offline checks and the fresh workplace result separately.
-
-Keep BYO-agent onboarding, OTel presentation, production hardening, automated promotion and recovery exercises as subsequent work. The lab's native tool selection is not a claim of hostile-tenant isolation.
+A successful result is a **custom-CRD-driven standalone documentation POC without Substrate**. It is not native kagent Agent/Harness execution or continuous native HostedAgent reconciliation. The current proof is explicit about this scope. Bring an owner-authored agent definition and new content through the same path only after this first Job passes.

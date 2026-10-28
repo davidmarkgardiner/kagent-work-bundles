@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "checkedAt": "2026-10-28",
-  "purpose": "Native kagent 1.0 skills/knowledge POC build and import target with included lab-tested adapter",
+  "purpose": "Standalone no-Substrate POC is the default; retain pinned native kagent 1.0 inputs as an optional separate track",
   "kagent": {
     "version": "1.0.0-alpha17",
     "tag": "v1.0.0-alpha17",
@@ -9,12 +9,14 @@
     "releaseUrl": "https://github.com/kagent-dev/kagent/releases/tag/v1.0.0-alpha17",
     "apiVersion": "api.kagent.dev/v1alpha3",
     "runtime": "native-go-adk",
-    "goVersion": "1.27.3"
+    "goVersion": "1.27.3",
+    "nativeTrackOnly": true
   },
   "substrate": {
     "version": "0.6.0-alpha3",
     "evidence": "kagent go/go.mod at v1.0.0-alpha17",
-    "requiredByManagedHarness": true
+    "requiredByManagedHarness": true,
+    "nativeTrackOnly": true
   },
   "runtime": {
     "image": "ghcr.io/kagent-dev/kagent/golang-adk@sha256:d20d411759d7bb549f00b7d6e8d669b91694aeb57dce847dcd2cbb68aa0d45f3",
@@ -23,7 +25,8 @@
       "linux/amd64",
       "linux/arm64"
     ],
-    "evidence": "kagent-1.0.0-alpha17.tgz: kagent/files/builtin-harness-images.json; GHCR manifest read-back"
+    "evidence": "kagent-1.0.0-alpha17.tgz: kagent/files/builtin-harness-images.json; GHCR manifest read-back",
+    "nativeTrackOnly": true
   },
   "charts": [
     {
@@ -38,6 +41,25 @@
     }
   ],
   "deployment": {
+    "implementation": "standalone",
+    "execution": "batch/v1 Job",
+    "nativeAgentCreated": false,
+    "substrateRequired": false,
+    "isolatedKubernetesJobVerified": true,
+    "realWorkplaceModelVerified": false,
+    "guide": "../NO-SUBSTRATE-TODAY.md"
+  },
+  "defaultExecution": {
+    "mode": "standalone-python-job",
+    "substrateRequired": false,
+    "nativeRuntimeRequired": false,
+    "platformUpgradeRequired": false,
+    "helperPythonVersion": "3.12-compatible",
+    "workerServiceAccountToken": false,
+    "workplaceProof": "pending fresh real-model Job receipt",
+    "guide": "../NO-SUBSTRATE-TODAY.md"
+  },
+  "nativeDeploymentTrack": {
     "implementation": "implementation/platform/skills-registry/native",
     "portRequired": false,
     "workplaceConfigurationRequired": true,

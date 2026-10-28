@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-10-28",
+  "scope": "standalone source, examples and local-test evidence",
+  "publicSafeScan": "clean",
+  "gitleaks": "no leaks found",
+  "detectSecrets": {
+    "reviewedDetections": 23,
+    "sha256HashDetections": 22,
+    "deliberatelyInvalidBasicAuthTestURLDetections": 1,
+    "disposition": "All reviewed as non-secrets: recorded SHA256 integrity/proof hashes and a reserved .invalid test URL used to assert credential-URL rejection."
+  },
+  "offlineTestsPassed": 275,
+  "workplaceQwenProof": false
+}

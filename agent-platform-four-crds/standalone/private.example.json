@@ -1,0 +1,12 @@
+{
+  "namespace": "{{NAMESPACE}}",
+  "helperImage": "{{INTERNAL_REGISTRY}}/platform/onboarding-helper@sha256:{{APPROVED_HELPER_DIGEST}}",
+  "endpoint": "https://{{APPROVED_QWEN_GATEWAY}}/v1/chat/completions",
+  "model": "{{EXISTING_RESOLVED_MODEL_ID}}",
+  "sourceControllerOrigin": "http://{{SOURCE_CONTROLLER_SERVICE}}:{{PORT}}",
+  "imagePullSecrets": ["{{NAMESPACE_LOCAL_PULL_SECRET}}"],
+  "credentialSecret": {"name": "{{NAMESPACE_LOCAL_MODEL_SECRET}}", "key": "{{TOKEN_KEY}}"},
+  "caConfigMap": {"name": "{{NAMESPACE_LOCAL_CA_CONFIGMAP}}", "key": "{{CA_CERTIFICATE_KEY}}"},
+  "limits": {"maxModelCalls": 6, "maxToolCalls": 16, "maxTokens": 2048,
+    "requestTimeoutSeconds": 30, "deadlineSeconds": 180, "maxResponseBytes": 131072}
+}
