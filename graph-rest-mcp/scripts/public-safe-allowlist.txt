@@ -1,0 +1,9 @@
+# Version strings in generated dependency locks trigger the scanner's IP heuristic.
+# Hashes are independently enforced by pip and lock contents are scanned by gitleaks.
+requirements.lock
+requirements-test.lock
+# The corresponding generated audit and wheel filenames contain the same versions.
+dependency-audit-2026-10-28.json
+wheelhouse-amd64-manifest-2026-10-28.json
+# The unchanged shared scanner necessarily contains its own detection patterns.
+public-safe-scan.sh

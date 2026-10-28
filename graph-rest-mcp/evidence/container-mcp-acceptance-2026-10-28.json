@@ -1,0 +1,167 @@
+[
+  {
+    "request_identifier": "mcp-production-8d0da6de7d13",
+    "agent_name": "direct-mcp-client",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [
+      "get_graph_context"
+    ],
+    "completion_status": "PASS",
+    "elapsed_seconds": 1.964,
+    "result_counts": {
+      "entities": 8,
+      "views": 2,
+      "relationships": 11
+    },
+    "source_scope_summary": {
+      "source": "fixture-v1",
+      "environments": [
+        "production"
+      ],
+      "groupings": [
+        "commerce",
+        "governance",
+        "platform"
+      ],
+      "complete": true
+    },
+    "error_category": "none"
+  },
+  {
+    "request_identifier": "mcp-development-940ea61d1d35",
+    "agent_name": "direct-mcp-client",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [
+      "get_graph_context"
+    ],
+    "completion_status": "PASS",
+    "elapsed_seconds": 0.233,
+    "result_counts": {
+      "entities": 8,
+      "views": 2,
+      "relationships": 11
+    },
+    "source_scope_summary": {
+      "source": "fixture-v1",
+      "environments": [
+        "development"
+      ],
+      "groupings": [
+        "commerce",
+        "governance",
+        "platform"
+      ],
+      "complete": true
+    },
+    "error_category": "none"
+  },
+  {
+    "request_identifier": "mcp-truncated-d24b73705074",
+    "agent_name": "direct-mcp-client",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [
+      "get_graph_context"
+    ],
+    "completion_status": "PASS",
+    "elapsed_seconds": 0.285,
+    "result_counts": {
+      "entities": 3,
+      "views": 0,
+      "relationships": 2
+    },
+    "source_scope_summary": {
+      "source": "fixture-v1",
+      "environments": [
+        "production"
+      ],
+      "groupings": [
+        "commerce"
+      ],
+      "complete": false
+    },
+    "error_category": "none"
+  },
+  {
+    "request_identifier": "mcp-unsupported-28b408467772",
+    "agent_name": "direct-mcp-client",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [
+      "get_graph_context"
+    ],
+    "completion_status": "PASS",
+    "elapsed_seconds": 0.388,
+    "result_counts": {
+      "entities": 0,
+      "views": 0,
+      "relationships": 0
+    },
+    "source_scope_summary": {
+      "source": "fixture-v1",
+      "environments": [],
+      "groupings": [],
+      "complete": false
+    },
+    "error_category": "none"
+  },
+  {
+    "request_identifier": "mcp-ambiguous-01df0c2ab760",
+    "agent_name": "direct-mcp-client",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [
+      "get_graph_context"
+    ],
+    "completion_status": "PASS",
+    "elapsed_seconds": 0.201,
+    "result_counts": {
+      "entities": 0,
+      "views": 0,
+      "relationships": 0
+    },
+    "source_scope_summary": {
+      "source": "fixture-v1",
+      "environments": [
+        "production",
+        "development"
+      ],
+      "groupings": [],
+      "complete": false
+    },
+    "error_category": "none"
+  },
+  {
+    "request_identifier": "mcp-sql-denied-4703fc354c65",
+    "agent_name": "direct-mcp-client",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [
+      "get_graph_context"
+    ],
+    "completion_status": "PASS",
+    "elapsed_seconds": 0.133,
+    "result_counts": {
+      "entities": 0,
+      "views": 0,
+      "relationships": 0
+    },
+    "source_scope_summary": {
+      "source": "fixture-v1",
+      "environments": [
+        "production"
+      ],
+      "groupings": [],
+      "complete": false
+    },
+    "error_category": "none"
+  }
+]

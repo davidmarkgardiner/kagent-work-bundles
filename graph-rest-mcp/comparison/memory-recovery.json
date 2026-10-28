@@ -1,0 +1,25 @@
+{
+  "reason": "OOMKilled",
+  "exit_code": 137,
+  "terminated_at": "2026-10-27T15:11:23Z",
+  "former_model_memory_limit_bytes": 4294967296,
+  "completed_scored_calls": 4,
+  "interrupted_scored_calls": 1,
+  "warmups": 2,
+  "replacement_model_memory_limit_bytes": 6442450944,
+  "replacement_model_memory_request_bytes": 4294967296,
+  "cpu_limit_cores_unchanged": 3,
+  "vm_available_gib_before_adjustment_approx": 6.7,
+  "unchanged": [
+    "model digest",
+    "model options",
+    "questions",
+    "oracle",
+    "system prompt",
+    "MCP adapter",
+    "REST service",
+    "Kagent AgentTemplate",
+    "shared worker pools"
+  ],
+  "handling": "Retained aborted receipt. No failed request retried in-place. Replacement study restarts all 40 calls with the same frozen script and cases."
+}

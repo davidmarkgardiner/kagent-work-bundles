@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "run_id": "d3642093057342458929af41f4f31204",
+  "started_at": "2026-10-27T15:06:24.608707+00:00",
+  "status": "aborted",
+  "scope": "post_retrieval_model_boundary",
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "options": {
+    "num_ctx": 8192,
+    "num_predict": 256,
+    "temperature": 0,
+    "repeat_penalty": 1.1
+  },
+  "repetitions": 5,
+  "case_count": 4,
+  "expected_trials": 40,
+  "cases_sha256": "2ee43c3b6b7aabf9cd28e37958524210792a05a9eb6918a5c2212bc5e7fb9a3b",
+  "script_sha256": "a890069b025e50911f0646df1e98bd8a3ceb69684a141d4cb6b6a57a94353b53",
+  "prompt_sha256": "9df13c1a1f4072304dc18d1e54ae421cc39bc35d64dac64e1d198e6ea82838ee",
+  "fixture_sha256": "320368a87223234e37f2d748337e54abe47fedac076a6bbba3cb1b136e813d4a",
+  "warmups": [
+    {
+      "arm": "graph_json",
+      "prompt_eval_count": 733,
+      "eval_count": 92,
+      "total_duration": 71410740767,
+      "load_duration": 8724545902,
+      "prompt_eval_duration": 25592686000,
+      "eval_duration": 37034115000,
+      "prompt_eval_cached_count": 0,
+      "done_reason": "stop"
+    },
+    {
+      "arm": "flat_tables",
+      "prompt_eval_count": 586,
+      "eval_count": 96,
+      "total_duration": 52942638494,
+      "load_duration": 519697,
+      "prompt_eval_duration": 16507775000,
+      "eval_duration": 36301957000,
+      "prompt_eval_cached_count": 124,
+      "done_reason": "stop"
+    }
+  ],
+  "snapshots": [
+    {
+      "case_id": "owner",
+      "tool_name": "get_graph_context",
+      "elapsed_seconds": 0.034,
+      "reencoded_mcp_result_json_bytes": 8411,
+      "facts_sha256": "ed5170ae28b3e84178ddc4244d6442710f5e6053ca415f7e74eed1309df34fc6",
+      "result_counts": {
+        "entities": 8,
+        "views": 2,
+        "relationships": 11
+      },
+      "source": "fixture-v1",
+      "environments": [
+        "production"
+      ],
+      "partial": false,
+      "encodings": {
+        "graph_json": {
+          "payload_sha256": "ed5170ae28b3e84178ddc4244d6442710f5e6053ca415f7e74eed1309df34fc6",
+          "payload_bytes": 2746,
+          "rendered_mcp_json_envelope_bytes": 6043
+        },
+        "flat_tables": {
+          "payload_sha256": "bc8dd6c6767a9e0b3b874d5ae3cd4b264287c449604692da953a21f45b970677",
+          "payload_bytes": 2073,
+          "rendered_mcp_json_envelope_bytes": 4555
+        }
+      }
+    },
+    {
+      "case_id": "policy_chain",
+      "tool_name": "get_graph_context",
+      "elapsed_seconds": 0.034,
+      "reencoded_mcp_result_json_bytes": 8411,
+      "facts_sha256": "ed5170ae28b3e84178ddc4244d6442710f5e6053ca415f7e74eed1309df34fc6",
+      "result_counts": {
+        "entities": 8,
+        "views": 2,
+        "relationships": 11
+      },
+      "source": "fixture-v1",
+      "environments": [
+        "production"
+      ],
+      "partial": false,
+      "encodings": {
+        "graph_json": {
+          "payload_sha256": "ed5170ae28b3e84178ddc4244d6442710f5e6053ca415f7e74eed1309df34fc6",
+          "payload_bytes": 2746,
+          "rendered_mcp_json_envelope_bytes": 6043
+        },
+        "flat_tables": {
+          "payload_sha256": "bc8dd6c6767a9e0b3b874d5ae3cd4b264287c449604692da953a21f45b970677",
+          "payload_bytes": 2073,
+          "rendered_mcp_json_envelope_bytes": 4555
+        }
+      }
+    },
+    {
+      "case_id": "development_compliance",
+      "tool_name": "get_graph_context",
+      "elapsed_seconds": 0.037,
+      "reencoded_mcp_result_json_bytes": 8319,
+      "facts_sha256": "2e3f0a6f63b063105e995067043f6aec8a0e9b10b6e98aa4fe369f3c568945c6",
+      "result_counts": {
+        "entities": 8,
+        "views": 2,
+        "relationships": 11
+      },
+      "source": "fixture-v1",
+      "environments": [
+        "development"
+      ],
+      "partial": false,
+      "encodings": {
+        "graph_json": {
+          "payload_sha256": "2e3f0a6f63b063105e995067043f6aec8a0e9b10b6e98aa4fe369f3c568945c6",
+          "payload_bytes": 2723,
+          "rendered_mcp_json_envelope_bytes": 5997
+        },
+        "flat_tables": {
+          "payload_sha256": "d8648278f1e2dca593a01d69b6b881c88fe99d6cfe3196db9d999f1a9a1d6f1c",
+          "payload_bytes": 2050,
+          "rendered_mcp_json_envelope_bytes": 4509
+        }
+      }
+    },
+    {
+      "case_id": "partial_policy",
+      "tool_name": "get_graph_context",
+      "elapsed_seconds": 0.032,
+      "reencoded_mcp_result_json_bytes": 3023,
+      "facts_sha256": "0674611be94527a2af3bbf6ec89d2e4aef68deafd5eeea042bd984c35fc479c3",
+      "result_counts": {
+        "entities": 3,
+        "views": 0,
+        "relationships": 2
+      },
+      "source": "fixture-v1",
+      "environments": [
+        "production"
+      ],
+      "partial": true,
+      "encodings": {
+        "graph_json": {
+          "payload_sha256": "0674611be94527a2af3bbf6ec89d2e4aef68deafd5eeea042bd984c35fc479c3",
+          "payload_bytes": 1021,
+          "rendered_mcp_json_envelope_bytes": 2315
+        },
+        "flat_tables": {
+          "payload_sha256": "811095a2cf68b5463a3bf2c5900216961b4cd9105f3bcb86ca7927177865fab0",
+          "payload_bytes": 988,
+          "rendered_mcp_json_envelope_bytes": 2241
+        }
+      }
+    }
+  ],
+  "trials": [
+    {
+      "request_identifier": "09096d566b4b4f74a0b33e84a04e5d0b",
+      "case_id": "owner",
+      "arm": "graph_json",
+      "repetition": 0,
+      "order": 0,
+      "error_category": "none",
+      "request_sha256": "c66c53643e9ec658e021e15e547877061ecf44085c48071ba643b0326baaf554",
+      "request_bytes": 5191,
+      "prompt_eval_count": 733,
+      "eval_count": 92,
+      "total_duration": 36129333072,
+      "load_duration": 3695939,
+      "prompt_eval_duration": 290496000,
+      "eval_duration": 35617970000,
+      "prompt_eval_cached_count": 732,
+      "done_reason": "stop",
+      "score": {
+        "format_ok": true,
+        "answer_ok": true,
+        "source_scope_ok": true,
+        "coverage_ok": true,
+        "relationship_ok": true,
+        "ungrounded_id": false,
+        "unsupported_relationship": false,
+        "passed": true
+      },
+      "elapsed_seconds": 36.179
+    },
+    {
+      "request_identifier": "aeb99293e2b140fcb3f361e5062e3d4e",
+      "case_id": "owner",
+      "arm": "flat_tables",
+      "repetition": 0,
+      "order": 1,
+      "error_category": "answer_mismatch",
+      "request_sha256": "1501e023d6231f88ad00b8df4180a2b07d7032711b1fcfbd7b0b33ce7af899a2",
+      "request_bytes": 4376,
+      "prompt_eval_count": 586,
+      "eval_count": 96,
+      "total_duration": 37785075608,
+      "load_duration": 571735,
+      "prompt_eval_duration": 395292000,
+      "eval_duration": 37200946000,
+      "prompt_eval_cached_count": 585,
+      "done_reason": "stop",
+      "score": {
+        "format_ok": true,
+        "answer_ok": false,
+        "source_scope_ok": true,
+        "coverage_ok": true,
+        "relationship_ok": true,
+        "ungrounded_id": false,
+        "unsupported_relationship": false,
+        "passed": false
+      },
+      "elapsed_seconds": 37.803
+    },
+    {
+      "request_identifier": "5256bb4151ee42b28828038bc3d419d6",
+      "case_id": "policy_chain",
+      "arm": "flat_tables",
+      "repetition": 0,
+      "order": 2,
+      "error_category": "answer_mismatch",
+      "request_sha256": "8836f300246da41ea46d57d26bffbcd35304865dcbac136af56d8c4ca24df009",
+      "request_bytes": 4415,
+      "prompt_eval_count": 593,
+      "eval_count": 62,
+      "total_duration": 40977089825,
+      "load_duration": 47877024,
+      "prompt_eval_duration": 16622044999,
+      "eval_duration": 24182770000,
+      "prompt_eval_cached_count": 112,
+      "done_reason": "stop",
+      "score": {
+        "format_ok": true,
+        "answer_ok": false,
+        "source_scope_ok": true,
+        "coverage_ok": true,
+        "relationship_ok": false,
+        "ungrounded_id": false,
+        "unsupported_relationship": false,
+        "passed": false
+      },
+      "elapsed_seconds": 40.991
+    },
+    {
+      "request_identifier": "df4f915da690488e9d16d75816e59ddf",
+      "case_id": "policy_chain",
+      "arm": "graph_json",
+      "repetition": 0,
+      "order": 3,
+      "error_category": "answer_mismatch",
+      "request_sha256": "e92d3c844afa9935f2d49bc90e0e632211802d9d5deeef8be4d4bdfe4fc284ac",
+      "request_bytes": 5230,
+      "prompt_eval_count": 740,
+      "eval_count": 95,
+      "total_duration": 58891270642,
+      "load_duration": 599188,
+      "prompt_eval_duration": 21323895000,
+      "eval_duration": 37403609000,
+      "prompt_eval_cached_count": 131,
+      "done_reason": "stop",
+      "score": {
+        "format_ok": true,
+        "answer_ok": false,
+        "source_scope_ok": true,
+        "coverage_ok": true,
+        "relationship_ok": false,
+        "ungrounded_id": false,
+        "unsupported_relationship": false,
+        "passed": false
+      },
+      "elapsed_seconds": 58.926
+    },
+    {
+      "request_identifier": "da29a26ea90740a0b5f2d9af56d03d8a",
+      "case_id": "development_compliance",
+      "arm": "graph_json",
+      "repetition": 0,
+      "order": 4,
+      "error_category": "model_transport",
+      "request_sha256": "f7d00921ab335684d8dcf12c7e158ce512b60e683825af778028f36d5529a966",
+      "request_bytes": 5178,
+      "elapsed_seconds": 1.069
+    }
+  ],
+  "model_digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+  "ollama_version": "0.40.11",
+  "error_category": "stopped_after_inference_error"
+}

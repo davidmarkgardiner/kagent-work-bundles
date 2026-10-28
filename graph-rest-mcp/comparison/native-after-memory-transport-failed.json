@@ -1,0 +1,15 @@
+[
+  {
+    "request_identifier": "graph-supported-20f4d9e3dd46",
+    "agent_name": "graph-context-lab",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [],
+    "completion_status": "FAIL",
+    "elapsed_seconds": 0.229,
+    "result_counts": {},
+    "source_scope_summary": null,
+    "error_category": "native_runtime"
+  }
+]

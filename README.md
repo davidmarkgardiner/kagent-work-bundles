@@ -67,6 +67,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 
 | Bundle | Capability | Primary outcome |
 |---|---|---|
+| [`graph-rest-mcp/`](graph-rest-mcp/WORK-AGENT-START-HERE.md) | Existing Swagger REST API → bounded FastMCP tool | Reviewed work-agent adaptation handoff, exact image/wheel prerequisites and fresh local proof; private contract and target-native acceptance remain work-side gates |
 | [`agent-platform-four-crds/`](agent-platform-four-crds/FRONT-SHEET.md) | CRD onboarding without Substrate | Reviewed skill/knowledge, controller-managed Agent, one fixed read-only MCP capability and correlated OTel; exact workplace compatibility remains a target gate |
 | [`otel-agent-flow/`](otel-agent-flow/FRONT-SHEET.md) | OTel workflow UI over Istio HTTPS | Native ADK Deployment versus Substrate actor comparison, real Kubernetes/GitLab MCP calls, fixture profiles, and Istio HTTPS integration |
 | [`radar-topology-mcp/`](radar-topology-mcp/README.md) | Radar topology plus existing vector KB; air-gapped OCI handoff | Resolves workload identity before cited KB lookup, with pinned artifact imports and live evaluation boundaries |

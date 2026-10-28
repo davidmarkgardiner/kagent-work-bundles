@@ -1,0 +1,30 @@
+apiVersion: ate.dev/v1alpha1
+kind: WorkerPool
+metadata:
+  name: graph-context-lab
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: graph-rest-mcp
+    kagent.dev/worker-pool-name: graph-context-lab
+    kagent.dev/worker-pool-namespace: kagent
+spec:
+  replicas: 1
+  workerImage: "{{WORKER_IMAGE}}"
+  sandboxClasses:
+    - name: gvisor
+      configRef: {name: "{{SANDBOX_CONFIG}}"}
+  template:
+    serviceAccountName: "{{WORKER_SERVICE_ACCOUNT}}"
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: Harness
+metadata:
+  name: graph-context-lab
+  namespace: kagent
+  labels:
+    app.kubernetes.io/part-of: graph-rest-mcp
+spec:
+  kagent: {}
+  substrate:
+    snapshotPolicy: {location: "{{SNAPSHOT_LOCATION}}"}
+    workerPoolRef: {name: graph-context-lab}

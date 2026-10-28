@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graph-model
+  namespace: graph-context-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: graph-model}
+  template:
+    metadata:
+      labels: {app: graph-model}
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: ollama
+          image: ollama/ollama:0.40.11
+          env:
+            - {name: HOME, value: /home/model}
+            - {name: OLLAMA_MODELS, value: /home/model/models}
+            - {name: OLLAMA_HOST, value: "0.0.0.0:11434"}
+            - {name: OLLAMA_NUM_PARALLEL, value: "1"}
+            - {name: OLLAMA_MAX_LOADED_MODELS, value: "1"}
+            - {name: OLLAMA_KEEP_ALIVE, value: 5m}
+          ports: [{name: http, containerPort: 11434}]
+          readinessProbe: {httpGet: {path: /, port: http}, initialDelaySeconds: 3}
+          resources:
+            requests: {cpu: 500m, memory: 4Gi}
+            limits: {cpu: "3", memory: 6Gi}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          volumeMounts:
+            - {name: model-home, mountPath: /home/model}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - {name: model-home, emptyDir: {sizeLimit: 8Gi}}
+        - {name: tmp, emptyDir: {sizeLimit: 128Mi}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: graph-model, namespace: graph-context-lab}
+spec:
+  selector: {app: graph-model}
+  ports: [{name: http, port: 11434, targetPort: http}]
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: ModelConfig
+metadata:
+  name: graph-context-lab-local
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: graph-rest-mcp}
+spec:
+  provider: Ollama
+  model: qwen3:4b-instruct-2507-q4_K_M
+  ollama:
+    host: graph-model.graph-context-lab.svc.cluster.local:11434
+    options:
+      num_ctx: "8192"
+      num_predict: "256"
+      repeat_penalty: "1.1"
+      temperature: "0"
+  stream: true

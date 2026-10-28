@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-28",
+  "scope": "Initial frozen source snapshot, static handoff review; no workplace API connection",
+  "input_sha256": "7c512394421c261347e337b07a5d6f663b8f374863c26053d3903ea8af277921",
+  "reviewers": [
+    {
+      "tool": "claude",
+      "requested_model": "opus",
+      "status": "unauthenticated",
+      "model_evidence": null,
+      "reported_model": null,
+      "output_sha256": null,
+      "blocker": "CLI signed out; auth preflight loggedIn=false"
+    },
+    {
+      "tool": "cursor",
+      "requested_model": "composer-2.5",
+      "status": "complete",
+      "model_evidence": "pinned-argv",
+      "reported_model": null,
+      "output_sha256": "9d577f4caa5ad069ee07d1043bd9fe2ec453c2b00d0971df43db09e35ab0293b",
+      "blocker": null
+    },
+    {
+      "tool": "kimi",
+      "requested_model": "kimi-code/k3",
+      "status": "completed_cli_response",
+      "exit_code": 0,
+      "model_evidence": "requested CLI model; served revision not independently reported",
+      "output_sha256": "e36da965aed16b624a1cf8846b0abea08b83658a85f8895051e34ef2ac7f4bc7"
+    }
+  ],
+  "final_followup": {
+    "tool": "cursor",
+    "requested_model": "composer-2.5",
+    "status": "complete",
+    "model_evidence": "pinned-argv",
+    "output_sha256": "5f497b091ef4411c75ed620f8eb5ca8c25b43204301163dc3cca7e2327b5d17e",
+    "verdict": "No blocking findings for work-agent adaptation/validation; not workplace deployment approval",
+    "scope": "Corrected frozen source snapshot; final image and extracted-package receipts added after review"
+  }
+}

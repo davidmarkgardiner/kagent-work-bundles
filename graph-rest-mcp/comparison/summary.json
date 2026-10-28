@@ -1,0 +1,301 @@
+{
+  "complete": true,
+  "distinct_questions": 4,
+  "scored_calls": 40,
+  "groups": [
+    {
+      "case_id": "owner",
+      "arm": "graph_json",
+      "calls": 5,
+      "passes": 5,
+      "answer_matches": 5,
+      "relationship_matches": 5,
+      "source_scope_matches": 5,
+      "coverage_matches": 5,
+      "ungrounded_id_calls": 0,
+      "unsupported_relationship_calls": 0,
+      "input_tokens": {
+        "median": 733,
+        "min": 733,
+        "max": 733,
+        "sum": 3665
+      },
+      "output_tokens": {
+        "median": 92,
+        "min": 92,
+        "max": 92,
+        "sum": 460
+      },
+      "elapsed_seconds_diagnostic": {
+        "median": 36.596,
+        "min": 36.208,
+        "max": 37.267,
+        "sum": 183.536
+      },
+      "errors": {},
+      "identical_request_across_repetitions": true
+    },
+    {
+      "case_id": "owner",
+      "arm": "flat_tables",
+      "calls": 5,
+      "passes": 0,
+      "answer_matches": 0,
+      "relationship_matches": 5,
+      "source_scope_matches": 5,
+      "coverage_matches": 5,
+      "ungrounded_id_calls": 0,
+      "unsupported_relationship_calls": 0,
+      "input_tokens": {
+        "median": 586,
+        "min": 586,
+        "max": 586,
+        "sum": 2930
+      },
+      "output_tokens": {
+        "median": 96,
+        "min": 96,
+        "max": 96,
+        "sum": 480
+      },
+      "elapsed_seconds_diagnostic": {
+        "median": 37.189,
+        "min": 36.359,
+        "max": 38.492,
+        "sum": 185.85
+      },
+      "errors": {
+        "answer_mismatch": 5
+      },
+      "identical_request_across_repetitions": true
+    },
+    {
+      "case_id": "policy_chain",
+      "arm": "graph_json",
+      "calls": 5,
+      "passes": 0,
+      "answer_matches": 0,
+      "relationship_matches": 0,
+      "source_scope_matches": 5,
+      "coverage_matches": 5,
+      "ungrounded_id_calls": 0,
+      "unsupported_relationship_calls": 0,
+      "input_tokens": {
+        "median": 740,
+        "min": 740,
+        "max": 740,
+        "sum": 3700
+      },
+      "output_tokens": {
+        "median": 95,
+        "min": 95,
+        "max": 95,
+        "sum": 475
+      },
+      "elapsed_seconds_diagnostic": {
+        "median": 38.323,
+        "min": 37.88,
+        "max": 59.301,
+        "sum": 212.122
+      },
+      "errors": {
+        "answer_mismatch": 5
+      },
+      "identical_request_across_repetitions": true
+    },
+    {
+      "case_id": "policy_chain",
+      "arm": "flat_tables",
+      "calls": 5,
+      "passes": 0,
+      "answer_matches": 0,
+      "relationship_matches": 0,
+      "source_scope_matches": 5,
+      "coverage_matches": 5,
+      "ungrounded_id_calls": 0,
+      "unsupported_relationship_calls": 0,
+      "input_tokens": {
+        "median": 593,
+        "min": 593,
+        "max": 593,
+        "sum": 2965
+      },
+      "output_tokens": {
+        "median": 93,
+        "min": 62,
+        "max": 93,
+        "sum": 434
+      },
+      "elapsed_seconds_diagnostic": {
+        "median": 36.371,
+        "min": 36.016,
+        "max": 40.575,
+        "sum": 185.90800000000002
+      },
+      "errors": {
+        "answer_mismatch": 5
+      },
+      "identical_request_across_repetitions": true
+    },
+    {
+      "case_id": "development_compliance",
+      "arm": "graph_json",
+      "calls": 5,
+      "passes": 0,
+      "answer_matches": 0,
+      "relationship_matches": 0,
+      "source_scope_matches": 5,
+      "coverage_matches": 5,
+      "ungrounded_id_calls": 0,
+      "unsupported_relationship_calls": 0,
+      "input_tokens": {
+        "median": 736,
+        "min": 736,
+        "max": 736,
+        "sum": 3680
+      },
+      "output_tokens": {
+        "median": 156,
+        "min": 156,
+        "max": 156,
+        "sum": 780
+      },
+      "elapsed_seconds_diagnostic": {
+        "median": 63.397,
+        "min": 62.109,
+        "max": 84.327,
+        "sum": 336.41
+      },
+      "errors": {
+        "answer_mismatch": 5
+      },
+      "identical_request_across_repetitions": true
+    },
+    {
+      "case_id": "development_compliance",
+      "arm": "flat_tables",
+      "calls": 5,
+      "passes": 0,
+      "answer_matches": 0,
+      "relationship_matches": 5,
+      "source_scope_matches": 5,
+      "coverage_matches": 5,
+      "ungrounded_id_calls": 0,
+      "unsupported_relationship_calls": 0,
+      "input_tokens": {
+        "median": 589,
+        "min": 589,
+        "max": 589,
+        "sum": 2945
+      },
+      "output_tokens": {
+        "median": 60,
+        "min": 60,
+        "max": 60,
+        "sum": 300
+      },
+      "elapsed_seconds_diagnostic": {
+        "median": 23.388,
+        "min": 22.88,
+        "max": 39.788,
+        "sum": 132.62
+      },
+      "errors": {
+        "answer_mismatch": 5
+      },
+      "identical_request_across_repetitions": true
+    },
+    {
+      "case_id": "partial_policy",
+      "arm": "graph_json",
+      "calls": 5,
+      "passes": 0,
+      "answer_matches": 0,
+      "relationship_matches": 5,
+      "source_scope_matches": 5,
+      "coverage_matches": 0,
+      "ungrounded_id_calls": 0,
+      "unsupported_relationship_calls": 0,
+      "input_tokens": {
+        "median": 350,
+        "min": 350,
+        "max": 350,
+        "sum": 1750
+      },
+      "output_tokens": {
+        "median": 62,
+        "min": 62,
+        "max": 62,
+        "sum": 310
+      },
+      "elapsed_seconds_diagnostic": {
+        "median": 23.002,
+        "min": 22.107,
+        "max": 30.149,
+        "sum": 121.247
+      },
+      "errors": {
+        "answer_mismatch": 5
+      },
+      "identical_request_across_repetitions": true
+    },
+    {
+      "case_id": "partial_policy",
+      "arm": "flat_tables",
+      "calls": 5,
+      "passes": 0,
+      "answer_matches": 0,
+      "relationship_matches": 5,
+      "source_scope_matches": 5,
+      "coverage_matches": 0,
+      "ungrounded_id_calls": 0,
+      "unsupported_relationship_calls": 0,
+      "input_tokens": {
+        "median": 344,
+        "min": 344,
+        "max": 344,
+        "sum": 1720
+      },
+      "output_tokens": {
+        "median": 61,
+        "min": 61,
+        "max": 61,
+        "sum": 305
+      },
+      "elapsed_seconds_diagnostic": {
+        "median": 22.808,
+        "min": 22.301,
+        "max": 30.519,
+        "sum": 121.287
+      },
+      "errors": {
+        "answer_mismatch": 5
+      },
+      "identical_request_across_repetitions": true
+    }
+  ],
+  "totals": {
+    "graph_json": {
+      "calls": 20,
+      "passes": 5,
+      "input_tokens": 12795,
+      "output_tokens": 2025,
+      "error_calls": 15,
+      "errors_by_category": {
+        "answer_mismatch": 15
+      }
+    },
+    "flat_tables": {
+      "calls": 20,
+      "passes": 0,
+      "input_tokens": 10560,
+      "output_tokens": 1519,
+      "error_calls": 20,
+      "errors_by_category": {
+        "answer_mismatch": 20
+      }
+    }
+  },
+  "flat_input_token_reduction_percent": 17.47,
+  "claim_boundary": "four-question synthetic post-retrieval model-call pilot; production benefit inconclusive"
+}

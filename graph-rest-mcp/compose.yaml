@@ -1,0 +1,44 @@
+services:
+  graph-rest:
+    build: .
+    image: graph-rest-mcp:fixture-v1
+    command: ["python", "-m", "app.rest"]
+    read_only: true
+    user: "10001:10001"
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    cpus: 0.5
+    ports: ["127.0.0.1:8001:8001"]
+    networks: [graph]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/healthz', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+  graph-mcp:
+    image: graph-rest-mcp:fixture-v1
+    build: .
+    command: ["python", "-m", "app.mcp_server"]
+    environment:
+      GRAPH_SERVICE_MODE: local
+      GRAPH_REST_URL: http://graph-rest:8001/get-context
+    read_only: true
+    user: "10001:10001"
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    cpus: 0.5
+    ports: ["127.0.0.1:8000:8000"]
+    networks: [graph]
+    depends_on:
+      graph-rest:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+networks:
+  graph:
+    internal: true

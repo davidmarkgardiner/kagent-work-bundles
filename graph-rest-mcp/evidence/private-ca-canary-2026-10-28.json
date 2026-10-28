@@ -1,0 +1,1 @@
+{"date": "2026-10-28", "operation": "POST /get_context/get_context", "data": "synthetic fixture only", "auth": "Authorization header absent", "private_CA": "verified chain and hostname with explicit PEM", "untrusted_CA": "rejected as upstream_transport", "result_count": 3, "status": "PASS"}

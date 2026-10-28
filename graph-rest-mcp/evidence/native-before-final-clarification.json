@@ -1,0 +1,133 @@
+[
+  {
+    "request_identifier": "graph-supported-1d22a204f539",
+    "agent_name": "graph-context-lab",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [
+      "get_graph_context"
+    ],
+    "completion_status": "FAIL",
+    "elapsed_seconds": 249.628,
+    "result_counts": {
+      "entities": 8,
+      "views": 2,
+      "relationships": 11
+    },
+    "source_scope_summary": {
+      "source": "fixture-v1",
+      "environments": [
+        "production"
+      ],
+      "groupings": [
+        "commerce",
+        "governance",
+        "platform"
+      ],
+      "complete": true
+    },
+    "error_category": "trace_or_answer_mismatch"
+  },
+  {
+    "request_identifier": "graph-development-0e81fd3659ab",
+    "agent_name": "graph-context-lab",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [
+      "get_graph_context"
+    ],
+    "completion_status": "PASS",
+    "elapsed_seconds": 136.617,
+    "result_counts": {
+      "entities": 8,
+      "views": 2,
+      "relationships": 11
+    },
+    "source_scope_summary": {
+      "source": "fixture-v1",
+      "environments": [
+        "development"
+      ],
+      "groupings": [
+        "commerce",
+        "governance",
+        "platform"
+      ],
+      "complete": true
+    },
+    "error_category": "none"
+  },
+  {
+    "request_identifier": "graph-unsupported-c3d24c098497",
+    "agent_name": "graph-context-lab",
+    "expected_tool_names": [],
+    "actual_tool_names": [],
+    "completion_status": "PASS",
+    "elapsed_seconds": 15.086,
+    "result_counts": {},
+    "source_scope_summary": {
+      "source": "none",
+      "environments": [],
+      "groupings": [],
+      "complete": false
+    },
+    "error_category": "none"
+  },
+  {
+    "request_identifier": "graph-ambiguous-29e2fb0f5a60",
+    "agent_name": "graph-context-lab",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [
+      "get_graph_context"
+    ],
+    "completion_status": "FAIL",
+    "elapsed_seconds": 35.332,
+    "result_counts": {
+      "entities": 0,
+      "views": 0,
+      "relationships": 0
+    },
+    "source_scope_summary": {
+      "source": "fixture-v1",
+      "environments": [
+        "production",
+        "development"
+      ],
+      "groupings": [],
+      "complete": false
+    },
+    "error_category": "trace_or_answer_mismatch"
+  },
+  {
+    "request_identifier": "graph-truncated-887311e62822",
+    "agent_name": "graph-context-lab",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [
+      "get_graph_context"
+    ],
+    "completion_status": "PASS",
+    "elapsed_seconds": 81.367,
+    "result_counts": {
+      "entities": 3,
+      "views": 0,
+      "relationships": 2
+    },
+    "source_scope_summary": {
+      "source": "fixture-v1",
+      "environments": [
+        "production"
+      ],
+      "groupings": [
+        "commerce"
+      ],
+      "complete": false
+    },
+    "error_category": "none"
+  }
+]

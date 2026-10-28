@@ -1,0 +1,63 @@
+# PRIVATE ADAPTATION INPUT ONLY. Resolve every placeholder and review before use.
+# Existing namespace, approved registry pull identity and remote egress required.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graph-mcp-remote
+  namespace: "{{MCP_NAMESPACE}}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: graph-mcp-remote}
+  template:
+    metadata:
+      labels: {app: graph-mcp-remote}
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: mcp
+          image: "{{IMAGE_DIGEST_REFERENCE}}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - {name: GRAPH_SERVICE_MODE, value: remote}
+            - {name: GRAPH_REST_URL, value: "{{GRAPH_REST_URL}}"}
+            - {name: GRAPH_REST_PATH, value: "{{GRAPH_REST_PATH}}"}
+            - {name: GRAPH_EXPECTED_SOURCE, value: "{{APPROVED_SOURCE_ID}}"}
+          # No auth setting by default. Add a Secret file mount only if required.
+          # Add GRAPH_CA_CERT_FILE and a read-only CA mount for private PKI.
+          ports: [{name: http, containerPort: 8000}]
+          readinessProbe: {httpGet: {path: /healthz, port: http}, initialDelaySeconds: 2}
+          livenessProbe: {httpGet: {path: /healthz, port: http}, initialDelaySeconds: 10}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: "1", memory: 512Mi}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          volumeMounts: [{name: tmp, mountPath: /tmp}]
+      volumes: [{name: tmp, emptyDir: {sizeLimit: 32Mi}}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: graph-mcp-remote, namespace: "{{MCP_NAMESPACE}}"}
+spec:
+  selector: {app: graph-mcp-remote}
+  ports: [{name: http, port: 8000, targetPort: http}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: graph-mcp-remote, namespace: "{{MCP_NAMESPACE}}"}
+spec:
+  podSelector: {matchLabels: {app: graph-mcp-remote}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: "{{KAGENT_NAMESPACE}}"}}
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: "{{EXECUTOR_NAMESPACE}}"}}
+      ports: [{protocol: TCP, port: 8000}]
+  egress:
+    - to: [{ipBlock: {cidr: "{{APPROVED_REMOTE_CIDR}}"}}]
+      ports: [{protocol: TCP, port: {{APPROVED_REMOTE_PORT}}}]
+    - to:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}
+          podSelector: {matchLabels: {k8s-app: kube-dns}}
+      ports: [{protocol: UDP, port: 53}, {protocol: TCP, port: 53}]

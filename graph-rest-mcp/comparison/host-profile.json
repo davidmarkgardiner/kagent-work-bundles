@@ -1,0 +1,31 @@
+{
+  "phase": "model startup and initial inference observation; timing diagnostic only",
+  "vm_cores": 4,
+  "vm_memory_gib_approx": 11,
+  "model_cpu_limit_cores": 3,
+  "model_memory_request_bytes": 4294967296,
+  "model_memory_limit_bytes": 6442450944,
+  "before": {
+    "epoch_seconds": 1793114320.3981388,
+    "usage_usec": 29337556,
+    "memory_current_bytes": 2588340224
+  },
+  "after": {
+    "epoch_seconds": 1793114430.6177845,
+    "usage_usec": 350248728,
+    "memory_current_bytes": 4858867712
+  },
+  "model_cpu_cores_used_average": 2.912,
+  "throttle_events_delta": 931,
+  "scope": "This observation diagnoses CPU/memory use and is not a speed comparison.",
+  "observation_milliseconds": 110220,
+  "post_study_and_native_canary": {
+    "model_ready": true,
+    "model_restart_count": 0,
+    "memory_limit_bytes": 6442450944,
+    "memory_current_bytes": 4793978880,
+    "memory_peak_bytes": 4960129024,
+    "agent_ready": true,
+    "agent_revision": "9ba236107f30712995482e0a8e34d7b030d239bcd9da36f6b8fb691bffe99a4d"
+  }
+}

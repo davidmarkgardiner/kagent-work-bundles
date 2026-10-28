@@ -1,0 +1,32 @@
+[
+  {
+    "request_identifier": "graph-supported-ab98622bee61",
+    "agent_name": "graph-context-lab",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [
+      "get_graph_context"
+    ],
+    "completion_status": "PASS",
+    "elapsed_seconds": 195.043,
+    "result_counts": {
+      "entities": 8,
+      "views": 2,
+      "relationships": 11
+    },
+    "source_scope_summary": {
+      "source": "fixture-v1",
+      "environments": [
+        "production"
+      ],
+      "groupings": [
+        "commerce",
+        "governance",
+        "platform"
+      ],
+      "complete": true
+    },
+    "error_category": "none"
+  }
+]

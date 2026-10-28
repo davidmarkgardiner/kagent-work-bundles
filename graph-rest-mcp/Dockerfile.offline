@@ -1,0 +1,13 @@
+ARG BASE_IMAGE=python:3.12-slim-bookworm@sha256:e697c81897302a4c4333bade000d98038fbb21eb064f8ee1fd42d02ebcd9d337
+FROM ${BASE_IMAGE}
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 GRAPH_DB_PATH=/app/data/graph.duckdb
+WORKDIR /app
+COPY requirements.lock .
+COPY wheelhouse/ /wheels/
+RUN --network=none pip install --no-cache-dir --no-index --find-links=/wheels --only-binary=:all: --require-hashes -r requirements.lock && useradd --uid 10001 --create-home graph && rm -rf /wheels
+COPY app/ app/
+COPY data/fixture.json data/fixture.json
+RUN --network=none python -c "import app.mcp_server; import app.rest" && python -m app.seed --database /app/data/graph.duckdb && chmod -R a-w /app/data
+USER 10001:10001
+EXPOSE 8000 8001
+CMD ["python", "-m", "app.mcp_server"]

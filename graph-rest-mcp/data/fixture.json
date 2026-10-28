@@ -1,0 +1,435 @@
+{
+  "source": "fixture-v1",
+  "nodes": [
+    {
+      "environment": "production",
+      "category": "entity",
+      "value": {
+        "id": "prod:checkout",
+        "kind": "workload",
+        "name": "checkout",
+        "environment": "production",
+        "grouping": "commerce",
+        "compliance": "compliant"
+      }
+    },
+    {
+      "environment": "production",
+      "category": "entity",
+      "value": {
+        "id": "prod:checkout-check",
+        "kind": "finding",
+        "name": "checkout restricted-policy assessment",
+        "environment": "production",
+        "grouping": "commerce",
+        "compliance": "compliant"
+      }
+    },
+    {
+      "environment": "production",
+      "category": "entity",
+      "value": {
+        "id": "prod:payments",
+        "kind": "namespace",
+        "name": "prod-payments",
+        "environment": "production",
+        "grouping": "commerce",
+        "compliance": "not_applicable"
+      }
+    },
+    {
+      "environment": "production",
+      "category": "entity",
+      "value": {
+        "id": "prod:restricted",
+        "kind": "policy",
+        "name": "restricted-pod-security",
+        "environment": "production",
+        "grouping": "governance",
+        "compliance": "not_applicable"
+      }
+    },
+    {
+      "environment": "production",
+      "category": "entity",
+      "value": {
+        "id": "prod:commerce-team",
+        "kind": "team",
+        "name": "commerce-platform",
+        "environment": "production",
+        "grouping": "commerce",
+        "compliance": "not_applicable"
+      }
+    },
+    {
+      "environment": "production",
+      "category": "entity",
+      "value": {
+        "id": "prod:metrics",
+        "kind": "workload",
+        "name": "metrics",
+        "environment": "production",
+        "grouping": "platform",
+        "compliance": "non_compliant"
+      }
+    },
+    {
+      "environment": "production",
+      "category": "entity",
+      "value": {
+        "id": "prod:metrics-check",
+        "kind": "finding",
+        "name": "metrics restricted-policy assessment",
+        "environment": "production",
+        "grouping": "platform",
+        "compliance": "non_compliant"
+      }
+    },
+    {
+      "environment": "production",
+      "category": "entity",
+      "value": {
+        "id": "prod:platform",
+        "kind": "namespace",
+        "name": "prod-platform",
+        "environment": "production",
+        "grouping": "platform",
+        "compliance": "not_applicable"
+      }
+    },
+    {
+      "environment": "production",
+      "category": "view",
+      "value": {
+        "id": "prod:workload-view",
+        "name": "approved_workloads",
+        "environment": "production",
+        "grouping": "governance",
+        "columns": [
+          "namespace",
+          "workload",
+          "owner_team"
+        ]
+      }
+    },
+    {
+      "environment": "production",
+      "category": "view",
+      "value": {
+        "id": "prod:compliance-view",
+        "name": "approved_compliance",
+        "environment": "production",
+        "grouping": "governance",
+        "columns": [
+          "workload",
+          "policy",
+          "compliance"
+        ]
+      }
+    },
+    {
+      "environment": "development",
+      "category": "entity",
+      "value": {
+        "id": "dev:checkout",
+        "kind": "workload",
+        "name": "checkout",
+        "environment": "development",
+        "grouping": "commerce",
+        "compliance": "non_compliant"
+      }
+    },
+    {
+      "environment": "development",
+      "category": "entity",
+      "value": {
+        "id": "dev:checkout-check",
+        "kind": "finding",
+        "name": "checkout restricted-policy assessment",
+        "environment": "development",
+        "grouping": "commerce",
+        "compliance": "non_compliant"
+      }
+    },
+    {
+      "environment": "development",
+      "category": "entity",
+      "value": {
+        "id": "dev:payments",
+        "kind": "namespace",
+        "name": "dev-payments",
+        "environment": "development",
+        "grouping": "commerce",
+        "compliance": "not_applicable"
+      }
+    },
+    {
+      "environment": "development",
+      "category": "entity",
+      "value": {
+        "id": "dev:restricted",
+        "kind": "policy",
+        "name": "restricted-pod-security",
+        "environment": "development",
+        "grouping": "governance",
+        "compliance": "not_applicable"
+      }
+    },
+    {
+      "environment": "development",
+      "category": "entity",
+      "value": {
+        "id": "dev:commerce-team",
+        "kind": "team",
+        "name": "commerce-platform",
+        "environment": "development",
+        "grouping": "commerce",
+        "compliance": "not_applicable"
+      }
+    },
+    {
+      "environment": "development",
+      "category": "entity",
+      "value": {
+        "id": "dev:metrics",
+        "kind": "workload",
+        "name": "metrics",
+        "environment": "development",
+        "grouping": "platform",
+        "compliance": "compliant"
+      }
+    },
+    {
+      "environment": "development",
+      "category": "entity",
+      "value": {
+        "id": "dev:metrics-check",
+        "kind": "finding",
+        "name": "metrics restricted-policy assessment",
+        "environment": "development",
+        "grouping": "platform",
+        "compliance": "compliant"
+      }
+    },
+    {
+      "environment": "development",
+      "category": "entity",
+      "value": {
+        "id": "dev:platform",
+        "kind": "namespace",
+        "name": "dev-platform",
+        "environment": "development",
+        "grouping": "platform",
+        "compliance": "not_applicable"
+      }
+    },
+    {
+      "environment": "development",
+      "category": "view",
+      "value": {
+        "id": "dev:workload-view",
+        "name": "approved_workloads",
+        "environment": "development",
+        "grouping": "governance",
+        "columns": [
+          "namespace",
+          "workload",
+          "owner_team"
+        ]
+      }
+    },
+    {
+      "environment": "development",
+      "category": "view",
+      "value": {
+        "id": "dev:compliance-view",
+        "name": "approved_compliance",
+        "environment": "development",
+        "grouping": "governance",
+        "columns": [
+          "workload",
+          "policy",
+          "compliance"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "environment": "production",
+      "value": {
+        "source": "prod:payments",
+        "target": "prod:checkout",
+        "relation": "contains"
+      }
+    },
+    {
+      "environment": "production",
+      "value": {
+        "source": "prod:platform",
+        "target": "prod:metrics",
+        "relation": "contains"
+      }
+    },
+    {
+      "environment": "production",
+      "value": {
+        "source": "prod:checkout",
+        "target": "prod:checkout-check",
+        "relation": "assessed_by"
+      }
+    },
+    {
+      "environment": "production",
+      "value": {
+        "source": "prod:metrics",
+        "target": "prod:metrics-check",
+        "relation": "assessed_by"
+      }
+    },
+    {
+      "environment": "production",
+      "value": {
+        "source": "prod:checkout-check",
+        "target": "prod:restricted",
+        "relation": "evaluates"
+      }
+    },
+    {
+      "environment": "production",
+      "value": {
+        "source": "prod:metrics-check",
+        "target": "prod:restricted",
+        "relation": "evaluates"
+      }
+    },
+    {
+      "environment": "production",
+      "value": {
+        "source": "prod:checkout",
+        "target": "prod:commerce-team",
+        "relation": "owned_by"
+      }
+    },
+    {
+      "environment": "production",
+      "value": {
+        "source": "prod:workload-view",
+        "target": "prod:checkout",
+        "relation": "describes"
+      }
+    },
+    {
+      "environment": "production",
+      "value": {
+        "source": "prod:workload-view",
+        "target": "prod:metrics",
+        "relation": "describes"
+      }
+    },
+    {
+      "environment": "production",
+      "value": {
+        "source": "prod:compliance-view",
+        "target": "prod:checkout-check",
+        "relation": "describes"
+      }
+    },
+    {
+      "environment": "production",
+      "value": {
+        "source": "prod:compliance-view",
+        "target": "prod:metrics-check",
+        "relation": "describes"
+      }
+    },
+    {
+      "environment": "development",
+      "value": {
+        "source": "dev:payments",
+        "target": "dev:checkout",
+        "relation": "contains"
+      }
+    },
+    {
+      "environment": "development",
+      "value": {
+        "source": "dev:platform",
+        "target": "dev:metrics",
+        "relation": "contains"
+      }
+    },
+    {
+      "environment": "development",
+      "value": {
+        "source": "dev:checkout",
+        "target": "dev:checkout-check",
+        "relation": "assessed_by"
+      }
+    },
+    {
+      "environment": "development",
+      "value": {
+        "source": "dev:metrics",
+        "target": "dev:metrics-check",
+        "relation": "assessed_by"
+      }
+    },
+    {
+      "environment": "development",
+      "value": {
+        "source": "dev:checkout-check",
+        "target": "dev:restricted",
+        "relation": "evaluates"
+      }
+    },
+    {
+      "environment": "development",
+      "value": {
+        "source": "dev:metrics-check",
+        "target": "dev:restricted",
+        "relation": "evaluates"
+      }
+    },
+    {
+      "environment": "development",
+      "value": {
+        "source": "dev:checkout",
+        "target": "dev:commerce-team",
+        "relation": "owned_by"
+      }
+    },
+    {
+      "environment": "development",
+      "value": {
+        "source": "dev:workload-view",
+        "target": "dev:checkout",
+        "relation": "describes"
+      }
+    },
+    {
+      "environment": "development",
+      "value": {
+        "source": "dev:workload-view",
+        "target": "dev:metrics",
+        "relation": "describes"
+      }
+    },
+    {
+      "environment": "development",
+      "value": {
+        "source": "dev:compliance-view",
+        "target": "dev:checkout-check",
+        "relation": "describes"
+      }
+    },
+    {
+      "environment": "development",
+      "value": {
+        "source": "dev:compliance-view",
+        "target": "dev:metrics-check",
+        "relation": "describes"
+      }
+    }
+  ]
+}

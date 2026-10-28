@@ -1,0 +1,14 @@
+**/__pycache__
+**/*.pyc
+**/*.duckdb*
+.pytest_cache
+.venv
+evidence
+docs
+deploy
+scripts
+tests
+*.zip
+*.env
+
+comparison

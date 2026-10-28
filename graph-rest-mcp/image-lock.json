@@ -1,0 +1,9 @@
+{
+  "checked": "2026-10-28",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "index_digest": "sha256:e697c81897302a4c4333bade000d98038fbb21eb064f8ee1fd42d02ebcd9d337",
+  "platforms": {
+    "linux/amd64": "sha256:623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487",
+    "linux/arm64": "sha256:e0b3f8d16a5ccfbe602d5c94297e5dbcda2ec256edca2b80fcd44e39e1ff6feb"
+  }
+}

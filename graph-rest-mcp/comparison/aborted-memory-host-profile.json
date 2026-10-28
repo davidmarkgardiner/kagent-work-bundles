@@ -1,0 +1,28 @@
+{
+  "phase": "unscored_warmup",
+  "vm_cores": 4,
+  "vm_memory_gib_approx": 11,
+  "vm_load_average_before": [
+    0.36,
+    0.51,
+    0.71
+  ],
+  "model_cpu_limit_cores": 3,
+  "model_memory_limit_bytes": 4294967296,
+  "before": {
+    "epoch_seconds": 1793113632.808542,
+    "usage_usec": 11389800004,
+    "nr_throttled": 32673,
+    "throttled_usec": 756834057
+  },
+  "after": {
+    "epoch_seconds": 1793113664.7197554,
+    "usage_usec": 11481974812,
+    "nr_throttled": 32935,
+    "throttled_usec": 761415949
+  },
+  "observation_seconds": 31.911,
+  "model_cpu_cores_used_average": 2.888,
+  "throttle_events_delta": 262,
+  "scope": "diagnostic cgroup observation during unscored warmup, no speed comparison"
+}

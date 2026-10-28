@@ -1,0 +1,89 @@
+[
+  {
+    "id": "owner",
+    "retrieval_query": "production graph",
+    "context_size": 10,
+    "question": "Which team owns checkout in production?",
+    "expected": {
+      "status": "answered",
+      "answer_ids": [
+        "prod:commerce-team"
+      ],
+      "source": "fixture-v1",
+      "environments": [
+        "production"
+      ],
+      "partial": false,
+      "supporting_edges": [
+        {
+          "source": "prod:checkout",
+          "relation": "owned_by",
+          "target": "prod:commerce-team"
+        }
+      ]
+    }
+  },
+  {
+    "id": "policy_chain",
+    "retrieval_query": "production graph",
+    "context_size": 10,
+    "question": "Which policy is evaluated by the finding that assesses checkout in production?",
+    "expected": {
+      "status": "answered",
+      "answer_ids": [
+        "prod:restricted"
+      ],
+      "source": "fixture-v1",
+      "environments": [
+        "production"
+      ],
+      "partial": false,
+      "supporting_edges": [
+        {
+          "source": "prod:checkout",
+          "relation": "assessed_by",
+          "target": "prod:checkout-check"
+        },
+        {
+          "source": "prod:checkout-check",
+          "relation": "evaluates",
+          "target": "prod:restricted"
+        }
+      ]
+    }
+  },
+  {
+    "id": "development_compliance",
+    "retrieval_query": "development graph",
+    "context_size": 10,
+    "question": "Which workloads are non-compliant in development?",
+    "expected": {
+      "status": "answered",
+      "answer_ids": [
+        "dev:checkout"
+      ],
+      "source": "fixture-v1",
+      "environments": [
+        "development"
+      ],
+      "partial": false,
+      "supporting_edges": []
+    }
+  },
+  {
+    "id": "partial_policy",
+    "retrieval_query": "production graph",
+    "context_size": 3,
+    "question": "Which policy is evaluated by the finding that assesses metrics in production?",
+    "expected": {
+      "status": "insufficient_context",
+      "answer_ids": [],
+      "source": "fixture-v1",
+      "environments": [
+        "production"
+      ],
+      "partial": true,
+      "supporting_edges": []
+    }
+  }
+]

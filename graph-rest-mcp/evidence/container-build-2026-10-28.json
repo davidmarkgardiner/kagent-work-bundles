@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-28",
+  "image_tag": "graph-rest-mcp:handoff-20261028",
+  "local_image_id": "sha256:d57582a076b349a98d2108b46faa243469e6fe19a1ede4bdbbee5e376f8fdb0e",
+  "platform": "linux/amd64",
+  "runtime": "Docker Linux amd64 on arm64 host via emulation",
+  "run_steps_network": "none",
+  "runtime_network": "dedicated internal Docker network; no published ports; acceptance client inside MCP container",
+  "read_only_root": true,
+  "capabilities": "ALL dropped",
+  "no_new_privileges": true,
+  "memory_limit": "512MiB per service",
+  "python_version": "Python 3.12.16",
+  "pip_check": "No broken requirements found."
+}

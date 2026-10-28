@@ -1,0 +1,29 @@
+[
+  {
+    "request_identifier": "graph-ambiguous-f549809db7fb",
+    "agent_name": "graph-context-lab",
+    "expected_tool_names": [
+      "get_graph_context"
+    ],
+    "actual_tool_names": [
+      "get_graph_context"
+    ],
+    "completion_status": "FAIL",
+    "elapsed_seconds": 37.311,
+    "result_counts": {
+      "entities": 0,
+      "views": 0,
+      "relationships": 0
+    },
+    "source_scope_summary": {
+      "source": "fixture-v1",
+      "environments": [
+        "production",
+        "development"
+      ],
+      "groupings": [],
+      "complete": false
+    },
+    "error_category": "trace_or_answer_mismatch"
+  }
+]
