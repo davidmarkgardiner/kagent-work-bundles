@@ -1,0 +1,70 @@
+{
+  "result": "Passed",
+  "verifiedAt": "2026-10-21T19:59:50.320293+00:00",
+  "environment": "isolated Proxmox lab; no Azure operations",
+  "kagent": "1.0.0-alpha17",
+  "substrate": "0.6.0-alpha3",
+  "scenario": "aks-docs-v3",
+  "goldenEvaluatorPolicy": "aks-docs-kagent-1x-v1",
+  "evaluatorUnchanged": true,
+  "goldenPromptClarifiesExactCitation": true,
+  "historicalLiteralCitationFailuresRetained": 2,
+  "nativeModelCalls": 3,
+  "gatewayModelObservations": 3,
+  "modelUsageSource": "native-runtime",
+  "nativeToolCalls": 6,
+  "tools": {
+    "load_skill": 2,
+    "load_skill_resource": 4
+  },
+  "reportedTokens": {
+    "input": 15822.0,
+    "output": 1166.0
+  },
+  "costUsd": null,
+  "costSource": "unknown",
+  "taskAndTelemetryCorrelation": true,
+  "exactGoldenFilesVerified": true,
+  "dependencyPinsUnchanged": true,
+  "livePromptAndProofsAbsentFromTelemetry": true,
+  "actorIdentityCorrelation": true,
+  "observedActorStates": [
+    "suspended",
+    "resuming",
+    "running",
+    "suspending",
+    "suspended"
+  ],
+  "retentionHardLimits": {
+    "maxTraces": 200,
+    "maxSpans": 4000
+  },
+  "viewerInvocationHttpStatus": 403,
+  "viewerChecks": 107,
+  "oldDemoDeploymentsAvailable": 7,
+  "oldDashboardPodAndRestartCountUnchanged": true,
+  "temporaryCaptureContainersRemaining": 0,
+  "traceLimitations": [
+    "Intermediate gateway parent spans are absent; no timing or equal-usage pairing is inferred.",
+    "Token totals use the native reporting layer; gateway reports remain inspectable."
+  ],
+  "unproven": [
+    "Live GitLab publication and private pulls",
+    "Reboot and node-loss recovery",
+    "Automatic acceptance/exposure gating",
+    "Arbitrary BYO runtime hosting",
+    "Runtime file-write isolation"
+  ],
+  "nativeActivitySummaryLimit": 8,
+  "excludedOtherRuntimeReportCount": 0,
+  "nativeTraceStatus": "unknown",
+  "dependencyPinCount": 13,
+  "review": {
+    "independentProvider": "Claude Opus 5.5",
+    "scopedVerdict": "Accepted for single-agent fresh-session proof",
+    "followupFixes": "Parent fixed bounded activity summaries, mixed-runtime completeness, and native fragment status; all 107 checks and a fresh live run passed.",
+    "multiAgentLiveProof": false
+  },
+  "backgroundRetentionPressureVerified": true,
+  "deployedCodeSha256": "206edba68b9c38fb26df9937ac67d6896c1007b472ab7588bfd264a61e7bb554"
+}

@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-21",
+  "scope": "Proxmox native documentation demo; no Azure operations",
+  "delivery": "Private local Git fixture reconciled by Flux; real GitLab pipeline not demonstrated",
+  "hostedAgent": "aks-onboarding-v1",
+  "nativeAgent": "hosted-aks-onboarding-v1",
+  "scenario": "aks-onboarding-v1",
+  "nativeAgentRevision": "82312240eff772abf729c0572d8d628715ac6bc3ef43756322e1d0de9edda81c",
+  "results": {
+    "freshGoldenPasses": 2,
+    "unchangedDependencyPins": 13,
+    "nativeModelCalls": 3,
+    "load_skill": 2,
+    "load_skill_resource": 4,
+    "mcpCalls": 0,
+    "actualSampledOnboardingChanges": 4,
+    "modelUsageSource": "native-runtime",
+    "inputTokens": 15825.0,
+    "outputTokens": 1338.0,
+    "costUsd": null,
+    "costSource": "unknown",
+    "traceStatus": "unknown"
+  },
+  "viewer": {
+    "codeSha256": "93c3079d930f4de52ff76b4893288f6be4d19c527d9edd8256f363f7a5af9df0",
+    "actualMountedFileHashesMatch": 8,
+    "invokeHTTPStatus": 403,
+    "observerNamedGets": 15,
+    "observerRBACChecksPassed": 10,
+    "viewerTokenMounted": false,
+    "existingGraphIsMainOnboardingView": true,
+    "sharedGraphOwner": true,
+    "readinessDetailsCollapsed": true
+  },
+  "validation": {
+    "offlineTestsPassed": 128,
+    "actualMetadataDOMReplay": "passed",
+    "realBrowserScreenshot": "not verified; browser URL policy blocked automation",
+    "oldDemoPodUIDsAndRestartsUnchanged": true,
+    "originalHostedAgentUIDSpecStatusUnchanged": true
+  },
+  "limits": [
+    "No MCP tools attached",
+    "Skill and KB calls share native executor; spans omit package arguments",
+    "Recorded Golden result is not automatic publication gating",
+    "Conversational creator and arbitrary BYO runtime provisioning remain proposed",
+    "Observer history and access tunnels are not a reboot recovery proof"
+  ]
+}

@@ -1,11 +1,13 @@
-# Start here: kagent 1.0 build target
+# Start here: native kagent skills and knowledge POC
 
-Target **kagent 1.0.0-alpha17**, the latest published 1.0 release checked on 28 October 2026. Use [build/README.md](build/README.md) for image intake and [build/kagent-1.0-target.json](build/kagent-1.0-target.json) for immutable release pins.
+Use [POC-QUICKSTART.md](POC-QUICKSTART.md). The native adapter is included, with saved lab proof on **kagent 1.0.0-alpha17**, **API `api.kagent.dev/v1alpha3`**, and **Substrate 0.6.0-alpha3**.
 
-Give the implementing work agent [KAGENT-1.0-WORK-AGENT-PROMPT.md](KAGENT-1.0-WORK-AGENT-PROMPT.md). It covers the native API port, image prerequisites, content delivery, permissions and acceptance. The requested managed runtime uses AgentTemplate, Harness and Substrate. The native Go ADK image is imported as a complete digest-pinned image. The helper controllers remain separate Python services.
+The work agent may choose any permitted namespace. Use a namespace with suitable local Harness and ModelConfig dependencies for the fastest setup. Keep every namespace-local reference consistent. The controller's own namespace need not change.
 
-**The current deployment implementation is still the legacy kagent 0.7.13 profile.** Build/import targeting has been corrected; a native 1.0 installation is not yet implemented or verified. Do not deploy `package.py`, `private_install.py` or the ordinary MCP profile onto alpha17 unchanged. Renaming an API version or replacing the Python image is insufficient.
+The immediate task is to build or reuse the helper image, publish the two data-only content OCI images, deploy the four CRDs and native adapters, and pass one fresh skill/knowledge request. The OTel dashboard and a new GitLab pipeline are optional. Bringing an owner-authored agent definition and new content is the next milestone.
 
-The following remain legacy references: [AIRGAP-INSTALL.md](AIRGAP-INSTALL.md), [NO-SUBSTRATE-WORK-AGENT-PROMPT.md](NO-SUBSTRATE-WORK-AGENT-PROMPT.md), [ORDINARY-MCP-DEMO.md](ORDINARY-MCP-DEMO.md) and [the old Python build](build/LEGACY-0.7-BUILD.md). The 22 October reviews and historical receipts document that earlier implementation.
+Give the work agent [KAGENT-1.0-WORK-AGENT-PROMPT.md](KAGENT-1.0-WORK-AGENT-PROMPT.md). Use [build/README.md](build/README.md) for image prerequisites and [build/kagent-1.0-target.json](build/kagent-1.0-target.json) for the immutable runtime pin.
 
-Run `python3 -B verify.py` to check the preserved snapshot and offline legacy tests. Passing them does not establish native 1.0 compatibility. The work agent must port the implementation and checks, validate exact alpha17 schemas and produce fresh native acceptance before claiming installation success. Keep workplace configuration and evidence private.
+[Native source and recorded proof](implementation/platform/skills-registry/native/README.md) are separate from the old 0.7 implementation. Use native `resources.py`, `publish.py` and `run_golden.py`. The root `package.py render`, `private_install.py` and ordinary MCP demo remain legacy. `package.py content` can export the shared sample content.
+
+Run `python3 -B verify.py` for the packaged native and legacy offline checks. Saved lab evidence and offline tests do not replace a fresh workplace POC receipt.

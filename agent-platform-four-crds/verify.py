@@ -10,6 +10,7 @@ package.verify_snapshot()
 root = Path(__file__).resolve().parent
 source = root / 'implementation/platform/skills-registry'
 groups = [(source, ['test_controller.py', 'test_knowledge.py', 'test_portability.py']),
+          (source / 'native', ['test_artifacts.py', 'test_native.py']),
           (source / 'golden', ['test_checks.py']),
           (source / 'knowledge', ['test_evidence.py', 'test_runner.py']),
           (source / 'hosted', ['test_onboarding.py', 'test_acceptance.py', 'test_fixed_profile.py', 'test_fixed_mcp.py', 'test_trace_bootstrap.py', 'test_combined_acceptance.py', 'test_ordinary_viewer.py']),

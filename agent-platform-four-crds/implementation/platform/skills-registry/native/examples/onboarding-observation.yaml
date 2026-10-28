@@ -1,0 +1,53 @@
+apiVersion: skills.platform.kagent.dev/v1alpha1
+kind: HostedAgent
+metadata:
+  name: aks-onboarding-v1
+  namespace: kagent
+spec:
+  owner:
+    team: platform-demo
+  purpose: Reviewed AKS documentation agent on native KAgent 1.x
+  instructions: Use the reviewed skill and knowledge runbook for synthetic AKS bootstrap
+    authorization cases. Cite sources. No operational actions.
+  runtimeProfile: lab-kagent-1x-v1
+  modelProfile: skills-demo-gateway-v1
+  toolGrantRefs: []
+  skillRefs:
+  - name: aks-known-issues-v1
+    sourceCommit: 75192c5ef918b775c6f8c03135caa93ba43d9abf
+    contentSha256: 1906dd0e228bcbc5d08d792d318917f0f9a6e1f663fc3ee0075df68dda2bb07e
+  knowledgeBaseRefs:
+  - name: aks-bootstrap-v1
+    sourceCommit: 75192c5ef918b775c6f8c03135caa93ba43d9abf
+    contentSha256: d4d8813c621f3e4ab96804616250da1571ae9b4ca79e0594e89c1bdc0251790f
+---
+apiVersion: skills.platform.kagent.dev/v1alpha1
+kind: GoldenScenario
+metadata:
+  name: aks-onboarding-v1
+  namespace: kagent
+spec:
+  policy: aks-docs-kagent-1x-v1
+  inputOrigin: synthetic
+  hostedAgentRef:
+    name: aks-onboarding-v1
+  hostedAgentSpecSha256: 6411d7e2e0cde6530b6ae2446e280fceeb1dd6cd93b23dd96787ae853702c9d8
+  prompt: 'Synthetic documentation case only. A network-isolated AKS bootstrap reports
+    OrasPullUnauthorizedVMExtensionError, exit 212, registry HTTP 401. Load both aks-known-issues
+    and kb-aks-bootstrap. Read references/error-code-map.md from the former and references/oras-pull-unauthorized.md
+    from the latter with load_skill_resource. Also read references/release-proof.txt
+    from EACH skill and report both complete release proof values, plus the runbook
+    demo evidence code. Explain proposed identity and registry-permission checks,
+    distinguish ABAC from ordinary RBAC, cite the source URLs, and state that no Azure
+    investigation or changes were performed. Include this exact reviewed source URL
+    in your final answer, retaining its /en-us/ segment: https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/error-codes/vmextensionerror-oraspullunauthorized'
+  referenceFile: references/error-code-map.md
+  knowledgeFile: references/oras-pull-unauthorized.md
+  answerTerms:
+  - OrasPullUnauthorizedVMExtensionError
+  - '212'
+  - AKS-KB-ORAS-212-R1
+  - Container Registry Repository Reader
+  - AcrPull
+  citations:
+  - https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/error-codes/vmextensionerror-oraspullunauthorized

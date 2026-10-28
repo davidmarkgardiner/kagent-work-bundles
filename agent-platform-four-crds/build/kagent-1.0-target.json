@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "checkedAt": "2026-10-28",
-  "purpose": "Native kagent 1.0 build and import target; legacy deployment adapter requires a port",
+  "purpose": "Native kagent 1.0 skills/knowledge POC build and import target with included lab-tested adapter",
   "kagent": {
     "version": "1.0.0-alpha17",
     "tag": "v1.0.0-alpha17",
@@ -38,9 +38,14 @@
     }
   ],
   "deployment": {
-    "implementation": "legacy-kagent-0.7.13",
-    "portRequired": true,
-    "nativeRenderVerified": false,
-    "targetRuntimeVerified": false
+    "implementation": "implementation/platform/skills-registry/native",
+    "portRequired": false,
+    "workplaceConfigurationRequired": true,
+    "nativeRenderVerified": true,
+    "historicalLabVerified": true,
+    "targetRuntimeVerified": false,
+    "namespace": "Any permitted namespace with namespace-local Harness, ModelConfig and source references",
+    "functionalLabEvidence": "implementation/platform/skills-registry/native/verification.json",
+    "telemetryLabEvidence": "implementation/platform/skills-registry/native/verification-native-otel.json"
   }
 }

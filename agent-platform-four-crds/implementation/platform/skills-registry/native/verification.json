@@ -1,0 +1,33 @@
+{
+  "result": "Passed",
+  "policy": "aks-docs-kagent-1x-v1",
+  "agentName": "hosted-aks-docs-v1",
+  "agentRevision": "f0b5f6ab50284b28dfb4c55f27ae6e3452d94103c5cacf84875c8959a96c9f6d",
+  "nativeToolCalls": 6,
+  "observedTools": [
+    "load_skill",
+    "load_skill_resource"
+  ],
+  "returnedFilesSha256": {
+    "aks-known-issues/references/error-code-map.md": "22fd4350d803c8ab6e00f41bc50d03a4f49aef879e6ac99e351c06800d1e0f45",
+    "kb-aks-bootstrap/references/oras-pull-unauthorized.md": "2c4cc4b89a8a4141d65ced9c42cdc099f17637bd9151fa8d7f495d29582b1282",
+    "aks-known-issues/references/release-proof.txt": "37cde664128431a43ae1dbe2abc43c41d9e46b35867f8c496cf17e370b26df1d",
+    "kb-aks-bootstrap/references/release-proof.txt": "b24af057d1cf5ffc17e093fb83f80436b5814db70a838fb6ec4184dc22d83ae3"
+  },
+  "releaseProofNotInPrompt": true,
+  "dependenciesUnchanged": true,
+  "packageDigests": {
+    "aks-known-issues": "sha256:84b5a6a8f85db941e2ec588016e0b48d4906bcf4001f45f6ebcc33a2075a34fc",
+    "kb-aks-bootstrap": "sha256:99872678014bef62bc8709ae30342246f7616d7f20d695b8a16500d3c54c1e2b"
+  },
+  "runtimeVersions": {
+    "kagent": "1.0.0-alpha17",
+    "substrate": "0.6.0-alpha3"
+  },
+  "inputOrigin": "synthetic",
+  "delivery": "pinned local Git fixture through Flux; local OCI registry",
+  "gitlabPipeline": "Not run; target project missing",
+  "otel": "Lifecycle observed; native tool/model spans not observed",
+  "operationalAzureToolsAttached": false,
+  "azureActionsPerformed": false
+}

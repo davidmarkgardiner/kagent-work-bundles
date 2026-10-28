@@ -1,0 +1,30 @@
+{
+  "runtimeProfile": "lab-kagent-1x-v1",
+  "modelProfile": "skills-demo-gateway-v1",
+  "modelConfig": {
+    "name": "flow-demo-model",
+    "specSha256": "8886e6754b8a742ba4bff2fe251dd1fc116cd3c90b9949b127a8fbde954aba8a"
+  },
+  "harness": {
+    "name": "aks-docs-v1",
+    "specSha256": "ae6459abb3e237b4ff4c72471ff9a938014e88fd27ee2167d4bd5f08760f6497"
+  },
+  "packages": {
+    "Skill/aks-known-issues-v1": {
+      "packaging": "reviewed-content-ustar-v3",
+      "sourceCommit": "75192c5ef918b775c6f8c03135caa93ba43d9abf",
+      "contentSha256": "1906dd0e228bcbc5d08d792d318917f0f9a6e1f663fc3ee0075df68dda2bb07e",
+      "sourceSpecSha256": "68ef996d1e4f4e6f0f8396739327cb2a3b64e2e5914e9e35bd61ec57955e71b0",
+      "releaseSpecSha256": "93f88999fa7e45d609cada7c93a2b75f77b9184543999672929003182853bae3",
+      "image": "{{GITLAB_REGISTRY_REPOSITORY}}@sha256:84b5a6a8f85db941e2ec588016e0b48d4906bcf4001f45f6ebcc33a2075a34fc"
+    },
+    "KnowledgeBase/aks-bootstrap-v1": {
+      "packaging": "reviewed-content-ustar-v3",
+      "sourceCommit": "75192c5ef918b775c6f8c03135caa93ba43d9abf",
+      "contentSha256": "d4d8813c621f3e4ab96804616250da1571ae9b4ca79e0594e89c1bdc0251790f",
+      "sourceSpecSha256": "68ef996d1e4f4e6f0f8396739327cb2a3b64e2e5914e9e35bd61ec57955e71b0",
+      "releaseSpecSha256": "7cd3cdb989d25516a7510a7e379a8834a9f08da847459ecc8975b4644ae6338d",
+      "image": "{{GITLAB_REGISTRY_REPOSITORY}}@sha256:99872678014bef62bc8709ae30342246f7616d7f20d695b8a16500d3c54c1e2b"
+    }
+  }
+}

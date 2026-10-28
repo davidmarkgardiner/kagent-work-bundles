@@ -1,0 +1,34 @@
+stages: [build, publish]
+
+variables:
+  GIT_DEPTH: "0"
+  REVIEWED_RELEASE_JSON: "deploy/reviewed-release.json"
+
+build-reviewed-content:
+  stage: build
+  image: python:3.12.12-slim-bookworm
+  before_script:
+    - apt-get update -qq && apt-get install -y --no-install-recommends git
+  script:
+    - python platform/skills-registry/native/publish.py --git . --release "$REVIEWED_RELEASE_JSON" --layout reviewed-layout > package.json
+    - python -c 'import json; p=json.load(open("package.json")); open("package.env","w").write("PACKAGE_NAME="+p["name"]+"\nPACKAGE_DIGEST="+p["digest"]+"\n")'
+  artifacts:
+    paths: [reviewed-layout/, package.json]
+    reports:
+      dotenv: package.env
+
+publish-reviewed-content:
+  stage: publish
+  image:
+    name: ghcr.io/oras-project/oras:v1.3.0
+    entrypoint: [""]
+  needs: [build-reviewed-content]
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+  script:
+    - printf '%s' "$CI_REGISTRY_PASSWORD" | oras login "$CI_REGISTRY" --username "$CI_REGISTRY_USER" --password-stdin
+    - oras cp --from-oci-layout reviewed-layout:reviewed "$CI_REGISTRY_IMAGE/reviewed-$PACKAGE_NAME:$CI_COMMIT_SHA"
+    - test "$(oras resolve "$CI_REGISTRY_IMAGE/reviewed-$PACKAGE_NAME:$CI_COMMIT_SHA")" = "$PACKAGE_DIGEST"
+    - printf '%s@%s\n' "$CI_REGISTRY_IMAGE/reviewed-$PACKAGE_NAME" "$PACKAGE_DIGEST" > published-image.txt
+  artifacts:
+    paths: [published-image.txt, package.json]
