@@ -1,31 +1,38 @@
-# Bootstrap the missing content, then run the no-Substrate POC
+# Use David's GitLab content, then run the no-Substrate POC
 
-The work agent's blocker is valid. Installed CRDs and bundled Markdown do not create verified releases or immutable ConfigMaps. **Bootstrap the content before preparing the Job.** Reuse the installed CRDs and compatible helper image.
+**Prerequisite owned by David:** David will provide his personal GitLab repository for this testing POC, with push and pull access for the work agent. David will make sure the sample files are already committed and pushed to GitLab before the agent starts the content bootstrap.
 
-The requested payload is the unchanged bundled synthetic AKS documentation sample. The work agent owns its publication/bootstrap work within the existing POC authorization and workplace access. Use an approved internal Git destination and the existing publication process. Prepare the concrete seed and publication diff; do not wait for a new content design or provider-created Kubernetes releases. The public bundle does not itself establish workplace approval, publish to internal Git or make a source Ready. If an explicit workplace publication gate applies, return that named gate and the prepared artifacts.
+**Agent starting point:** pull the provided repository, verify the files and pin the actual commit. Do not make initial content publication, creation of another repository, a CI pipeline or container-registry publication part of this task. Keep the installed CRDs and compatible helper image.
 
-## 1. Export and publish the provided sample
+## 1. Confirm David's prerequisite and pull the content
 
-From the bundle root, choose a new private bootstrap directory:
+David will supply the HTTPS GitLab clone URL, access and any branch/ref he wants tested. If he supplies a commit, use it. Otherwise, clone the provided branch or repository default branch into a fresh private checkout and record its full 40-character commit SHA. David does not need to calculate that SHA manually.
 
-```bash
-export BOOTSTRAP_DIR='{{NEW_PRIVATE_BOOTSTRAP_DIRECTORY}}'
-mkdir -m 700 "$BOOTSTRAP_DIR"
-python3 -B package.py content --output "$BOOTSTRAP_DIR/content-seed"
-```
-
-Publish **the contents** of `content-seed/` into an approved internal Git repository. An existing approved repository can be reused by adding these paths through its normal delivery flow. The helper limits Flux delivery to the two payload directories. The repository root must contain:
+The committed repository root must contain the unchanged bundled sample:
 
 ```text
 skills/aks-known-issues/     # five selected files, including licence/provenance
 knowledge/aks-bootstrap/    # one cited Markdown document
 ```
 
-Preserve the sample bytes, licence, provenance and paths for this first proof. Do not replace an existing repository or overwrite unrelated content. Use its normal authenticated Git workflow. Record the published full 40-character commit and verify remote read-back through the approved Git service. A local commit, bundled lab commit, image digest or branch name is not that publication receipt.
+For David preparing those files, export them from the bundle root with:
 
-Required private inputs are the approved HTTPS Git URL, published commit, a local checkout containing that exact commit, and an existing namespace-local Git authentication Secret reference when needed. Git and Qwen authentication have different purposes; select the correct existing Git credential reference. Preserve the Git service's established CA/authentication configuration.
+```bash
+python3 -B package.py content --output '{{NEW_CONTENT_SEED_DIRECTORY}}'
+```
 
-If publication cannot proceed, return the exact missing repository destination, publishing permission or credential-reference name and who must supply it. Do not restart image builds or ask for a provider-created Kubernetes release: the next steps create those releases.
+Commit and push **the contents** of that exported directory to the personal GitLab repository, preserving the bytes, licence, provenance and paths. This is David's prerequisite, not an instruction for the work agent to republish the initial sample.
+
+The work agent then creates a new private bootstrap directory and uses its fresh checkout for the commands below:
+
+```bash
+export BOOTSTRAP_DIR='{{NEW_PRIVATE_BOOTSTRAP_DIRECTORY}}'
+mkdir -m 700 "$BOOTSTRAP_DIR"
+```
+
+Verify the selected commit really exists in the provided GitLab repository and contains both payload paths. A bundled lab commit, image digest or moving branch name is not the content pin. If the repo URL/access or committed files have not yet been supplied, report exactly what David needs to provide; preserve all existing builds and cluster work.
+
+The agent's Git push/pull access and Flux's read access are separate connections. Reuse a working namespace-local Git authentication Secret when needed, or configure the provided repository access through the existing Secret process. Do not put credential values into manifests, logs or Git URLs. The Flux source-controller must be able to reach this personal GitLab repository from the cluster. No internal-only repository requirement is imposed by this POC.
 
 ## 2. Generate source, releases and matching standalone requests
 
@@ -35,7 +42,7 @@ With the existing `standalone/private.example.json` already populated privately:
 python3 -B standalone/bootstrap_content.py \
   --config "$PRIVATE_DIR/config.json" \
   --checkout '{{PUBLISHED_CONTENT_GIT_CHECKOUT}}' \
-  --git-url '{{APPROVED_INTERNAL_HTTPS_GIT_URL}}' \
+  --git-url '{{DAVID_PERSONAL_GITLAB_HTTPS_CLONE_URL}}' \
   --commit '{{ACTUAL_PUBLISHED_40_HEX_COMMIT}}' \
   --release-id crd-poc-v1 \
   --output "$BOOTSTRAP_DIR/manifests"
@@ -79,7 +86,7 @@ kubectl --context "$TARGET_CONTEXT" apply \
   -f "$BOOTSTRAP_DIR/manifests/source-and-releases.json"
 ```
 
-The adapter uses the configured helper image and exact `SOURCE_CONTROLLER_ORIGIN`. Its source-controller, API and internal Git access must work. The Job requires no Harness/WorkerPool; this adapter's native API read permission is only for content-deletion checks. Do not deploy the native HostedAgent adapter.
+The adapter uses the configured helper image and exact `SOURCE_CONTROLLER_ORIGIN`. Its source-controller, API and GitLab read access must work. The Job requires no Harness/WorkerPool; this adapter's native API read permission is only for content-deletion checks. Do not deploy the native HostedAgent adapter.
 
 For the example release ID, wait on the actual generated resources:
 

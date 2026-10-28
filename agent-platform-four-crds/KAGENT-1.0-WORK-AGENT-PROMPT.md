@@ -12,7 +12,9 @@ The report mentions kagent alpha8 and a Substrate chart version, while the opera
 
 ## Bootstrap missing content first
 
-The current target has no verified Skill/KnowledgeBase releases, immutable content ConfigMaps or content adapter. Execute [CONTENT-BOOTSTRAP-SHEET.md](CONTENT-BOOTSTRAP-SHEET.md) before Job preparation. Export the provided sample, publish it through an approved internal Git destination using existing authorized access, pin the actual published commit and generate matching source/releases with `standalone/bootstrap_content.py`. Run the content-only adapter and require actual current-generation readiness and immutable owned ConfigMaps. Do not stop merely because no release preexists: this is the bootstrap task. If publication access is unavailable, return the specific repository/permission/credential-reference input required. Do not manufacture approval, Ready fields, UIDs or source artifact metadata.
+David will provide his personal GitLab repository and push/pull access for this testing POC. **David will ensure the sample files are committed and pushed there before the content bootstrap starts.** The work agent does not own that initial publication prerequisite and must not wait for a separate provider or create another repository, CI pipeline or registry publication.
+
+Once David supplies the repository/ref and access, pull it into a fresh private checkout, verify the two payload paths, resolve and pin the actual full commit SHA, and execute [CONTENT-BOOTSTRAP-SHEET.md](CONTENT-BOOTSTRAP-SHEET.md). David may provide a SHA, but the agent can determine it from the selected ref. Configure working Flux read access to that personal GitLab repo, generate source/releases with `standalone/bootstrap_content.py`, run the content-only adapter and require genuine current-generation readiness and immutable owned ConfigMaps before snapshots and Job preparation. If the URL/access/files are still missing, report that exact prerequisite to David while preserving existing builds. Do not fabricate Ready fields, UIDs or source artifact metadata.
 
 ## Execute the bounded Job path
 

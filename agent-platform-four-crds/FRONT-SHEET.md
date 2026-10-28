@@ -2,7 +2,7 @@
 
 **Today's requirement is no Substrate.** Resume from the four established CRDs and the already-built images. Use [NO-SUBSTRATE-TODAY.md](NO-SUBSTRATE-TODAY.md) and the runnable [standalone Job guide](standalone/README.md).
 
-**No content releases yet?** Start with [CONTENT-BOOTSTRAP-SHEET.md](CONTENT-BOOTSTRAP-SHEET.md). It covers publication to internal Git, the real commit pin, content-adapter installation, readiness and fresh snapshots.
+**No content releases yet?** Start with [CONTENT-BOOTSTRAP-SHEET.md](CONTENT-BOOTSTRAP-SHEET.md). David will provide his personal GitLab repo and push/pull access, with the sample files already committed and pushed. The agent starts by pulling and pinning that content, then installs the adapter, checks readiness and captures fresh snapshots. No CI or registry publication is required.
 
 The native Harness route is not today's execution path. The standalone adapter consumes the custom Skill, KnowledgeBase, HostedAgent and GoldenScenario requests and creates an ordinary Kubernetes Job. The worker calls the configured real model and reads verified content. A passing run ends with a Completed Pod and a sanitized receipt.
 

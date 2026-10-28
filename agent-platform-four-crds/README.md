@@ -2,7 +2,7 @@
 
 **Today's target is no Substrate.** Resume from the four established CRDs and existing images. Start with [NO-SUBSTRATE-TODAY.md](NO-SUBSTRATE-TODAY.md) and the runnable [standalone Job guide](standalone/README.md). Give the work agent [KAGENT-1.0-WORK-AGENT-PROMPT.md](KAGENT-1.0-WORK-AGENT-PROMPT.md).
 
-**The current content bootstrap blocker is covered by [CONTENT-BOOTSTRAP-SHEET.md](CONTENT-BOOTSTRAP-SHEET.md).** Publish and pin the sample through approved internal Git, run the content-only adapter and wait for verified releases/ConfigMaps before preparing the Job.
+**The current content bootstrap blocker is covered by [CONTENT-BOOTSTRAP-SHEET.md](CONTENT-BOOTSTRAP-SHEET.md).** David will provide his personal GitLab repo and push/pull access, with the sample files already committed and pushed. The agent then pulls and pins that commit, runs the content-only adapter and waits for verified releases/ConfigMaps before preparing the Job. No initial publication, CI pipeline or registry task is assigned to the agent.
 
 The standalone execution adapter consumes Skill, KnowledgeBase, HostedAgent and GoldenScenario and prepares an ordinary Kubernetes Job. Its worker calls the configured real model and reads the verified content through two bounded tools. It requires no Harness, WorkerPool, snapshots, native Agent compiler or kagent/Substrate upgrade. Reuse the compatible Python helper image and immutable content ConfigMaps. The Job's Pod should complete; the content-adapter Deployment remains running.
 

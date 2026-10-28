@@ -6,7 +6,7 @@ The Job has exactly two model tools: `load_skill` and `load_skill_resource`. The
 
 ## Start here when the target has no content
 
-The current workplace report has no verified releases, immutable content ConfigMaps or content adapter. Follow [CONTENT-BOOTSTRAP-SHEET.md](../CONTENT-BOOTSTRAP-SHEET.md) first. `bootstrap_content.py` generates source/releases and matching requests from the actual committed sample bytes. This guide's full snapshot and Job steps begin only after real source/controller readiness.
+David will provide his personal GitLab repo and push/pull access, with the sample files already committed and pushed before bootstrap starts. The agent pulls and pins that content; it does not own the initial publication step. The cluster still needs verified releases, immutable content ConfigMaps and the content adapter. Follow [CONTENT-BOOTSTRAP-SHEET.md](../CONTENT-BOOTSTRAP-SHEET.md) first. `bootstrap_content.py` generates source/releases and matching requests from the actual committed sample bytes. This guide's full snapshot and Job steps begin only after real source/controller readiness.
 
 ## Private configuration
 

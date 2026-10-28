@@ -1,6 +1,6 @@
 # Offline content bootstrap helper
 
-When the target has the four CRDs but no content releases, export the bundled seed with `python3 -B package.py content --output NEW_CONTENT_DIR`. The authorized work agent publishes the **contents** of that directory to an approved internal Git repository using work credentials. Its committed root must contain `skills/aks-known-issues/` and `knowledge/aks-bootstrap/`. Preserve every payload file, license, hash and provenance field. Obtain the actual published full 40-character commit and a local checkout containing those Git objects.
+David will provide his personal GitLab repository and push/pull access for this testing POC. He will ensure that the unchanged sample files are already committed and pushed before the agent starts. The work agent then pulls the repository, verifies `skills/aks-known-issues/` and `knowledge/aks-bootstrap/` at the committed root, resolves the actual full commit SHA and uses a local checkout containing those Git objects. David may provide a SHA; otherwise the agent determines it from the selected branch/ref. There is no initial Git publication, CI pipeline or container-registry task for the agent. See [CONTENT-BOOTSTRAP-SHEET.md](../CONTENT-BOOTSTRAP-SHEET.md).
 
 ```sh
 python3 -B standalone/bootstrap_content.py \
