@@ -4,6 +4,14 @@ Use [POC-QUICKSTART.md](POC-QUICKSTART.md) as the execution sheet. This is a sma
 
 Target **kagent 1.0.0-alpha17**, API **`api.kagent.dev/v1alpha3`**, with the matching **Substrate 0.6.0-alpha3** platform. The included native implementation has saved passing Proxmox receipts on those versions. Inspect the installed platform and report concrete incompatibilities. Reuse it rather than reinstalling shared services.
 
+## Resume the work already completed
+
+Resume using the updated full bundle and this handover. Preserve completed image builds and existing cluster resources. Keep private configuration, credentials and earlier receipts outside the downloaded bundle.
+
+Check the installed kagent/Substrate versions and each existing image's source revision, architecture and manifest digest against `build/kagent-1.0-target.json` and its intended role. Reuse matching images. Build or import only missing or incompatible images. Publish the two skill/knowledge content OCI images only if matching content images are not already available. The old Python Agent runtime is not the native Go ADK runtime.
+
+Use the included native implementation, not the legacy renderer. Choose a permitted namespace, deploy the POC and run fresh native acceptance. Report any concrete mismatch without rebuilding everything or reinstalling the shared platform. Updating this bundle did not change the workplace cluster; verify its actual configuration before proceeding.
+
 ## Namespace and authority
 
 Choose any namespace your work account is permitted to use. There is no required POC namespace name. Prefer one already containing suitable Harness and ModelConfig dependencies. Configure namespace-local requests, GitRepository, native AgentTemplate/Agent, model and Harness references consistently. Verify the existing controller watches it. Keep cluster-scoped CRD changes compatible with any existing installation.
