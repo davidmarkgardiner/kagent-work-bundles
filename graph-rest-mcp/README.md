@@ -1,5 +1,7 @@
 # Graph REST to MCP home-lab bundle
 
+**HTML presentation:** [PRESENTATION.html](PRESENTATION.html) explains the architecture, the comparison with the previous typed SQL MCP, possible benefits, evidence and workplace gates. Download the bundle and open the HTML file locally; GitHub displays its source rather than running the slides. It works offline and supports keyboard navigation and printing.
+
 **Workplace handoff:** start with [WORK-AGENT-START-HERE.md](WORK-AGENT-START-HERE.md) and [IMAGE-IMPORT-SHEET.md](IMAGE-IMPORT-SHEET.md). The fixture and historical native proof remain below; the existing workplace Swagger service requires its own contract and target-runtime checks.
 
 A native Kagent agent retrieves synthetic topology and compliance metadata through one read-only FastMCP tool and a separate Swagger-documented REST service. The bundle contains no private endpoint or model credential.

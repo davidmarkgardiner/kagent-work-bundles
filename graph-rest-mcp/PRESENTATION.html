@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23296956'/%3E%3Ctext x='7' y='23' fill='white' font-size='22'%3EG%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Graph REST MCP: architecture, comparison with the previous database MCP, possible benefits, evidence and workplace handoff.">
+<title>Graph REST MCP | Architecture and possible benefits</title>
+<style>
+:root{--paper:#faf9f5;--ink:#19272c;--muted:#526368;--line:#d5dcd7;--accent:#b85838;--green:#296956;--soft:#edf2ed;--nav:#192f36;--white:#fff;--serif:ui-serif,Georgia,serif;--sans:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SF Mono",Menlo,monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:84px;scroll-snap-type:y proximity}body{margin:0;background:var(--paper);color:var(--ink);font:18px/1.55 var(--sans)}a{color:var(--green);text-underline-offset:4px;overflow-wrap:anywhere}a:hover{color:var(--accent)}button,select{font:inherit}button,a,select{-webkit-tap-highlight-color:transparent}button:focus-visible,a:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--accent);outline-offset:5px}.skip{position:fixed;left:14px;top:-80px;z-index:30;padding:12px;background:var(--white)}.skip:focus{top:12px}
+.toolbar{height:70px;position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:16px;padding:0 4vw;background:var(--nav);color:var(--white);box-shadow:0 1px 0 #ffffff24}.brand{font:12px var(--mono);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}.toolbar select{margin-left:auto;max-width:360px;background:var(--nav);color:var(--white);border:1px solid #8c9b9d;border-radius:5px;padding:10px;min-height:44px;font-size:14px}.controls{display:flex;align-items:center;gap:8px}.toolbar button{border:1px solid #8c9b9d;background:transparent;color:var(--white);border-radius:5px;padding:8px 12px;min-width:44px;min-height:44px;cursor:pointer}.toolbar button:hover{background:#ffffff14}.toolbar button:disabled{opacity:.35;cursor:default}.count{font:13px var(--mono);min-width:46px;text-align:center}.slide{position:relative;scroll-snap-align:start;min-height:calc(100svh - 70px);padding:52px max(5vw,24px) 40px;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--line)}.wrap{width:100%;max-width:1240px;margin:0 auto}.eyebrow{display:flex;align-items:center;gap:12px;font:12px/1.5 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}.eyebrow:before{content:"";width:28px;height:3px;background:var(--accent)}h1,h2,h3,p{margin-top:0}h1,h2{font-family:var(--serif);font-weight:500;letter-spacing:-.025em;line-height:1.08}h1{font-size:clamp(46px,5.6vw,80px);max-width:880px;margin-bottom:24px}h2{font-size:clamp(35px,4.1vw,56px);margin-bottom:20px;max-width:1020px}h3{font-size:20px;line-height:1.25;margin-bottom:12px;font-weight:650}.lead{font-size:clamp(20px,2.1vw,26px);max-width:900px;line-height:1.45;color:var(--muted);margin-bottom:30px}.small{font-size:14px;line-height:1.5;color:var(--muted)}.tag{display:inline-block;font:11px/1.5 var(--mono);padding:4px 9px;border:1px solid currentColor;border-radius:3px;letter-spacing:.04em;text-transform:uppercase;color:var(--green);margin-bottom:14px}.tag.pending{color:var(--accent)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}.three{grid-template-columns:repeat(3,1fr)}.card{background:var(--white);border:1px solid var(--line);border-top:3px solid var(--green);padding:24px;border-radius:3px}.card p:last-child{margin-bottom:0}.card.warm{border-top-color:var(--accent)}.card p,.card li{font-size:17px}.card ul{padding-left:20px;margin:0}.card li+li{margin-top:9px}.callout{padding:18px 22px;background:var(--soft);border-left:4px solid var(--green);margin-top:24px;font-size:17px}.callout.warm{background:#f4e9e1;border-color:var(--accent)}.callout p{margin:0}.footer{display:flex;justify-content:space-between;gap:24px;padding-top:24px;margin-top:22px;border-top:1px solid var(--line);font:12px/1.5 var(--mono);color:var(--muted)}.footer a{color:inherit}code{font: .88em var(--mono);overflow-wrap:anywhere}pre{font:14px/1.65 var(--mono);background:var(--nav);color:#f6f6ee;border-radius:4px;margin:0;padding:22px;white-space:pre-wrap;overflow-wrap:anywhere}.caption{font-size:14px;color:var(--muted);margin:12px 0 0}.diagram{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--white);padding:18px}.diagram svg{display:block;width:100%;min-width:760px;height:auto}.diagram text{font-family:var(--sans);fill:var(--ink)}.diagram .label{font-size:17px;font-weight:650}.diagram .sub{font-size:14px;fill:var(--muted)}.diagram .mono{font-family:var(--mono);font-size:13px}.diagram .line{stroke:#6d898e;stroke-width:2;fill:none}.diagram .node{fill:#fff;stroke:#a9bab5;stroke-width:1.5}.diagram .rest{fill:#edf2ed;stroke:var(--green)}.diagram .future{fill:#fcf6f0;stroke:var(--accent);stroke-dasharray:5 4}.table-wrap{overflow-x:auto;border:1px solid var(--line);background:var(--white)}table{border-collapse:collapse;width:100%;min-width:800px;font-size:16px;text-align:left}th,td{padding:15px 18px;vertical-align:top;border-bottom:1px solid var(--line)}thead th{background:var(--nav);color:var(--white);font-size:14px}tbody th{font-weight:600;width:20%}td{width:40%}tr:last-child>*{border-bottom:0}.stat{font:500 48px/1.1 var(--serif);letter-spacing:-.03em;margin-bottom:9px}.split-note{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:start}.steps{counter-reset:steps;list-style:none;padding:0;margin:0}.steps li{counter-increment:steps;display:grid;grid-template-columns:38px 1fr;gap:12px;padding:15px 0;border-bottom:1px solid var(--line)}.steps li:before{content:counter(steps,decimal-leading-zero);font:14px var(--mono);color:var(--accent);padding-top:3px}.steps strong{display:block;font-size:18px;font-weight:650}.steps span{font-size:16px;color:var(--muted)}.source-list{padding-left:22px;line-height:1.9;font-size:16px}.bars{margin:20px 0}.bar-row{display:grid;grid-template-columns:110px 1fr 45px;gap:10px;align-items:center;font-size:14px;margin:16px 0}.track{height:24px;background:#e8ece6;border-radius:2px}.bar{height:24px;width:25%;background:var(--green);border-radius:2px}.hero{background:var(--nav);color:var(--white)}.hero h1 em{font-weight:400;color:#e8ad8b}.hero .lead,.hero .eyebrow,.hero .small,.hero .footer{color:#d3deda}.hero .tag{color:#b3d8c6}.hero .footer{border-color:#ffffff35}.hero a{color:#d3deda}.hero .hero-route{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:26px 0 34px}.hero-route span{padding:12px 18px;border:1px solid #7e9899;border-radius:4px;font-size:17px}.hero-route b{font-weight:400;color:#c1cfc7}.subtle-rule{border:0;border-top:1px solid var(--line);margin:24px 0}.slide-label{font:12px var(--mono);color:var(--muted);margin-bottom:14px}.supply{display:grid;grid-template-columns:1fr 50px 1fr 50px 1fr;gap:10px;align-items:center}.supply .arrow{text-align:center;font-size:25px;color:var(--green)}.supply .card{height:100%}.supply .card h3{font-size:19px}.supply .card p{font-size:16px}.key{font:12px var(--mono);border:1px solid #7e9899;padding:2px 5px;border-radius:3px}.noscript{margin:10px 5vw}
+@media(min-width:1500px){.slide{padding-top:64px;padding-bottom:50px}}@media(max-width:880px){.toolbar{padding:0 18px;gap:10px}.brand{display:none}.toolbar select{margin-left:0;width:100%;min-width:0}.toolbar .print{display:none}.slide{padding:36px 22px;min-height:auto;scroll-snap-align:none}.grid,.three,.split-note{grid-template-columns:1fr;gap:18px}.supply{grid-template-columns:1fr}.supply .arrow{transform:rotate(90deg)}.lead{margin-bottom:23px}.footer{flex-direction:column;gap:6px}.card{padding:21px}.diagram{padding:12px}.hero{min-height:calc(100svh - 70px)}body{font-size:17px}.count{display:none}h2{font-size:38px}.stat{font-size:42px}.slide h3{font-size:20px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{@page{size:A4 landscape;margin:10mm}html{scroll-snap-type:none;scroll-padding:0;scroll-behavior:auto}body{font-size:11px;background:white;color:#16272b;-webkit-print-color-adjust:exact;print-color-adjust:exact}.toolbar,.skip,.noscript{display:none}.slide,.hero{min-height:0;padding:8mm 6mm 6mm;break-after:page;break-inside:avoid;background:#fff;color:var(--ink);border:0}.slide:last-child{break-after:auto}.wrap{max-width:none}.eyebrow,.hero .eyebrow{font-size:9px;margin-bottom:12px;color:var(--muted)}h1{font-size:46px;max-width:800px}h2{font-size:31px;margin-bottom:14px}h3,.slide h3{font-size:15px}.lead,.hero .lead{font-size:17px;line-height:1.35;color:var(--muted);margin-bottom:20px}.grid{gap:15px;grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}.split-note{grid-template-columns:1.2fr 1fr;gap:25px}.card{padding:14px;break-inside:avoid}.card p,.card li,.supply .card p{font-size:12px}.callout{font-size:12px;padding:12px;margin-top:15px}.small,.caption{font-size:10px}pre{font-size:10px;padding:14px}.table-wrap,.diagram{overflow:visible}.diagram svg{min-width:0;max-height:270px}table{min-width:0;font-size:11px}th,td{padding:9px 12px}thead th{font-size:11px}.footer,.hero .footer{font-size:9px;color:var(--muted);border-color:var(--line);padding-top:13px;margin-top:14px;flex-direction:row}.hero .hero-route span{color:var(--ink);border-color:var(--line)}.hero h1 em{color:var(--accent)}.hero .tag{color:var(--green)}.hero .small,.hero a{color:var(--muted)}.hero-route{margin:20px 0!important}.hero-route span{font-size:13px!important;padding:10px!important}.tag{font-size:9px;margin-bottom:10px}.supply{grid-template-columns:1fr 30px 1fr 30px 1fr}.supply .arrow{transform:none}.stat{font-size:34px}.steps li{padding:10px 0}.steps strong{font-size:13px}.steps span,.source-list{font-size:11px}.source-list{line-height:1.7}.bar-row{font-size:11px;margin:12px 0}.subtle-rule{margin:16px 0}}
+</style>
+</head>
+<body>
+<a class="skip" href="#overview">Skip to presentation</a>
+<header class="toolbar" aria-label="Presentation controls">
+  <span class="brand">Graph REST MCP</span>
+  <label class="small" for="jump" style="position:absolute;clip-path:inset(50%);width:1px;height:1px;overflow:hidden">Choose a slide</label>
+  <select id="jump" aria-label="Choose a slide"></select>
+  <div class="controls"><button id="previous" aria-label="Previous slide">←</button><span id="count" class="count" aria-live="polite">1 / 12</span><button id="next" aria-label="Next slide">→</button></div>
+  <button class="print" id="print">Print / PDF</button>
+</header>
+<noscript><p class="noscript">Scroll to read all slides. All content and diagrams work without JavaScript.</p></noscript>
+<main>
+
+<section class="slide hero" id="overview" data-title="What we built" aria-labelledby="title">
+<div class="wrap">
+  <div class="eyebrow">Architecture briefing · 28 October 2026</div>
+  <span class="tag">Local proof complete · workplace validation pending</span>
+  <h1 id="title">Graph context through<br> an <em>approved REST API.</em></h1>
+  <p class="lead">A small MCP adapter lets an agent ask for bounded topology and compliance context through an existing service documented in Swagger.</p>
+  <div class="hero-route" aria-label="Main request flow"><span>Agent question</span><b aria-hidden="true">→</b><span>One typed MCP tool</span><b aria-hidden="true">→</b><span>Fixed REST operation</span><b aria-hidden="true">→</b><span>Scoped context</span></div>
+  <p class="small">The design moves retrieval and data semantics behind a service boundary. Its benefit depends on the API returning useful, correct, bounded evidence.</p>
+  <div class="footer"><span>Graph REST MCP · implementation snapshot 78ccacf</span><span>12 slides · scroll, use arrow keys, or choose a slide</span></div>
+</div>
+</section>
+
+<section class="slide" id="baseline" data-title="The previous database MCP" aria-labelledby="baseline-title">
+<div class="wrap">
+  <div class="eyebrow">02 · The starting point</div>
+  <h2 id="baseline-title">The previous MCP already had safeguards.</h2>
+  <p class="lead">The primary PostgreSQL reference uses typed, read-only tools over approved views. It does not expose general CRUD operations.</p>
+  <div class="grid">
+    <article class="card"><span class="tag">Database-backed MCP</span><h3>What it does</h3><p>The agent calls tools such as <code>get_namespace_count</code> or <code>get_namespace_summary</code>. The adapter executes fixed, parameterized SQL against an approved PostgreSQL view.</p><p>Database access and password or Entra identity handling live in the MCP adapter.</p></article>
+    <article class="card"><h3>Controls already present</h3><ul><li>Read-only transactions and least-privilege database grants.</li><li>Default limit of 50 rows and 32 KiB of result data.</li><li>Per-cell limits, a five-second statement timeout, and explicit truncation.</li><li>No arbitrary SQL tool in the primary typed-tool design.</li></ul></article>
+  </div>
+  <div class="callout warm"><p>“CRUD SQL MCP” is shorthand here. A separate legacy SQL-text route exists in the reference material, but the deployed workplace toolset must be inspected before comparing permissions or risk.</p></div>
+  <div class="footer"><span>Fair comparison: service-owned retrieval versus adapter-owned SQL</span><a href="https://github.com/davidmarkgardiner/kagent-public/blob/main/work-agent-bundles/postgres-fastmcp-entra-uami/WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md">Previous PostgreSQL reference</a></div>
+</div>
+</section>
+
+<section class="slide" id="architecture" data-title="How the new route works" aria-labelledby="architecture-title">
+<div class="wrap">
+  <div class="eyebrow">03 · The architecture</div>
+  <h2 id="architecture-title">Keep the agent interface small.</h2>
+  <p class="lead">Reuse the workplace agent, model, MCP registration and Gateway controls. Add the REST adapter behind that existing route.</p>
+  <div class="diagram" tabindex="0" aria-label="Architecture diagram. On small screens, scroll horizontally.">
+    <svg viewBox="0 0 1160 335" role="img" aria-labelledby="arch-svg-title arch-svg-desc">
+      <title id="arch-svg-title">Shared MCP adapter with separate lab and workplace data paths</title>
+      <desc id="arch-svg-desc">The agent connects through existing MCP registration and optional Gateway to FastMCP. The adapter calls either the lab REST fixture and DuckDB, or the existing workplace REST API and its owner-managed data backend. Swagger describes the REST operation.</desc>
+      <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="#6d898e"/></marker></defs>
+      <rect class="node" x="15" y="125" width="155" height="78" rx="5"/><text class="label" x="92" y="158" text-anchor="middle">Existing agent</text><text class="sub" x="92" y="183" text-anchor="middle">Existing model</text>
+      <path class="line" d="M170 164 H210" marker-end="url(#arrow)"/>
+      <rect class="node" x="215" y="125" width="210" height="78" rx="5"/><text class="label" x="320" y="157" text-anchor="middle">MCP registration</text><text class="sub" x="320" y="183" text-anchor="middle">Existing Gateway if used</text>
+      <path class="line" d="M425 164 H466" marker-end="url(#arrow)"/>
+      <rect class="node rest" x="471" y="113" width="225" height="102" rx="5"/><text class="label" x="583" y="145" text-anchor="middle">FastMCP adapter</text><text class="mono" x="583" y="171" text-anchor="middle">get_graph_context</text><text class="sub" x="583" y="197" text-anchor="middle">Streamable HTTP /mcp</text>
+      <path class="line" d="M696 148 H728 V69 H765" marker-end="url(#arrow)"/>
+      <path class="line" d="M696 183 H728 V259 H765" marker-end="url(#arrow)"/>
+      <rect class="node rest" x="770" y="28" width="365" height="86" rx="5"/><text class="label" x="791" y="57">Lab fixture · proved locally</text><text class="sub" x="791" y="82">FastAPI POST /get-context → DuckDB</text><text class="sub" x="791" y="103">Deterministic synthetic data</text>
+      <rect class="node future" x="770" y="216" width="365" height="95" rx="5"/><text class="label" x="791" y="245">Existing workplace REST API</text><text class="sub" x="791" y="270">Confirm operation in private OpenAPI</text><text class="sub" x="791" y="293">Backend and retrieval owned by the service</text>
+      <text class="sub" x="585" y="48" text-anchor="middle">Swagger / OpenAPI describes</text><text class="sub" x="585" y="70" text-anchor="middle">the REST contract. It is not MCP.</text>
+    </svg>
+  </div>
+  <p class="caption">The API may use SQL, a graph database, or another retrieval method internally. This POC does not establish the workplace backend implementation.</p>
+  <div class="footer"><span>Solid green: fixture route · dashed orange: workplace adaptation</span><a href="docs/ARCHITECTURE.md">Architecture reference</a></div>
+</div>
+</section>
+
+<section class="slide" id="request" data-title="A request and its evidence" aria-labelledby="request-title">
+<div class="wrap">
+  <div class="eyebrow">04 · A request end to end</div>
+  <h2 id="request-title">Return evidence the model can cite.</h2>
+  <div class="grid">
+    <div><h3>1. Ask for a bounded graph</h3><pre>get_graph_context(
+  query="production compliance relationships",
+  context_size=10
+)</pre><p class="caption">The adapter currently sends POST JSON with <code>query</code> and <code>context_size</code>. The work agent must map a different private contract explicitly.</p><h3 style="margin-top:26px">2. Retrieve from one fixed URL</h3><p>The suspected workplace path is <code>/get_context/get_context</code>. Confirm the exact method, prefix and trailing slash in Swagger first.</p></div>
+    <div class="card"><h3>3. Validate before returning to MCP</h3><ul><li>Strict response schema and expected source ID.</li><li>Entities plus views within the requested 1–10 object limit.</li><li>At most 20 directed relationships, with both endpoints in the returned graph.</li><li>A five-second HTTP deadline and 32 KiB upstream body limit.</li><li>A 64 KiB MCP result-envelope budget with a reserved request-ID allowance.</li></ul></div>
+  </div>
+  <div class="callout"><p>4. The agent answers from the returned source, scope, relationships and limitations. Partial results must say they are partial. An error or missing relationship is not evidence of compliance or absence.</p></div>
+  <div class="footer"><span>Source IDs check routing consistency; they do not prove that the data is true.</span><a href="app/adapter.py">Adapter implementation</a></div>
+</div>
+</section>
+
+<section class="slide" id="relationships" data-title="Why explicit relationships may help" aria-labelledby="relationships-title">
+<div class="wrap">
+  <div class="eyebrow">05 · Context with relationships</div>
+  <h2 id="relationships-title">Make the evidence path explicit.</h2>
+  <p class="lead">A context response can carry the connection between a workload, an assessment and a policy alongside the relevant facts.</p>
+  <div class="diagram" tabindex="0" aria-label="Synthetic graph example, scroll horizontally on small screens.">
+    <svg viewBox="0 0 1160 175" role="img" aria-labelledby="edge-title edge-desc">
+      <title id="edge-title">An actual chain in the synthetic fixture</title><desc id="edge-desc">Workload prod:checkout is assessed by finding prod:checkout-check, which evaluates policy prod:restricted.</desc>
+      <defs><marker id="edge-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="#6d898e"/></marker></defs>
+      <rect class="node" x="18" y="54" width="260" height="85" rx="5"/><text class="sub" x="148" y="83" text-anchor="middle">Workload</text><text class="label" x="148" y="111" text-anchor="middle">prod:checkout</text>
+      <path class="line" d="M278 97 H445" marker-end="url(#edge-arrow)"/><text class="mono" x="361" y="78" text-anchor="middle">assessed_by</text>
+      <rect class="node rest" x="450" y="54" width="280" height="85" rx="5"/><text class="sub" x="590" y="83" text-anchor="middle">Finding</text><text class="label" x="590" y="111" text-anchor="middle">prod:checkout-check</text>
+      <path class="line" d="M730 97 H894" marker-end="url(#edge-arrow)"/><text class="mono" x="812" y="78" text-anchor="middle">evaluates</text>
+      <rect class="node" x="899" y="54" width="244" height="85" rx="5"/><text class="sub" x="1021" y="83" text-anchor="middle">Policy</text><text class="label" x="1021" y="111" text-anchor="middle">prod:restricted</text>
+    </svg>
+  </div>
+  <div class="grid" style="margin-top:25px"><div><h3>Possible benefit</h3><p>A service can resolve these relationships once, consistently, so an agent has less need to discover table joins or infer links from names.</p></div><div><h3>The condition</h3><p>The API must return correct, relevant edges with honest scope and coverage. Typed SQL can return the same relationships. REST alone does not create them.</p></div></div>
+  <div class="footer"><span>Synthetic fixture example · no live compliance claim</span><a href="data/fixture.json">Inspect the fixture</a></div>
+</div>
+</section>
+
+<section class="slide" id="comparison" data-title="REST context versus typed SQL" aria-labelledby="comparison-title">
+<div class="wrap">
+  <div class="eyebrow">06 · What actually changes</div>
+  <h2 id="comparison-title">Move retrieval ownership into the API.</h2>
+  <div class="table-wrap" tabindex="0" aria-label="Comparison table. Scroll horizontally on small screens."><table>
+    <thead><tr><th scope="col">Decision</th><th scope="col">Previous typed SQL MCP</th><th scope="col">REST context MCP</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Data access</th><td>MCP adapter connects to approved database views.</td><td>MCP adapter calls one approved REST operation. The service owns backend access.</td></tr>
+      <tr><th scope="row">Meaning of a query</th><td>Tool parameters and fixed SQL define the answer.</td><td>API retrieval logic and a reviewed mapping define the returned context.</td></tr>
+      <tr><th scope="row">Relationships</th><td>Approved joins or views can return linked facts.</td><td>Context can include explicit nodes, directed edges and provenance.</td></tr>
+      <tr><th scope="row">Protection</th><td>DB grants, read-only transactions, typed tools and result budgets.</td><td>API access policy and network controls, fixed route, typed contract and result budgets.</td></tr>
+      <tr><th scope="row">Change management</th><td>View or schema changes may require adapter/query changes.</td><td>A stable versioned API may hide backend changes. API changes still require compatibility tests.</td></tr>
+      <tr><th scope="row">Good fit</th><td>Exact counts, aggregates and approved structured lookups.</td><td>Scoped context and relationship retrieval when the service already supplies them well.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout warm"><p>Both designs need least privilege, correct semantics and bounded outputs. The useful comparison is the contract and retrieval quality, not HTTP versus SQL syntax.</p></div>
+  <div class="footer"><span>No workplace permission or performance advantage has been assumed.</span><a href="docs/WORKPLACE-CONTRACT.md">Private contract checklist</a></div>
+</div>
+</section>
+
+<section class="slide" id="benefits" data-title="Possible benefits and their conditions" aria-labelledby="benefits-title">
+<div class="wrap">
+  <div class="eyebrow">07 · Benefits to evaluate</div>
+  <h2 id="benefits-title">The potential gain is a better data contract.</h2>
+  <div class="grid">
+    <article class="card"><h3>Shared business meaning</h3><p>One service can apply approved definitions, scope and retrieval rules for every caller.</p><p class="small">Requires an owned contract and tests that catch semantic changes.</p></article>
+    <article class="card"><h3>Less database coupling in MCP</h3><p>The adapter can rely on an API rather than database drivers, grants and schema details.</p><p class="small">Moves backend identity and query ownership into the service. That responsibility still exists.</p></article>
+    <article class="card"><h3>More useful evidence per call</h3><p>Relevant entities and explicit relationships may reduce exploratory tool calls or inferred joins.</p><p class="small">Requires selective retrieval that returns the right context for the question.</p></article>
+    <article class="card"><h3>Reusable integration</h3><p>The same documented operation can serve agents, dashboards and other approved applications.</p><p class="small">Requires stable versions, service reliability and a compatible mapping.</p></article>
+  </div>
+  <div class="callout"><p>Smaller model context, fewer wrong answers and lower operating effort are hypotheses to measure. A REST response can be larger or less useful than a well-designed SQL result.</p></div>
+  <div class="footer"><span>Potential benefits · not measured workplace outcomes</span><a href="docs/EVALUATION.md">Evaluation design</a></div>
+</div>
+</section>
+
+<section class="slide" id="tradeoffs" data-title="Trade-offs and protections" aria-labelledby="tradeoffs-title">
+<div class="wrap">
+  <div class="eyebrow">08 · What the API boundary does not solve</div>
+  <h2 id="tradeoffs-title">Keep the controls and account for another service.</h2>
+  <div class="grid three">
+    <article class="card warm"><h3>Another failure point</h3><p>The extra HTTP hop adds latency, availability and TLS dependencies. Contract changes can break the mapper.</p><p class="small">Keep bounded deadlines, categorized errors, a rollback image and target-runtime canaries.</p></article>
+    <article class="card warm"><h3>Data quality still matters</h3><p>Stale context, wrong edges, incomplete scope and misleading human text can produce wrong answers.</p><p class="small">Validate graph closure and coverage. Treat returned text as untrusted data, never instructions.</p></article>
+    <article class="card warm"><h3>No auth needs confirmation</h3><p>The adapter sends no Authorization header when its token-file setting is absent. That does not make the data public.</p><p class="small">Confirm service access policy, verified HTTPS, approved callers and enforcing network controls.</p></article>
+  </div>
+  <div class="callout warm"><p>Swagger is documentation. It does not prove read-only semantics, authorize data access or secure the endpoint. The suspected operation, its auth requirements and its response shape remain work-side gates.</p></div>
+  <div class="footer"><span>No caller-supplied URLs, headers, SQL or write tools</span><a href="WORK-AGENT-START-HERE.md">Workplace acceptance gates</a></div>
+</div>
+</section>
+
+<section class="slide" id="evidence" data-title="What is proved and what remains open" aria-labelledby="evidence-title">
+<div class="wrap">
+  <div class="eyebrow">09 · Evidence boundaries</div>
+  <h2 id="evidence-title">Local integration works. Work-side proof comes next.</h2>
+  <div class="grid three">
+    <article class="card"><span class="tag">Current handoff revision</span><div class="stat">80 + 5</div><h3>Tests and subtests pass</h3><p>Eight standalone unittest checks also pass. The extracted package passes in a fresh hash-locked environment.</p><p class="small">FastMCP 4.1.4. Six direct MCP scenarios pass on the amd64 container. A real local HTTPS canary proves the suspected path, no auth header and private-CA verification with synthetic data.</p></article>
+    <article class="card"><span class="tag">Historical native lab</span><h3>Agent-to-tool invocation proved</h3><p>The earlier alpha17 lab invoked the tool and produced grounded fixture answers.</p><p class="small">That native run used FastMCP 2.14.3. It does not certify the upgraded dependencies or the workplace kagent version.</p></article>
+    <article class="card warm"><span class="tag pending">Work-side gates</span><h3>Private contract and runtime</h3><p>Confirm method, exact path, request/response mapping, auth, data scope, internal image supply and egress.</p><p class="small">Then prove direct MCP calls and grounded native-agent answers on the actual workplace stack.</p></article>
+  </div>
+  <p class="caption">Cursor and Kimi completed initial reviews. Cursor's final source review found no blocking handoff issues. Claude was signed out and supplied no review. The Python dependency audit reported no known advisories at scan time; OS-image and workplace policy approval remain separate.</p>
+  <div class="footer"><span>Fixture proof, historical native proof and workplace proof stay separate.</span><a href="evidence/HANDOFF-REVIEW-2026-10-28.md">Review and validation evidence</a></div>
+</div>
+</section>
+
+<section class="slide" id="measurement" data-title="How we will judge the benefit" aria-labelledby="measurement-title">
+<div class="wrap">
+  <div class="eyebrow">10 · Measure the actual question</div>
+  <h2 id="measurement-title">A graph-shaped answer is not proof of better reasoning.</h2>
+  <div class="split-note">
+    <div class="card warm"><span class="tag pending">Earlier representation pilot</span><h3>Neither format was reliable overall.</h3><p>Four synthetic questions, each repeated five times per format, used the same small local model and the same graph facts.</p><div class="bars" aria-label="Graph JSON passed 5 of 20 calls. Flat tables passed 0 of 20 calls."><div class="bar-row"><span>Graph JSON</span><div class="track"><div class="bar"></div></div><span>5/20</span></div><div class="bar-row"><span>Flat tables</span><div class="track"></div><span>0/20</span></div></div><p class="small">Flat tables used 17.47% fewer input tokens in that replay. Both retained the relationships. This was not a REST-versus-SQL comparison and excluded orchestration, Gateway and retrieval tokens.</p></div>
+    <div><h3>The useful workplace comparison</h3><ul style="padding-left:22px"><li>Use equivalent approved questions, data scopes and the same model.</li><li>Score correct facts, supporting edges, source, scope and partial-result warnings.</li><li>Measure complete MCP response bytes and per-call plus cumulative model tokens.</li><li>Count tool calls, latency, failures and human corrections.</li><li>Compare the existing typed SQL path with the mapped REST path, then decide by question type.</li></ul><p class="small">Include aggregates and exact lookups as well as topology questions. An API should not replace SQL operations that it cannot answer correctly.</p></div>
+  </div>
+  <div class="footer"><span>No measured workplace token-saving or hallucination-reduction claim</span><a href="comparison/REPORT.md">Pilot methods and limitations</a></div>
+</div>
+</section>
+
+<section class="slide" id="supply" data-title="What the work agent needs to build" aria-labelledby="supply-title">
+<div class="wrap">
+  <div class="eyebrow">11 · Supply and deployment</div>
+  <h2 id="supply-title">One application image. Reuse the workplace platform.</h2>
+  <p class="lead">FastMCP is a Python dependency inside the adapter image. There is no separate FastMCP container to import.</p>
+  <div class="supply">
+    <article class="card"><span class="tag">Import / transfer</span><h3>Pinned base + wheels</h3><p>Import the digest-pinned Python base. For an offline build, transfer the target-architecture, hash-checked runtime wheelhouse too.</p></article><span class="arrow" aria-hidden="true">→</span>
+    <article class="card"><span class="tag">Build internally</span><h3>Adapter image</h3><p>Use the locked source and offline Dockerfile. Run tests, scan and sign under workplace policy. Record the internal registry digest.</p></article><span class="arrow" aria-hidden="true">→</span>
+    <article class="card"><span class="tag pending">Adapt + prove</span><h3>Existing agent route</h3><p>Point the adapter at the confirmed API, preserve the existing identity and Gateway wiring, and run direct plus native acceptance.</p></article>
+  </div>
+  <div class="callout"><p>The workplace route needs the existing REST service. It does not need the fixture DuckDB/FastAPI deployment, a new graph database, Ollama, model weights or a replacement worker.</p></div>
+  <p class="caption">The repository ZIP contains source, locks, templates and evidence. Images and wheels are separate supply inputs. Fresh image/runtime validation covers amd64 via emulation; arm64 still needs its own build and test.</p>
+  <div class="footer"><span>Importing a base image alone does not make a pip build offline.</span><a href="IMAGE-IMPORT-SHEET.md">Exact digests and offline build commands</a></div>
+</div>
+</section>
+
+<section class="slide" id="handoff" data-title="Handoff and decision" aria-labelledby="handoff-title">
+<div class="wrap">
+  <div class="eyebrow">12 · What happens next</div>
+  <h2 id="handoff-title">Validate the contract, then judge the answers.</h2>
+  <div class="grid">
+    <ol class="steps"><li><div><strong>Confirm the Swagger operation</strong><span>Check the actual method, path, request/response schema, read-only semantics, auth and data-owner scope.</span></div></li><li><div><strong>Make the smallest reviewed mapping</strong><span>Preserve the typed tool, fixed route, TLS checks, limits, provenance and existing workplace wiring.</span></div></li><li><div><strong>Build and prove on the target</strong><span>Use an internal digest. Validate direct MCP calls, target kagent compatibility and grounded native answers.</span></div></li><li><div><strong>Measure and choose by use case</strong><span>Keep exact SQL operations where they fit. Adopt REST context where equivalent tests show useful evidence and acceptable cost.</span></div></li></ol>
+    <div class="card"><h3>The work-agent reading pack</h3><ul class="source-list"><li><a href="WORK-AGENT-START-HERE.md">Start sheet and acceptance gates</a></li><li><a href="docs/WORKPLACE-CONTRACT.md">Private API contract checklist</a></li><li><a href="IMAGE-IMPORT-SHEET.md">Images, wheels and offline builds</a></li><li><a href="evidence/HANDOFF-REVIEW-2026-10-28.md">Review decisions and current proof</a></li><li><a href="evidence/REPORT.md">Historical native lab acceptance</a></li><li><a href="comparison/REPORT.md">Representation pilot and limitations</a></li></ul><hr class="subtle-rule"><p class="small">The presentation is one HTML file with inline diagrams and no external libraries, fonts, telemetry or external network requests. Open it from the downloaded bundle. Use Print / PDF for a paper copy.</p></div>
+  </div>
+  <div class="footer"><a href="https://github.com/davidmarkgardiner/kagent-work-bundles/tree/main/graph-rest-mcp">github.com/davidmarkgardiner/kagent-work-bundles/tree/main/graph-rest-mcp</a><span>Ready for work-agent adaptation · not workplace deployment approval</span></div>
+</div>
+</section>
+
+</main>
+<script>
+const slides = [...document.querySelectorAll('.slide')];
+const jump = document.getElementById('jump');
+const previous = document.getElementById('previous');
+const next = document.getElementById('next');
+const count = document.getElementById('count');
+let active = Math.max(0, slides.findIndex(slide => '#' + slide.id === location.hash));
+slides.forEach((slide, index) => jump.add(new Option(String(index + 1).padStart(2, '0') + ' · ' + slide.dataset.title, String(index))));
+function update(index) {
+  active = index;
+  jump.value = String(index);
+  count.textContent = `${index + 1} / ${slides.length}`;
+  previous.disabled = index === 0;
+  next.disabled = index === slides.length - 1;
+}
+function go(index) {
+  const target = Math.max(0, Math.min(slides.length - 1, index));
+  update(target);
+  slides[target].scrollIntoView({block: 'start'});
+  history.replaceState(null, '', '#' + slides[target].id);
+}
+jump.addEventListener('change', () => go(Number(jump.value)));
+previous.addEventListener('click', () => go(active - 1));
+next.addEventListener('click', () => go(active + 1));
+document.getElementById('print').addEventListener('click', () => window.print());
+document.addEventListener('keydown', event => {
+  if (event.target.closest('select, input, textarea, button, a') || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  const offset = {ArrowRight: 1, ArrowLeft: -1, PageDown: 1, PageUp: -1}[event.key];
+  if (offset) { event.preventDefault(); go(active + offset); }
+  if (event.key === 'Home') { event.preventDefault(); go(0); }
+  if (event.key === 'End') { event.preventDefault(); go(slides.length - 1); }
+});
+let scheduled = false;
+window.addEventListener('scroll', () => {
+  if (scheduled) return;
+  scheduled = true;
+  requestAnimationFrame(() => {
+    const index = slides.reduce((best, slide, i) => Math.abs(slide.getBoundingClientRect().top - 84) < Math.abs(slides[best].getBoundingClientRect().top - 84) ? i : best, 0);
+    update(index);
+    scheduled = false;
+  });
+}, {passive: true});
+update(active);
+</script>
+</body>
+</html>

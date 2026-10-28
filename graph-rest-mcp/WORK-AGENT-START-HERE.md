@@ -12,6 +12,8 @@ Existing workplace agent → existing MCP/Gateway wiring → FastMCP /mcp
 
 ## Read first
 
+For an overview, open [the HTML presentation](PRESENTATION.html) locally. It explains the API design and compares it with the previous typed SQL MCP without claiming unmeasured benefits.
+
 1. This sheet, then [the image/import sheet](IMAGE-IMPORT-SHEET.md).
 2. [API contract checklist](docs/WORKPLACE-CONTRACT.md).
 3. [Current handoff review and proof](evidence/HANDOFF-REVIEW-2026-10-28.md).
