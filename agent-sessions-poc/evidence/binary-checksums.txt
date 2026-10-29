@@ -1,0 +1,3 @@
+f724ef1aec93f9092d5261b072cba600bcdaef30de245aec02aa8dbfeebb6b00  bin/agentctl
+f37c7455e2ce6ed235db31856a974f2880653dac254ff4a5cc3cb0057fca5b9c  bin/agentsessionsd
+55dbf3787b4dcd9644997b64dc03871d6101057fc13587a0561bccc5826759a9  bin/harnessnode

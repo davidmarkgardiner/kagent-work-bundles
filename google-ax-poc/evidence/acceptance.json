@@ -1,0 +1,25 @@
+{
+  "ax_commit": "8440ae689d3314954b4f9f91d5b1460bdf5d6120",
+  "substrate_commit": "d3f2363590a11b2f50489971985ba033b4c9eff7",
+  "runtime": "gVisor",
+  "upstream_live_tests_passed": [
+    "TestE2E_CLIVersionAndAutoTunnel",
+    "TestE2E_WorkspaceCRUD",
+    "TestE2E_ModelCRUD",
+    "TestE2E_TaskLifecycleAndSubstrateSync",
+    "TestE2E_MetadataServerAndGuestExec",
+    "TestE2E_WorkspaceSetup_FilesAndGit",
+    "TestE2E_TaskSuspendAndResumePersistence",
+    "TestE2E_DescribeAndAtespaceIsolation"
+  ],
+  "failed": [],
+  "skipped": [],
+  "workspace_persisted": true,
+  "ephemeral_rootfs_reset": true,
+  "live_model_call_tested": false,
+  "scope": "Eight upstream live checks plus a retained task on a separate kind/Substrate/gVisor lab installation.",
+  "workplace_verified": false,
+  "devpod_remote_api_topology_verified": false,
+  "clean_cache_airgap_verified": false,
+  "resource_scoping_is_not_tenant_authorization": true
+}

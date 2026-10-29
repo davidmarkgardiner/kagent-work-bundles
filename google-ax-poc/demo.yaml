@@ -1,0 +1,37 @@
+apiVersion: ax.io/v1alpha1
+kind: Workspace
+metadata:
+  name: ax-reference-workspace
+spec:
+  files:
+    - path: seed.txt
+      content: AX_HOME_LAB_SEED
+    - path: task.py
+      content: |
+        import json
+        from pathlib import Path
+        workspace = Path('/workspace')
+        result = {
+            'result': 'AX_POC_OK',
+            'seed': (workspace / 'seed.txt').read_text().strip(),
+            'runtime': 'AX task runner in a Substrate gVisor actor'
+        }
+        (workspace / 'task-result.json').write_text(json.dumps(result, indent=2) + '\n')
+        print(json.dumps(result), flush=True)
+  skills:
+    path: /workspace/.agents/skills
+---
+apiVersion: ax.io/v1alpha1
+kind: Task
+metadata:
+  name: ax-reference-demo
+spec:
+  debug: true
+  command: [python3, /workspace/task.py]
+  workspace:
+    name: ax-reference-workspace
+    path: /workspace
+  resources:
+    limits:
+      cpu: "500m"
+      memory: 256Mi

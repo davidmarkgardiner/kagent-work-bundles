@@ -1,0 +1,26 @@
+{
+  "source_commit": "7531d2026252df8617b20d1f0d19240962408c80",
+  "passed": [
+    "TestReplayReconstructsNondeterministicOutput",
+    "TestMultiTurnResumeContinue",
+    "TestForkEquivalence",
+    "TestSingleWriter",
+    "TestReplayNeverReachesTheProvider",
+    "TestTamperedJournalRefusedBeforeUse",
+    "TestApprovalGatedModelToolOnStockDaemon"
+  ],
+  "failed": [],
+  "scope": "Seven upstream fixtures on a Linux/amd64 lab host; no Substrate execution for Sessions.",
+  "lab_observations": {
+    "journal_unchanged_across_daemon_replacement": true,
+    "historical_fork_divergence": true,
+    "local_qwen_context_after_daemon_replacement": true,
+    "local_sqlite_publications_before_approval": 0,
+    "local_sqlite_publications_after_approval_and_repeated_resume": 1,
+    "denial_added_publications": 0,
+    "workplace_verified": false,
+    "devpod_remote_api_topology_verified": false,
+    "clean_cache_airgap_verified": false
+  },
+  "release_note": "Pinned commit build; not a claim that v0.3.0 images contain all tested behaviour."
+}

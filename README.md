@@ -14,6 +14,15 @@ Before live implementation, fill in
 That sheet lists the common namespaces, MCP server names, datasource UIDs,
 GitLab project values, approval routes, and demo targets needed across bundles.
 
+## Sessions and AX home-lab POCs
+
+Start with the [dev-pod, remote-cluster and air-gap guide](agent-runtime-workplace-guide/README.md).
+The [Sessions README](agent-sessions-poc/README.md) and
+[AX README](google-ax-poc/README.md) record the separate lab proofs, component
+placement, client commands and remaining workplace gates. Copy all three folders
+together. These contain documentation, a portable AX example and sanitized
+receipts; they are not complete offline artifact distributions.
+
 ## Office demo and security handoff
 
 Download this full repository as a ZIP, extract it, and copy the required folders

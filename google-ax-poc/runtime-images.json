@@ -1,0 +1,158 @@
+{
+  "recorded_date": "2026-10-29",
+  "scope": "Observed selected lab backend and bootstrap images, plus actor runner. Not a universal offline BOM.",
+  "excludes": [
+    "Kubernetes foundation, CNI and storage provisioner images",
+    "Other task images",
+    "Model inference image and weight files",
+    "Build-time dependencies",
+    "Separate sandbox asset archives"
+  ],
+  "note": "Lab-built images are not hosted by this repository. Import approved OCI artifacts or rebuild from pinned source. Regenerate the digest lock for approved rebuilds. Preserve source/destination digest evidence.",
+  "images": [
+    {
+      "namespace_role": "ate-system",
+      "component": "ateapi",
+      "origin": "built in lab from pinned source",
+      "source_reference": null,
+      "observed_lab_digest": "sha256:b47e9d773f15e814df6b2aacdd587751ead53004f7244213061bcfb2c4315ae7",
+      "import_destination": "{{INTERNAL_REGISTRY}}/ateapi@sha256:b47e9d773f15e814df6b2aacdd587751ead53004f7244213061bcfb2c4315ae7"
+    },
+    {
+      "namespace_role": "ate-system",
+      "component": "objectstore-plugin",
+      "origin": "built in lab from pinned source",
+      "source_reference": null,
+      "observed_lab_digest": "sha256:93b026526d45e7baad1b00fa9f71d6c88ab95b847c2c689a71652dd4b4e25b8d",
+      "import_destination": "{{INTERNAL_REGISTRY}}/objectstore-plugin@sha256:93b026526d45e7baad1b00fa9f71d6c88ab95b847c2c689a71652dd4b4e25b8d"
+    },
+    {
+      "namespace_role": "ate-system",
+      "component": "atecontroller",
+      "origin": "built in lab from pinned source",
+      "source_reference": null,
+      "observed_lab_digest": "sha256:5256362bc87c4903fe8faadf0e60a7e7c513f987c2d946f8ddedd3bb688b3324",
+      "import_destination": "{{INTERNAL_REGISTRY}}/atecontroller@sha256:5256362bc87c4903fe8faadf0e60a7e7c513f987c2d946f8ddedd3bb688b3324"
+    },
+    {
+      "namespace_role": "ate-system",
+      "component": "ate-idp-server",
+      "origin": "built in lab from pinned source",
+      "source_reference": null,
+      "observed_lab_digest": "sha256:df59f6ad392a844130501ccee1829b5d84b7ff80a26103d5780334f0ca69f001",
+      "import_destination": "{{INTERNAL_REGISTRY}}/ate-idp-server@sha256:df59f6ad392a844130501ccee1829b5d84b7ff80a26103d5780334f0ca69f001"
+    },
+    {
+      "namespace_role": "ate-system",
+      "component": "atelet",
+      "origin": "built in lab from pinned source",
+      "source_reference": null,
+      "observed_lab_digest": "sha256:3aa7e922f81aff1bf8c7a5989c341bc5915ccb8b9d0022a17607a91c83d7e92d",
+      "import_destination": "{{INTERNAL_REGISTRY}}/atelet@sha256:3aa7e922f81aff1bf8c7a5989c341bc5915ccb8b9d0022a17607a91c83d7e92d"
+    },
+    {
+      "namespace_role": "ate-system",
+      "component": "envoy-dataplane",
+      "origin": "built in lab from pinned source",
+      "source_reference": null,
+      "observed_lab_digest": "sha256:82e925341c30776eb09d54757ef58a8f84229a44809ad1cdc95972c0bc8dcc22",
+      "import_destination": "{{INTERNAL_REGISTRY}}/envoy-dataplane@sha256:82e925341c30776eb09d54757ef58a8f84229a44809ad1cdc95972c0bc8dcc22"
+    },
+    {
+      "namespace_role": "ate-system",
+      "component": "atenet",
+      "origin": "built in lab from pinned source",
+      "source_reference": null,
+      "observed_lab_digest": "sha256:dc8b1c1c8ef46b97ec1d05eac31191654c0d4e5d273b312a17a9c56b37c116c6",
+      "import_destination": "{{INTERNAL_REGISTRY}}/atenet@sha256:dc8b1c1c8ef46b97ec1d05eac31191654c0d4e5d273b312a17a9c56b37c116c6"
+    },
+    {
+      "namespace_role": "ate-system",
+      "component": "postgres",
+      "origin": "public upstream image",
+      "source_reference": "postgres:18-alpine@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15",
+      "observed_lab_digest": "sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15",
+      "import_destination": "{{INTERNAL_REGISTRY}}/postgres@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15"
+    },
+    {
+      "namespace_role": "ate-system",
+      "component": "rustfs",
+      "origin": "public upstream image",
+      "source_reference": "rustfs/rustfs:1.0.0-beta.3@sha256:378642b05b7dcb4849fb77ebe6aca4ced1c3f66e7e504247df95a5c9018d3358",
+      "observed_lab_digest": "sha256:378642b05b7dcb4849fb77ebe6aca4ced1c3f66e7e504247df95a5c9018d3358",
+      "import_destination": "{{INTERNAL_REGISTRY}}/rustfs@sha256:378642b05b7dcb4849fb77ebe6aca4ced1c3f66e7e504247df95a5c9018d3358"
+    },
+    {
+      "namespace_role": "ate-system",
+      "component": "aws-cli",
+      "origin": "public upstream image",
+      "source_reference": "amazon/aws-cli:2.17.0@sha256:643507c10ada7964ca6157b3d799f030b90577643da9955d319a77399ed80d73",
+      "observed_lab_digest": "sha256:643507c10ada7964ca6157b3d799f030b90577643da9955d319a77399ed80d73",
+      "import_destination": "{{INTERNAL_REGISTRY}}/aws-cli@sha256:643507c10ada7964ca6157b3d799f030b90577643da9955d319a77399ed80d73"
+    },
+    {
+      "namespace_role": "ax-system",
+      "component": "postgres",
+      "origin": "public upstream image",
+      "source_reference": "postgres:17-alpine",
+      "observed_lab_digest": "sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b",
+      "import_destination": "{{INTERNAL_REGISTRY}}/postgres@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b"
+    },
+    {
+      "namespace_role": "ax-system",
+      "component": "ax-server",
+      "origin": "built in lab from pinned source",
+      "source_reference": null,
+      "observed_lab_digest": "sha256:6fbce1f00f53dad3377ece7d43ccda360c3ad297dfec8eab5d0f8c21230f35f4",
+      "import_destination": "{{INTERNAL_REGISTRY}}/ax-server@sha256:6fbce1f00f53dad3377ece7d43ccda360c3ad297dfec8eab5d0f8c21230f35f4"
+    },
+    {
+      "namespace_role": "ax-system",
+      "component": "ateworker-gvisor",
+      "origin": "built in lab from pinned source",
+      "source_reference": null,
+      "observed_lab_digest": "sha256:6b23cbffbd3a778693c5c1749d89c3d0f829eba8048f3cae7a81f9e87b082adf",
+      "import_destination": "{{INTERNAL_REGISTRY}}/ateworker-gvisor@sha256:6b23cbffbd3a778693c5c1749d89c3d0f829eba8048f3cae7a81f9e87b082adf"
+    },
+    {
+      "namespace_role": "otel-system",
+      "component": "all-in-one",
+      "origin": "public upstream image",
+      "source_reference": "jaegertracing/all-in-one:1.55@sha256:f6b5d09073f14f76873d300f565a6691d815e81bea8e07e1dc3ff67e0596dd4e",
+      "observed_lab_digest": "sha256:f6b5d09073f14f76873d300f565a6691d815e81bea8e07e1dc3ff67e0596dd4e",
+      "import_destination": "{{INTERNAL_REGISTRY}}/all-in-one@sha256:f6b5d09073f14f76873d300f565a6691d815e81bea8e07e1dc3ff67e0596dd4e"
+    },
+    {
+      "namespace_role": "otel-system",
+      "component": "opentelemetry-collector-contrib",
+      "origin": "public upstream image",
+      "source_reference": "otel/opentelemetry-collector-contrib:0.157.0@sha256:f2f01157055a9b2aab9df7118e1f1c9abf345e99b23bc7a2bc791db374a7d0f6",
+      "observed_lab_digest": "sha256:f2f01157055a9b2aab9df7118e1f1c9abf345e99b23bc7a2bc791db374a7d0f6",
+      "import_destination": "{{INTERNAL_REGISTRY}}/opentelemetry-collector-contrib@sha256:f2f01157055a9b2aab9df7118e1f1c9abf345e99b23bc7a2bc791db374a7d0f6"
+    },
+    {
+      "namespace_role": "otel-system",
+      "component": "prometheus",
+      "origin": "public upstream image",
+      "source_reference": "prom/prometheus:v3.5.3@sha256:ddc2493835a1509976d5e4e0c94199c4f843ce1f42dd6bcfc8231ba734a93ff7",
+      "observed_lab_digest": "sha256:ddc2493835a1509976d5e4e0c94199c4f843ce1f42dd6bcfc8231ba734a93ff7",
+      "import_destination": "{{INTERNAL_REGISTRY}}/prometheus@sha256:ddc2493835a1509976d5e4e0c94199c4f843ce1f42dd6bcfc8231ba734a93ff7"
+    },
+    {
+      "namespace_role": "podcertificate-controller-system",
+      "component": "podcertcontroller",
+      "origin": "built in lab from pinned source",
+      "source_reference": null,
+      "observed_lab_digest": "sha256:8339d76dbffe151b303111b7f524e413532b6038671a27f95757b2fd9739c6db",
+      "import_destination": "{{INTERNAL_REGISTRY}}/podcertcontroller@sha256:8339d76dbffe151b303111b7f524e413532b6038671a27f95757b2fd9739c6db"
+    },
+    {
+      "namespace_role": "Substrate actor, not a Kubernetes pod",
+      "component": "ax-task-runner",
+      "origin": "built in lab from pinned AX source and E2E Dockerfile",
+      "source_reference": null,
+      "observed_lab_digest": "sha256:a7385253ef4200943281a00bd3f9cef1921d768e18695b08ceabe6469fdf57fd",
+      "import_destination": "{{INTERNAL_REGISTRY}}/ax-task-runner@sha256:a7385253ef4200943281a00bd3f9cef1921d768e18695b08ceabe6469fdf57fd"
+    }
+  ]
+}

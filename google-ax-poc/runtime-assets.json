@@ -1,0 +1,21 @@
+{
+  "substrate_commit": "d3f2363590a11b2f50489971985ba033b4c9eff7",
+  "sandbox_class": "gvisor",
+  "sandbox_config_version": "v4",
+  "field": "spec.versions[].assets.<arch>.gvisor",
+  "note": "Expected hashes read from the pinned SandboxConfig. Complete archive contains runsc plus required gvisor-bin helpers. Only amd64 runtime exercised; no clean-cache offline import proof.",
+  "assets": [
+    {
+      "architecture": "amd64",
+      "upstream_url": "gs://gvisor/releases/nightly/2026-10-17/x86_64/gvisor.tar.zstd",
+      "expected_sha256": "fa72f0d45756c69a30beec21222c78241b0d330c36f4f2185648617cc23415c8",
+      "lab_runtime_exercised": true
+    },
+    {
+      "architecture": "arm64",
+      "upstream_url": "gs://gvisor/releases/nightly/2026-10-17/aarch64/gvisor.tar.zstd",
+      "expected_sha256": "238634978d99f0dd3e631c4f88eae7b19fb36937065428467f0b6d6b10697689",
+      "lab_runtime_exercised": false
+    }
+  ]
+}
