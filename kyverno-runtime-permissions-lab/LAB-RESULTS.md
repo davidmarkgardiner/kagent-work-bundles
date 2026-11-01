@@ -19,4 +19,4 @@ All **26 offline tests passed**, including missing reports, changed Pod UIDs, sc
 
 The validation webhook has failurePolicy Fail. An actual engine-outage test was not performed on this shared lab. The single-replica lab installation does not prove high availability. Azure governance equivalence, a bounded Substrate exception and workplace deployment remain separate acceptance work.
 
-Raw API responses, admission requests and receipts remain in the operator's private evidence directory. Run the README commands to capture fresh evidence on another explicitly selected lab context. No Git publication or workplace change was performed.
+Raw API responses, admission requests and receipts remain in the operator's private evidence directory. Run the README commands to capture fresh evidence on another explicitly selected lab context. No workplace change was performed.
