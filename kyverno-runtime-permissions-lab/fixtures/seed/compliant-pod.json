@@ -1,0 +1,50 @@
+{
+  "apiVersion": "v1",
+  "kind": "Pod",
+  "metadata": {
+    "name": "compliant-pod",
+    "namespace": "policy-demo-compliant",
+    "labels": {
+      "app": "kyverno-lab-compliant"
+    }
+  },
+  "spec": {
+    "restartPolicy": "Never",
+    "automountServiceAccountToken": false,
+    "containers": [
+      {
+        "name": "main",
+        "image": "busybox:1.37.0",
+        "imagePullPolicy": "IfNotPresent",
+        "command": [
+          "sh",
+          "-c",
+          "sleep 86400"
+        ],
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 1000,
+          "allowPrivilegeEscalation": false,
+          "capabilities": {
+            "drop": [
+              "ALL"
+            ]
+          },
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "resources": {
+          "requests": {
+            "cpu": "5m",
+            "memory": "8Mi"
+          },
+          "limits": {
+            "cpu": "50m",
+            "memory": "32Mi"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,427 @@
+{
+  "apiVersion": "kyverno.io/v1",
+  "kind": "ClusterPolicy",
+  "metadata": {
+    "name": "lab-runtime-permissions",
+    "annotations": {
+      "policies.kyverno.io/title": "Lab runtime permissions",
+      "pod-policies.kyverno.io/autogen-controllers": "Deployment,StatefulSet,DaemonSet,Job,CronJob,ReplicaSet,ReplicationController",
+      "policies.kyverno.io/category": "Pod Security Standards",
+      "policies.kyverno.io/severity": "high",
+      "policies.kyverno.io/subject": "Pod",
+      "policies.kyverno.io/description": "Require drop ALL and bounded capability additions; deny privileged containers, escalation, host namespaces and hostPath volumes."
+    }
+  },
+  "spec": {
+    "background": true,
+    "rules": [
+      {
+        "name": "require-drop-all",
+        "match": {
+          "any": [
+            {
+              "resources": {
+                "kinds": [
+                  "Pod"
+                ]
+              }
+            }
+          ]
+        },
+        "exclude": {
+          "any": [
+            {
+              "resources": {
+                "namespaces": [
+                  "kube-system",
+                  "kube-public",
+                  "kube-node-lease",
+                  "kyverno",
+                  "policy-reporter"
+                ]
+              }
+            }
+          ]
+        },
+        "preconditions": {
+          "all": [
+            {
+              "key": "{{ request.operation || 'BACKGROUND' }}",
+              "operator": "NotEquals",
+              "value": "DELETE"
+            }
+          ]
+        },
+        "validate": {
+          "failureAction": "Audit",
+          "message": "All containers must explicitly drop ALL capabilities.",
+          "foreach": [
+            {
+              "list": "request.object.spec.[ephemeralContainers, initContainers, containers][]",
+              "deny": {
+                "conditions": {
+                  "all": [
+                    {
+                      "key": "ALL",
+                      "operator": "AnyNotIn",
+                      "value": "{{ element.securityContext.capabilities.drop[] || `[]` }}"
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "failureActionOverrides": [
+            {
+              "action": "Enforce",
+              "namespaces": [
+                "policy-demo-compliant",
+                "policy-demo-noncompliant"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "allow-capability-additions",
+        "match": {
+          "any": [
+            {
+              "resources": {
+                "kinds": [
+                  "Pod"
+                ]
+              }
+            }
+          ]
+        },
+        "exclude": {
+          "any": [
+            {
+              "resources": {
+                "namespaces": [
+                  "kube-system",
+                  "kube-public",
+                  "kube-node-lease",
+                  "kyverno",
+                  "policy-reporter"
+                ]
+              }
+            }
+          ]
+        },
+        "preconditions": {
+          "all": [
+            {
+              "key": "{{ request.operation || 'BACKGROUND' }}",
+              "operator": "NotEquals",
+              "value": "DELETE"
+            }
+          ]
+        },
+        "validate": {
+          "failureAction": "Audit",
+          "message": "Only NET_BIND_SERVICE may be added.",
+          "foreach": [
+            {
+              "list": "request.object.spec.[ephemeralContainers, initContainers, containers][]",
+              "deny": {
+                "conditions": {
+                  "all": [
+                    {
+                      "key": "{{ element.securityContext.capabilities.add[] || `[]` }}",
+                      "operator": "AnyNotIn",
+                      "value": [
+                        "NET_BIND_SERVICE",
+                        ""
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "failureActionOverrides": [
+            {
+              "action": "Enforce",
+              "namespaces": [
+                "policy-demo-compliant",
+                "policy-demo-noncompliant"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "deny-privileged",
+        "match": {
+          "any": [
+            {
+              "resources": {
+                "kinds": [
+                  "Pod"
+                ]
+              }
+            }
+          ]
+        },
+        "exclude": {
+          "any": [
+            {
+              "resources": {
+                "namespaces": [
+                  "kube-system",
+                  "kube-public",
+                  "kube-node-lease",
+                  "kyverno",
+                  "policy-reporter"
+                ]
+              }
+            }
+          ]
+        },
+        "preconditions": {
+          "all": [
+            {
+              "key": "{{ request.operation || 'BACKGROUND' }}",
+              "operator": "NotEquals",
+              "value": "DELETE"
+            }
+          ]
+        },
+        "validate": {
+          "failureAction": "Audit",
+          "message": "Privileged containers are forbidden.",
+          "pattern": {
+            "spec": {
+              "containers": [
+                {
+                  "=(securityContext)": {
+                    "=(privileged)": "false"
+                  }
+                }
+              ],
+              "=(initContainers)": [
+                {
+                  "=(securityContext)": {
+                    "=(privileged)": "false"
+                  }
+                }
+              ],
+              "=(ephemeralContainers)": [
+                {
+                  "=(securityContext)": {
+                    "=(privileged)": "false"
+                  }
+                }
+              ]
+            }
+          },
+          "failureActionOverrides": [
+            {
+              "action": "Enforce",
+              "namespaces": [
+                "policy-demo-compliant",
+                "policy-demo-noncompliant"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "deny-escalation",
+        "match": {
+          "any": [
+            {
+              "resources": {
+                "kinds": [
+                  "Pod"
+                ]
+              }
+            }
+          ]
+        },
+        "exclude": {
+          "any": [
+            {
+              "resources": {
+                "namespaces": [
+                  "kube-system",
+                  "kube-public",
+                  "kube-node-lease",
+                  "kyverno",
+                  "policy-reporter"
+                ]
+              }
+            }
+          ]
+        },
+        "preconditions": {
+          "all": [
+            {
+              "key": "{{ request.operation || 'BACKGROUND' }}",
+              "operator": "NotEquals",
+              "value": "DELETE"
+            }
+          ]
+        },
+        "validate": {
+          "failureAction": "Audit",
+          "message": "Every container must set allowPrivilegeEscalation false.",
+          "pattern": {
+            "spec": {
+              "containers": [
+                {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": "false"
+                  }
+                }
+              ],
+              "=(initContainers)": [
+                {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": "false"
+                  }
+                }
+              ],
+              "=(ephemeralContainers)": [
+                {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": "false"
+                  }
+                }
+              ]
+            }
+          },
+          "failureActionOverrides": [
+            {
+              "action": "Enforce",
+              "namespaces": [
+                "policy-demo-compliant",
+                "policy-demo-noncompliant"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "deny-host-namespaces",
+        "match": {
+          "any": [
+            {
+              "resources": {
+                "kinds": [
+                  "Pod"
+                ]
+              }
+            }
+          ]
+        },
+        "exclude": {
+          "any": [
+            {
+              "resources": {
+                "namespaces": [
+                  "kube-system",
+                  "kube-public",
+                  "kube-node-lease",
+                  "kyverno",
+                  "policy-reporter"
+                ]
+              }
+            }
+          ]
+        },
+        "preconditions": {
+          "all": [
+            {
+              "key": "{{ request.operation || 'BACKGROUND' }}",
+              "operator": "NotEquals",
+              "value": "DELETE"
+            }
+          ]
+        },
+        "validate": {
+          "failureAction": "Audit",
+          "message": "Host network, PID and IPC namespaces are forbidden.",
+          "pattern": {
+            "spec": {
+              "=(hostPID)": "false",
+              "=(hostIPC)": "false",
+              "=(hostNetwork)": "false"
+            }
+          },
+          "failureActionOverrides": [
+            {
+              "action": "Enforce",
+              "namespaces": [
+                "policy-demo-compliant",
+                "policy-demo-noncompliant"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "deny-hostpath",
+        "match": {
+          "any": [
+            {
+              "resources": {
+                "kinds": [
+                  "Pod"
+                ]
+              }
+            }
+          ]
+        },
+        "exclude": {
+          "any": [
+            {
+              "resources": {
+                "namespaces": [
+                  "kube-system",
+                  "kube-public",
+                  "kube-node-lease",
+                  "kyverno",
+                  "policy-reporter"
+                ]
+              }
+            }
+          ]
+        },
+        "preconditions": {
+          "all": [
+            {
+              "key": "{{ request.operation || 'BACKGROUND' }}",
+              "operator": "NotEquals",
+              "value": "DELETE"
+            }
+          ]
+        },
+        "validate": {
+          "failureAction": "Audit",
+          "message": "HostPath volumes are forbidden.",
+          "pattern": {
+            "spec": {
+              "=(volumes)": [
+                {
+                  "X(hostPath)": "null"
+                }
+              ]
+            }
+          },
+          "failureActionOverrides": [
+            {
+              "action": "Enforce",
+              "namespaces": [
+                "policy-demo-compliant",
+                "policy-demo-noncompliant"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

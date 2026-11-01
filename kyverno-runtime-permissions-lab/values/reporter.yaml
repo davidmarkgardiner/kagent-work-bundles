@@ -1,0 +1,16 @@
+ui:
+  enabled: true
+plugin:
+  kyverno:
+    enabled: true
+metrics:
+  enabled: true
+rest:
+  enabled: true
+  waitForInitialReports: true
+resources:
+  requests:
+    cpu: 50m
+    memory: 96Mi
+  limits:
+    memory: 512Mi

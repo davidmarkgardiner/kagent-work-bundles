@@ -1,0 +1,52 @@
+{
+  "fixtureImage": "busybox:1.37.0",
+  "kyverno": {
+    "app": "1.17.1",
+    "chart": "3.7.1",
+    "chartArchiveSha256": "b0d74512ea707e7612a36886a8ac1369d3ed5df71bc8cd64ba2b1abe98865325",
+    "repository": "https://kyverno.github.io/kyverno/"
+  },
+  "policyReporter": {
+    "chart": "3.11.2",
+    "chartArchiveSha256": "0806acbff3dab57de25dfbfeb3a6e0cb7c132afb84a6d1d6c9c0a36aea9bab8c",
+    "repository": "https://kyverno.github.io/policy-reporter",
+    "ui": "2.9.1"
+  },
+  "schemaVersion": 1,
+  "target": {
+    "context": "{{KUBECONFIG_CONTEXT}}",
+    "kubernetes": "1.35"
+  },
+  "upstreamPolicies": {
+    "commit": "d12f1b56ff051b2b5e59ffd7d3d563f8add30547",
+    "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "repository": "https://github.com/kyverno/policies",
+    "sources": [
+      {
+        "path": "policies/upstream/disallow-capabilities-strict.yaml",
+        "sha256": "6000c5c6e0a0b0f87d67dd9a382a871f301dc2daa02d649abfe9fa14d0bff253",
+        "url": "https://raw.githubusercontent.com/kyverno/policies/d12f1b56ff051b2b5e59ffd7d3d563f8add30547/pod-security/restricted/disallow-capabilities-strict/disallow-capabilities-strict.yaml"
+      },
+      {
+        "path": "policies/upstream/disallow-privileged-containers.yaml",
+        "sha256": "31d595cab8979474bfbb853fb0f1c67a98bbfff08dda6ec0ef71158cea09ba8d",
+        "url": "https://raw.githubusercontent.com/kyverno/policies/d12f1b56ff051b2b5e59ffd7d3d563f8add30547/pod-security/baseline/disallow-privileged-containers/disallow-privileged-containers.yaml"
+      },
+      {
+        "path": "policies/upstream/disallow-privilege-escalation.yaml",
+        "sha256": "896f413ddf85259b6b61515bc6327ea9f6d9b4b76db43dec745cbd16dfcc9974",
+        "url": "https://raw.githubusercontent.com/kyverno/policies/d12f1b56ff051b2b5e59ffd7d3d563f8add30547/pod-security/restricted/disallow-privilege-escalation/disallow-privilege-escalation.yaml"
+      },
+      {
+        "path": "policies/upstream/disallow-host-namespaces.yaml",
+        "sha256": "59eba864baeede16f51173a304f052af1aaa6f7e2c87c53c36b4235b58aebd99",
+        "url": "https://raw.githubusercontent.com/kyverno/policies/d12f1b56ff051b2b5e59ffd7d3d563f8add30547/pod-security/baseline/disallow-host-namespaces/disallow-host-namespaces.yaml"
+      },
+      {
+        "path": "policies/upstream/disallow-host-path.yaml",
+        "sha256": "f062fed727b0eb8f3a829d1f22e5a7d288cedc7ea7ed69c7d3b69c935b4f3318",
+        "url": "https://raw.githubusercontent.com/kyverno/policies/d12f1b56ff051b2b5e59ffd7d3d563f8add30547/pod-security/baseline/disallow-host-path/disallow-host-path.yaml"
+      }
+    ]
+  }
+}

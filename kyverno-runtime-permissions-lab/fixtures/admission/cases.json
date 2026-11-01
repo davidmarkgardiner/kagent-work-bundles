@@ -1,0 +1,2456 @@
+{
+  "cases": [
+    {
+      "expected": "deny",
+      "expectedRule": "allow-capability-additions",
+      "name": "main-sys-admin",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "SYS_ADMIN"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "allow-capability-additions",
+      "name": "main-sys-ptrace",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "SYS_PTRACE"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "allow-capability-additions",
+      "name": "main-net-raw",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "NET_RAW"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "require-drop-all",
+      "name": "main-missing-drop",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {},
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-privileged",
+      "name": "main-privileged",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": true,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "privileged": true,
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-escalation",
+      "name": "main-escalation",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": true,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-escalation",
+      "name": "main-missing-escalation",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "allow-capability-additions",
+      "name": "init-sys-admin",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "initContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "true"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "init",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "SYS_ADMIN"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "allow-capability-additions",
+      "name": "init-sys-ptrace",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "initContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "true"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "init",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "SYS_PTRACE"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "allow-capability-additions",
+      "name": "init-net-raw",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "initContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "true"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "init",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "NET_RAW"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "require-drop-all",
+      "name": "init-missing-drop",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "initContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "true"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "init",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {},
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-privileged",
+      "name": "init-privileged",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "initContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "true"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "init",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": true,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "privileged": true,
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-escalation",
+      "name": "init-escalation",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "initContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "true"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "init",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": true,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-escalation",
+      "name": "init-missing-escalation",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "initContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "true"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "init",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "allow-capability-additions",
+      "name": "ephemeral-sys-admin",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "ephemeralContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "debug-sys-admin",
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "SYS_ADMIN"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              },
+              "targetContainerName": "main"
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "ephemeral-update"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "allow-capability-additions",
+      "name": "ephemeral-sys-ptrace",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "ephemeralContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "debug-sys-ptrace",
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "SYS_PTRACE"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              },
+              "targetContainerName": "main"
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "ephemeral-update"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "allow-capability-additions",
+      "name": "ephemeral-net-raw",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "ephemeralContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "debug-net-raw",
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "NET_RAW"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              },
+              "targetContainerName": "main"
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "ephemeral-update"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "require-drop-all",
+      "name": "ephemeral-missing-drop",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "ephemeralContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "debug-missing-drop",
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {},
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              },
+              "targetContainerName": "main"
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "ephemeral-update"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-privileged",
+      "name": "ephemeral-privileged",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "ephemeralContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "debug-privileged",
+              "securityContext": {
+                "allowPrivilegeEscalation": true,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "privileged": true,
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              },
+              "targetContainerName": "main"
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "ephemeral-update"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-escalation",
+      "name": "ephemeral-escalation",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "ephemeralContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "debug-escalation",
+              "securityContext": {
+                "allowPrivilegeEscalation": true,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              },
+              "targetContainerName": "main"
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "ephemeral-update"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-escalation",
+      "name": "ephemeral-missing-escalation",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "ephemeralContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "debug-missing-escalation",
+              "securityContext": {
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              },
+              "targetContainerName": "main"
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "ephemeral-update"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-host-namespaces",
+      "name": "hostNetwork",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "hostNetwork": true,
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-host-namespaces",
+      "name": "hostPID",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "hostPID": true,
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-host-namespaces",
+      "name": "hostIPC",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "hostIPC": true,
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "deny-hostpath",
+      "name": "hostpath",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never",
+          "volumes": [
+            {
+              "hostPath": {
+                "path": "/",
+                "type": "Directory"
+              },
+              "name": "host"
+            }
+          ]
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "autogen-allow-capability-additions",
+      "name": "deployment-sys-admin",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "apps/v1",
+        "kind": "Deployment",
+        "metadata": {
+          "name": "compliant-deployment",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "replicas": 1,
+          "selector": {
+            "matchLabels": {
+              "app": "kyverno-lab-deployment"
+            }
+          },
+          "template": {
+            "metadata": {
+              "labels": {
+                "app": "kyverno-lab-deployment"
+              }
+            },
+            "spec": {
+              "automountServiceAccountToken": false,
+              "containers": [
+                {
+                  "command": [
+                    "sh",
+                    "-c",
+                    "sleep 86400"
+                  ],
+                  "image": "busybox:1.37.0",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "main",
+                  "resources": {
+                    "limits": {
+                      "cpu": "50m",
+                      "memory": "32Mi"
+                    },
+                    "requests": {
+                      "cpu": "5m",
+                      "memory": "8Mi"
+                    }
+                  },
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "add": [
+                        "SYS_ADMIN"
+                      ],
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "runAsNonRoot": true,
+                    "runAsUser": 1000,
+                    "seccompProfile": {
+                      "type": "RuntimeDefault"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "allow",
+      "name": "compliant-pod",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "allow",
+      "name": "compliant-deployment",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "apps/v1",
+        "kind": "Deployment",
+        "metadata": {
+          "name": "compliant-deployment",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "replicas": 1,
+          "selector": {
+            "matchLabels": {
+              "app": "kyverno-lab-deployment"
+            }
+          },
+          "template": {
+            "metadata": {
+              "labels": {
+                "app": "kyverno-lab-deployment"
+              }
+            },
+            "spec": {
+              "automountServiceAccountToken": false,
+              "containers": [
+                {
+                  "command": [
+                    "sh",
+                    "-c",
+                    "sleep 86400"
+                  ],
+                  "image": "busybox:1.37.0",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "main",
+                  "resources": {
+                    "limits": {
+                      "cpu": "50m",
+                      "memory": "32Mi"
+                    },
+                    "requests": {
+                      "cpu": "5m",
+                      "memory": "8Mi"
+                    }
+                  },
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "runAsNonRoot": true,
+                    "runAsUser": 1000,
+                    "seccompProfile": {
+                      "type": "RuntimeDefault"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "allow",
+      "name": "net-bind-service",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "NET_BIND_SERVICE"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "allow",
+      "name": "ephemeral-compliant",
+      "namespace": "policy-demo-compliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-compliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "ephemeralContainers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "debug-compliant",
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              },
+              "targetContainerName": "main"
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "ephemeral-update"
+    },
+    {
+      "expected": "allow",
+      "name": "noncompliant-namespace-compliant",
+      "namespace": "policy-demo-noncompliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-noncompliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "deny",
+      "expectedRule": "allow-capability-additions",
+      "name": "noncompliant-namespace-sys-admin",
+      "namespace": "policy-demo-noncompliant",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-demo-noncompliant"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "SYS_ADMIN"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "allow",
+      "expectedRule": null,
+      "name": "audit-sys-admin",
+      "namespace": "default",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "default"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "SYS_ADMIN"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    },
+    {
+      "expected": "allow",
+      "expectedRule": null,
+      "name": "excluded-sys-admin",
+      "namespace": "policy-reporter",
+      "object": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "labels": {
+            "app": "kyverno-lab-compliant"
+          },
+          "name": "compliant-pod",
+          "namespace": "policy-reporter"
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "command": [
+                "sh",
+                "-c",
+                "sleep 86400"
+              ],
+              "image": "busybox:1.37.0",
+              "imagePullPolicy": "IfNotPresent",
+              "name": "main",
+              "resources": {
+                "limits": {
+                  "cpu": "50m",
+                  "memory": "32Mi"
+                },
+                "requests": {
+                  "cpu": "5m",
+                  "memory": "8Mi"
+                }
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "add": [
+                    "SYS_ADMIN"
+                  ],
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "runAsNonRoot": true,
+                "runAsUser": 1000,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              }
+            }
+          ],
+          "restartPolicy": "Never"
+        }
+      },
+      "operation": "create"
+    }
+  ],
+  "purpose": "Dry-run-only case catalogue. Never apply request objects.",
+  "schemaVersion": 1
+}
