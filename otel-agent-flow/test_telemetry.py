@@ -691,3 +691,34 @@ class LogProjectionTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DemoMetadataTests(unittest.TestCase):
+    def test_controller_metadata_allowlist_and_receiver_log_timestamp(self):
+        values = {'flow.run.id':'demo-current', 'flow.demo.step':'classify',
+                  'flow.demo.state':'started', 'flow.evidence.source':'demo-controller',
+                  'flow.component':'client', 'http.request.header.authorization':'secret',
+                  'gen_ai.input.messages':'private-prompt', 'tool.arguments':'private-arguments',
+                  'receivedAt':9999999999}
+        item = log_record()
+        item['attributes'] = [{'key':k, 'value':{'stringValue':v}} for k,v in values.items()]
+        store = ActivityStore()
+        with patch('telemetry.time.time', return_value=1234.5):
+            store.ingest_logs(log_export([item], 'kyverno-demo-controller'))
+        log = store.logs_snapshot()['logs'][0]
+        self.assertEqual(log['receivedAt'],1234.5)
+        self.assertEqual(log['attributes']['flow.demo.step'],'classify')
+        self.assertEqual(log['attributes']['flow.demo.state'],'started')
+        self.assertEqual(log['attributes']['flow.evidence.source'],'demo-controller')
+        with patch('telemetry.time.time', return_value=9999):
+            store.ingest_logs(log_export([item], 'kyverno-demo-controller'))
+        self.assertEqual(store.logs_snapshot()['logs'][0]['receivedAt'],1234.5)
+        output = json.dumps(store.logs_snapshot())
+        for private in ('secret','private-prompt','private-arguments','9999999999'):
+            self.assertNotIn(private,output)
+        parsed = parse_otlp(export([span(values=values)],'kyverno-demo-controller'))[0]
+        self.assertEqual(parsed.attributes['flow.demo.state'],'started')
+
+
+if __name__ == '__main__':
+    unittest.main()

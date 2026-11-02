@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: '{{BUDGET_SERVICE}}-data'
+  namespace: '{{BUDGET_NAMESPACE}}'
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: '{{APPROVED_STORAGE_CLASS}}'
+  resources:
+    requests: {storage: 1Gi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: '{{BUDGET_SERVICE}}'
+  namespace: '{{BUDGET_NAMESPACE}}'
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: '{{BUDGET_SERVICE}}'}
+  template:
+    metadata:
+      labels: {app: '{{BUDGET_SERVICE}}'}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: budget
+          image: '{{APPROVED_RUNTIME_IMAGE_DIGEST}}'
+          command: [python, -B, /app/budget_proxy.py]
+          args: [--config, /budget/budget.json, --db, /data/model-budget.sqlite]
+          ports:
+            - {containerPort: 8082}
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {cpu: 500m, memory: 128Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          readinessProbe:
+            httpGet: {path: /healthz, port: 8082}
+            periodSeconds: 3
+          volumeMounts:
+            - {name: config, mountPath: /budget, readOnly: true}
+            - {name: data, mountPath: /data}
+      volumes:
+        - name: config
+          configMap:
+            name: '{{BUDGET_SERVICE}}-config'
+            items:
+              - {key: budget.json, path: budget.json}
+        - name: data
+          persistentVolumeClaim: {claimName: '{{BUDGET_SERVICE}}-data'}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: '{{BUDGET_SERVICE}}'
+  namespace: '{{BUDGET_NAMESPACE}}'
+spec:
+  selector: {app: '{{BUDGET_SERVICE}}'}
+  ports:
+    - {port: 8082, targetPort: 8082}

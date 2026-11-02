@@ -24,6 +24,8 @@ NATIVE_METADATA = {
 }
 MODEL_OPERATIONS = {"generate_content", "chat", "text_completion", "embeddings"}
 NATIVE_REQUEST_OPERATIONS = MODEL_OPERATIONS | {"execute_tool", "invoke_agent"}
+DEMO_METADATA = {"flow.demo.step", "flow.demo.state"}
+RECOVERY_METADATA = {"flow.incident.id", "flow.run.id", "gen_ai.task.id"}
 ALLOWED = {
     "flow.execution.mode", "service.name", "service.namespace", "service.version", "kagent.agent.name", "kagent.name",
     "gen_ai.operation.name", "gen_ai.request.model", "gen_ai.response.model",
@@ -45,7 +47,7 @@ ALLOWED = {
     "flow.simulated", "flow.workflow", "flow.tool.system", "flow.execution.id", "flow.evidence.source",
     "flow.security.subject", "flow.security.resource", "flow.security.decision", "flow.security.authority",
     "flow.security.expected_status", "flow.security.observed_status", "flow.security.backend_delta", "flow.security.check",
-} | NATIVE_METADATA
+} | NATIVE_METADATA | RECOVERY_METADATA | DEMO_METADATA
 
 
 def attrs(items):
@@ -128,12 +130,14 @@ class LogRecord:
     event: str
     message: str
     attributes: dict
+    receivedAt: float = 0.0
 
 
 def parse_logs(payload):
     if not isinstance(payload, dict) or not isinstance(payload.get("resourceLogs"), list):
         raise ValueError("Expected OTLP JSON resourceLogs array")
     records = []
+    received_at = time.time()
     log_keys = {"service.name", "service.version", "event.name", "gen_ai.event.name",
                 "gen_ai.request.model", "gen_ai.response.model", "gen_ai.operation.name",
                 "gen_ai.tool.name", "mcp.tool.name", "http.method", "http.request.method",
@@ -141,7 +145,7 @@ def parse_logs(payload):
                 "gen_ai.usage.output_tokens", "gen_ai.provider.name", "gen_ai.system",
                 "ate.actor.name", "ate.actor.uid", "ate.atespace", "ate.actor.state",
                 "ate.template.name", "ate.template.atespace", "ate.worker.name", "ate.worker.uid",
-                "ate.worker_pool.name", "kagent.session.id", "flow.simulated", "flow.workflow", "flow.result"} | NATIVE_METADATA
+                "ate.worker_pool.name", "kagent.session.id", "flow.simulated", "flow.workflow", "flow.result", "flow.component", "flow.evidence.source"} | NATIVE_METADATA | RECOVERY_METADATA | DEMO_METADATA
     for resource in payload["resourceLogs"]:
         resource_attrs = attrs(resource.get("resource", {}).get("attributes", []))
         service = str(resource_attrs.get("service.name", "unknown"))[:128]
@@ -181,7 +185,7 @@ def parse_logs(payload):
                 body_digest = hashlib.sha256(json.dumps(raw.get("body"), sort_keys=True, allow_nan=False).encode()).hexdigest()
                 identity = repr((timestamp, trace_id, span_id, service, severity_number, event, sorted(values.items()), body_digest))
                 records.append(LogRecord(hashlib.sha256(identity.encode()).hexdigest()[:24], str(timestamp), trace_id, span_id,
-                                         service, severity, severity_number, event, message, values))
+                                         service, severity, severity_number, event, message, values, received_at))
                 if len(records) > 4000:
                     raise ValueError("Export exceeds 4000 logs")
     return records

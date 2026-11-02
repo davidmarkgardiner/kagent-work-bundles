@@ -1,0 +1,8 @@
+{
+  "upstream_base_url": "http://{{APPROVED_GATEWAY_SERVICE}}.{{GATEWAY_NAMESPACE}}.svc.cluster.local:{{GATEWAY_PORT}}",
+  "model": "kimi-for-coding",
+  "run_id": "{{OPERATOR_APPROVED_ALLOWANCE_ID}}",
+  "max_requests": 16,
+  "max_input_bytes": 524288,
+  "max_output_tokens": 1200
+}

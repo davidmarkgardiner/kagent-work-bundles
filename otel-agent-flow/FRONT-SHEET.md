@@ -1,5 +1,9 @@
 # OTel agent workflow demo for AKS
 
+For the 1 November 2026 remediation demo, start with
+[Kyverno recovery](KYVERNO-RECOVERY.md) and the
+[companion handoff](../kyverno-application-specialist/OFFICE-HANDOFF.md).
+
 Deploy the same application image and Helm chart on one cluster. The browser submits prompts on the left. The right column switches between a workflow map and OTel logs. Native Substrate actor identity links resume, execution, checkpoint, and suspend traces without correlating by timing.
 
 Start with [WORK-BUNDLE-README.md](WORK-BUNDLE-README.md). Give the implementing work agent [WORK-AGENT-PROMPT.md](WORK-AGENT-PROMPT.md). Use [LIVE-INTEGRATION.md](LIVE-INTEGRATION.md) to reuse the existing agent, gateway, Kubernetes MCP tools, and approved skills. Build the backend container from this repository through work CI. No prebuilt archive is required.

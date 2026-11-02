@@ -39,6 +39,10 @@ ingress:
 dashboard:
   identity: admin@kagent.dev
   runtimeLabel: kagent 1.0.0-alpha8 · Substrate 0.4.0-alpha1 · single cluster
+recovery:
+  enabled: false
+  profileConfigMap: ''
+  snapshotClaim: ''
 
 tools:
   mode: fixture

@@ -1,0 +1,164 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: '{{RUNTIME_DEPLOYMENT}}'
+  namespace: '{{DEMO_NAMESPACE}}'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: '{{RUNTIME_DEPLOYMENT}}-read'
+  namespace: '{{DEMO_NAMESPACE}}'
+rules:
+  - apiGroups: [kyverno.io]
+    resources: [policies]
+    resourceNames: [approved-registry]
+    verbs: [get]
+  - apiGroups: [apps]
+    resources: [deployments]
+    resourceNames: [registry-demo]
+    verbs: [get]
+  - apiGroups: ['']
+    resources: [events]
+    verbs: [list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: '{{RUNTIME_DEPLOYMENT}}-read'
+  namespace: '{{DEMO_NAMESPACE}}'
+subjects:
+  - kind: ServiceAccount
+    name: '{{RUNTIME_DEPLOYMENT}}'
+    namespace: '{{DEMO_NAMESPACE}}'
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: '{{RUNTIME_DEPLOYMENT}}-read'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: '{{RUNTIME_DEPLOYMENT}}-flux-read'
+  namespace: '{{FLUX_NAMESPACE}}'
+rules:
+  - apiGroups: [source.toolkit.fluxcd.io]
+    resources: [gitrepositories]
+    resourceNames: ['{{FLUX_SOURCE}}']
+    verbs: [get]
+  - apiGroups: [kustomize.toolkit.fluxcd.io]
+    resources: [kustomizations]
+    resourceNames: ['{{FLUX_KUSTOMIZATION}}']
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: '{{RUNTIME_DEPLOYMENT}}-flux-read'
+  namespace: '{{FLUX_NAMESPACE}}'
+subjects:
+  - kind: ServiceAccount
+    name: '{{RUNTIME_DEPLOYMENT}}'
+    namespace: '{{DEMO_NAMESPACE}}'
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: '{{RUNTIME_DEPLOYMENT}}-flux-read'
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: '{{RUNTIME_DEPLOYMENT}}-data'
+  namespace: '{{DEMO_NAMESPACE}}'
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: '{{APPROVED_STORAGE_CLASS}}'
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: '{{RUNTIME_DEPLOYMENT}}'
+  namespace: '{{DEMO_NAMESPACE}}'
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: '{{RUNTIME_DEPLOYMENT}}'
+  template:
+    metadata:
+      labels:
+        app: '{{RUNTIME_DEPLOYMENT}}'
+    spec:
+      serviceAccountName: '{{RUNTIME_DEPLOYMENT}}'
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: runtime
+          image: '{{APPROVED_RUNTIME_IMAGE_DIGEST}}'
+          args: [--config, /config/config.json, --data, /data/runs/office-bootstrap, --port, '8080', --dashboard-human-id, '{{TRUSTED_GITLAB_HUMAN_ID}}']
+          env:
+            - name: GITLAB_TOKEN_FILE
+              value: /gitlab/gitlab.token
+          ports:
+            - containerPort: 8080
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          readinessProbe:
+            httpGet: {path: /healthz, port: 8080}
+            periodSeconds: 3
+          volumeMounts:
+            - {name: config, mountPath: /config, readOnly: true}
+            - {name: gitlab, mountPath: /gitlab, readOnly: true}
+            - {name: data, mountPath: /data}
+      volumes:
+        - name: config
+          projected:
+            defaultMode: 0440
+            sources:
+              - configMap:
+                  name: '{{RUNTIME_DEPLOYMENT}}-config'
+                  items:
+                    - {key: config.json, path: config.json}
+              - secret:
+                  name: '{{RUNTIME_ROLE_SECRET}}'
+                  items:
+                    - {key: investigator.token, path: investigator.token}
+                    - {key: reviewer.token, path: reviewer.token}
+                    - {key: operator.token, path: operator.token}
+                    - {key: model.token, path: model.token}
+        - name: gitlab
+          secret:
+            secretName: '{{GITLAB_API_SECRET}}'
+            defaultMode: 0440
+            items:
+              - {key: gitlab.token, path: gitlab.token}
+        - name: data
+          persistentVolumeClaim:
+            claimName: '{{RUNTIME_DEPLOYMENT}}-data'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: '{{RUNTIME_DEPLOYMENT}}'
+  namespace: '{{DEMO_NAMESPACE}}'
+spec:
+  selector:
+    app: '{{RUNTIME_DEPLOYMENT}}'
+  ports:
+    - {port: 8080, targetPort: 8080}

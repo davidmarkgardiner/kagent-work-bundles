@@ -10,7 +10,7 @@ data:
     }
     :8443 {
       tls /tls/tls.crt /tls/tls.key
-      @frontend path / /favicon.svg /style.css /logs.css /app.js /api/state /api/logs /api/invoke /healthz
+      @frontend path / /favicon.svg /style.css /logs.css /app.js /demo.js /api/state /api/logs /api/invoke /healthz
       handle @frontend {
         reverse_proxy flow-dashboard:8787
       }
@@ -88,7 +88,7 @@ spec:
   gateways: [{{ default (printf "%s/flow-demo" .Values.ingress.istio.namespace) .Values.ingress.istio.existingGateway | quote }}]
   http:
   - match:
-    {{- range list "/" "/favicon.svg" "/style.css" "/logs.css" "/app.js" "/api/state" "/api/logs" "/api/invoke" "/healthz" }}
+    {{- range list "/" "/favicon.svg" "/style.css" "/logs.css" "/app.js" "/demo.js" "/api/state" "/api/logs" "/api/invoke" "/healthz" }}
     - uri: {exact: {{ . | quote }}}
     {{- end }}
     timeout: 180s

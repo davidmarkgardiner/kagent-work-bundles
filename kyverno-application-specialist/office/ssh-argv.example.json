@@ -1,0 +1,9 @@
+[
+  "ssh",
+  "-o", "BatchMode=yes",
+  "-o", "ConnectTimeout=6",
+  "-o", "StrictHostKeyChecking=yes",
+  "-o", "UserKnownHostsFile={{PRIVATE_PINNED_KNOWN_HOSTS_FILE}}",
+  "-i", "{{PRIVATE_OPERATOR_SSH_KEY}}",
+  "{{APPROVED_OPERATOR_USER}}@{{APPROVED_EXECUTOR_HOST}}"
+]

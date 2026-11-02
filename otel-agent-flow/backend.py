@@ -12,6 +12,7 @@ import urllib.parse
 import urllib.request
 import uuid
 from telemetry import ActivityStore
+from recovery import read_view as read_recovery_view
 if os.getenv('ONBOARDING_RUNTIME') == 'ordinary':
     if os.getenv('READ_ONLY_VIEWER', '').lower() != 'true':
         raise ValueError('Ordinary runtime observation requires the read-only viewer')
@@ -189,6 +190,7 @@ class Handler(BaseHTTPRequestHandler):
             viewer = read_only_viewer()
             return self.send(200, {**snapshot, "invocation": invocation, "sessionActivity": activity,
                 "nativeActivities": native_activities,
+                "recovery": read_recovery_view(os.getenv("RECOVERY_SNAPSHOT"), os.getenv("RECOVERY_PROFILE"), snapshot),
                 "onboarding": read_view(os.getenv("ONBOARDING_SNAPSHOT", "/observer/onboarding.json")), "runtime": {
                 "readOnlyViewer": viewer,
                 "ordinaryObservationOnly": os.getenv('ONBOARDING_RUNTIME') == 'ordinary',
@@ -209,6 +211,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(200, STORE.logs_snapshot(trace_id.lower() or None, service or None))
         files = {"/": ("index.html", "text/html; charset=utf-8"),
                  "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+                 "/demo.js": ("demo.js", "text/javascript; charset=utf-8"),
                  "/style.css": ("style.css", "text/css; charset=utf-8"),
                  "/logs.css": ("logs.css", "text/css; charset=utf-8"),
                  "/favicon.svg": ("favicon.svg", "image/svg+xml")}

@@ -25,6 +25,11 @@ spec:
         - {name: KAGENT_GRPC_ADDRESS, value: {{ default (printf "kagent-controller.%s.svc.cluster.local:8083" .Values.agentNamespace) .Values.integration.controllerAddress | quote }}}
         - {name: KAGENT_USER_ID, value: {{ .Values.dashboard.identity | quote }}}
         - {name: OTEL_ENDPOINT, value: "http://flow-collector:4318/v1/traces"}
+        {{- if .Values.recovery.enabled }}
+        - {name: READ_ONLY_VIEWER, value: "true"}
+        - {name: RECOVERY_PROFILE, value: "/recovery-profile/profile.json"}
+        - {name: RECOVERY_SNAPSHOT, value: "/recovery-observer/recovery.json"}
+        {{- end }}
         - {name: SUBSTRATE_INSTALLED, value: {{ ne .Values.execution.mode "standalone" | quote }}}
         {{- if eq .Values.integration.mode "bundled" }}
         - name: EXECUTION_TARGETS
@@ -42,6 +47,20 @@ spec:
         livenessProbe: {httpGet: {path: /healthz, port: http}, periodSeconds: 15}
         resources: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: "1", memory: 256Mi}}
         securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+        {{- if .Values.recovery.enabled }}
+        volumeMounts:
+        - {name: recovery-profile, mountPath: /recovery-profile, readOnly: true}
+        - {name: recovery-observer, mountPath: /recovery-observer, readOnly: true}
+      volumes:
+      - name: recovery-profile
+        configMap:
+          name: {{ required "recovery.profileConfigMap is required" .Values.recovery.profileConfigMap | quote }}
+          items: [{key: profile.json, path: profile.json}]
+      - name: recovery-observer
+        persistentVolumeClaim:
+          claimName: {{ required "recovery.snapshotClaim is required" .Values.recovery.snapshotClaim | quote }}
+          readOnly: true
+        {{- end }}
 {{- if and (eq .Values.integration.mode "bundled") (eq .Values.tools.mode "fixture") }}
 ---
 apiVersion: apps/v1

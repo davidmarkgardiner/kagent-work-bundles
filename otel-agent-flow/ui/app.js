@@ -30,47 +30,62 @@ const expectedEdges = [['client','kagent'],['kagent','agentgateway'],['agentgate
 let state = {traces:[]}, selectedId = null, filter = null, follow = true, initial = true;
 let seen = new Set(), activeNodes = new Map(), activeEdges = new Map(), replayTimers = [], replaying = false;
 let manualPrices = null, lastRevision = -1;
+const demoSeen=new Set(),activeStages=new Map();
+let demoRunId=null;
 const activeOperations=new Map();
 let showInternal = false;
 let logsPaused = false, logData = null;
 let currentView = 'visual';
 let submitting = false, pendingTraceId = null;
-const views = {visual: {panel:'visual-view', description:'Follow the observed request path and inspect its spans.'},onboarding: {panel:'onboarding-view', description:'Follow actual agent calls, then inspect delivery readiness and the independent GoldenScenario receipt.'},logs: {panel:'logs-view', description:'Inspect API calls, status codes, and GenAI events. Select a trace ID to open its visual flow.'}};
-function setView(view, focus=false){
+let receiverConnected = false;
+let defaultDemoPending = !location.hash || location.hash==='#demo';
+const demoPanel = createDemoPanel({openTrace:selectTrace});
+const views = {demo: {panel:'demo-view',description:'Follow the real incident, review the remedy in GitLab, and wait for verified recovery.'},visual: {panel:'visual-view', description:'Follow the observed request path and inspect its spans.'},onboarding: {panel:'onboarding-view', description:'Follow actual agent calls, then inspect delivery readiness and the independent GoldenScenario receipt.'},logs: {panel:'logs-view', description:'Inspect API calls, status codes, and GenAI events. Select a trace ID to open its visual flow.'},recovery: {panel:'recovery-view', description:'Check the exact reviewed fix, live admission recovery and matching native task evidence.'}};
+function setView(view, focus=false, user=false){
+  if(user)defaultDemoPending=false;
+  if(view==='demo'&&state.demo?.enabled!==true)view='visual';
   if(!Object.hasOwn(views,view))view='visual';
   for(const [id,config] of Object.entries(views)){
     $(config.panel).hidden=id!==view;
     $(`tab-${id}`).setAttribute('aria-selected',String(id===view));
     $(`tab-${id}`).tabIndex=id===view?0:-1;
   }
-  currentView=view;
-  $(view==='onboarding'?'onboarding-flow-slot':'visual-flow-slot').append($('runtime-flow'));
-  if(view==='onboarding'&&follow){stopReplay();filter=null;selectedId=preferredTraceId()||null;}
+  if(view==='demo'&&currentView!=='demo')follow=true;
+  currentView=view;$('runtime-flow').classList.toggle('demo-runtime',view==='demo');
+  $(view==='demo'?'demo-flow-slot':view==='onboarding'?'onboarding-flow-slot':view==='recovery'?'recovery-flow-slot':'visual-flow-slot').append($('runtime-flow'));
+  $('runtime-operations').open=view!=='demo';$('runtime-details').open=view!=='demo';
+  if(['demo','onboarding','recovery'].includes(view)&&follow){stopReplay();filter=null;selectedId=preferredTraceId()||null;}
   $('view-description').textContent=views[view].description;
-  $('prompt-column').hidden=view==='onboarding';$('prompt-column').style.display=view==='onboarding'?'none':'';
-  $('demo-intro').hidden=view==='onboarding';$('demo-intro').style.display=view==='onboarding'?'none':'';
-  $('agent-workspace').classList.toggle('onboarding-wide',view==='onboarding');
+  const wide=['demo','onboarding','recovery'].includes(view);
+  $('prompt-column').hidden=wide;$('prompt-column').style.display=wide?'none':'';
+  $('demo-intro').hidden=wide;$('demo-intro').style.display=wide?'none':'';
+  $('agent-workspace').classList.toggle('onboarding-wide',wide);
   render();
   history.replaceState(null,'',`#${view}`);
   if(view==='logs'){stopReplay();render();}
   if(focus)$(`tab-${view}`).focus();
 }
 for(const id of Object.keys(views)){
-  $(`tab-${id}`).onclick=()=>setView(id);
+  $(`tab-${id}`).onclick=()=>setView(id,false,true);
   $(`tab-${id}`).onkeydown=event=>{
-    const order=['visual','logs','onboarding'],at=order.indexOf(id);
-    const keys={ArrowLeft:order[(at+2)%3],ArrowRight:order[(at+1)%3],Home:'visual',End:'onboarding'};
-    if(keys[event.key]){event.preventDefault();setView(keys[event.key],true);}
+    const order=['demo','visual','logs','onboarding','recovery'].filter(key=>!$(`tab-${key}`).hidden),at=order.indexOf(id);
+    const keys={ArrowLeft:order[(at+order.length-1)%order.length],ArrowRight:order[(at+1)%order.length],Home:order[0],End:order.at(-1)};
+    if(keys[event.key]){event.preventDefault();setView(keys[event.key],true,true);}
   };
 }
 function el(tag, text, cls) { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (cls) e.className = cls; return e; }
 function svgel(tag, attrs) {const e = document.createElementNS(svgNS,tag);for (const [key,value] of Object.entries(attrs))e.setAttribute(key,value);return e;}
+function selectTrace(traceId){
+  if(!state.traces.some(trace=>trace.traceId===traceId&&trace.spans?.length))return;
+  stopReplay();follow=false;filter=null;selectedId=traceId;if(currentView==='demo'){$('runtime-details').open=true;render();}else setView('visual',true,true);
+}
 function selected() { return state.traces.find(t=>t.traceId===selectedId); }
 function readOnlyViewer(){return state.runtime?.readOnlyViewer===true;}
-function preferredTraceId(){if(currentView==='onboarding')return onboardingTrace()?.traceId;return readOnlyViewer()?(state.traces.find(t=>t.nativeRequest)?.traceId||state.traces[0]?.traceId):state.invocation?.traceId||state.traces[0]?.traceId;}
+function demoFlow(){return state.demo?.flow?.schemaVersion===1&&state.demo.flow.runId===state.demo.runId?state.demo.flow:null;}
+function preferredTraceId(){if(currentView==='demo'){const id=demoFlow()?.scope?.activeTraceId;return state.traces.some(t=>t.traceId===id&&t.spans?.length)?id:null;}if(currentView==='onboarding')return onboardingTrace()?.traceId;if(currentView==='recovery')return recoveryTraceId();return readOnlyViewer()?(state.traces.find(t=>t.nativeRequest)?.traceId||state.traces[0]?.traceId):state.invocation?.traceId||state.traces[0]?.traceId;}
 function requestActivity(){return state.nativeActivities?.[selectedId]||(selectedId===state.invocation?.traceId?state.sessionActivity:null);}
 function selectedActivity(){return requestActivity()||(state.sessionActivity?.traceIds.includes(selectedId)?state.sessionActivity:null);}
-function sessionGraph(){return replaying?null:requestActivity();}
+function sessionGraph(){if(replaying)return null;if(currentView==='demo'){if(!follow)return null;return demoFlow()?.scope||{traceIds:[],components:[],edges:[]};}return requestActivity();}
 $('session-flow').onclick=()=>{const activity=selectedActivity();if(!activity)return;stopReplay();follow=false;filter=null;selectedId=activity.requestTraceId||state.invocation?.traceId;render();};
 function time(ms) {return ms>=1000 ? `${(ms/1000).toFixed(2)} s` : `${ms.toFixed(1)} ms`;}
 function money(value) {return value===null || value===undefined ? 'Not reported' : `$${value.toFixed(6)}`;}
@@ -86,9 +101,9 @@ function buildMap() {
     const g=svgel('g',{id:`node-${id}`,class:'node',tabindex:'0',role:'button','aria-label':`Inspect ${n.label}`,transform:`translate(${n.x},${n.y})`});
     g.append(svgel('rect',{class:'box',width:185,height:80,rx:12}));
     const icon=svgel('path',{class:'icon',d:n.icon,transform:'translate(2,14) scale(.82)'});g.append(icon);
-    const title=svgel('text',{class:'label',x:52,y:33});if(n.labelSize)title.setAttribute('style',`font-size:${n.labelSize}px`);title.textContent=n.label;g.append(title);
+    const title=svgel('text',{class:`label${n.labelSize?' compact-label':''}`,x:52,y:33});title.textContent=n.label;g.append(title);
     const sub=svgel('text',{class:'sub',x:52,y:52,id:`sub-${id}`});sub.textContent=n.sub;g.append(sub);
-    const choose=()=>{filter=id;renderTimeline();drawMap();};g.addEventListener('click',choose);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}});$('nodes').append(g);
+    const choose=()=>{if(currentView==='demo'){stopReplay();follow=false;}filter=id;render();};g.addEventListener('click',choose);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}});$('nodes').append(g);
   }
 }
 function executionMode(){return selected()?.executionMode||(selectedId===state.invocation?.traceId?state.invocation.executionMode:null)||(state.runtime?.ordinaryObservationOnly?'ordinary':null);}
@@ -101,21 +116,24 @@ function renderExecutionPicker(){
 }
 $('execution-runtime').onchange=renderExecutionPicker;
 function drawMap() {
-  const t=sessionGraph()||selected();const nodes=new Set(t?.components||[]), observed=new Map((t?.edges||[]).map(e=>[`${e.from}-${e.to}`,e]));
-  $('graph-scope').textContent=receiptBackendSpans().length?'Selected request + receipt-correlated backend':sessionGraph()?'Observed in this session':'Observed in selected trace';
+  const t=sessionGraph()||selected(),hasSubstrate=t?.components?.some(c=>['substrate','worker','actor'].includes(c)),compact=currentView==='demo'&&!hasSubstrate;const nodes=new Set(t?.components||[]), observed=new Map((t?.edges||[]).map(e=>[`${e.from}-${e.to}`,e]));
+  $('graph-scope').textContent=receiptBackendSpans().length?'Selected request + receipt-correlated backend':sessionGraph()?currentView==='demo'?'Observed in this incident':'Observed in this session':'Observed in selected trace';
   const all=new Map(expectedEdges.map(e=>[e.join('-'),e]));for(const e of t?.edges||[])all.set(`${e.from}-${e.to}`,[e.from,e.to]);
   $('edges').replaceChildren();const now=Date.now();
   for(const [key,[from,to]] of all){
+    if(compact&&[from,to].some(id=>['substrate','worker','actor'].includes(id)))continue;
     const p=svgel('path',{d:route(from,to),class:`edge${observed.has(key)?' observed':''}${(activeEdges.get(key)||0)>now?' active':''}`,'marker-end':'url(#arrow)'});
     const title=svgel('title',{});title.textContent=observed.has(key)?`${from} → ${to}: ${observed.get(key).basis}`:'No traffic observed';p.append(title);$('edges').append(p);
   }
   for(const id of Object.keys(layout)){
     const node=$(`node-${id}`);node.setAttribute('class',`node${nodes.has(id)?' observed':' absent'}${(activeNodes.get(id)||0)>now?' active':''}${filter===id?' selected':''}`);
-    $(`sub-${id}`).textContent=nodes.has(id)?sessionGraph()?'Observed in this session':'Observed in this trace':layout[id].sub;
+    $(`sub-${id}`).textContent=nodes.has(id)?sessionGraph()?currentView==='demo'?'Observed in this incident':'Observed in this session':'Observed in this trace':layout[id].sub;
   }
   const activeMcpServices=new Set(scopedSpans().filter(s=>mcpExecution(s)&&(activeOperations.get(`${s.traceId}/${s.spanId}`)||0)>now).map(s=>s.service));
   for(const card of document.querySelectorAll('.operation-card, .mcp-server'))card.classList.toggle('active',card.dataset.service?activeMcpServices.has(card.dataset.service):(activeOperations.get(card.dataset.spanKey)||0)>now);
-  const mode=executionMode(),hasSubstrate=t?.components?.some(c=>['substrate','worker','actor'].includes(c));
+  const mode=executionMode();
+  $('diagram').setAttribute('viewBox',compact?'0 0 1050 345':'0 0 1050 500');
+  for(const id of ['substrate','worker','actor'])$('node-'+id).setAttribute('display',compact?'none':'');
   $('execution-caption').textContent=['standalone','ordinary'].includes(mode)?'Without Substrate · native kagent ADK Deployment':mode==='substrate'?'With Substrate · session actor':'';
   $('substrate-note').textContent=['standalone','ordinary'].includes(mode)?(hasSubstrate?'Unexpected Substrate activity received for this standalone run. Inspect its spans.':'Not used for this run. The agent is a normal Deployment; worker and actor lanes stay inactive.'):hasSubstrate?(sessionGraph()?'Native runtime spans linked by observed actor identity. Trace details and token counts below stay scoped to the selected trace.':'Native runtime spans received in this trace. Related lifecycle requires shared actor identity.'):state.runtime?.substrateInstalled?'Substrate path configured. Waiting for native runtime spans.':'Substrate path is not configured. Its worker and actor lane stays inactive.';
   $('mcp-explanation').textContent=currentView==='onboarding'&&state.onboarding?.profile?.mcpCapabilityCount===1?'Sampled profile: 0 ToolGrants; 1 fixed profile capability. Client spans show attempts; backend spans report actual handler execution.':currentView==='onboarding'&&state.onboarding?.profile?.toolGrants===0?'Sampled profile: 0 tool grants. No MCP tools attached. MCP stays inactive unless execution spans are received. Native skill / knowledge calls use the separate executor.':'MCP server spans provide execution evidence. Client spans show attempts. Native skill activity appears separately below.';
@@ -125,10 +143,11 @@ function drawMap() {
 }
 function scopedSpans(){
   const scope=sessionGraph();
-  const spans=scope?state.traces.filter(t=>scope.traceIds.includes(t.traceId)).flatMap(t=>t.spans):selected()?.spans||[];
+  const spans=scope?state.traces.filter(t=>scope.traceIds.includes(t.traceId)).flatMap(t=>currentView==='demo'?t.spans.filter(s=>scope.spanIds?.[t.traceId]?.includes(s.spanId)):t.spans):selected()?.spans||[];
   return [...spans,...receiptBackendSpans().filter(extra=>!spans.some(s=>s.traceId===extra.traceId&&s.spanId===extra.spanId))];
 }
 function receiptBackendSpans(){
+  if(currentView==='demo')return [];
   const record=state.onboarding?.golden,trace=selected();
   if(record?.schemaVersion!==2||!record.appliesToCurrent||!trace)return [];
   const proof=record.observations?.find(o=>o.category==='mcp');
@@ -187,7 +206,9 @@ function pulse(span,trace) {
   const until=Date.now()+2100;activeNodes.set(span.component,until);
   for(const [key,expiry] of activeOperations)if(expiry<Date.now())activeOperations.delete(key);
   activeOperations.set(`${span.traceId}/${span.spanId}`,until);
-  for(const e of trace.edges.filter(e=>e.spanIds.includes(span.spanId))){
+  const scope=currentView==='demo'&&follow&&!replaying?demoFlow()?.scope:null;
+  const edges=scope?scope.edges.filter(e=>Array.isArray(e.traceIds)&&e.traceIds.includes(trace.traceId)):trace.edges;
+  for(const e of edges.filter(e=>e.spanIds.includes(span.spanId))){
     activeNodes.set(e.from,until);activeNodes.set(e.to,until);activeEdges.set(`${e.from}-${e.to}`,until);
   }
   drawMap();renderOperations();
@@ -210,12 +231,14 @@ function costOf(t){
   return {value:t.costUsd,label:t.costSource==='unknown'?'No per-request USD charge or configured rate.':`${t.costSource==='reported'?'Reported by telemetry':t.costSource==='partial'?'Partial cost; some calls have no price':'Estimated from configured rates'}.`};
 }
 function render(){
+  updateDemoPanel();
   renderOnboarding();
-  renderRuns();drawMap();renderOperations();const t=selected();$('follow').disabled=follow;$('replay').disabled=!t||replaying;
-  const activity=selectedActivity();$('actor-activity').hidden=!activity;
+  renderRecovery();
+  renderRuns();drawMap();renderOperations();const t=selected();$('follow').disabled=follow;$('follow').textContent=currentView==='demo'?'Follow live':'Follow latest';$('replay').textContent=currentView==='demo'?'Recorded replay':'Replay trace';updateMode();$('replay').disabled=!t||replaying;
+  const activity=currentView==='demo'?null:selectedActivity();$('actor-activity').hidden=!activity;
   if(activity){$('actor-states').replaceChildren(...activity.states.map(event=>{const b=el('button',event.state);b.title=`${new Date(Number(event.timestampNs)/1e6).toLocaleTimeString()} · ${event.traceId}`;b.disabled=!state.traces.some(trace=>trace.traceId===event.traceId);b.onclick=()=>{stopReplay();follow=false;filter=null;selectedId=event.traceId;render();};return b;}));}
   if(!t){
-    $('graph-caption').textContent=selectedId?`Waiting for trace ${selectedId.slice(0,8)} to arrive.`:'Waiting for the first OTel trace.';
+    $('graph-caption').textContent=selectedId?`Waiting for trace ${selectedId.slice(0,8)} to arrive.`:currentView==='demo'?'No correlated OTel trace received for this incident.':'Waiting for the first OTel trace.';
     $('trace-id').textContent=selectedId||'Select a received trace to inspect its spans.';
     $('duration').textContent='—';$('spans').textContent='—';$('tokens').textContent='Not reported';$('cost').textContent='Not reported';$('cost-source').textContent='No price has been assumed.';
     $('model-usage-source').textContent='No model reports received.';
@@ -224,7 +247,7 @@ function render(){
     $('internal-spans').disabled=true;
     return;
   }
-  $('graph-caption').textContent=`Trace ${t.traceId.slice(0,8)} · recent activity from completed spans`;
+  $('graph-caption').textContent=currentView==='demo'&&follow?`${demoFlow()?.scope?.traceIds?.length||0} retained current-incident traces. Purple marks received OTel; the rail outline shows workflow state.`:`Trace ${t.traceId.slice(0,8)} · recorded spans`;
   $('trace-id').textContent=t.traceId;$('duration').textContent=time(t.durationMs);$('spans').textContent=t.spanCount;
   $('tokens').textContent=t.inputTokens===null&&t.outputTokens===null?'Not reported':`${count(t.inputTokens)} / ${count(t.outputTokens)}${t.usageComplete?'':' (partial)'}`;
   $('model-usage-source').textContent=t.modelUsageSource==='native-runtime'?'Native runtime reports':t.modelUsageSource==='reconciled-reports'?'Runtime / gateway reports':'No model reports received.';
@@ -243,10 +266,30 @@ function renderTimeline(){
   });$('timeline').replaceChildren(...(rows.length?rows:[el('p','No spans for this component in the selected trace.','empty')]));
 }
 function inspect(span){
+  if(currentView==='demo')$('runtime-details').open=true;
+  if(currentView==='demo'&&follow){follow=false;render();}
   const pairs=[['Operation',span.name],['Service',span.service],['Status',span.status],['Span kind',span.kind||'unspecified'],['OTel status',span.otelStatus||'unset'],['Duration',time(span.durationMs)],['Span ID',span.spanId],['Parent ID',span.parentSpanId||'Root or not exported'],...Object.entries(span.attributes)];
   $('inspection').replaceChildren(...pairs.map(([k,v])=>{const row=el('div',undefined,'kv');row.append(el('span',k),el('span',String(v)));return row;}));
 }
-function stopReplay(){for(const timer of replayTimers)clearTimeout(timer);replayTimers=[];replaying=false;activeNodes.clear();activeEdges.clear();$('mode').textContent='LIVE';$('mode').className='mode';}
+function updateDemoPanel(){demoPanel.update(state.demo,state.traces,receiverConnected,{replaying,following:follow,activeStages:Object.fromEntries(activeStages)});}
+function updateMode(){const flow=demoFlow();$('mode').textContent=replaying?'Recorded replay':currentView==='demo'?(!receiverConnected||flow?.telemetryConnected===false?'Disconnected':follow?'Current incident':'Trace inspection'):'LIVE';$('mode').className=replaying?'mode replay':'mode';}
+function stopReplay(){for(const timer of replayTimers)clearTimeout(timer);replayTimers=[];replaying=false;activeNodes.clear();activeEdges.clear();activeOperations.clear();activeStages.clear();updateMode();}
+function observeDemoFlow(){
+  const flow=demoFlow(),runId=state.demo?.runId||null;
+  if(runId!==demoRunId){demoRunId=runId;stopReplay();if(currentView==='demo'){follow=true;filter=null;selectedId=null;}}
+  for(const record of flow?.observations||[]){
+    const key=`${runId}/${record.id}`,unseen=!demoSeen.has(key);demoSeen.add(key);
+    const now=Date.now()/1000,received=Number(record.receivedAt||record.viewerReceivedAt),occurred=Number(record.endNs||record.timeNs)/1e9;
+    if(initial||!unseen||!record.recent||replaying||currentView!=='demo'||flow.telemetryConnected===false||!receiverConnected||received>now||occurred>now||now-received>15||now-occurred>15||received<=0||occurred<=0)continue;
+    if(!follow&&record.traceId!==selectedId)continue;
+    activeStages.set(record.stageId,Date.now()+2100);
+    if(record.source==='coordinator'){activeNodes.set('client',Date.now()+2100);continue;}
+    if(record.kind!=='span')continue;
+    const trace=state.traces.find(t=>t.traceId===record.traceId&&flow.scope?.traceIds?.includes(t.traceId)),span=trace?.spans.find(s=>s.spanId===record.spanId);
+    if(span&&flow.scope.spanIds?.[trace.traceId]?.includes(span.spanId))pulse(span,trace);
+  }
+}
+
 $('prompt-form').onsubmit=async event=>{
   event.preventDefault();
   if(readOnlyViewer()||submitting||$('invoke').disabled)return;
@@ -265,7 +308,7 @@ $('prompt').oninput=()=>{$('prompt-count').textContent=`${$('prompt').value.leng
 $('prompt').oninput();
 $('prompt').onkeydown=event=>{if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)){event.preventDefault();if(!$('invoke').disabled)$('prompt-form').requestSubmit();}};
 $('replay').onclick=()=>{
-  const t=selected();if(!t)return;stopReplay();follow=false;replaying=true;$('mode').textContent='REPLAY';$('mode').className='mode replay';$('replay').disabled=true;
+  const t=selected();if(!t)return;stopReplay();follow=false;replaying=true;$('mode').textContent='Recorded replay';updateDemoPanel();$('mode').className='mode replay';$('replay').disabled=true;
   const scale=Math.min(1,9000/Math.max(1,t.durationMs));
   for(const s of t.spans)replayTimers.push(setTimeout(()=>pulse(s,t),Math.max(0,(Number(s.endNs)-Number(t.startNs))/1e6*scale)));
   replayTimers.push(setTimeout(()=>{stopReplay();render();},t.durationMs*scale+2400));
@@ -284,7 +327,10 @@ async function poll(){
   try{
     const r=await fetch('/api/state');if(!r.ok)throw Error('Receiver unavailable');const next=await r.json();
     const fresh=[];for(const t of next.traces)for(const s of t.spans){const key=`${s.traceId}/${s.spanId}`;if(!seen.has(key)&&!initial)fresh.push([s,t]);}
-    seen=new Set(next.traces.flatMap(t=>t.spans.map(s=>`${s.traceId}/${s.spanId}`)));state=next;
+    for(const t of next.traces)for(const s of t.spans)seen.add(`${s.traceId}/${s.spanId}`);state=next;receiverConnected=true;observeDemoFlow();
+    updateDemoPanel();
+    if(defaultDemoPending){defaultDemoPending=false;if(state.demo?.enabled===true)setView('demo');}
+    if(currentView==='demo'&&state.demo?.enabled!==true)setView('visual');
     const viewer=readOnlyViewer();$('invocation-controls').hidden=viewer;$('invocation-controls').style.display=viewer?'none':'';$('prompt').disabled=viewer;$('intro-description').textContent=viewer?'Follow native requests as their runtime exports metadata.':'Send a prompt, then follow the components it actually touches.';
     renderExecutionPicker();
     if(state.runtime){$('runtime-label').textContent=state.runtime.label;$('prompt-help').textContent=state.runtime.promptHelp;$('demo-mode').hidden=!state.runtime.demoMode;$('demo-mode').textContent=runtimeModes[state.runtime.demoMode]||'Runtime data mode not specified.';$('workflow').closest('label').hidden=state.runtime.demoMode==='connected';$('workflow').disabled=viewer||state.runtime.demoMode==='connected';
@@ -292,10 +338,10 @@ async function poll(){
         $('workflow').replaceChildren(...[{id:'custom',label:'Custom prompt'},...(state.runtime.scenarios||[])].map(s=>{const option=el('option',s.label);option.value=s.id;return option;}));
         $('workflow').dataset.mode='live-tools';$('workflow').value='live-combined';
       }if(state.runtime.demoMode==='live-tools'){$('prompt-help').textContent='Live read-only Kubernetes and GitLab tools · Each prompt creates a new session.';if(initial&&state.runtime.demoPrompt){$('prompt').value=state.runtime.demoPrompt;$('prompt').oninput();}}}
-    if(follow&&(state.traces.length||currentView==='onboarding'))selectedId=preferredTraceId()||null;
-    $('connection').textContent='Receiver connected';$('connection-dot').className='online';
+    if(follow&&(state.traces.length||['demo','onboarding','recovery'].includes(currentView)))selectedId=preferredTraceId()||null;
+    $('connection').textContent=state.receiverConnected===false?'Controller connected · OTel unavailable':'Receiver connected';$('connection-dot').className='online';
     const inv=state.invocation,waitingForAcceptedTrace=!!pendingTraceId&&inv.traceId!==pendingTraceId,busy=submitting||waitingForAcceptedTrace||['starting','running'].includes(inv.status);$('invoke').disabled=viewer||busy;$('invoke-label').textContent=busy?'Running…':'Send to agent';
-    if(initial&&inv.traceId&&!viewer&&currentView!=='onboarding'){selectedId=inv.traceId;follow=false;}
+    if(initial&&inv.traceId&&!viewer&&!['demo','onboarding','recovery'].includes(currentView)){selectedId=inv.traceId;follow=false;}
     if(viewer)$('agent-response').hidden=true;
     else if(inv.traceId&&!waitingForAcceptedTrace){pendingTraceId=null;$('agent-response').hidden=false;$('response-trace').textContent=`Trace ${inv.traceId}${inv.sessionId?' · Session '+inv.sessionId:''}`;$('response-text').textContent=busy?'Waiting for the agent response…':inv.text||'Waiting for completion…';}
     if(viewer){$('notice').textContent='Read-only viewer · observing external agent calls. Span activity does not establish task completion.';$('notice').className='notice';}
@@ -303,14 +349,16 @@ async function poll(){
     else if(inv.status==='completed'){$('notice').textContent='Agent completed. Inspect the visual flow or switch to Logs.';$('notice').className='notice';}
     else if(inv.status==='failed'){$('notice').textContent=inv.text;$('notice').className='notice error';}
     renderOnboarding();
-    const revisionKey=`${state.revision}/${state.sessionActivity?.states.length||0}/${JSON.stringify(state.nativeActivities||{})}/${inv.status}/${selectedId}`;
+    const revisionKey=`${state.revision}/${state.sessionActivity?.states.length||0}/${JSON.stringify(state.nativeActivities||{})}/${inv.status}/${selectedId}/${JSON.stringify(state.demo?.flow||null)}`;
     if(revisionKey!==lastRevision){lastRevision=revisionKey;render();}
-    const graph=sessionGraph();if(graph)$('graph-caption').textContent=`${graph.actorName} · ${graph.traceIds.length} related native traces. Details below show the selected trace.`;
-    if(!replaying)for(const [s,t] of fresh)if(t.traceId===selectedId||sessionGraph()?.traceIds.includes(t.traceId))pulse(s,t);
+    const graph=sessionGraph();if(graph)$('graph-caption').textContent=currentView==='demo'?`${graph.traceIds.length} retained current-incident trace${graph.traceIds.length===1?'':'s'}. Purple marks received OTel; the rail outline shows workflow state.`:`${graph.actorName} · ${graph.traceIds.length} related native traces. Details below show the selected trace.`;
+    if(!replaying&&currentView!=='demo')for(const [s,t] of fresh)if(t.traceId===selectedId||sessionGraph()?.traceIds.includes(t.traceId))pulse(s,t);
     if(inv.exportStatus==='failed'){$('notice').textContent+=' Caller span export failed; inspect the collector.';}
     initial=false;
-  }catch(e){$('connection').textContent='Receiver disconnected';$('connection-dot').className='offline';$('notice').textContent='Cannot reach the receiver. Check the local port-forward; reconnecting automatically.';$('notice').className='notice error';}
+  }catch(e){receiverConnected=false;$('connection').textContent='Receiver disconnected';$('connection-dot').className='offline';$('notice').textContent='Cannot reach the receiver. Check the local port-forward; reconnecting automatically.';$('notice').className='notice error';}
   renderOnboarding();
+  renderRecovery();
+  updateDemoPanel();
   setTimeout(poll,600);
 }
 function renderLogs(){
@@ -411,5 +459,45 @@ function renderOnboarding(now=Date.now()/1000){
   $('onboarding-pins').replaceChildren(...Object.entries(view?.pins||{}).map(([role,pin])=>el('p',`${role}: ${pin.kind}/${pin.name} · UID ${pin.uid} · generation ${pin.generation??'n/a'} · body SHA-256 ${pin.bodySha256||pin.specSha256}`)));
   $('onboarding-connection').textContent=view?.agentName?`Tenant ${view.namespace}/${view.agentName} · native kagent controller in the approved target namespace`:'Native connection identity is unavailable until an observation is published.';
 }
-globalThis.onhashchange=()=>setView(location.hash.slice(1));
-buildMap();setView(location.hash.slice(1));render();poll();pollLogs();setInterval(()=>drawMap(),700);
+const recoveryLabels={investigation:'Native investigation',model:'Model call',gateway:'Gateway request',skill:'Skill operation',knowledge:'Knowledge operation','kubernetes-mcp':'Kubernetes MCP execution','gitlab-mcp':'GitLab MCP execution',verification:'Native verification'};
+function recoveryChecks(){return state.recovery?.telemetry?.checks||[];}
+function recoveryTraceId(){return recoveryChecks().find(check=>check.category==='verification'&&check.state==='observed')?.traceId||recoveryChecks().find(check=>check.state==='observed')?.traceId;}
+function openRecoveryTrace(check,logs=false){
+  const trace=state.traces.find(item=>item.traceId===check?.traceId);
+  const span=trace?.spans.find(item=>item.spanId===check.spanId);
+  if(check?.state!=='observed'||!span)return;
+  stopReplay();follow=false;filter=null;selectedId=trace.traceId;
+  if(logs){$('log-scope').value='selected';lastLogKey='';logData=null;setView('logs',true);}
+  else{setView('visual',true);inspect(span);}
+}
+function renderRecovery(now=Date.now()/1000){
+  const view=state.recovery, fresh=receiverConnected&&view?.capturedAt<=now&&now<view.expiresAt;
+  const status=fresh?view.state:'unknown', badge=$('recovery-status');
+  badge.textContent=fresh?view.label:'Recovery unknown';badge.className=`recovery-badge ${status}`;
+  const scope=view?.binding, pending=view?.preAdmissionScope;
+  $('recovery-scope').textContent=scope?`${view.mode==='fixture'?'FIXTURE REPLAY · ':''}${scope.clusterId} · ${scope.namespace}/${scope.application} · policy ${scope.policyName}/${scope.ruleName} · incident ${scope.incidentId} · run ${scope.runId} · native task ${scope.taskId}${view.verificationTaskId&&view.verificationTaskId!==scope.taskId?' · reviewed verification task '+view.verificationTaskId:''}`:pending?`${pending.cluster_id} · ${pending.namespace}/${pending.application} · policy ${pending.policy_name}/${pending.rule_name} · incident ${pending.incident_id} · run ${pending.run_id} · native task not yet verified`:'No reviewed incident scope is available.';
+  $('recovery-fault').textContent=view?.summary?.fault||'Waiting for a bounded fault receipt.';
+  $('recovery-fix').textContent=view?.summary?.fix||'Waiting for the exact reviewed policy fix.';
+  const repo=view?.repository;
+  $('recovery-repository').textContent=repo?`Project ${repo.projectId} · ${repo.policyPath} · MR ${repo.mergeRequestIid||'unknown'} · reviewed head ${repo.headSha||'unknown'} · merged SHA ${repo.mergeSha||'unknown'}`:'Repository revision evidence is unavailable.';
+  $('recovery-freshness').textContent=fresh?`Observer ${view.observerId} · captured ${new Date(view.capturedAt*1000).toLocaleString()} · live evidence expires ${new Date(view.expiresAt*1000).toLocaleTimeString()}`:view?.capturedAt?'Current recovery is unknown: the receiver or live observation is unavailable, stale or from the future.':'Current recovery is unknown until the observer publishes valid evidence.';
+  const reasons=fresh?view.reasons||[]:view?.enabled&&view?.capturedAt?['Fresh connected observation required.']:view?.reasons||['Recovery observer is not configured.'];
+  $('recovery-reasons').replaceChildren(...reasons.map(reason=>el('li',reason)));
+  $('recovery-stages').replaceChildren(...(view?.stages||[]).map(stage=>{
+    const effective=fresh?stage.state:'unknown',card=el('li',undefined,`recovery-stage ${effective}`);
+    card.append(el('span',effective,'recovery-badge '+effective),el('h3',stage.label),el('p',fresh?stage.reason:'Current stage evidence is unknown.'));
+    return card;
+  }));
+  $('recovery-telemetry-status').textContent=view?.completeDemoProof&&fresh?'Recovery and referenced execution evidence complete.':view?.mode==='fixture'?'Fixture replay only. Live runtime execution remains unverified.':view?.telemetry?.state==='complete'?'All requested operation spans are retained. Live recovery checks remain separate.':'Demo evidence incomplete. Missing spans remain unknown.';
+  $('recovery-telemetry').replaceChildren(...recoveryChecks().map(check=>{
+    const retained=state.traces.some(trace=>trace.traceId===check.traceId&&trace.spans.some(span=>span.spanId===check.spanId));
+    const button=el('button',`${recoveryLabels[check.category]||check.category} · ${check.state==='observed'&&retained?'observed':'unknown'}`);
+    button.disabled=check.state!=='observed'||!retained;button.title=check.reason;
+    button.onclick=()=>openRecoveryTrace(check);return button;
+  }));
+  const check=recoveryChecks().find(item=>item.category==='verification'&&item.state==='observed');
+  $('recovery-logs').disabled=!check||!state.traces.some(trace=>trace.traceId===check.traceId&&trace.spans.some(span=>span.spanId===check.spanId));
+  $('recovery-logs').onclick=()=>openRecoveryTrace(check,true);
+}
+globalThis.onhashchange=()=>setView(location.hash.slice(1),false,true);
+buildMap();setView(location.hash.slice(1));render();poll();pollLogs();setInterval(()=>{drawMap();if(currentView==='demo')updateDemoPanel();},700);

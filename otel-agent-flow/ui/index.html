@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent flow · kagent</title><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/logs.css"><script src="/app.js" defer></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent flow · kagent</title><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/logs.css"><script src="/demo.js" defer></script><script src="/app.js" defer></script></head>
 <body>
 <header><a class="brand" href="/" aria-label="kagent agent flow"><img src="/favicon.svg" width="34" height="34" alt=""><strong>kagent</strong><span class="slash">/</span><span>Agent flow</span></a><div class="connection"><span id="connection-dot"></span><span id="connection">Connecting</span></div></header>
 <main>
@@ -18,34 +18,61 @@
     <aside class="runs-panel" aria-labelledby="runs-title"><div class="panel-head"><h2 id="runs-title">Recent traces</h2><span id="trace-count">0</span></div><div id="runs" class="runs"><p class="empty">Run the agent to see its first trace here.</p></div><p class="retention">Metadata only · up to 200 traces<br>Routine polls expire first. Restart clears history.</p></aside>
   </aside>
   <div class="activity-column">
-  <nav class="view-switch" aria-label="Dashboard views"><div role="tablist" aria-label="View"><button id="tab-visual" role="tab" aria-controls="visual-view" aria-selected="true">Visual flow</button><button id="tab-logs" role="tab" aria-controls="logs-view" aria-selected="false" tabindex="-1">Logs</button><button id="tab-onboarding" role="tab" aria-controls="onboarding-view" aria-selected="false" tabindex="-1">Onboarding</button></div><p id="view-description">Follow the observed request path and inspect its spans.</p></nav>
+  <nav class="view-switch" aria-label="Dashboard views"><div role="tablist" aria-label="View"><button id="tab-demo" role="tab" aria-controls="demo-view" aria-selected="false" tabindex="-1" hidden>Demo</button><button id="tab-visual" role="tab" aria-controls="visual-view" aria-selected="true">Visual flow</button><button id="tab-logs" role="tab" aria-controls="logs-view" aria-selected="false" tabindex="-1">Logs</button><button id="tab-onboarding" role="tab" aria-controls="onboarding-view" aria-selected="false" tabindex="-1">Onboarding</button><button id="tab-recovery" role="tab" aria-controls="recovery-view" aria-selected="false" tabindex="-1">Recovery</button></div><p id="view-description">Follow the observed request path and inspect its spans.</p></nav>
+  <section id="demo-view" class="demo-panel" role="tabpanel" aria-labelledby="tab-demo" hidden>
+    <div class="demo-heading"><div><h2>Follow an incident to verified recovery.</h2><p>Fault → agent investigation → your approval → verified recovery.</p></div><strong id="demo-phase" class="demo-phase" role="status" aria-live="polite">Status unknown</strong></div>
+    <div class="demo-controls"><button id="demo-start" class="primary" type="button" aria-describedby="demo-start-help" disabled>Start demonstration</button><p id="demo-start-help">Waiting for lab state.</p></div>
+    <div id="demo-resume-controls" class="demo-controls demo-resume-controls" hidden><button id="demo-resume" type="button" aria-describedby="demo-resume-help" disabled>Resume incident</button><p id="demo-resume-help">Continue this same incident with fresh fault observations. Its original failed window stays in the history.</p></div>
+    <p id="demo-feedback" class="demo-feedback" role="status" aria-live="polite"></p>
+    <ol id="demo-flow-stages" class="demo-flow-stages" aria-label="Incident process"></ol>
+    <section id="demo-stage-inspector" class="demo-stage-inspector" aria-labelledby="demo-stage-title">
+      <div class="demo-stage-heading"><div><p id="demo-stage-mode" class="demo-stage-mode"></p><h3 id="demo-stage-title">Inspect a stage</h3></div><div class="demo-stage-actions"><span id="demo-stage-status" class="demo-stage-status"></span><button id="demo-stage-follow" type="button" hidden>Follow current stage</button></div></div>
+      <p id="demo-stage-purpose" class="demo-stage-purpose"></p><p id="demo-stage-outcome" class="demo-stage-outcome"></p>
+      <div class="demo-stage-columns"><dl id="demo-stage-facts" class="demo-stage-facts"></dl><div><h4>Components observed in this stage</h4><ul id="demo-stage-components" class="demo-stage-components"></ul><p id="demo-stage-coverage" class="demo-stage-coverage"></p></div></div>
+      <div class="demo-stage-evidence"><details><summary id="demo-stage-history-count">Controller history</summary><p>Recorded workflow outcomes; these receipts alone do not establish native component activity.</p><ol id="demo-stage-history"></ol></details><details><summary id="demo-stage-otel-count">Received OTel records</summary><p>Most recent 30 retained observations for this stage. Trace links require the matching span to be retained.</p><ol id="demo-stage-otel"></ol></details></div>
+    </section>
+    <section class="demo-now" aria-labelledby="demo-now-title" aria-live="polite"><div><h3 id="demo-now-title">Waiting for incident state.</h3><p id="demo-now-detail"></p><p id="demo-now-next" class="demo-next"></p></div><div class="demo-observation-state"><strong id="demo-flow-mode">Waiting for OTel</strong><span id="demo-flow-freshness"></span></div></section>
+    <p id="demo-human" class="demo-human" role="status" aria-live="polite" hidden></p>
+    <section id="demo-approval" class="demo-human" aria-labelledby="demo-approval-title" hidden><h3 id="demo-approval-title">Approve the reviewed fix</h3><p id="demo-approval-head" class="demo-run"></p><p id="demo-approval-status"></p><div class="demo-controls"><button id="demo-approve" class="primary" type="button" aria-describedby="demo-approve-help" disabled>Approve fix and let Kagent merge</button><p id="demo-approve-help">Waiting for the reviewed fix.</p></div></section>
+    <div class="demo-links"><div id="demo-review"></div><div id="demo-ticket-link"></div><p id="demo-ticket-state"></p></div>
+    <div id="demo-flow-slot"></div>
+    <section class="demo-live-observations" aria-labelledby="demo-live-title"><div class="demo-feed-heading"><h3 id="demo-live-title">Received OTel activity</h3><span>Workflow receipts and native calls are labelled separately.</span></div><ol id="demo-live-feed" class="demo-live-feed"></ol></section>
+    <details class="demo-evidence"><summary>Incident evidence and controller history</summary>
+    <p id="demo-run" class="demo-run"></p>
+    <ol id="demo-steps" class="demo-steps" aria-label="Incident recovery stages"></ol>
+    <section class="demo-observations" aria-labelledby="demo-events-title"><h3 id="demo-events-title">Controller history</h3><p>Durable workflow receipts. These records alone do not establish native agent activity.</p><ol id="demo-events" class="demo-events"><li>No operations recorded yet.</li></ol></section>
+    </details>
+  </section>
   <div id="visual-view" role="tabpanel" aria-labelledby="tab-visual">
   <div id="visual-flow-slot">
   <div id="runtime-flow">
   <div class="workspace">
     <section class="graph-panel" aria-labelledby="graph-title">
-      <div class="panel-head"><div><h2 id="graph-title">Request path</h2><p id="execution-caption"></p><p id="graph-caption">Waiting for the first OTel trace.</p></div><span id="mode" class="mode">LIVE</span></div>
+      <div class="panel-head"><div><h2 id="graph-title">Request path</h2><p id="execution-caption"></p><p id="graph-caption">Waiting for the first OTel trace.</p></div><div class="graph-actions"><span id="mode" class="mode">LIVE</span><div class="actions"><button id="follow" disabled>Follow latest</button><button id="replay" disabled>Replay trace</button></div></div></div>
       <div class="diagram-wrap">
       <svg id="diagram" viewBox="0 0 1050 500" role="img" aria-label="Observed agent request topology. Select a component to inspect its spans.">
         <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/></marker></defs>
         <g id="edges"></g><g id="nodes"></g>
       </svg>
       </div>
+      <details id="runtime-operations" class="runtime-operations" open><summary>Skills, knowledge and tool evidence</summary>
       <section class="mcp-activity" aria-label="MCP server activity"><div id="mcp-servers" class="mcp-servers"></div><p id="mcp-explanation">MCP server spans provide execution evidence. Client spans show attempts. Native skill activity appears separately below.</p></section>
       <section class="observed-operations" aria-labelledby="observed-skills-title"><h3 id="observed-skills-title">Skills and knowledge</h3><p id="observed-skills-help">Skills and knowledge share the native skill executor. Spans omit arguments, so individual calls cannot be attributed to a skill or knowledge package. Select a call to inspect its metadata.</p><div id="observed-skills" class="observed-tools"><p class="empty">Waiting for native skill execution spans.</p></div></section>
       <section class="observed-operations" aria-labelledby="observed-tools-title"><h3 id="observed-tools-title">Observed tool calls and access probes</h3><p>Received OTel only. Simulation labels describe fixture data. Probe results alone do not prove Entra enforcement.</p><div id="observed-tools" class="observed-tools"><p class="empty">Waiting for tool or access-probe spans.</p></div></section>
+      </details>
       <div class="legend"><span><i class="key observed"></i><span id="graph-scope">Observed in selected trace</span></span><span><i class="key pulse-key"></i>New span received</span><span><i class="key absent"></i>No telemetry</span></div>
       <div id="actor-activity" class="actor-activity" hidden><h3>Actor lifecycle</h3><div id="actor-states"></div><p>Linked by native actor identity. Select a state to inspect its original trace.</p><button id="session-flow">View session workflow</button></div>
       <div class="substrate-note"><strong>Agent Substrate</strong><span id="substrate-note">Not installed in this local cluster. Its worker and actor lane stays inactive until runtime spans arrive.</span></div>
     </section>
 
   </div>
-  <section class="detail-panel" aria-labelledby="trace-title">
-    <div class="panel-head"><div><h2 id="trace-title">Trace details</h2><p id="trace-id">Select a received trace to inspect its spans.</p></div><div class="actions"><button id="follow" disabled>Follow latest</button><button id="replay" disabled>Replay trace</button></div></div>
+  <details id="runtime-details" class="detail-panel" open aria-labelledby="trace-title">
+    <summary>Trace details, spans and costs</summary>
+    <div class="panel-head"><div><h2 id="trace-title">Trace details</h2><p id="trace-id">Select a received trace to inspect its spans.</p></div></div>
     <div class="measures"><div><span>Elapsed</span><strong id="duration">—</strong></div><div><span>Observed spans</span><strong id="spans">—</strong></div><div><span>Input / output tokens</span><strong id="tokens">Not reported</strong><small id="model-usage-source">No model reports received.</small></div><div><span>Transaction cost</span><strong id="cost">Not reported</strong><small id="cost-source">No price has been assumed.</small></div></div>
     <div class="trace-body"><div><div class="timeline-head"><h3 id="timeline-title">Workflow timeline</h3><div class="actions"><button id="clear-filter" hidden>Clear filter</button><button id="internal-spans" disabled>Show internal spans</button></div></div><div id="timeline" class="timeline"><p class="empty">Completed spans will appear as the runtime exports them.</p></div></div><div class="inspection"><h3>Selected span</h3><div id="inspection"><p class="empty">Select a span or a component on the map.</p></div></div></div>
     <details class="pricing"><summary>Estimate cost with your own rates</summary><p>When the provider does not report a per-request USD charge, enter rates to estimate a token cost. These values are for this browser session only and are never labelled as billed cost.</p><form id="pricing"><label>Input USD / 1M tokens<input id="input-rate" inputmode="decimal" type="number" min="0" step="any" placeholder="Your input rate"></label><label>Output USD / 1M tokens<input id="output-rate" inputmode="decimal" type="number" min="0" step="any" placeholder="Your output rate"></label><button type="submit">Apply estimate</button><button id="reset-pricing" type="button">Clear rates</button></form><p id="pricing-status" role="status"></p></details>
-  </section>
+  </details>
   </div>
   </div>
   </div>
@@ -61,6 +88,18 @@
     <section class="onboarding-card"><h3>Connect through the native client</h3><p id="onboarding-connection"></p><p id="onboarding-client-help">Native CLI session create → invoke → session get. A2A over gRPC, namespace/name routing, internal controller port 8083. No public endpoint is provisioned here.</p></section>
     <details class="onboarding-card proposed"><summary>Proposed conversational onboarding · no creator active</summary><p>An onboarding agent could turn that request into approved catalog choices and declarative resources.</p><p>Request → review and Git → Flux → platform controllers → independent test → connection details.</p><p>The current demo uses one fixed reviewed model and harness profile, one skill, one knowledge package, and no operational tool grants. Conversational requests, automatic publication, and arbitrary bring-your-own runtimes are future work.</p></details>
   </section>
+  <section id="recovery-view" class="recovery-panel" role="tabpanel" aria-labelledby="tab-recovery" hidden>
+    <div class="panel-head recovery-heading"><div><h2>Follow the fault through recovery.</h2><p>Reviewed Git fix → human approval → GitOps → live admission checks → native verification.</p></div><strong id="recovery-status" class="recovery-badge unknown" role="status">Recovery unknown</strong></div>
+    <p id="recovery-scope" class="recovery-scope"></p>
+    <div class="recovery-summaries"><section class="onboarding-card"><h3>Observed fault</h3><p id="recovery-fault"></p></section><section class="onboarding-card"><h3>Reviewed fix</h3><p id="recovery-fix"></p></section></div>
+    <p id="recovery-repository" class="recovery-scope"></p>
+    <p id="recovery-freshness" class="recovery-scope"></p>
+    <ul id="recovery-reasons" class="recovery-reasons" aria-label="Missing recovery evidence"></ul>
+    <ol id="recovery-stages" class="recovery-stages" aria-label="Recovery verification stages"></ol>
+    <section class="onboarding-card"><h3>Observed recovery evidence</h3><p id="recovery-telemetry-status" role="status"></p><div id="recovery-telemetry" class="recovery-telemetry"></div><button id="recovery-logs" disabled>View correlated OTel logs</button><p class="recovery-footnote">Trace links require exact retained span IDs and task identity. Model, gateway, skill, knowledge, Kubernetes MCP and GitLab MCP operations appear only from received OTel. Application recovery and recovery telemetry completeness are checked separately.</p></section>
+    <div id="recovery-flow-slot"></div>
+    <p class="recovery-footnote">Operator-supplied receipts are checked for consistency against a separately configured profile. This viewer does not authenticate their source or grant permission to investigate, approve, merge or deploy. A fixture replay is never live recovery.</p>
+  </section>
   <section id="logs-view" class="logs-panel" role="tabpanel" aria-labelledby="tab-logs" hidden>
     <div class="panel-head"><div><h2 id="logs-title">OTel logs</h2><p id="logs-status" role="status">Connecting to the log receiver.</p></div><div class="log-controls"><label>Service<select id="log-service"><option value="">All services</option></select></label><label>Trace<select id="log-scope"><option value="all">All traces</option><option value="selected">Selected trace</option></select></label><label>Severity<select id="log-severity"><option value="0">All severities</option><option value="9">Info and above</option><option value="13">Warning and above</option><option value="17">Error and above</option></select></label><button id="pause-logs">Pause logs</button></div></div>
     <div class="log-table-wrap"><table class="log-table"><thead><tr><th>Time</th><th>Severity</th><th>Service</th><th>API call / event</th><th>Trace</th></tr></thead><tbody id="log-rows"><tr><td colspan="5">Waiting for exported OTel log records.</td></tr></tbody></table></div>
@@ -69,6 +108,6 @@
   </section>
   </div>
   </div>
-  <footer><span>OTel → observed spans → activity map</span><span id="runtime-label">kagent 0.10.1 · agentgateway 1.5.0 · local kind POC</span></footer>
+  <footer><span>OTel → observed spans → activity map</span><span id="runtime-label">Waiting for runtime metadata</span></footer>
 </main>
 </body></html>

@@ -1,0 +1,14 @@
+stages:
+- test
+policy-tests:
+  stage: test
+  image: '{{APPROVED_CI_PYTHON_IMAGE}}'
+  script:
+  - python ci/test_policy.py
+  timeout: 5 minutes
+  artifacts:
+    when: always
+    reports:
+      junit: policy-report.xml
+    paths:
+    - policy-report.xml

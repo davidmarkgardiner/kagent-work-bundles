@@ -307,17 +307,18 @@ class OnboardingUiTests(unittest.TestCase):
         return {'revision': 1, 'traces': [trace] if trace else [], 'invocation': {'status': 'idle'},
             'sessionActivity': None, 'onboarding': view, 'runtime': {'readOnlyViewer': True, 'executionTargets': []}}
 
-    def test_three_tabs_keyboard_and_browser_freshness(self):
+    def test_four_tabs_keyboard_and_browser_freshness(self):
         self.run_ui(self.state(), r"""
           setView('onboarding');assert.equal($('onboarding-view').hidden,false);assert.equal($('prompt-column').hidden,true);
           renderOnboarding(4102444001);assert.equal($('onboarding-pipeline').children.length,6);
           assert.match($('onboarding-pipeline').textContent,/ready/);assert.match($('onboarding-golden').textContent,/No validated/);
           renderOnboarding(4102444061);assert.match($('onboarding-freshness').textContent,/Expired/);
           assert.doesNotMatch($('onboarding-pipeline').textContent,/ready/);
-          $('tab-onboarding').onkeydown({key:'ArrowRight',preventDefault(){}});assert.equal($('visual-view').hidden,false);
+          $('tab-onboarding').onkeydown({key:'ArrowRight',preventDefault(){}});assert.equal($('recovery-view').hidden,false);
+          $('tab-recovery').onkeydown({key:'ArrowRight',preventDefault(){}});assert.equal($('visual-view').hidden,false);
           $('tab-visual').onkeydown({key:'ArrowRight',preventDefault(){}});assert.equal($('logs-view').hidden,false);
           $('tab-logs').onkeydown({key:'ArrowRight',preventDefault(){}});assert.equal($('onboarding-view').hidden,false);
-          $('tab-onboarding').onkeydown({key:'End',preventDefault(){}});assert.equal($('tab-onboarding').attributes['aria-selected'],'true');
+          $('tab-onboarding').onkeydown({key:'End',preventDefault(){}});assert.equal($('tab-recovery').attributes['aria-selected'],'true');
           setView('visual');assert.equal($('prompt-column').hidden,false);
         """)
 

@@ -40,6 +40,7 @@ elements.get('log-severity').value='0';elements.get('log-scope').value='all';
 const calls=[];
 const context=vm.createContext({document:{getElementById:id=>elements.get(id)||null,createElement:tag=>new Element(tag),createElementNS:(_,tag)=>new Element(tag),querySelectorAll:selectors=>all.filter(e=>selectors.split(',').some(s=>e.className.split(' ').includes(s.trim().slice(1))))},history:{replaceState(){}},location:{hash:''},setTimeout:()=>1,clearTimeout(){},setInterval(){},Date,console,assert,elements,calls,root,
   fetch:async(url,options)=>{calls.push({url,options});return {ok:true,json:async()=>url==='/api/state'?input.state:{revision:0,services:[],logs:[],matching:0,retained:0}};}});
+vm.runInContext(fs.readFileSync('ui/demo.js','utf8'),context);
 vm.runInContext(fs.readFileSync('ui/app.js','utf8'),context);
 setImmediate(async()=>{try{assert.equal(elements.get('connection').textContent,'Receiver connected');await vm.runInContext('(async()=>{'+input.assertions+'})()',context);process.stdout.write('PASS UI behavior\n');}catch(error){console.error(error);process.exitCode=1;}});
 """

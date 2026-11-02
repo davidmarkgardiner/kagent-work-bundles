@@ -12,6 +12,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", str(root), "-p", "test_*.py", "-q"], check=True)
     subprocess.run(["node", "--check", str(root / "ui/app.js")], check=True)
+    subprocess.run(["node", "--check", str(root / "ui/demo.js")], check=True)
     subprocess.run(["helm", "lint", str(root / "deploy/chart")], check=True)
     source = (root / "deploy/values/aks-istio.yaml.example").read_text()
     samples = {
@@ -49,7 +50,7 @@ def main():
                 assert gateway["spec"]["servers"][1]["tls"]["credentialName"] == "existing-demo-tls"
                 vs = next(d for d in docs if d["kind"] == "VirtualService")
                 paths = {match["uri"]["exact"] for route in vs["spec"]["http"] for match in route["match"]}
-                assert {"/", "/api/invoke", "/api/state", "/api/logs"} <= paths
+                assert {"/", "/demo.js", "/api/invoke", "/api/state", "/api/logs"} <= paths
                 assert not {"/v1/traces", "/v1/logs"} & paths
                 assert not any(d["kind"] == "Deployment" and d["metadata"]["name"] == "flow-https" for d in docs)
         existing = (root / "deploy/values/existing-agent-istio.yaml.example").read_text()
