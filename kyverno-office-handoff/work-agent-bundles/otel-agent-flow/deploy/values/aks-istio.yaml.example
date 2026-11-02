@@ -1,0 +1,21 @@
+image:
+  repository: "{{INTERNAL_REGISTRY}}/otel-agent-flow"
+  tag: "{{REVIEWED_IMAGE_TAG}}"
+  digest: "{{REVIEWED_IMAGE_DIGEST}}"
+imagePullSecrets: []
+ingress:
+  mode: istio
+  host: "{{DEMO_FQDN}}"
+  tlsSecret: "{{EXISTING_TLS_SECRET}}"
+  istio:
+    namespace: aks-istio-ingress
+    selector: aks-istio-ingressgateway-internal
+agentNamespace: kagent
+workerPool: "{{APPROVED_WORKERPOOL}}"
+snapshotLocation: "{{APPROVED_SNAPSHOT_LOCATION}}"
+model:
+  mode: fixture
+  name: fixture-workflow
+dashboard:
+  identity: "{{APPROVED_DEMO_USER_CONTEXT}}"
+  runtimeLabel: kagent + Substrate · AKS single-cluster demo

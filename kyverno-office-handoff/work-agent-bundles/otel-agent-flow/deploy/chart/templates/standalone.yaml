@@ -1,0 +1,90 @@
+{{- if and (eq .Values.integration.mode "bundled") (ne .Values.execution.mode "substrate") }}
+{{- $tools := list }}
+{{- range (include "flow.toolConnections" . | fromJsonArray) }}
+{{- $tools = append $tools (dict "params" (dict "url" (printf "http://%s.%s.svc.cluster.local:8084/mcp" .service $.Release.Namespace)) "tools" .tools "require_approval" false) }}
+{{- end }}
+{{- $model := dict "type" "openai" "model" .Values.model.name "base_url" (printf "http://flow-gateway.%s.svc.cluster.local:8081/v1" .Release.Namespace) "max_tokens" 1200 "timeout" 90 }}
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: flow-standalone, namespace: {{ .Release.Namespace }}}
+data:
+  agent.json: |
+{{ dict "name" "flow-standalone-kagent" "description" "Native kagent ADK without Substrate" "instruction" (include "flow.instruction" .) "model" $model "http_tools" $tools "stream" false | toPrettyJson | indent 4 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: flow-standalone, namespace: {{ .Release.Namespace }}}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app: flow-standalone}}
+  template:
+    metadata:
+      labels: {app: flow-standalone, sidecar.istio.io/inject: "false"}
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, fsGroup: 10001}
+      containers:
+      - name: agent
+        image: {{ include "flow.image" . | quote }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: [/usr/local/bin/flow-standalone-agent]
+        env:
+        - {name: POD_NAMESPACE, valueFrom: {fieldRef: {fieldPath: metadata.namespace}}}
+        - {name: OPENAI_API_KEY, value: lab-gateway-authenticates-upstream}
+        - {name: KAGENT_PROPAGATE_TOKEN, value: "false"}
+        - {name: OTEL_SERVICE_NAME, value: flow-standalone-kagent}
+        - {name: OTEL_EXPORTER_OTLP_ENDPOINT, value: "http://flow-collector:4317"}
+        - {name: OTEL_EXPORTER_OTLP_PROTOCOL, value: grpc}
+        - {name: OTEL_EXPORTER_OTLP_INSECURE, value: "true"}
+        - {name: OTEL_TRACES_EXPORTER, value: otlp}
+        - {name: OTEL_LOGS_EXPORTER, value: otlp}
+        - {name: OTEL_METRICS_EXPORTER, value: none}
+        - {name: OTEL_PROPAGATORS, value: "tracecontext,baggage"}
+        - {name: OTEL_BSP_SCHEDULE_DELAY, value: "300"}
+        ports: [{name: a2a, containerPort: 8080}]
+        readinessProbe: {httpGet: {path: /healthz, port: a2a}, periodSeconds: 5}
+        livenessProbe: {httpGet: {path: /healthz, port: a2a}, periodSeconds: 15}
+        resources: {requests: {cpu: 100m, memory: 128Mi}, limits: {cpu: "2", memory: 768Mi}}
+        volumeMounts: [{name: config, mountPath: /config, readOnly: true}]
+        securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+      volumes: [{name: config, configMap: {name: flow-standalone}}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: flow-standalone, namespace: {{ .Release.Namespace }}}
+spec:
+  selector: {app: flow-standalone}
+  ports: [{name: a2a, port: 8080, targetPort: a2a}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: flow-standalone, namespace: {{ .Release.Namespace }}}
+spec:
+  podSelector: {matchLabels: {app: flow-standalone}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+  - from: [{podSelector: {matchLabels: {app: flow-dashboard}}}]
+    ports: [{protocol: TCP, port: 8080}]
+  egress:
+  - to:
+    - podSelector: {matchLabels: {app: flow-gateway}}
+    ports: [{protocol: TCP, port: 8081}]
+  - to:
+    {{- if eq .Values.tools.mode "fixture" }}
+    - podSelector: {matchLabels: {app: flow-workflows}}
+    {{- else }}
+    - podSelector: {matchLabels: {app: flow-kubernetes-mcp}}
+    - podSelector: {matchLabels: {app: flow-gitlab-mcp}}
+    {{- end }}
+    ports: [{protocol: TCP, port: 8084}]
+  - to: [{podSelector: {matchLabels: {app: flow-collector}}}]
+    ports: [{protocol: TCP, port: 4317}]
+  - to:
+    - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: kube-system}}
+      podSelector: {matchLabels: {k8s-app: kube-dns}}
+    ports: [{protocol: UDP, port: 53}, {protocol: TCP, port: 53}]
+{{- end }}

@@ -1,0 +1,32 @@
+{
+  "contract": "kyverno-dashboard-native-bindings-v1",
+  "purpose": "Translate into the installed native Agent and MCP schemas; this is not a Kubernetes manifest.",
+  "namespace": "kagent",
+  "skills": [
+    {"source": "../skills/kyverno-incident-specialist", "oci": "{{PINNED_SPECIALIST_SKILL_OCI_DIGEST}}"},
+    {"source": "../skills/kyverno-recovery-knowledge", "oci": "{{PINNED_KYVERNO_KNOWLEDGE_OCI_DIGEST}}"}
+  ],
+  "specialist": {
+    "agent": "{{SPECIALIST_AGENT_NAME}}",
+    "mcp_path": "/mcp/investigator",
+    "credential_role": "investigator",
+    "allowed_tools": ["read_kyverno_incident", "read_policy_repository", "propose_policy_fix", "inspect_policy_fix"],
+    "instruction": "Load the pinned skills and knowledge. Investigate actual evidence, propose only the one-field policy fix and inspect CI. Finish triage. Never call a merge, approval, recovery-verification or Kubernetes-write operation."
+  },
+  "reviewer": {
+    "agent": "{{REVIEWER_AGENT_NAME}}",
+    "mcp_path": "/mcp/reviewer",
+    "credential_role": "reviewer",
+    "allowed_tools": ["read_kyverno_incident", "read_policy_repository", "inspect_policy_fix"],
+    "instruction": "Independently inspect the exact proposed head, permitted diff and required CI/JUnit results. Return the required exact-binding structured review. Never propose, approve or merge."
+  },
+  "executor": {
+    "agent": "{{EXECUTOR_AGENT_NAME}}",
+    "mcp_path": "/mcp/investigator",
+    "credential_role": "investigator",
+    "allowed_tools": ["merge_dashboard_approved_fix", "verify_recovery"],
+    "instruction": "For the merge request, call merge_dashboard_approved_fix once and complete. For the separate verification request, call verify_recovery once and complete. Never approve, propose another fix, retry a merge or claim recovery without the actual tool result."
+  },
+  "legacy_tool_not_bound": "merge_policy_fix",
+  "security_boundary": "Specialist/executor separation uses native tool allowlists. The runtime has no distinct executor credential. Enforce per-agent MCP authorization or add an executor capability split for a multi-tenant service."
+}

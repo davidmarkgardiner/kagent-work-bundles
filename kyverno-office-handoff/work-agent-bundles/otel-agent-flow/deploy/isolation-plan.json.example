@@ -1,0 +1,10 @@
+{
+  "cases": [
+    {"name": "agent-a-own", "subject": "agent-a", "resource": "team-a", "url": "https://{{AGENTGATEWAY_FQDN}}/team-a/mcp", "tokenEnv": "DEMO_AGENT_A_TOKEN", "expectedStatus": 200, "metricsUrl": "https://{{PRIVATE_METRICS_FQDN}}/team-a/metrics", "metric": "tenant_mcp_requests_total", "metricsTokenEnv": "DEMO_METRICS_TOKEN"},
+    {"name": "agent-b-own", "subject": "agent-b", "resource": "team-b", "url": "https://{{AGENTGATEWAY_FQDN}}/team-b/mcp", "tokenEnv": "DEMO_AGENT_B_TOKEN", "expectedStatus": 200, "metricsUrl": "https://{{PRIVATE_METRICS_FQDN}}/team-b/metrics", "metric": "tenant_mcp_requests_total", "metricsTokenEnv": "DEMO_METRICS_TOKEN"},
+    {"name": "agent-a-cross-team", "subject": "agent-a", "resource": "team-b", "url": "https://{{AGENTGATEWAY_FQDN}}/team-b/mcp", "tokenEnv": "DEMO_AGENT_A_TOKEN", "expectedStatus": 403, "metricsUrl": "https://{{PRIVATE_METRICS_FQDN}}/team-b/metrics", "metric": "tenant_mcp_requests_total", "metricsTokenEnv": "DEMO_METRICS_TOKEN"},
+    {"name": "agent-b-cross-team", "subject": "agent-b", "resource": "team-a", "url": "https://{{AGENTGATEWAY_FQDN}}/team-a/mcp", "tokenEnv": "DEMO_AGENT_B_TOKEN", "expectedStatus": 403, "metricsUrl": "https://{{PRIVATE_METRICS_FQDN}}/team-a/metrics", "metric": "tenant_mcp_requests_total", "metricsTokenEnv": "DEMO_METRICS_TOKEN"},
+    {"name": "missing-token", "subject": "anonymous", "resource": "team-a", "url": "https://{{AGENTGATEWAY_FQDN}}/team-a/mcp", "expectedStatus": 401, "metricsUrl": "https://{{PRIVATE_METRICS_FQDN}}/team-a/metrics", "metric": "tenant_mcp_requests_total", "metricsTokenEnv": "DEMO_METRICS_TOKEN"},
+    {"name": "wrong-audience", "subject": "wrong-audience", "resource": "team-a", "url": "https://{{AGENTGATEWAY_FQDN}}/team-a/mcp", "tokenEnv": "DEMO_WRONG_AUDIENCE_TOKEN", "expectedStatus": 401, "metricsUrl": "https://{{PRIVATE_METRICS_FQDN}}/team-a/metrics", "metric": "tenant_mcp_requests_total", "metricsTokenEnv": "DEMO_METRICS_TOKEN"}
+  ]
+}

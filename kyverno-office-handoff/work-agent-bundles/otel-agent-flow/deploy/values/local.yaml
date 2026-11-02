@@ -1,0 +1,6 @@
+ingress:
+  mode: local
+  host: localhost
+model:
+  mode: fixture
+  name: fixture-workflow

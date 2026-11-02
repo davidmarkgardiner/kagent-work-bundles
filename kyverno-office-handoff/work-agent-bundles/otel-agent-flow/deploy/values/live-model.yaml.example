@@ -1,0 +1,9 @@
+model:
+  mode: live
+  name: "{{MODEL_ID}}"
+  live:
+    host: "{{APPROVED_MODEL_DNS_NAME}}:443"
+    path: /v1/chat/completions
+    tls: true
+    existingSecret: "{{EXISTING_MODEL_SECRET}}"
+    secretKey: api-key

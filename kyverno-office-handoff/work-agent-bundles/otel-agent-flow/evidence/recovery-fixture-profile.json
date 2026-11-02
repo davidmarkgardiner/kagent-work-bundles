@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "mode": "fixture",
+  "observerId": "reviewed-observer",
+  "binding": {
+    "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+    "incidentId": "incident-demo-1",
+    "runId": "run-demo-1",
+    "clusterId": "reviewed-demo-cluster",
+    "namespace": "kyverno-demo",
+    "policyName": "image-policy",
+    "ruleName": "trusted-image",
+    "application": "sample-app",
+    "taskId": "native-task-1"
+  },
+  "agent": {
+    "namespace": "kagent",
+    "name": "kyverno-specialist"
+  },
+  "repository": {
+    "projectId": "demo/policy",
+    "policyPath": "apps/sample/policy.yaml"
+  },
+  "reviewerId": "independent-reviewer",
+  "humanApproverId": "reviewed-human",
+  "healthyPolicySpecSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "application": {
+    "namespace": "kyverno-demo",
+    "deploymentName": "sample-app",
+    "expectedStatus": 200,
+    "expectedBodySha256": "5555555555555555555555555555555555555555555555555555555555555555"
+  },
+  "mcpServices": {
+    "kubernetes": "flow-kubernetes-mcp",
+    "gitlab": "flow-gitlab-mcp"
+  },
+  "maxAgeSeconds": 300
+}

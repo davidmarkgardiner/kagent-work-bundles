@@ -1,0 +1,55 @@
+{
+  "apiVersion": "kyverno.io/v1",
+  "kind": "Policy",
+  "metadata": {
+    "name": "approved-registry",
+    "namespace": "{{DEMO_NAMESPACE}}",
+    "annotations": {
+      "policies.kyverno.io/title": "Require the approved image registry",
+      "policies.kyverno.io/severity": "high",
+      "pod-policies.kyverno.io/autogen-controllers": "none"
+    }
+  },
+  "spec": {
+    "admission": true,
+    "background": false,
+    "emitWarning": false,
+    "rules": [
+      {
+        "match": {
+          "any": [
+            {
+              "resources": {
+                "kinds": [
+                  "Pod"
+                ],
+                "selector": {
+                  "matchLabels": {
+                    "app.kubernetes.io/name": "registry-demo"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "name": "approved-registry",
+        "skipBackgroundRequests": true,
+        "validate": {
+          "allowExistingViolations": true,
+          "failureAction": "Enforce",
+          "message": "Images must come from the approved registry.",
+          "pattern": {
+            "spec": {
+              "containers": [
+                {
+                  "image": "docker.io/libary/*"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "validationFailureAction": "Audit"
+  }
+}

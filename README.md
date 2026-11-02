@@ -31,6 +31,8 @@ Start with [the office handoff](office-demo-security-2026-10-23/README.md).
 
 | Folder | Entry point |
 | --- | --- |
+| Kyverno permissions monitoring and compliance | [kyverno-runtime-permissions-lab/](kyverno-runtime-permissions-lab/WORKPLACE-START-HERE.md) |
+| Kagent remediation and recovery with human approval | [kyverno-office-handoff/](kyverno-office-handoff/README.md) |
 | CRDs, skills, knowledge and combined dashboard | [agent-platform-four-crds/](agent-platform-four-crds/FRONT-SHEET.md) |
 | Wider OTel dashboard | [otel-agent-flow/](otel-agent-flow/FRONT-SHEET.md) |
 | Cluster security reviewer | [cluster-security-review/](cluster-security-review/README.md) |

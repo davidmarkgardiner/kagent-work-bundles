@@ -1,0 +1,95 @@
+{{- if and (eq .Values.integration.mode "bundled") (eq .Values.tools.mode "live") }}
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: flow-kubernetes-mcp, namespace: {{ .Release.Namespace }}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: flow-kubernetes-mcp, namespace: {{ .Release.Namespace }}}
+rules:
+- apiGroups: [apps]
+  resources: [deployments, replicasets]
+  verbs: [get, list]
+- apiGroups: [""]
+  resources: [pods, services, events]
+  verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: flow-kubernetes-mcp, namespace: {{ .Release.Namespace }}}
+subjects: [{kind: ServiceAccount, name: flow-kubernetes-mcp, namespace: {{ .Release.Namespace }}}]
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: flow-kubernetes-mcp}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: flow-kubernetes-mcp, namespace: {{ .Release.Namespace }}}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: flow-kubernetes-mcp}}
+  template:
+    metadata:
+      labels: {app: flow-kubernetes-mcp, sidecar.istio.io/inject: "false"}
+    spec:
+      serviceAccountName: flow-kubernetes-mcp
+      automountServiceAccountToken: true
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: kubernetes-mcp
+        image: {{ .Values.tools.kubernetesImage | quote }}
+        command: [/tool-server]
+        args: [--port, "8084", --metrics-port, "8085", --read-only, --tools, "k8s"]
+        env:
+        - {name: KAGENT_NAMESPACE, value: {{ .Release.Namespace | quote }}}
+        - {name: OTEL_TRACING_ENABLED, value: "true"}
+        - {name: OTEL_EXPORTER_OTLP_ENDPOINT, value: "http://flow-collector:4317"}
+        - {name: OTEL_EXPORTER_OTLP_TRACES_INSECURE, value: "true"}
+        - {name: OTEL_SERVICE_NAME, value: flow-kubernetes-mcp}
+        - {name: TOKEN_PASSTHROUGH, value: "false"}
+        ports: [{name: http, containerPort: 8084}]
+        readinessProbe: {tcpSocket: {port: http}}
+        resources: {requests: {cpu: 25m, memory: 64Mi}, limits: {cpu: "1", memory: 256Mi}}
+        securityContext: {runAsNonRoot: true, runAsUser: 10001, readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: flow-gitlab-mcp, namespace: {{ .Release.Namespace }}}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: flow-gitlab-mcp}}
+  template:
+    metadata:
+      labels: {app: flow-gitlab-mcp, sidecar.istio.io/inject: "false"}
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: gitlab-mcp
+        image: {{ include "flow.image" . | quote }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: [python, /app/live_gitlab.py]
+        env:
+        - {name: GITLAB_API_URL, value: {{ .Values.tools.gitlab.apiUrl | quote }}}
+        - {name: GITLAB_PROJECT, value: {{ .Values.tools.gitlab.project | quote }}}
+        - name: GITLAB_TOKEN
+          valueFrom:
+            secretKeyRef: {name: {{ .Values.tools.gitlab.existingSecret | quote }}, key: {{ .Values.tools.gitlab.secretKey | quote }}}
+        - {name: OTEL_HTTP_ENDPOINT, value: "http://flow-collector:4318"}
+        ports: [{name: http, containerPort: 8084}]
+        readinessProbe: {httpGet: {path: /healthz, port: http}}
+        resources: {requests: {cpu: 25m, memory: 32Mi}, limits: {cpu: 500m, memory: 128Mi}}
+        securityContext: {runAsNonRoot: true, runAsUser: 10001, readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+---
+{{- range list "flow-kubernetes-mcp" "flow-gitlab-mcp" }}
+apiVersion: v1
+kind: Service
+metadata: {name: {{ . }}, namespace: {{ $.Release.Namespace }}}
+spec:
+  selector: {app: {{ . }}}
+  ports: [{name: http, port: 8084}]
+---
+{{- end }}
+{{- end }}

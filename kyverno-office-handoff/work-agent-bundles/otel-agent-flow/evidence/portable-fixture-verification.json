@@ -1,0 +1,183 @@
+{
+  "url": "https://localhost:19443",
+  "tlsCertificateVerified": true,
+  "externalOtlpBlocked": true,
+  "crossOriginBlocked": true,
+  "workflows": [
+    {
+      "workflow": "inventory",
+      "mode": "fixture",
+      "traceId": "e4877e740abb444f953de250f19038c5",
+      "sessionId": "01a15a60-8fdd-7940-ab8e-9a3230bf42b8",
+      "status": "completed",
+      "elapsedSeconds": 1.479,
+      "requestSpanCount": 97,
+      "relatedTraceIds": [
+        "e2f1f1c7c80297681faf25e4e85a9897",
+        "f27cc10b62df3ec420a406d06d65ce32",
+        "083887908e991fd37d5ac51c62671355",
+        "ed2d50a0c4ea2d45440d6fb7c1670a19",
+        "b00839448731e5ec1c88973735100d4f",
+        "e4877e740abb444f953de250f19038c5",
+        "3bd6dbd5da3aea78096976813de5693d",
+        "b8755af0598f8b22aa720a8485adbf21",
+        "b12c6915ce29964966ec61ba113fbe4b",
+        "9b6180ec1f06d51b4a6cd736cc2028c0",
+        "7185dca260e8632d0da97214d50b38a7",
+        "795208292dab460992a0c68f0e6bfb28"
+      ],
+      "observedComponents": [
+        "actor",
+        "agentgateway",
+        "client",
+        "kagent",
+        "mcp",
+        "model",
+        "substrate",
+        "worker"
+      ],
+      "tools": [
+        "get_inventory_status",
+        "get_recent_alerts"
+      ],
+      "actorStates": [
+        "suspended",
+        "resuming",
+        "running",
+        "suspending",
+        "suspended"
+      ],
+      "workerOperations": [
+        "ateom.Ateom/CheckpointWorkload",
+        "ateom.Ateom/RestoreWorkload"
+      ],
+      "inputTokens": null,
+      "outputTokens": null,
+      "modelCallCount": 3,
+      "billedUsd": null,
+      "intentionalToolErrorObserved": false
+    },
+    {
+      "workflow": "change-review",
+      "mode": "fixture",
+      "traceId": "38812080d5a844c7b7ef5e4a73bc0022",
+      "sessionId": "01a15a60-a1d7-7ee2-8835-b79012e1e16d",
+      "status": "completed",
+      "elapsedSeconds": 1.455,
+      "requestSpanCount": 108,
+      "relatedTraceIds": [
+        "c67394afb35cb1cdc0fc888b6453c7b6",
+        "7e2cc27798301e5ca52c0b9a349126ab",
+        "522da5bb996bb4088510219f51236f6a",
+        "482e329c15c590e3fa5bb13210081121",
+        "38812080d5a844c7b7ef5e4a73bc0022",
+        "7f797786ef907ed0b001f82076d8dc2b",
+        "eb65d1c5fd34e4e906144ae15dd325e2",
+        "f0dcbad507ddb5ecb1b8d868c7d51124",
+        "c67058efdbdc12b1a982188614982dd4",
+        "6097bec3b9a437529d59dbadd8639e61",
+        "9d7ba534f63066338a9490fb6fd8121c",
+        "322e9b8b710e822e6e2d34b278c5a29c",
+        "d7d4eec9a9fb87087afb18b16881205d",
+        "3a2ceab6a94fd9a03da658f4581c88ba"
+      ],
+      "observedComponents": [
+        "actor",
+        "agentgateway",
+        "client",
+        "kagent",
+        "mcp",
+        "model",
+        "substrate",
+        "worker"
+      ],
+      "tools": [
+        "get_inventory_status",
+        "review_change"
+      ],
+      "actorStates": [
+        "suspended",
+        "resuming",
+        "running",
+        "suspending",
+        "suspended"
+      ],
+      "workerOperations": [
+        "atelet.AteomHerder/Checkpoint",
+        "atelet.AteomHerder/Restore",
+        "ateom.Ateom/CheckpointWorkload",
+        "ateom.Ateom/RestoreWorkload",
+        "fetchFileFromGCSWithZstd",
+        "fetchFromGCS",
+        "prepareOCIDirectory",
+        "sendBytesToGCS",
+        "sendFileToGCSWithZstd"
+      ],
+      "inputTokens": null,
+      "outputTokens": null,
+      "modelCallCount": 3,
+      "billedUsd": null,
+      "intentionalToolErrorObserved": false
+    },
+    {
+      "workflow": "dependency-failure",
+      "mode": "fixture",
+      "traceId": "6c1cca59b57b47ab83bb78dbe320a8c3",
+      "sessionId": "01a15a60-b5df-7b0d-a635-696a4c058d6e",
+      "status": "completed",
+      "elapsedSeconds": 0.719,
+      "requestSpanCount": 92,
+      "relatedTraceIds": [
+        "b17453ad2774c9092f0d54751b2287f2",
+        "ce5af6d1e88962aecd860d5cce2b2eb8",
+        "6515c080b68fb6322db39ef3fab70d35",
+        "888da2a0e78c5db122b7275687fc3993",
+        "6c1cca59b57b47ab83bb78dbe320a8c3",
+        "55921b15b521c0b7bdf5b5444ac80127",
+        "a4921cf6260d433a04c3a50b71d0fafa",
+        "9c85abf9d0b583e994a0fc59e770c608",
+        "e9608b2ccfcaf8e031c16c7b5f205e37",
+        "fb596ca22aebe0a8e59dd06488e5134b",
+        "84ed51444822c6a951d4821a5329c7e3"
+      ],
+      "observedComponents": [
+        "actor",
+        "agentgateway",
+        "client",
+        "kagent",
+        "mcp",
+        "model",
+        "substrate",
+        "worker"
+      ],
+      "tools": [
+        "check_dependency"
+      ],
+      "actorStates": [
+        "suspended",
+        "resuming",
+        "running",
+        "suspending",
+        "suspended"
+      ],
+      "workerOperations": [
+        "ateom.Ateom/CheckpointWorkload",
+        "ateom.Ateom/RestoreWorkload"
+      ],
+      "inputTokens": null,
+      "outputTokens": null,
+      "modelCallCount": 2,
+      "billedUsd": null,
+      "intentionalToolErrorObserved": true
+    }
+  ],
+  "browserVisualRecheck": false,
+  "aksIstioRuntimeTested": false,
+  "networkPolicyEnforcementTested": false,
+  "singleClusterRuntime": {
+    "namespace": "agent-flow-demo",
+    "serviceEndpointsArePods": true,
+    "servicesAreInternal": true,
+    "hostBridgeDependencies": 0
+  }
+}

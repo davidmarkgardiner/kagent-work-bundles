@@ -1,0 +1,336 @@
+{
+  "image": "otel-agent-flow:poc-11",
+  "localImageId": "sha256:2e876db25a2134b57784ea8c636960a910f58c18deba86659e614a4d0e156770",
+  "url": "https://localhost:9443",
+  "tlsCertificateVerified": true,
+  "verificationAccess": "Full HTTPS checks from the dashboard pod through the same Caddy Service, with localhost SNI and the lab CA; process-local DNS redirected only localhost to that Service. Supplemental laptop checks used the HTTPS URL above.",
+  "runtimeSourceHashesMatch": true,
+  "offlineTestsPassed": 69,
+  "scenarios": [
+    {
+      "scenario": "live-kubernetes",
+      "verification": {
+        "url": "https://localhost",
+        "tlsCertificateVerified": true,
+        "externalOtlpBlocked": true,
+        "crossOriginBlocked": true,
+        "workflows": [
+          {
+            "workflow": "connected",
+            "mode": "live-tools",
+            "traceId": "8dda125bf7aa4d00bce2aaca41c93c75",
+            "sessionId": "01a15aee-254e-7b4c-ab0a-722d19b135ee",
+            "status": "completed",
+            "elapsedSeconds": 8.415,
+            "requestSpanCount": 1648,
+            "relatedTraceIds": [
+              "d714a0bf797354de5ee61b998debf8a6",
+              "8dda125bf7aa4d00bce2aaca41c93c75",
+              "849f723f0c2ec4cb4bdda52c53b935ad",
+              "70c54afe523667e8045da420284adf07",
+              "cd7be3d0a34ab1c736c402500b295196",
+              "b96d185a8d91ec1c22864a5c1bb74fd1",
+              "22ec0e02ddbc36baf17920f22a01042f",
+              "95f6b808fed51ded5d7a991363599174",
+              "f992a7e0ab9dba70c9e823196b62d1ea",
+              "259928b8f1b05b8342441e8cd948af06",
+              "d46dd6d325fb0f6296586a13d73c7671",
+              "66ff3c3ac136d74369811f58a1f0fb8b"
+            ],
+            "observedComponents": [
+              "actor",
+              "agentgateway",
+              "client",
+              "kagent",
+              "mcp",
+              "model",
+              "substrate",
+              "worker"
+            ],
+            "tools": [
+              "k8s_get_resources"
+            ],
+            "toolService": null,
+            "expectedServerTools": [
+              [
+                "flow-kubernetes-mcp",
+                "k8s_get_resources"
+              ]
+            ],
+            "actorStates": [
+              "suspended",
+              "resuming",
+              "running",
+              "suspending",
+              "suspended"
+            ],
+            "workerOperations": [
+              "atelet.AteomHerder/Checkpoint",
+              "atelet.AteomHerder/Restore",
+              "ateom.Ateom/CheckpointWorkload",
+              "ateom.Ateom/RestoreWorkload",
+              "fetchFileFromGCSWithZstd",
+              "fetchFromGCS",
+              "prepareOCIDirectory",
+              "sendBytesToGCS",
+              "sendFileToGCSWithZstd"
+            ],
+            "inputTokens": 2223.0,
+            "outputTokens": 497.0,
+            "modelCallCount": 2,
+            "billedUsd": null,
+            "intentionalToolErrorObserved": false
+          }
+        ],
+        "browserVisualRecheck": false,
+        "aksIstioRuntimeTested": false,
+        "networkPolicyEnforcementTested": false
+      },
+      "observedMcpExecutions": [
+        {
+          "service": "flow-kubernetes-mcp",
+          "tool": "k8s_get_resources",
+          "kind": "internal",
+          "evidence": "kagent-tools-internal",
+          "otelStatus": "ok",
+          "status": "ok"
+        }
+      ],
+      "noUnrequestedMcpToolExecutionsObserved": true
+    },
+    {
+      "scenario": "live-gitlab",
+      "verification": {
+        "url": "https://localhost",
+        "tlsCertificateVerified": true,
+        "externalOtlpBlocked": true,
+        "crossOriginBlocked": true,
+        "workflows": [
+          {
+            "workflow": "connected",
+            "mode": "live-tools",
+            "traceId": "96582bd0bcc14b679282fb8e17a0aea6",
+            "sessionId": "01a15aee-5f6e-72af-9925-63363df28616",
+            "status": "completed",
+            "elapsedSeconds": 9.986,
+            "requestSpanCount": 791,
+            "relatedTraceIds": [
+              "4317c56f7725ca4379c85ef6f78b602f",
+              "96582bd0bcc14b679282fb8e17a0aea6",
+              "f9f00bad78888c5fa59a450c4deebe29",
+              "0a905ef3c495cb05d4ad8d50b8cbfa1a",
+              "f707489ad63be84ab48e77d7e49e20e6",
+              "932d7b8b98b1b62c71dcdd2763e03cb5",
+              "14ebcfb01bc0ead7ccc1844e3563d629",
+              "4e0c3898eaebb8d73d99a998004e7f2c",
+              "4238208510aa3a92b78f4e1b00879a25",
+              "070fc77684945813a12e0f896190d308",
+              "980e6fd265bf9fc621e0e484e31baacd",
+              "b4715e48ee33d8cc1ee35545df15dfa7",
+              "6b9a261409c2c67a65e35af18796e3ac",
+              "776c1b2320f3b9a1eaeb1ef35720bc97",
+              "1321ec5834692168c415f656ed50e42f",
+              "03766ef5403ca57fc9e8a25297e28496",
+              "afcbec311fd194ff6b868e2704034328"
+            ],
+            "observedComponents": [
+              "actor",
+              "agentgateway",
+              "client",
+              "kagent",
+              "mcp",
+              "model",
+              "substrate",
+              "worker"
+            ],
+            "tools": [
+              "gitlab_get_project",
+              "gitlab_get_latest_pipeline"
+            ],
+            "toolService": null,
+            "expectedServerTools": [
+              [
+                "flow-gitlab-mcp",
+                "gitlab_get_project"
+              ],
+              [
+                "flow-gitlab-mcp",
+                "gitlab_get_latest_pipeline"
+              ]
+            ],
+            "actorStates": [
+              "suspended",
+              "resuming",
+              "running",
+              "suspending",
+              "suspended"
+            ],
+            "workerOperations": [
+              "atelet.AteomHerder/Checkpoint",
+              "atelet.AteomHerder/Restore",
+              "ateom.Ateom/CheckpointWorkload",
+              "ateom.Ateom/RestoreWorkload",
+              "fetchFileFromGCSWithZstd",
+              "fetchFromGCS",
+              "prepareOCIDirectory",
+              "sendBytesToGCS",
+              "sendFileToGCSWithZstd"
+            ],
+            "inputTokens": 1954.0,
+            "outputTokens": 346.0,
+            "modelCallCount": 2,
+            "billedUsd": null,
+            "intentionalToolErrorObserved": false
+          }
+        ],
+        "browserVisualRecheck": false,
+        "aksIstioRuntimeTested": false,
+        "networkPolicyEnforcementTested": false
+      },
+      "observedMcpExecutions": [
+        {
+          "service": "flow-gitlab-mcp",
+          "tool": "gitlab_get_latest_pipeline",
+          "kind": "server",
+          "evidence": "server",
+          "otelStatus": "ok",
+          "status": "ok"
+        },
+        {
+          "service": "flow-gitlab-mcp",
+          "tool": "gitlab_get_project",
+          "kind": "server",
+          "evidence": "server",
+          "otelStatus": "ok",
+          "status": "ok"
+        }
+      ],
+      "noUnrequestedMcpToolExecutionsObserved": true
+    },
+    {
+      "scenario": "live-combined",
+      "verification": {
+        "url": "https://localhost",
+        "tlsCertificateVerified": true,
+        "externalOtlpBlocked": true,
+        "crossOriginBlocked": true,
+        "workflows": [
+          {
+            "workflow": "connected",
+            "mode": "live-tools",
+            "traceId": "3cf16d1a01b9468b8cdfd67d6edbf41e",
+            "sessionId": "01a15aee-9a70-7424-9ba8-7964d8bc6352",
+            "status": "completed",
+            "elapsedSeconds": 12.066,
+            "requestSpanCount": 1725,
+            "relatedTraceIds": [
+              "3a529a2a0994ef3aaffba7c29b79a75b",
+              "3cf16d1a01b9468b8cdfd67d6edbf41e",
+              "bb4e20cf4afb6db9a11b8795a2b4595a"
+            ],
+            "observedComponents": [
+              "actor",
+              "agentgateway",
+              "client",
+              "kagent",
+              "mcp",
+              "model",
+              "substrate",
+              "worker"
+            ],
+            "tools": [
+              "k8s_get_resources",
+              "gitlab_get_project",
+              "gitlab_list_issues",
+              "gitlab_get_latest_pipeline"
+            ],
+            "toolService": null,
+            "expectedServerTools": [
+              [
+                "flow-kubernetes-mcp",
+                "k8s_get_resources"
+              ],
+              [
+                "flow-gitlab-mcp",
+                "gitlab_get_project"
+              ],
+              [
+                "flow-gitlab-mcp",
+                "gitlab_list_issues"
+              ],
+              [
+                "flow-gitlab-mcp",
+                "gitlab_get_latest_pipeline"
+              ]
+            ],
+            "actorStates": [
+              "suspended",
+              "resuming",
+              "running",
+              "suspending",
+              "suspended"
+            ],
+            "workerOperations": [
+              "atelet.AteomHerder/Checkpoint",
+              "atelet.AteomHerder/Restore",
+              "ateom.Ateom/CheckpointWorkload",
+              "ateom.Ateom/RestoreWorkload",
+              "fetchFileFromGCSWithZstd",
+              "fetchFromGCS",
+              "prepareOCIDirectory",
+              "sendBytesToGCS",
+              "sendFileToGCSWithZstd"
+            ],
+            "inputTokens": 4829.0,
+            "outputTokens": 1203.0,
+            "modelCallCount": 3,
+            "billedUsd": null,
+            "intentionalToolErrorObserved": false
+          }
+        ],
+        "browserVisualRecheck": false,
+        "aksIstioRuntimeTested": false,
+        "networkPolicyEnforcementTested": false
+      },
+      "observedMcpExecutions": [
+        {
+          "service": "flow-kubernetes-mcp",
+          "tool": "k8s_get_resources",
+          "kind": "internal",
+          "evidence": "kagent-tools-internal",
+          "otelStatus": "ok",
+          "status": "ok"
+        },
+        {
+          "service": "flow-gitlab-mcp",
+          "tool": "gitlab_get_project",
+          "kind": "server",
+          "evidence": "server",
+          "otelStatus": "ok",
+          "status": "ok"
+        },
+        {
+          "service": "flow-gitlab-mcp",
+          "tool": "gitlab_list_issues",
+          "kind": "server",
+          "evidence": "server",
+          "otelStatus": "ok",
+          "status": "ok"
+        },
+        {
+          "service": "flow-gitlab-mcp",
+          "tool": "gitlab_get_latest_pipeline",
+          "kind": "server",
+          "evidence": "server",
+          "otelStatus": "ok",
+          "status": "ok"
+        }
+      ],
+      "noUnrequestedMcpToolExecutionsObserved": true
+    }
+  ],
+  "browserVisualRecheck": false,
+  "aksIstioRuntimeTested": false,
+  "entraIsolationTested": false,
+  "nativeKubernetesToolOtelLogsAvailable": false
+}

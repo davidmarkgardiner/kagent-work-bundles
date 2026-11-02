@@ -1,0 +1,110 @@
+{
+  "url": "https://localhost",
+  "tlsCertificateVerified": true,
+  "externalOtlpBlocked": true,
+  "crossOriginBlocked": true,
+  "workflows": [
+    {
+      "workflow": "connected",
+      "mode": "live-tools",
+      "traceId": "118b53f6870c4f7c9dd5b654a2752d7c",
+      "sessionId": "01a15ac8-8c6a-74e0-8d31-a0d2fe111f20",
+      "status": "completed",
+      "elapsedSeconds": 10.021,
+      "requestSpanCount": 1597,
+      "relatedTraceIds": [
+        "dec47ab786518c883856442f061f651a",
+        "118b53f6870c4f7c9dd5b654a2752d7c",
+        "19ed11969cf75be5fe74902e5ff7621c"
+      ],
+      "observedComponents": [
+        "actor",
+        "agentgateway",
+        "client",
+        "kagent",
+        "mcp",
+        "model",
+        "substrate",
+        "worker"
+      ],
+      "tools": [
+        "k8s_get_resources",
+        "gitlab_get_project",
+        "gitlab_list_issues",
+        "gitlab_get_latest_pipeline"
+      ],
+      "toolService": null,
+      "expectedServerTools": [
+        [
+          "flow-kubernetes-mcp",
+          "k8s_get_resources"
+        ],
+        [
+          "flow-gitlab-mcp",
+          "gitlab_get_project"
+        ],
+        [
+          "flow-gitlab-mcp",
+          "gitlab_list_issues"
+        ],
+        [
+          "flow-gitlab-mcp",
+          "gitlab_get_latest_pipeline"
+        ]
+      ],
+      "actorStates": [
+        "suspended",
+        "resuming",
+        "running",
+        "suspending",
+        "suspended"
+      ],
+      "workerOperations": [
+        "atelet.AteomHerder/Checkpoint",
+        "atelet.AteomHerder/Restore",
+        "ateom.Ateom/CheckpointWorkload",
+        "ateom.Ateom/RestoreWorkload",
+        "fetchFileFromGCSWithZstd",
+        "fetchFromGCS",
+        "prepareOCIDirectory",
+        "sendBytesToGCS",
+        "sendFileToGCSWithZstd"
+      ],
+      "inputTokens": 2840.0,
+      "outputTokens": 788.0,
+      "modelCallCount": 2,
+      "billedUsd": null,
+      "intentionalToolErrorObserved": false
+    }
+  ],
+  "browserVisualRecheck": false,
+  "aksIstioRuntimeTested": false,
+  "networkPolicyEnforcementTested": false,
+  "imageTag": "otel-agent-flow:poc-8",
+  "imageId": "sha256:19a791f9ddfd371a0c47a4a0c5044c4ada81da96cfa1370e711331d4cd00a0d0",
+  "unitTestsPassed": 65,
+  "liveModelAndToolData": true,
+  "fixtureToolsDeployed": false,
+  "singleClusterRuntime": {
+    "namespace": "agent-flow-demo",
+    "serviceEndpointsArePods": true,
+    "servicesAreInternal": true,
+    "hostBridgeDependencies": 0
+  },
+  "independentReadback": {
+    "projectNameMatches": true,
+    "pipelineIdMatches": true,
+    "issueIidsMatched": 5,
+    "deploymentNamesMatched": 6
+  },
+  "readOnlyKubernetesChecks": {
+    "getDemoDeployments": true,
+    "patchDemoDeployments": false,
+    "getSecrets": false,
+    "getOtherNamespaceDeployments": false,
+    "getNodes": false
+  },
+  "accessPath": "In-cluster client through the local HTTPS Service. Process-local DNS override mapped localhost to flow-https; TLS SNI, CA, and hostname validation stayed enabled. Separate laptop UI checks used https://localhost:9443.",
+  "gitlabCredentialLifecycle": "Existing CLI OAuth access token only; short-lived; no unattended refresh claimed.",
+  "entraRuntimeTested": false
+}

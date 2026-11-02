@@ -1,0 +1,375 @@
+{
+  "schemaVersion": 1,
+  "mode": "fixture",
+  "observerId": "reviewed-observer",
+  "binding": {
+    "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+    "incidentId": "incident-demo-1",
+    "runId": "run-demo-1",
+    "clusterId": "reviewed-demo-cluster",
+    "namespace": "kyverno-demo",
+    "policyName": "image-policy",
+    "ruleName": "trusted-image",
+    "application": "sample-app",
+    "taskId": "native-task-1"
+  },
+  "capturedAt": 1793533563,
+  "summary": {
+    "fault": "Fixture: a policy revision blocks the application's new rollout.",
+    "fix": "Fixture: restore the reviewed image rule through the exact-head MR."
+  },
+  "receipts": {
+    "fault": {
+      "receiptId": "receipt-fault",
+      "binding": {
+        "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+        "incidentId": "incident-demo-1",
+        "runId": "run-demo-1",
+        "clusterId": "reviewed-demo-cluster",
+        "namespace": "kyverno-demo",
+        "policyName": "image-policy",
+        "ruleName": "trusted-image",
+        "application": "sample-app",
+        "taskId": "native-task-1"
+      },
+      "recordedAt": 1793533203,
+      "policyRevision": "7777777777777777777777777777777777777777",
+      "policySpecSha256": "8888888888888888888888888888888888888888888888888888888888888888",
+      "observations": [
+        {
+          "probeId": "fault-0",
+          "observedAt": 1793533138,
+          "kind": "valid",
+          "result": "denied"
+        },
+        {
+          "probeId": "fault-1",
+          "observedAt": 1793533168,
+          "kind": "valid",
+          "result": "denied"
+        },
+        {
+          "probeId": "fault-2",
+          "observedAt": 1793533198,
+          "kind": "valid",
+          "result": "denied"
+        }
+      ],
+      "application": {
+        "namespace": "kyverno-demo",
+        "deploymentName": "sample-app",
+        "uid": "application-uid",
+        "observedAt": 1793533198,
+        "generation": 2,
+        "observedGeneration": 2,
+        "desiredReplicas": 1,
+        "updatedReplicas": 0,
+        "availableReplicas": 1
+      }
+    },
+    "investigation": {
+      "receiptId": "receipt-investigation",
+      "binding": {
+        "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+        "incidentId": "incident-demo-1",
+        "runId": "run-demo-1",
+        "clusterId": "reviewed-demo-cluster",
+        "namespace": "kyverno-demo",
+        "policyName": "image-policy",
+        "ruleName": "trusted-image",
+        "application": "sample-app",
+        "taskId": "native-task-1"
+      },
+      "recordedAt": 1793533213,
+      "taskState": "accepted"
+    },
+    "proposal": {
+      "receiptId": "receipt-proposal",
+      "binding": {
+        "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+        "incidentId": "incident-demo-1",
+        "runId": "run-demo-1",
+        "clusterId": "reviewed-demo-cluster",
+        "namespace": "kyverno-demo",
+        "policyName": "image-policy",
+        "ruleName": "trusted-image",
+        "application": "sample-app",
+        "taskId": "native-task-1"
+      },
+      "recordedAt": 1793533223,
+      "projectId": "demo/policy",
+      "mergeRequestIid": 17,
+      "headSha": "3333333333333333333333333333333333333333",
+      "policyPath": "apps/sample/policy.yaml",
+      "policySpecSha256": "2222222222222222222222222222222222222222222222222222222222222222"
+    },
+    "ci": {
+      "receiptId": "receipt-ci",
+      "binding": {
+        "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+        "incidentId": "incident-demo-1",
+        "runId": "run-demo-1",
+        "clusterId": "reviewed-demo-cluster",
+        "namespace": "kyverno-demo",
+        "policyName": "image-policy",
+        "ruleName": "trusted-image",
+        "application": "sample-app",
+        "taskId": "native-task-1"
+      },
+      "recordedAt": 1793533233,
+      "headSha": "3333333333333333333333333333333333333333",
+      "pipelineId": "pipeline-42",
+      "result": "passed",
+      "validAdmission": "admitted",
+      "invalidAdmission": "denied"
+    },
+    "review": {
+      "receiptId": "receipt-review",
+      "binding": {
+        "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+        "incidentId": "incident-demo-1",
+        "runId": "run-demo-1",
+        "clusterId": "reviewed-demo-cluster",
+        "namespace": "kyverno-demo",
+        "policyName": "image-policy",
+        "ruleName": "trusted-image",
+        "application": "sample-app",
+        "taskId": "native-task-1"
+      },
+      "recordedAt": 1793533243,
+      "headSha": "3333333333333333333333333333333333333333",
+      "reviewerId": "independent-reviewer",
+      "result": "approved"
+    },
+    "approval": {
+      "receiptId": "receipt-approval",
+      "binding": {
+        "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+        "incidentId": "incident-demo-1",
+        "runId": "run-demo-1",
+        "clusterId": "reviewed-demo-cluster",
+        "namespace": "kyverno-demo",
+        "policyName": "image-policy",
+        "ruleName": "trusted-image",
+        "application": "sample-app",
+        "taskId": "native-task-1"
+      },
+      "recordedAt": 1793533253,
+      "headSha": "3333333333333333333333333333333333333333",
+      "approverId": "reviewed-human",
+      "principalType": "human",
+      "decision": "approved"
+    },
+    "merge": {
+      "receiptId": "receipt-merge",
+      "binding": {
+        "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+        "incidentId": "incident-demo-1",
+        "runId": "run-demo-1",
+        "clusterId": "reviewed-demo-cluster",
+        "namespace": "kyverno-demo",
+        "policyName": "image-policy",
+        "ruleName": "trusted-image",
+        "application": "sample-app",
+        "taskId": "native-task-1"
+      },
+      "recordedAt": 1793533263,
+      "headSha": "3333333333333333333333333333333333333333",
+      "mergeRequestIid": 17,
+      "mergeSha": "4444444444444444444444444444444444444444",
+      "result": "merged"
+    },
+    "gitops": {
+      "receiptId": "receipt-gitops",
+      "binding": {
+        "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+        "incidentId": "incident-demo-1",
+        "runId": "run-demo-1",
+        "clusterId": "reviewed-demo-cluster",
+        "namespace": "kyverno-demo",
+        "policyName": "image-policy",
+        "ruleName": "trusted-image",
+        "application": "sample-app",
+        "taskId": "native-task-1"
+      },
+      "recordedAt": 1793533363,
+      "sourceRevision": "4444444444444444444444444444444444444444",
+      "appliedRevision": "4444444444444444444444444444444444444444",
+      "ready": true
+    },
+    "liveObject": {
+      "receiptId": "receipt-live-object",
+      "binding": {
+        "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+        "incidentId": "incident-demo-1",
+        "runId": "run-demo-1",
+        "clusterId": "reviewed-demo-cluster",
+        "namespace": "kyverno-demo",
+        "policyName": "image-policy",
+        "ruleName": "trusted-image",
+        "application": "sample-app",
+        "taskId": "native-task-1"
+      },
+      "recordedAt": 1793533473,
+      "uid": "policy-uid",
+      "generation": 3,
+      "observedGeneration": 3,
+      "policySpecSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "enforcement": "Enforce",
+      "ready": true,
+      "deleting": false
+    },
+    "probes": {
+      "receiptId": "receipt-probes",
+      "binding": {
+        "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+        "incidentId": "incident-demo-1",
+        "runId": "run-demo-1",
+        "clusterId": "reviewed-demo-cluster",
+        "namespace": "kyverno-demo",
+        "policyName": "image-policy",
+        "ruleName": "trusted-image",
+        "application": "sample-app",
+        "taskId": "native-task-1"
+      },
+      "recordedAt": 1793533558,
+      "observedGeneration": 3,
+      "policySpecSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "observations": [
+        {
+          "probeId": "valid-0",
+          "observedAt": 1793533483,
+          "kind": "valid",
+          "result": "admitted"
+        },
+        {
+          "probeId": "valid-1",
+          "observedAt": 1793533513,
+          "kind": "valid",
+          "result": "admitted"
+        },
+        {
+          "probeId": "valid-2",
+          "observedAt": 1793533543,
+          "kind": "valid",
+          "result": "admitted"
+        },
+        {
+          "probeId": "invalid-1",
+          "observedAt": 1793533553,
+          "kind": "invalid",
+          "result": "denied"
+        }
+      ]
+    },
+    "application": {
+      "receiptId": "receipt-application",
+      "binding": {
+        "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+        "incidentId": "incident-demo-1",
+        "runId": "run-demo-1",
+        "clusterId": "reviewed-demo-cluster",
+        "namespace": "kyverno-demo",
+        "policyName": "image-policy",
+        "ruleName": "trusted-image",
+        "application": "sample-app",
+        "taskId": "native-task-1"
+      },
+      "recordedAt": 1793533559,
+      "namespace": "kyverno-demo",
+      "deploymentName": "sample-app",
+      "uid": "application-uid",
+      "deploymentObservedAt": 1793533478,
+      "generation": 2,
+      "observedGeneration": 2,
+      "desiredReplicas": 1,
+      "actualReplicas": 1,
+      "updatedReplicas": 1,
+      "readyReplicas": 1,
+      "availableReplicas": 1,
+      "unavailableReplicas": 0,
+      "httpObservations": [
+        {
+          "probeId": "http-0",
+          "observedAt": 1793533483,
+          "statusCode": 200,
+          "bodySha256": "5555555555555555555555555555555555555555555555555555555555555555"
+        },
+        {
+          "probeId": "http-1",
+          "observedAt": 1793533523,
+          "statusCode": 200,
+          "bodySha256": "5555555555555555555555555555555555555555555555555555555555555555"
+        },
+        {
+          "probeId": "http-2",
+          "observedAt": 1793533553,
+          "statusCode": 200,
+          "bodySha256": "5555555555555555555555555555555555555555555555555555555555555555"
+        }
+      ]
+    },
+    "verification": {
+      "receiptId": "receipt-verification",
+      "binding": {
+        "profileRevision": "6666666666666666666666666666666666666666666666666666666666666666",
+        "incidentId": "incident-demo-1",
+        "runId": "run-demo-1",
+        "clusterId": "reviewed-demo-cluster",
+        "namespace": "kyverno-demo",
+        "policyName": "image-policy",
+        "ruleName": "trusted-image",
+        "application": "sample-app",
+        "taskId": "native-task-1"
+      },
+      "recordedAt": 1793533560,
+      "taskId": "native-task-1",
+      "parentTaskId": "native-task-1",
+      "taskState": "completed",
+      "result": "recovered",
+      "mergeSha": "4444444444444444444444444444444444444444",
+      "policySpecSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "observedGeneration": 3,
+      "probeReceiptId": "receipt-probes",
+      "applicationReceiptId": "receipt-application",
+      "applicationUid": "application-uid",
+      "applicationGeneration": 2,
+      "traceId": "11111111111111111111111111111111",
+      "spanId": "0000000000000007"
+    }
+  },
+  "telemetry": {
+    "investigation": {
+      "traceId": "11111111111111111111111111111111",
+      "spanId": "0000000000000001"
+    },
+    "model": {
+      "traceId": "11111111111111111111111111111111",
+      "spanId": "0000000000000002"
+    },
+    "skill": {
+      "traceId": "11111111111111111111111111111111",
+      "spanId": "0000000000000003"
+    },
+    "knowledge": {
+      "traceId": "11111111111111111111111111111111",
+      "spanId": "0000000000000004"
+    },
+    "kubernetes-mcp": {
+      "traceId": "11111111111111111111111111111111",
+      "spanId": "0000000000000005"
+    },
+    "gitlab-mcp": {
+      "traceId": "11111111111111111111111111111111",
+      "spanId": "0000000000000006"
+    },
+    "verification": {
+      "traceId": "11111111111111111111111111111111",
+      "spanId": "0000000000000007"
+    },
+    "gateway": {
+      "traceId": "11111111111111111111111111111111",
+      "spanId": "0000000000000008"
+    }
+  }
+}
