@@ -8,7 +8,7 @@ import zipfile
 
 ROOT_NAME = 'secure-byo-agent-composition'
 EXTENSIONS = {'.py', '.md', '.json', '.yaml', '.yml', '.lock', '.tsv', '.sh', '.txt',
-    '.go', '.mod', '.sum', '.sql'}
+    '.go', '.mod', '.sum', '.sql', '.html', '.pdf'}
 OMIT_PARTS = {'__pycache__', '.git', '.rendered', 'private', 'evidence-private', 'node_modules', '.venv'}
 OMIT_NAMES = {'bundle.manifest.json', 'settings.json', 'profile.json', 'kubeconfig', 'kagent'}
 

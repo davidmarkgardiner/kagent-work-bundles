@@ -1,0 +1,28 @@
+{
+  "format": "secure-byo-delivery-v1",
+  "outcome": "in-progress",
+  "sourceRevision": "{{REVIEWED_SOURCE_REVISION}}",
+  "targetPath": "{{EXISTING_STANDALONE_OR_APPROVED_NATIVE}}",
+  "implementedOperator": "{{ACTUAL_EXISTING_OPERATOR_AND_PROFILE}}",
+  "scopeDecision": "{{AUTHORIZED_SCOPE_AND_REQUIRED_GATES}}",
+  "reusedArtifacts": [],
+  "changedFilesAndResources": [],
+  "targetVersionsAndDigests": {},
+  "gates": [
+    {"id": "D01", "status": "not-run", "evidence": []},
+    {"id": "D02", "status": "not-run", "evidence": []},
+    {"id": "D03", "status": "not-run", "evidence": []},
+    {"id": "D04", "status": "not-run", "evidence": []},
+    {"id": "D05", "status": "not-run", "evidence": []},
+    {"id": "D06", "status": "not-run", "evidence": []},
+    {"id": "D07", "status": "not-run", "evidence": []},
+    {"id": "D08", "status": "not-run", "evidence": []},
+    {"id": "D09", "status": "not-run", "evidence": []}
+  ],
+  "rehearsal": {"status": "not-run", "revision": null, "receipt": null},
+  "blockers": [],
+  "remainingLimits": [],
+  "ownerYaml": "{{PRIVATE_REVIEWED_OWNER_YAML_PATH}}",
+  "rollbackInstructions": "{{PRIVATE_ROLLBACK_REFERENCE}}",
+  "resumeRecord": "{{PRIVATE_WORK_STATE_PATH}}"
+}

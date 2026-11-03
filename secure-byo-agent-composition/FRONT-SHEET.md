@@ -5,6 +5,9 @@ Download the full `kagent-work-bundles` repository ZIP. Copy both `secure-byo-ag
 | Reader | Start here | Outcome |
 | --- | --- | --- |
 | Human preparing the environment | [Human prerequisite sheet](HUMAN-PREREQUISITES.md) | Named owners and evidence for every applicable prerequisite, with a clear proceed or blocked decision |
+| David supplying the inputs | [David's starting sheet](DAVID-START-HERE.md) | What you provide and what the agent should handle |
+| Delivery owner | [Desired state](DESIRED-STATE.md) and [demo rehearsal](SHOWCASE-DEMO.md) | Continue until the target is verified and the delivered revision has a successful full rehearsal |
+| Human or presenter wanting a visual copy | [Offline HTML guide](docs/DELIVERY-GUIDE.html) and [printable PDF](docs/DELIVERY-GUIDE.pdf) | Delivery brief, private checklist export and presenter support; no implied live status |
 | Work agent | [Copyable work-agent prompt](WORK-AGENT-PROMPT.md) | Discover the installed path, reuse previous work, implement the smallest compatible delta, and return target receipts |
 | Engineer extending HostedAgent | [Existing-operator continuation](docs/EXISTING-HOSTEDAGENT.md) | Extend `skills.platform.kagent.dev/v1alpha1 HostedAgent`, retaining its existing contracts and ownership |
 | Reviewer selecting an approach | [HostedAgent versus KRO](docs/HOSTED-VS-KRO.md) | Benefits, limitations, operational costs, and the conditional recommendation |

@@ -2,6 +2,8 @@
 
 Use this sheet in the private work context. Leave boxes unchecked until the named owner supplies current target evidence. Record references and checksums, never passwords or token values. A lab pass is not a work prerequisite pass.
 
+[David's starting sheet](DAVID-START-HERE.md) separates your inputs from agent work. [Desired state](DESIRED-STATE.md) requires verified target outcomes and a full demo rehearsal. For a visual private record, open [the offline HTML](docs/DELIVERY-GUIDE.html); use [the PDF](docs/DELIVERY-GUIDE.pdf) for a printable briefing. Neither document creates a target pass.
+
 | Handoff field | Record privately |
 | --- | --- |
 | Target environment and approved scope | `{{TARGET_AND_SCOPE}}` |

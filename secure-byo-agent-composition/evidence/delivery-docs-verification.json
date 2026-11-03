@@ -1,0 +1,16 @@
+{
+  "desktopWidth": 1200,
+  "mobileWidth": 360,
+  "mobileHorizontalOverflow": false,
+  "prerequisiteRows": 29,
+  "exportPreservesEntries": true,
+  "exportNeverClaimsVerifiedOutcome": true,
+  "reloadResetsPrivateInputs": true,
+  "externalNetworkRequests": 0,
+  "javascriptErrors": [],
+  "pdfPages": 3,
+  "pdfPageSize": "A4",
+  "pdfVisualReview": "All three rendered pages inspected; no clipping or overlap",
+  "htmlVisualReview": "Desktop and mobile inspected; no document horizontal overflow",
+  "scope": "Supporting documents and manual record only; not a target execution result"
+}

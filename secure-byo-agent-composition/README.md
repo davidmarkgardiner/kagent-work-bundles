@@ -4,6 +4,10 @@ This source bundle compares KRO and a HostedSecureAgent controller against the s
 
 Start with [the front sheet](FRONT-SHEET.md). Give the agent [the continuation prompt](WORK-AGENT-PROMPT.md) and give the human [the prerequisite sheet](HUMAN-PREREQUISITES.md). Copy the existing `agent-platform-four-crds` folder with this bundle. [The existing-operator continuation](docs/EXISTING-HOSTEDAGENT.md) preserves that operator and its four CRDs. The separate lab adapter is not its completed upgrade.
 
+[Desired state](DESIRED-STATE.md) makes delivery mean a verified target and a successful full demo rehearsal. [David's starting sheet](DAVID-START-HERE.md) lists the inputs you provide. The agent continues through implementation, fixes, target proof and [the demo run sheet](SHOWCASE-DEMO.md); it records real blockers instead of presenting partial work as delivered.
+
+[Supporting HTML and PDF guides](docs/README.md) provide an offline prerequisite record with export and a printable three-page briefing. They record human inputs and explain the demo; actual receipts establish target readiness.
+
 Complete [the air-gap prerequisites](AIRGAP-PREREQUISITES.md) before applying a request. [The execution workflow](WORKFLOW.md) defines the acceptance gates. Compare the approaches in [HostedAgent versus KRO](docs/HOSTED-VS-KRO.md). [Native replication](WORK-AGENT-START-HERE.md) applies only after selecting the compatible native/Substrate path. Source tests and resource readiness do not establish native or target acceptance.
 
 [Home-lab results and limits](evidence/LAB-RESULTS.md) record completed native runs for both approaches, actual admission and actor isolation, lifecycle cleanup/recreation, and revocation during native execution. The local identity proof uses Kubernetes tokens. Entra and cold workplace imports remain separate gates.

@@ -31,6 +31,8 @@ class Packaging(unittest.TestCase):
                 'diagnostics/go.sum': 'approved-module-checksums\n',
                 'diagnostics/build.sh': '#!/bin/sh\nexit 0\n',
                 'prerequisites/schema.sql': 'CREATE SCHEMA secure_byo;\n',
+                'docs/guide.html': '<!doctype html><title>Offline delivery guide</title>\n',
+                'docs/guide.pdf': '%PDF-1.4\n',
                 '.gitignore': '__pycache__/\n', 'private-token.json': '{"private":true}',
                 'actor-probe': 'binary input', 'settings.json': '{}',
                 '__pycache__/stale.pyc': 'cache'}.items():
@@ -53,7 +55,8 @@ class Packaging(unittest.TestCase):
             with zipfile.ZipFile(first) as archive:
                 names = {name.removeprefix(package.ROOT_NAME + '/') for name in archive.namelist()}
                 for expected in ('diagnostics/main.go', 'diagnostics/go.mod', 'diagnostics/go.sum',
-                        'diagnostics/build.sh', 'prerequisites/schema.sql', '.gitignore'):
+                        'diagnostics/build.sh', 'prerequisites/schema.sql', '.gitignore',
+                        'docs/guide.html', 'docs/guide.pdf'):
                     self.assertIn(expected, names)
                 self.assertEqual(archive.getinfo(package.ROOT_NAME + '/diagnostics/build.sh').external_attr >> 16, 0o100755)
                 for private in ('private-token.json', 'actor-probe', 'settings.json', '__pycache__/stale.pyc'):
