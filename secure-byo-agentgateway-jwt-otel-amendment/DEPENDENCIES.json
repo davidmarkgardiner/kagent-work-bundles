@@ -45,5 +45,8 @@
     }
   },
   "officeIntegrationVerified": false,
-  "dashboardsIncluded": false
+  "dashboardsIncluded": false,
+  "executionScope": "without-substrate",
+  "substrateDeferred": true,
+  "substrateRequired": false
 }

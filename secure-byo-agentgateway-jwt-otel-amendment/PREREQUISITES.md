@@ -6,7 +6,7 @@ Fill this in privately. Unchecked means unverified, not necessarily absent. Reus
 | --- | --- | --- |
 | [ ] | Amendment beside existing folders; local changes and base revision recorded | Transfer owner |
 | [ ] | Approved target/context, namespace, existing operator location and change/drill scope | Platform owner |
-| [ ] | No-Substrate or approved native path confirmed | Runtime owner |
+| [ ] | Existing no-Substrate profile and actual Deployment or Job kind confirmed; Substrate deferred and not a demo gate | Runtime owner |
 | [ ] | Gateway identity, served CRDs, current policies/merges and routing writer captured | Gateway owner |
 | [ ] | JWT issuer/JWKS, audience, subjects, TokenRequest authority and private token delivery | Identity owner |
 | [ ] | JWT-only demo scope recorded; Entra deferred without weakening other security gates | Demo/platform owner |

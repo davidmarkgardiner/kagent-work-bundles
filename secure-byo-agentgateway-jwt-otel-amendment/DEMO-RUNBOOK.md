@@ -2,6 +2,8 @@
 
 Rehearse for 8 to 12 minutes against the final delivered office revision in the approved POC scope. Gateway deployment and upgrade handling need only a brief explanation. Use the existing observability tools; dashboards are outside this amendment.
 
+Run without Substrate using the existing standalone profile. Do not wait for its installation or demonstrate actor, Harness or WorkerPool execution. Record whether the application/agent is a Deployment or a Job and prove that actual workload's readiness and execution.
+
 | Step | Show | Retain |
 | --- | --- | --- |
 | 1. Platform boundary | Existing operator, approved profile, Gateway, collector and LGTM roles | Runtime path, versions and shared/dedicated ownership |

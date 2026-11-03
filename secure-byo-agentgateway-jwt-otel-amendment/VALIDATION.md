@@ -22,6 +22,8 @@ This checks the supplied hash inventory, source syntax, local links and tests wi
 
 ## Required office proof
 
+The current execution is without Substrate. Prove the actual existing standalone Deployment or Job path. Native/Substrate prerequisites and actor lifecycle checks are deferred and must not block acceptance of this scoped demo. Historical native-lab dry-run evidence above validates the proposed Gateway object shape only.
+
 The work agent must implement and show a newly named owner request automatically generating the existing operator's runtime/model/MCP/Gateway closure, with no per-agent manual Gateway fixup. Actual JWT policies, destination consent, call-time authorization, Kyverno and network enforcement remain required. Entra is deferred for this explicitly JWT-only demonstration.
 
 The Gateway observability policy must be accepted and attached, its collector reachable, producer capture disabled, privacy enforced before fan-out, and existing exporter destinations preserved. Require actual Gateway spans and access logs, real Tempo query results, independent log and metrics collection evidence, and a full final-revision rehearsal. Correct the base's real propagation gaps before claiming one continuous trace. Requested trace context, a trace ID string, unit tests, dry-run admission or historical dashboard activity cannot pass those gates.

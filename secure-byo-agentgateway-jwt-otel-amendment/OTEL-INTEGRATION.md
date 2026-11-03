@@ -45,7 +45,13 @@ Review the private proposal and run server dry-run. Then use the existing platfo
 
 Do not copy a whole collector ConfigMap from this amendment. Its actual destinations and credentials belong to the target owner. Missing pipeline permissions, privacy review, export or query access is a concrete gate to resolve, not evidence of successful LGTM integration.
 
-## Native producer configuration is version-specific
+## Instrument the standalone producer now
+
+Use the existing application/agent workload's supported OTel configuration and instrumentation without Substrate. Verify real model/MCP calls and Gateway spans for that workload. Missing standalone instrumentation is a gap to fix or report, not a reason to switch to native execution or wait for Substrate.
+
+## Native producer configuration is future reference only
+
+Do not apply this section for the current no-Substrate demo. Native/Substrate installation and telemetry are deferred.
 
 The existing `otel-agent-flow/NATIVE-KAGENT-OTEL.md` documents the native alpha17 configuration. It configures **both** controller `config.telemetry` and `config.runtimeDefaults.telemetry`, with content/raw-body capture disabled. The paired Substrate 0.6 configuration uses its own `otel` settings. Preserve all other values and the existing native-controller ownership split.
 

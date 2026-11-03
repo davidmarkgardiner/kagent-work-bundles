@@ -2,6 +2,8 @@
 
 Copy **only this amendment folder** beside the folders already given to the office agent. Give it [the amendment prompt](WORK-AGENT-AMENDMENT.md). Merge the reviewed delta into its ongoing work. Do not replace its checkout or add files inside the base bundle's hash-verified inventory.
 
+**Run the current office demo without Substrate.** Use the existing standalone application/agent profile. Substrate installation and native actor demonstrations are deferred and must not block this work. The amendment prompt overrides older runtime-choice instructions.
+
 The baseline is `secure-byo-agent-composition` at `4bfb61fc197a94157dcbebcaf1143cbf9f398b13`, plus `agent-platform-four-crds`. Reuse the existing Gateway, OTel collector and LGTM services where compatible. No dashboard implementation or platform upgrade is assigned here.
 
 The base includes strict JWT issuer/audience/subject checks, agent/model/MCP HTTPRoutes, ReferenceGrants, call-time authorization, RBAC, Kyverno, network controls and exact native runtime RPC routes. This amendment adds automated Gateway onboarding and fresh telemetry evidence as delivery requirements.
