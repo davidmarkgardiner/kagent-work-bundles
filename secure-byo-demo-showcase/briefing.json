@@ -1,0 +1,77 @@
+{
+  "title": "One YAML. One verified agent.",
+  "subtitle": "A live onboarding demonstration without Substrate",
+  "pages": [
+    {
+      "eyebrow": "01 / The promise",
+      "title": "One YAML. One verified agent.",
+      "lead": "Choose approved inputs. Let the operator configure the runtime and its connections. Prove the new agent before handing it to its user.",
+      "bullets": [
+        "The user selects model, MCP capabilities, skills, knowledge and an approved scenario.",
+        "The operator and trusted platform owners create the per-agent runtime and Gateway security.",
+        "Automatic authentication checks and the GoldenScenario produce a result tied to this exact request."
+      ],
+      "note": "Office target, not a completed office result. Shared infrastructure, images and approved content are prerequisites."
+    },
+    {
+      "eyebrow": "02 / The architecture",
+      "title": "The operator owns the wiring.",
+      "lead": "One owner request starts a controlled process. The agent runs as a normal approved workload without Substrate.",
+      "bullets": [
+        "Bind the actual ModelConfig, MCP tools and pinned skill/knowledge releases.",
+        "Configure HTTPRoute, destination ReferenceGrants and strict JWT/authorization policies.",
+        "Keep access fail-closed during reconciliation. Use independent bounded verification authority.",
+        "Publish the usable endpoint only after the current security and GoldenScenario gates pass."
+      ],
+      "note": "Architecture illustration. Real readiness comes from Kubernetes; actual calls come from observed telemetry."
+    },
+    {
+      "eyebrow": "03 / The live demonstration",
+      "title": "Deploy, watch, invoke, verify.",
+      "lead": "Use a newly named agent so the audience can distinguish new onboarding from previously prepared resources.",
+      "bullets": [
+        "Apply the final owner YAML through the approved delivery process.",
+        "Watch actual bindings, route/policy attachment and runtime readiness appear.",
+        "Watch automatic JWT checks and GoldenScenario execution against the secured endpoint.",
+        "Invoke as an approved caller, then show an unauthorized caller denied without forbidden dispatch."
+      ],
+      "note": "No manual per-agent fixes or separately prepared scenario Job. Keep tokens, prompts and raw tool results private."
+    },
+    {
+      "eyebrow": "04 / The evidence view",
+      "title": "See what is happening now.",
+      "lead": "Extend the existing read-only OTel view with onboarding and verification evidence. Do not build a replacement observability stack.",
+      "bullets": [
+        "Onboarding panel: named Kubernetes objects, current UID/generation, bindings and observation freshness.",
+        "Execution panel: received model/Gateway/MCP spans, call names, status and duration; real skill/knowledge-use metadata.",
+        "Verification panel: trusted JWT results, backend witnesses and the current GoldenScenario verdict.",
+        "Unknown, blocked and stale stay visible. No timer-driven success or invented connections."
+      ],
+      "note": "A received viewer trace does not prove Tempo ingestion. Verify traces, logs and metrics stores separately."
+    },
+    {
+      "eyebrow": "05 / What is already proved",
+      "title": "Lab results and office gates stay separate.",
+      "lead": "The Gateway 1.7 home-lab receipts support a bounded technical result. The complete office onboarding demo still needs implementation and rehearsal.",
+      "bullets": [
+        "Lab: three in-scope Gateway containers upgraded to digest-pinned 1.7.0 images.",
+        "Home lab, 3 November 2026: 30 security checks passed across two existing POCs, including allowed MCP calls and revocation checks.",
+        "Lab: a real model request produced two received Gateway spans and one access log in the existing OTel viewer.",
+        "Office still to prove: new one-file onboarding, automatic GoldenScenario, live lifecycle view and Tempo/log/metrics-store evidence."
+      ],
+      "note": "Historical lab receipt included in the pack. It is not a full standalone-agent workflow, office deployment or Substrate result."
+    },
+    {
+      "eyebrow": "06 / The handover",
+      "title": "Leave evidence the team can use.",
+      "lead": "At the end, present what was actually delivered and show how another engineer can repeat the same demonstration.",
+      "bullets": [
+        "Final owner YAML, editable-field guide and generated resource/binding inventory.",
+        "Current GoldenScenario result with actual model, MCP, skill and knowledge evidence; PASS is required for completion.",
+        "Protected live-view location, observed IDs, redacted captures and exact apply/invoke/watch/reset commands.",
+        "Named operational owners, artifact prerequisites, rollback steps and explicit remaining limits."
+      ],
+      "note": "Use the completion statement only after its gates pass. Substrate and Entra remain deferred; a Job must be described as a Job."
+    }
+  ]
+}

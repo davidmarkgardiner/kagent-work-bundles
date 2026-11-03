@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "status": "rendered-and-reviewed-prepared-pack",
+  "project": "Secure BYO operator onboarding without Substrate",
+  "source_revision": "e95ac84b8eb5dd1b21bd3d2ef5a4af38a64354ef",
+  "audience": "Private platform engineering team demonstration; public-safe source materials",
+  "pack": "HTML briefing, printable PDF, presenter run sheet and live-view implementation handoff",
+  "brand_source": "Existing project purple identity; no employer logo or approved corporate brand claimed",
+  "brand_status": "proposed editorial treatment",
+  "host": "VM110",
+  "requested_outputs": [
+    "HTML briefing",
+    "PDF briefing",
+    "presenter walkthrough",
+    "work-agent handover",
+    "completion report"
+  ],
+  "office_demo_status": "unverified",
+  "dashboard_implementation_status": "target work required",
+  "review": {
+    "factual": "independent read-only review; no blocking issue",
+    "brand": "proposed editorial treatment; no approved employer brand claimed",
+    "visual": "all six PDF pages reviewed; final changed pages rechecked",
+    "htmlBrowser": "unavailable; source and offline links checked",
+    "export_integrity": "pending publication check"
+  },
+  "generation_authority": {
+    "paid_media_generation": false
+  },
+  "limits": [
+    "Static briefing is not a live dashboard",
+    "No new office runtime or one-file onboarding proof",
+    "No narrated video or editable PowerPoint requested as mandatory output"
+  ],
+  "model_runs": [
+    {
+      "role": "independent evidence and readability review",
+      "host": "VM110",
+      "reported_model": "claude-sonnet-5-5",
+      "read_only": true,
+      "result": "no publication blocker; bounded improvements applied"
+    }
+  ]
+}

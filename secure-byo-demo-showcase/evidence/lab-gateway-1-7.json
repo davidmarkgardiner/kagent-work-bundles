@@ -1,0 +1,286 @@
+{
+  "format": "agentgateway-1-7-lab-upgrade-v1",
+  "date": "2026-11-03",
+  "previousVersion": "v1.5.0",
+  "targetVersion": "v1.7.0",
+  "labKubernetes": "v1.35.0",
+  "labGatewayApi": "v1.6.2",
+  "helmReleases": [
+    {
+      "component": "controller",
+      "chart": "agentgateway-v1.7.0",
+      "revision": 2,
+      "status": "deployed"
+    },
+    {
+      "component": "CRDs",
+      "chart": "agentgateway-crds-v1.7.0",
+      "revision": 2,
+      "status": "deployed"
+    }
+  ],
+  "readyContainers": [
+    {
+      "image": "cr.agentgateway.dev/agentgateway:v1.7.0",
+      "imageID": "cr.agentgateway.dev/agentgateway@sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b",
+      "ready": true
+    },
+    {
+      "image": "cr.agentgateway.dev/agentgateway:v1.7.0",
+      "imageID": "cr.agentgateway.dev/agentgateway@sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b",
+      "ready": true
+    },
+    {
+      "image": "cr.agentgateway.dev/controller:v1.7.0",
+      "imageID": "cr.agentgateway.dev/controller@sha256:87c1363bf0cbc7fdb375866e592294114c8763097d2d0c9fc45fcb1fe00a4ab8",
+      "ready": true
+    }
+  ],
+  "existingSpecsPreserved": {
+    "gateways": true,
+    "httproutes": true,
+    "grpcroutes": true,
+    "agentgatewaypolicies": true,
+    "agentgatewaybackends": true,
+    "referencegrants": true
+  },
+  "changedWorkloadScope": [
+    "secure Gateway controller",
+    "controller-generated secure Gateway proxy",
+    "standalone OTel model Gateway proxy"
+  ],
+  "allOtherDeploymentSpecsUnchanged": true,
+  "substrateBundledGatewaysUnchanged": true,
+  "substrateInvoked": false,
+  "approvalBaseline": {
+    "initiallyExpired": true,
+    "boundedLabApprovalsRenewed": true,
+    "automaticRenewalClaimed": false
+  },
+  "acceptance": [
+    {
+      "poc": "hosted",
+      "passed": true,
+      "checks": [
+        {
+          "name": "authenticated-witness",
+          "passed": true
+        },
+        {
+          "name": "missing-token",
+          "passed": true
+        },
+        {
+          "name": "wrong-audience",
+          "passed": true
+        },
+        {
+          "name": "sibling-identity",
+          "passed": true
+        },
+        {
+          "name": "caller-cannot-use-runtime-token-lane",
+          "passed": true
+        },
+        {
+          "name": "runtime-cannot-invoke-agent",
+          "passed": true
+        },
+        {
+          "name": "session-api-denied",
+          "passed": true
+        },
+        {
+          "name": "forbidden-tool",
+          "passed": true
+        },
+        {
+          "name": "unapproved-model",
+          "passed": true
+        },
+        {
+          "name": "denials-no-dispatch",
+          "passed": true
+        },
+        {
+          "name": "allowed-tool-discovery",
+          "passed": true
+        },
+        {
+          "name": "allowed-tool-call",
+          "passed": true
+        },
+        {
+          "name": "allowed-call-backend-witness",
+          "passed": true
+        },
+        {
+          "name": "revoked-existing-token-mcp",
+          "passed": true
+        },
+        {
+          "name": "revoked-existing-token-invoke",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "poc": "kro",
+      "passed": true,
+      "checks": [
+        {
+          "name": "authenticated-witness",
+          "passed": true
+        },
+        {
+          "name": "missing-token",
+          "passed": true
+        },
+        {
+          "name": "wrong-audience",
+          "passed": true
+        },
+        {
+          "name": "sibling-identity",
+          "passed": true
+        },
+        {
+          "name": "caller-cannot-use-runtime-token-lane",
+          "passed": true
+        },
+        {
+          "name": "runtime-cannot-invoke-agent",
+          "passed": true
+        },
+        {
+          "name": "session-api-denied",
+          "passed": true
+        },
+        {
+          "name": "forbidden-tool",
+          "passed": true
+        },
+        {
+          "name": "unapproved-model",
+          "passed": true
+        },
+        {
+          "name": "denials-no-dispatch",
+          "passed": true
+        },
+        {
+          "name": "allowed-tool-discovery",
+          "passed": true
+        },
+        {
+          "name": "allowed-tool-call",
+          "passed": true
+        },
+        {
+          "name": "allowed-call-backend-witness",
+          "passed": true
+        },
+        {
+          "name": "revoked-existing-token-mcp",
+          "passed": true
+        },
+        {
+          "name": "revoked-existing-token-invoke",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "repeatedHeaderAndMetricsChecks": {
+    "checks": [
+      {
+        "name": "secure-gateway-metrics-endpoint",
+        "httpStatus": 200,
+        "bytes": 111131,
+        "passed": true
+      },
+      {
+        "name": "standalone-gateway-metrics-endpoint",
+        "httpStatus": 200,
+        "bytes": 49137,
+        "passed": true
+      },
+      {
+        "namespace": "secure-byo-hosted",
+        "name": "repeated-untrusted-role",
+        "httpStatus": 403,
+        "passed": true
+      },
+      {
+        "namespace": "secure-byo-hosted",
+        "name": "repeated-invalid-authorization",
+        "httpStatus": 401,
+        "passed": true
+      },
+      {
+        "namespace": "secure-byo-kro",
+        "name": "repeated-untrusted-role",
+        "httpStatus": 403,
+        "passed": true
+      },
+      {
+        "namespace": "secure-byo-kro",
+        "name": "repeated-invalid-authorization",
+        "httpStatus": 401,
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "metricsBackendIngestionVerified": false
+  },
+  "realModelCanary": {
+    "httpStatus": 200,
+    "functionalReplyVerified": true,
+    "reportedUsage": {
+      "prompt_tokens": 95,
+      "completion_tokens": 42,
+      "total_tokens": 137,
+      "completion_tokens_details": {
+        "reasoning_tokens": 21
+      },
+      "prompt_tokens_details": {
+        "cached_tokens": 95
+      },
+      "cached_tokens": 95
+    },
+    "agentWorkflowPerformed": false
+  },
+  "otel": {
+    "gatewayTraceObserved": true,
+    "traceId": "9bb7808989f6d16f4762dfd45ffc6cd2",
+    "gatewaySpanCount": 2,
+    "gatewayAccessLogsObserved": 1,
+    "destination": "existing OTel viewer",
+    "tempoIngestionVerified": false,
+    "metricsStoreIngestionVerified": false,
+    "newSecureGatewayTelemetryApplied": false,
+    "priorTelemetryProposalRenderedAndServerDryRunPassedAgainst17": true
+  },
+  "standaloneProxySessionKey": {
+    "persistentSecretReferenceConfigured": true,
+    "keyNeverPublished": true,
+    "persistenceWarningResolved": true,
+    "mcpSessionLifecycleTested": false
+  },
+  "newlyNamedStandaloneAgentOnboardingVerified": false,
+  "fullStandaloneAgentWorkflowVerified": false,
+  "nativeActorWorkflowRetested": false,
+  "all17FeaturesActivated": false,
+  "officeUpgradeVerified": false,
+  "rollbackInputsCaptured": true,
+  "fullDowngradeRehearsed": false,
+  "kubectlCompatibility": {
+    "initialHostVersion": "v1.37.1",
+    "initialHostSkewUnsupported": true,
+    "finalVerificationClientVersion": "v1.35.0",
+    "systemClientInstallationChanged": false,
+    "source": "existing matching kind-node binary copied to private task bin",
+    "securityAcceptanceRepeatedWithCompatibleClient": true,
+    "telemetryDryRunRepeatedWithCompatibleClient": true
+  }
+}

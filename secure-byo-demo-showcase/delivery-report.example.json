@@ -1,0 +1,22 @@
+{
+  "format": "secure-byo-showcase-handover-v1",
+  "status": "in-progress",
+  "targetRevision": null,
+  "ownerYaml": null,
+  "ownerUid": null,
+  "runtimeKind": null,
+  "substrateUsed": null,
+  "operatorOnboardingVerified": false,
+  "gatewaySecurityVerified": false,
+  "automaticGoldenScenarioVerified": false,
+  "liveResourceViewVerified": false,
+  "liveOtelExecutionVerified": false,
+  "tempoLogsMetricsStoreEvidenceVerified": false,
+  "staleAndBlockedStatesVerified": false,
+  "finalRevisionRehearsalVerified": false,
+  "receipts": [],
+  "privateViewUrlReference": null,
+  "resetAndRollbackReference": null,
+  "ownersAndBlockers": [],
+  "substrateRequired": false
+}
