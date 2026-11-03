@@ -1,0 +1,61 @@
+{
+  "repository": "https://github.com/davidmarkgardiner/kagent-work-bundles",
+  "inspectedCommit": "9c6989eb448d6a24311974483b74498a99a361a1",
+  "requiredSiblingFolder": "agent-platform-four-crds",
+  "existingRequestAPI": "skills.platform.kagent.dev/v1alpha1",
+  "existingRequestKind": "HostedAgent",
+  "labReferenceAPI": "secure.platform.kagent.dev/v1alpha1",
+  "labReferenceKind": "HostedSecureAgent",
+  "existingDefaultAtInspection": "no-Substrate standalone Job; native alpha17 source is a separate retained track",
+  "continuationStatus": "Target implementation of the secure profile in the existing HostedAgent operator remains a work-agent task. Native lab adapter proof does not establish that integration.",
+  "files": {
+    "agent-platform-four-crds/README.md": {
+      "gitBlobSha": "b0d683f4dd6762baa8c675b1345ee363026b97d7",
+      "sha256": "3277b14155601a7c18f8f1c2a5c2e8601d458e385b1b1b21d1661db0728540e2"
+    },
+    "agent-platform-four-crds/KAGENT-1.0-WORK-AGENT-PROMPT.md": {
+      "gitBlobSha": "9bd335bb7ed2cc8341bf1d76c235d46b2dde0ddf",
+      "sha256": "6daddcb6d71d851bc32c1dffad55fa51f9f0b13922ed2b885dfbe4e7ca1ed28f"
+    },
+    "agent-platform-four-crds/CONTENT-BOOTSTRAP-SHEET.md": {
+      "gitBlobSha": "841bb06b4f38b24b5e4f3dc5a691477ed1b95d75",
+      "sha256": "92b76fedcfb12f94828f0fef7a09edb560ffb0f6c8fce85dd326d6331563540d"
+    },
+    "agent-platform-four-crds/standalone/README.md": {
+      "gitBlobSha": "df885073c59b6a9dd873b5181cbb0d14a46635c8",
+      "sha256": "c7dd8666786e0f053b6a8d7cfac8ddb4a7db3f8498f06317aba9e35c3ceba0e9"
+    },
+    "agent-platform-four-crds/standalone/prepare.py": {
+      "gitBlobSha": "7660947d0fdc33f588765167feaa0a2d529f2df8",
+      "sha256": "70828374eb246bdf3eac775eebec68c8f551039ef6e57a199b8a8f5887035889"
+    },
+    "agent-platform-four-crds/standalone/worker.py": {
+      "gitBlobSha": "fd94d58ea6efe85aee831b55f5b64e79f8b3fcbb",
+      "sha256": "40e23b80969ff18d54e4250224a1fde62ba96055e8aaa22a95bce9ca55af9367"
+    },
+    "agent-platform-four-crds/implementation/platform/skills-registry/hosted/contract.py": {
+      "gitBlobSha": "33103a160a6fa4af956995cc2bfcbfe58f340376",
+      "sha256": "a33d81166ff59bb62377a4a0978643b0ad9b2c5af4fd85bec090e3caad2447fa"
+    },
+    "agent-platform-four-crds/implementation/platform/skills-registry/hosted/reconcile.py": {
+      "gitBlobSha": "8ec3ca843f2710afccf40b88bf1bea926565a2fb",
+      "sha256": "1fa97412f588bc6aa802ced18451fdacce58d57e7619e12f28debf6b02d2866d"
+    },
+    "agent-platform-four-crds/implementation/platform/skills-registry/native/reconcile_native.py": {
+      "gitBlobSha": "978299957541029ff4529dfd1dc8d049f1480465",
+      "sha256": "305e728ab4b2338e25740c03649d47e3bc6ddc6d8db71cc228d422eaa4bfc794"
+    },
+    "agent-platform-four-crds/implementation/platform/skills-registry/native/resources.py": {
+      "gitBlobSha": "fd3fed4fa6241006f6e42ffeaf10dd3d212a58d6",
+      "sha256": "cb369c506443b5fee1ac6ae04b6ddf4276eea6b4538daa391195fc9c2d35878a"
+    },
+    "agent-platform-four-crds/implementation/platform/skills-registry/controller.py": {
+      "gitBlobSha": "d9e8ef5cd5c1d6e8e2b4e25ebbb46b0212cd6640",
+      "sha256": "492d45df5e9bd83e43cdad1bf20af724ebf8f5a07504ac748bf44ebb483247a4"
+    },
+    "agent-platform-four-crds/implementation/platform/skills-registry/native/artifacts.py": {
+      "gitBlobSha": "8e4d63abea18340ee6b2da0840ac93a39a1d2a88",
+      "sha256": "102d07b0fa4de0504d360f22c3a7c8c30d734f4f8eac9a2d7368b690932edc95"
+    }
+  }
+}

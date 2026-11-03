@@ -1,0 +1,1422 @@
+{
+  "capturedAt": "2026-11-03T09:46:25.910547+00:00",
+  "scope": "Native home-lab POC only. Sanitized receipt summaries, not workplace evidence.",
+  "receipts": {
+    "native-hosted": {
+      "sourceArtifact": "native-hosted-final-v2/summary.json",
+      "sourceSha256": "39a3427f1ee9adeafbf901d78548c5cb21bb3500f79cebd070bd1043bc0f8256",
+      "receipt": {
+        "namespace": "secure-byo-hosted",
+        "checks": [
+          {
+            "name": "authenticated-witness",
+            "passed": true,
+            "details": {
+              "http": 200
+            }
+          },
+          {
+            "name": "missing-token",
+            "passed": true,
+            "details": {
+              "http": 401
+            }
+          },
+          {
+            "name": "wrong-audience",
+            "passed": true,
+            "details": {
+              "http": 401
+            }
+          },
+          {
+            "name": "sibling-identity",
+            "passed": true,
+            "details": {
+              "http": 403
+            }
+          },
+          {
+            "name": "caller-cannot-use-runtime-token-lane",
+            "passed": true,
+            "details": {
+              "http": 403
+            }
+          },
+          {
+            "name": "runtime-cannot-invoke-agent",
+            "passed": true,
+            "details": {
+              "http": 403
+            }
+          },
+          {
+            "name": "session-api-denied",
+            "passed": true,
+            "details": {
+              "http": 404
+            }
+          },
+          {
+            "name": "forbidden-tool",
+            "passed": true,
+            "details": {
+              "http": 200
+            }
+          },
+          {
+            "name": "unapproved-model",
+            "passed": true,
+            "details": {
+              "http": 400
+            }
+          },
+          {
+            "name": "denials-no-dispatch",
+            "passed": true,
+            "details": {
+              "before": {
+                "authorizedMcpCalls": 0,
+                "authorizedInvocations": 0,
+                "authorizedModelCalls": 0,
+                "deniedRequests": 6
+              },
+              "after": {
+                "authorizedMcpCalls": 0,
+                "authorizedInvocations": 0,
+                "authorizedModelCalls": 0,
+                "deniedRequests": 10
+              }
+            }
+          },
+          {
+            "name": "allowed-tool-discovery",
+            "passed": true,
+            "details": {
+              "http": 200
+            }
+          },
+          {
+            "name": "allowed-tool-call",
+            "passed": true,
+            "details": {
+              "http": 200
+            }
+          },
+          {
+            "name": "allowed-call-backend-witness",
+            "passed": true,
+            "details": {
+              "authorizedMcpCalls": 1,
+              "authorizedInvocations": 0,
+              "authorizedModelCalls": 0,
+              "deniedRequests": 10
+            }
+          },
+          {
+            "name": "revoked-existing-token-mcp",
+            "passed": true,
+            "details": {
+              "http": 403
+            }
+          },
+          {
+            "name": "revoked-existing-token-invoke",
+            "passed": true,
+            "details": {
+              "http": 403
+            }
+          },
+          {
+            "name": "native-completed",
+            "passed": true,
+            "details": {
+              "http": 200
+            }
+          },
+          {
+            "name": "native-used-load_skill",
+            "passed": true,
+            "details": {
+              "calls": 2,
+              "results": 2
+            }
+          },
+          {
+            "name": "native-used-load_skill_resource",
+            "passed": true,
+            "details": {
+              "calls": 2,
+              "results": 2
+            }
+          },
+          {
+            "name": "native-used-get_demo_status",
+            "passed": true,
+            "details": {
+              "calls": 1,
+              "results": 1
+            }
+          },
+          {
+            "name": "native-loaded-document-evidence",
+            "passed": true,
+            "details": null
+          },
+          {
+            "name": "native-returned-mcp-evidence",
+            "passed": true,
+            "details": null
+          }
+        ],
+        "passed": true
+      },
+      "nativeTask": {
+        "id": "01a1a0c8-b46e-797a-90fd-6a4719a5314e",
+        "session": "01a1a0c8-b28b-7186-b7f5-5f5189682743",
+        "state": "TASK_STATE_COMPLETED",
+        "timestamp": "2026-11-03T09:41:30.570959739Z",
+        "originalResponseSha256": "d06bbdd05460f7b707a24939342a547b823af0cee034eaba2550a65186052747"
+      }
+    },
+    "native-kro": {
+      "sourceArtifact": "native-kro-final/summary.json",
+      "sourceSha256": "718d4e67c800782012694b3a5c503a5d6e7dec050de2a9d659fddfaac2bb3212",
+      "receipt": {
+        "namespace": "secure-byo-kro",
+        "checks": [
+          {
+            "name": "authenticated-witness",
+            "passed": true,
+            "details": {
+              "http": 200
+            }
+          },
+          {
+            "name": "missing-token",
+            "passed": true,
+            "details": {
+              "http": 401
+            }
+          },
+          {
+            "name": "wrong-audience",
+            "passed": true,
+            "details": {
+              "http": 401
+            }
+          },
+          {
+            "name": "sibling-identity",
+            "passed": true,
+            "details": {
+              "http": 403
+            }
+          },
+          {
+            "name": "caller-cannot-use-runtime-token-lane",
+            "passed": true,
+            "details": {
+              "http": 403
+            }
+          },
+          {
+            "name": "runtime-cannot-invoke-agent",
+            "passed": true,
+            "details": {
+              "http": 403
+            }
+          },
+          {
+            "name": "session-api-denied",
+            "passed": true,
+            "details": {
+              "http": 404
+            }
+          },
+          {
+            "name": "forbidden-tool",
+            "passed": true,
+            "details": {
+              "http": 200
+            }
+          },
+          {
+            "name": "unapproved-model",
+            "passed": true,
+            "details": {
+              "http": 400
+            }
+          },
+          {
+            "name": "denials-no-dispatch",
+            "passed": true,
+            "details": {
+              "before": {
+                "authorizedMcpCalls": 1,
+                "authorizedInvocations": 1,
+                "authorizedModelCalls": 3,
+                "deniedRequests": 8
+              },
+              "after": {
+                "authorizedMcpCalls": 1,
+                "authorizedInvocations": 1,
+                "authorizedModelCalls": 3,
+                "deniedRequests": 12
+              }
+            }
+          },
+          {
+            "name": "allowed-tool-discovery",
+            "passed": true,
+            "details": {
+              "http": 200
+            }
+          },
+          {
+            "name": "allowed-tool-call",
+            "passed": true,
+            "details": {
+              "http": 200
+            }
+          },
+          {
+            "name": "allowed-call-backend-witness",
+            "passed": true,
+            "details": {
+              "authorizedMcpCalls": 2,
+              "authorizedInvocations": 1,
+              "authorizedModelCalls": 3,
+              "deniedRequests": 12
+            }
+          },
+          {
+            "name": "revoked-existing-token-mcp",
+            "passed": true,
+            "details": {
+              "http": 403
+            }
+          },
+          {
+            "name": "revoked-existing-token-invoke",
+            "passed": true,
+            "details": {
+              "http": 403
+            }
+          },
+          {
+            "name": "native-completed",
+            "passed": true,
+            "details": {
+              "http": 200
+            }
+          },
+          {
+            "name": "native-used-load_skill",
+            "passed": true,
+            "details": {
+              "calls": 2,
+              "results": 2
+            }
+          },
+          {
+            "name": "native-used-load_skill_resource",
+            "passed": true,
+            "details": {
+              "calls": 2,
+              "results": 2
+            }
+          },
+          {
+            "name": "native-used-get_demo_status",
+            "passed": true,
+            "details": {
+              "calls": 1,
+              "results": 1
+            }
+          },
+          {
+            "name": "native-loaded-document-evidence",
+            "passed": true,
+            "details": null
+          },
+          {
+            "name": "native-returned-mcp-evidence",
+            "passed": true,
+            "details": null
+          }
+        ],
+        "passed": true
+      },
+      "nativeTask": {
+        "id": "01a1a0c8-b6db-7e70-b39d-1e8740cb08dc",
+        "session": "01a1a0c8-b4f9-7833-a759-d9c4b81f7e6b",
+        "state": "TASK_STATE_COMPLETED",
+        "timestamp": "2026-11-03T09:41:29.994931286Z",
+        "originalResponseSha256": "45693588bf4e549e4c621df2ae499e2ae36dbaa4539a93037910852d47c4cc47"
+      }
+    },
+    "admission": {
+      "sourceArtifact": "admission-final-v2/summary.json",
+      "sourceSha256": "c8f3a7824ba7d70822a1118eee79d308d891e45e6daf98b6fd692fc4684b1796",
+      "receipt": {
+        "checks": [
+          {
+            "name": "approved-template",
+            "passed": true,
+            "expectedAllow": true,
+            "response": "agenttemplate.api.kagent.dev/admission-proof-template created (server dry run)\n"
+          },
+          {
+            "name": "unapproved-model",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource AgentTemplate/secure-byo-hosted/admission-proof-template was blocked due to the following policies \n\nsecure-byo-approved-bindings:\n  template-model-and-content: Only the approved model binding is allowed.\n"
+          },
+          {
+            "name": "unapproved-content",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource AgentTemplate/secure-byo-hosted/admission-proof-template was blocked due to the following policies \n\nsecure-byo-approved-bindings:\n  template-model-and-content: Skills must use approved digest-pinned OCI content.\n"
+          },
+          {
+            "name": "unapproved-tool",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource AgentTemplate/secure-byo-hosted/admission-proof-template was blocked due to the following policies \n\nsecure-byo-approved-bindings:\n  template-model-and-content: Only the exact reviewed MCP bindings are allowed.\n"
+          },
+          {
+            "name": "approved-restricted-pod",
+            "passed": true,
+            "expectedAllow": true,
+            "response": "pod/admission-proof created (server dry run)\n"
+          },
+          {
+            "name": "privileged",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-byo-hosted/admission-proof was blocked due to the following policies \n\nsecure-byo-workload-safety:\n  workload-safety-0: Containers must drop ALL capabilities and forbid privilege escalation.\n"
+          },
+          {
+            "name": "host-network",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-byo-hosted/admission-proof was blocked due to the following policies \n\nsecure-byo-workload-safety:\n  workload-safety-0: Host namespaces are forbidden.\n"
+          },
+          {
+            "name": "foreign-account",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-byo-hosted/admission-proof was blocked due to the following policies \n\nsecure-byo-workload-safety:\n  workload-safety-0: The workload account is not approved.\n"
+          },
+          {
+            "name": "extra-capability",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-byo-hosted/admission-proof was blocked due to the following policies \n\nsecure-byo-workload-safety:\n  workload-safety-0: Containers must drop ALL capabilities and forbid privilege escalation.\n"
+          },
+          {
+            "name": "spoof-runtime-label",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-byo-hosted/admission-proof was blocked due to the following policies \n\nsecure-byo-workload-safety:\n  workload-safety-0: Reserved runtime labels require the approved controller identity.\n"
+          },
+          {
+            "name": "self-approval",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource ConfigMap/secure-byo-hosted/admission-proof-approval was blocked due to the following policies \n\nsecure-byo-composer-configmap-boundary:\n  composer-cannot-publish-approval: The hosting composer may write only its fixed\n    generated frontdoor configuration.\nsecure-byo-protected-ownership:\n  approval-records-platform-only: Only the independent platform publisher may change\n    approval records.\n"
+          },
+          {
+            "name": "tenant-allow-all-network",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource NetworkPolicy/secure-byo-hosted/admission-proof was blocked due to the following policies \n\nsecure-byo-protected-ownership:\n  platform-owned-scaffolding: Only protected platform writers may change or delete\n    security scaffolding.\n"
+          },
+          {
+            "name": "approved-worker-lineage",
+            "passed": true,
+            "expectedAllow": true,
+            "response": "pod/approved-worker-admission-proof created (server dry run)\n"
+          },
+          {
+            "name": "copied-worker-identity",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-byo-hosted/approved-worker-admission-proof was blocked due to the following policies \n\nsecure-byo-workload-safety:\n  workload-safety-0: Host paths are forbidden.\n"
+          },
+          {
+            "name": "changed-worker-image",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-byo-hosted/approved-worker-admission-proof was blocked due to the following policies \n\nsecure-byo-workload-safety:\n  workload-safety-0: Host paths are forbidden.\n"
+          },
+          {
+            "name": "wrong-worker-lineage",
+            "passed": true,
+            "expectedAllow": false,
+            "response": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-byo-hosted/approved-worker-admission-proof was blocked due to the following policies \n\nsecure-byo-workload-safety:\n  workload-safety-0: Host paths are forbidden.\n"
+          }
+        ],
+        "passed": true
+      }
+    },
+    "pod-network": {
+      "sourceArtifact": "network-final/summary.json",
+      "sourceSha256": "3e902337341c095fd187dfa3badf58341d2fc4c0b36c9e52e941beae7ca84e7b",
+      "receipt": {
+        "checks": [
+          {
+            "namespace": "secure-byo-rogue",
+            "observed": {
+              "gateway": 401,
+              "controller": "blocked",
+              "dedicated-controller": "blocked",
+              "frontdoor": "blocked"
+            },
+            "expected": {
+              "gateway": 401,
+              "controller": "blocked",
+              "dedicated-controller": "blocked",
+              "frontdoor": "blocked"
+            },
+            "passed": true
+          },
+          {
+            "namespace": "secure-byo-hosted",
+            "observed": {
+              "controller": "blocked",
+              "dedicated-controller": "blocked",
+              "direct-model": "blocked",
+              "frontdoor": 200,
+              "gateway": 401
+            },
+            "expected": {
+              "gateway": 401,
+              "controller": "blocked",
+              "dedicated-controller": "blocked",
+              "frontdoor": 200,
+              "direct-model": "blocked"
+            },
+            "passed": true
+          },
+          {
+            "namespace": "secure-byo-kro",
+            "observed": {
+              "controller": "blocked",
+              "dedicated-controller": "blocked",
+              "direct-model": "blocked",
+              "frontdoor": 200,
+              "gateway": 401
+            },
+            "expected": {
+              "gateway": 401,
+              "controller": "blocked",
+              "dedicated-controller": "blocked",
+              "frontdoor": 200,
+              "direct-model": "blocked"
+            },
+            "passed": true
+          }
+        ],
+        "passed": true,
+        "boundary": "Pod network witnesses; actor tunnel requires separate evidence"
+      }
+    },
+    "actor-hosted": {
+      "sourceArtifact": "actor-hosted-final/summary.json",
+      "sourceSha256": "07aff7709ca35caea24a09616f385041aa5d0f9765ab6f0eec98e9e547925f92",
+      "receipt": {
+        "proof": {
+          "checks": [
+            {
+              "name": "own-session-read",
+              "observed": "NotFound",
+              "expected": "NotFound",
+              "passed": true
+            },
+            {
+              "name": "sibling-session-read",
+              "observed": "PermissionDenied",
+              "expected": "PermissionDenied",
+              "passed": true
+            },
+            {
+              "name": "management-rpc-not-routed",
+              "observed": "Unimplemented",
+              "expected": "Unimplemented",
+              "passed": true
+            },
+            {
+              "name": "direct-controller",
+              "observed": "blocked",
+              "expected": "blocked",
+              "passed": true
+            },
+            {
+              "name": "dedicated-controller",
+              "observed": "blocked",
+              "expected": "blocked",
+              "passed": true
+            },
+            {
+              "name": "direct-model",
+              "observed": "blocked",
+              "expected": "blocked",
+              "passed": true
+            },
+            {
+              "name": "reachable-authenticated-gateway",
+              "observed": 401,
+              "expected": 401,
+              "passed": true
+            }
+          ],
+          "mode": "actor",
+          "passed": true,
+          "transportExit": 128
+        },
+        "binding": {
+          "session": "01a1a0c9-a376-7ce3-b88e-37236c0d23f1",
+          "actorUID": "b4a424f9-8406-4994-a24e-5b2b8388e567"
+        },
+        "passed": true
+      }
+    },
+    "actor-kro": {
+      "sourceArtifact": "actor-kro-final/summary.json",
+      "sourceSha256": "2e535cc871e79aa0e09f5c9d4fdddd633956d3c51ed6f5a2460b2b247864cac3",
+      "receipt": {
+        "proof": {
+          "checks": [
+            {
+              "name": "own-session-read",
+              "observed": "NotFound",
+              "expected": "NotFound",
+              "passed": true
+            },
+            {
+              "name": "sibling-session-read",
+              "observed": "PermissionDenied",
+              "expected": "PermissionDenied",
+              "passed": true
+            },
+            {
+              "name": "management-rpc-not-routed",
+              "observed": "Unimplemented",
+              "expected": "Unimplemented",
+              "passed": true
+            },
+            {
+              "name": "direct-controller",
+              "observed": "blocked",
+              "expected": "blocked",
+              "passed": true
+            },
+            {
+              "name": "dedicated-controller",
+              "observed": "blocked",
+              "expected": "blocked",
+              "passed": true
+            },
+            {
+              "name": "direct-model",
+              "observed": "blocked",
+              "expected": "blocked",
+              "passed": true
+            },
+            {
+              "name": "reachable-authenticated-gateway",
+              "observed": 401,
+              "expected": 401,
+              "passed": true
+            }
+          ],
+          "mode": "actor",
+          "passed": true,
+          "transportExit": 128
+        },
+        "binding": {
+          "session": "01a1a0c7-dbc9-726a-aee1-8d79368279ec",
+          "actorUID": "843f5f95-f735-4be0-91d4-3aeb044f9019"
+        },
+        "passed": true
+      }
+    },
+    "runtime-outside": {
+      "sourceArtifact": "runtime-gateway-outside.json",
+      "sourceSha256": "2c70c006eafeaf39a12c4e9d8dcab2c9a2e5cf105c2ef16dde71ea3bf763fe69",
+      "receipt": {
+        "checks": [
+          {
+            "name": "anonymous-runtime",
+            "observed": "PermissionDenied",
+            "expected": "PermissionDenied",
+            "passed": true
+          },
+          {
+            "name": "uninjected-placeholder",
+            "observed": "PermissionDenied",
+            "expected": "PermissionDenied",
+            "passed": true
+          },
+          {
+            "name": "forged-actor",
+            "observed": "Unauthenticated",
+            "expected": "Unauthenticated",
+            "passed": true
+          },
+          {
+            "name": "management-rpc-not-routed",
+            "observed": "Unimplemented",
+            "expected": "Unimplemented",
+            "passed": true
+          }
+        ],
+        "mode": "outside",
+        "passed": true
+      }
+    },
+    "lifecycle-hosted": {
+      "sourceArtifact": "lifecycle-hosted-final/summary.json",
+      "sourceSha256": "a118be2d48dd400941efc93c939cc7159bd3e41837e086146cc2cf325c748586",
+      "receipt": {
+        "namespace": "secure-byo-hosted",
+        "checks": [
+          {
+            "name": "expired-approval",
+            "passed": true,
+            "details": {
+              "mcp": 403,
+              "invoke": 403,
+              "noDispatch": true
+            }
+          },
+          {
+            "name": "wrong-request-uid",
+            "passed": true,
+            "details": {
+              "mcp": 403,
+              "invoke": 403,
+              "noDispatch": true
+            }
+          },
+          {
+            "name": "wrong-agent-uid",
+            "passed": true,
+            "details": {
+              "mcp": 403,
+              "invoke": 403,
+              "noDispatch": true
+            }
+          },
+          {
+            "name": "dependency-pins-missing",
+            "passed": true,
+            "details": {
+              "mcp": 403,
+              "invoke": 403,
+              "noDispatch": true
+            }
+          },
+          {
+            "name": "authority-unavailable-no-dispatch",
+            "passed": true,
+            "details": {
+              "mcp": 503,
+              "invoke": 503
+            }
+          },
+          {
+            "name": "referencegrant-removal-blocks-route",
+            "passed": true,
+            "details": {
+              "http": 500,
+              "resolvedRefsFalse": true,
+              "noDispatch": true
+            }
+          },
+          {
+            "name": "same-name-dependency-replacement-denied",
+            "passed": true,
+            "details": {
+              "http": 403,
+              "newUID": true
+            }
+          },
+          {
+            "name": "fresh-dependency-approval-restores-access",
+            "passed": true,
+            "details": null
+          },
+          {
+            "name": "composer-repairs-deleted-child",
+            "passed": true,
+            "details": null
+          },
+          {
+            "name": "request-deletion-removes-all-owned-children",
+            "passed": true,
+            "details": {
+              "ownedChildren": 9
+            }
+          },
+          {
+            "name": "same-name-request-recreation-rejects-old-approval",
+            "passed": true,
+            "details": {
+              "http": 403
+            }
+          },
+          {
+            "name": "fresh-request-approval-restores-access",
+            "passed": true,
+            "details": null
+          },
+          {
+            "name": "composer-restart-preserves-owned-agent",
+            "passed": true,
+            "details": null
+          }
+        ],
+        "passed": true
+      }
+    },
+    "lifecycle-kro": {
+      "sourceArtifact": "lifecycle-kro-final/summary.json",
+      "sourceSha256": "f2d39e40313890bd1128830f0d6ea903a35f414e225f0322dd96b53631c97c4a",
+      "receipt": {
+        "namespace": "secure-byo-kro",
+        "checks": [
+          {
+            "name": "expired-approval",
+            "passed": true,
+            "details": {
+              "mcp": 403,
+              "invoke": 403,
+              "noDispatch": true
+            }
+          },
+          {
+            "name": "wrong-request-uid",
+            "passed": true,
+            "details": {
+              "mcp": 403,
+              "invoke": 403,
+              "noDispatch": true
+            }
+          },
+          {
+            "name": "wrong-agent-uid",
+            "passed": true,
+            "details": {
+              "mcp": 403,
+              "invoke": 403,
+              "noDispatch": true
+            }
+          },
+          {
+            "name": "dependency-pins-missing",
+            "passed": true,
+            "details": {
+              "mcp": 403,
+              "invoke": 403,
+              "noDispatch": true
+            }
+          },
+          {
+            "name": "authority-unavailable-no-dispatch",
+            "passed": true,
+            "details": {
+              "mcp": 503,
+              "invoke": 503
+            }
+          },
+          {
+            "name": "referencegrant-removal-blocks-route",
+            "passed": true,
+            "details": {
+              "http": 500,
+              "resolvedRefsFalse": true,
+              "noDispatch": true
+            }
+          },
+          {
+            "name": "same-name-dependency-replacement-denied",
+            "passed": true,
+            "details": {
+              "http": 403,
+              "newUID": true
+            }
+          },
+          {
+            "name": "fresh-dependency-approval-restores-access",
+            "passed": true,
+            "details": null
+          },
+          {
+            "name": "composer-repairs-deleted-child",
+            "passed": true,
+            "details": null
+          },
+          {
+            "name": "request-deletion-removes-all-owned-children",
+            "passed": true,
+            "details": {
+              "ownedChildren": 9
+            }
+          },
+          {
+            "name": "same-name-request-recreation-rejects-old-approval",
+            "passed": true,
+            "details": {
+              "http": 403
+            }
+          },
+          {
+            "name": "fresh-request-approval-restores-access",
+            "passed": true,
+            "details": null
+          },
+          {
+            "name": "composer-restart-preserves-owned-agent",
+            "passed": true,
+            "details": null
+          }
+        ],
+        "passed": true
+      }
+    },
+    "inflight-hosted": {
+      "sourceArtifact": "inflight-hosted-final/summary.json",
+      "sourceSha256": "bfd6cfdc8d255a6806130756ed1bd5cfcc820f73cd25bf66e556f164beb870dd",
+      "receipt": {
+        "namespace": "secure-byo-hosted",
+        "checks": [
+          {
+            "name": "model-dispatch-observed-before-revocation",
+            "passed": true
+          },
+          {
+            "name": "new-tool-and-invoke-denied",
+            "passed": true
+          },
+          {
+            "name": "unfinished-native-call-returns-no-task",
+            "passed": true
+          },
+          {
+            "name": "no-further-authorized-dispatch",
+            "passed": true
+          },
+          {
+            "name": "client-call-settled-within-request-bound",
+            "passed": true
+          }
+        ],
+        "passed": true,
+        "secondsFromRevocationApplyStartToClientSettlement": 4.297,
+        "clientResult": {
+          "http": 502,
+          "error": "NativeCommandFailed",
+          "returnedTask": false
+        },
+        "before": {
+          "authorizedMcpCalls": 0,
+          "authorizedInvocations": 0,
+          "authorizedModelCalls": 0,
+          "deniedRequests": 6
+        },
+        "atObservedDispatch": {
+          "authorizedMcpCalls": 0,
+          "authorizedInvocations": 1,
+          "authorizedModelCalls": 1,
+          "deniedRequests": 6
+        },
+        "afterApprovalRestore": {
+          "authorizedMcpCalls": 0,
+          "authorizedInvocations": 1,
+          "authorizedModelCalls": 1,
+          "deniedRequests": 10
+        },
+        "limit": "Already-dispatched provider work may complete. This measures client settlement and authorization counters, not provider cancellation or token renewal."
+      }
+    },
+    "inflight-kro": {
+      "sourceArtifact": "inflight-kro-final/summary.json",
+      "sourceSha256": "634c5d3444d1e94a7fcd961b85df53d977a7d0b2adb9e5e2a460bacc7f0f83e6",
+      "receipt": {
+        "namespace": "secure-byo-kro",
+        "checks": [
+          {
+            "name": "model-dispatch-observed-before-revocation",
+            "passed": true
+          },
+          {
+            "name": "new-tool-and-invoke-denied",
+            "passed": true
+          },
+          {
+            "name": "unfinished-native-call-returns-no-task",
+            "passed": true
+          },
+          {
+            "name": "no-further-authorized-dispatch",
+            "passed": true
+          },
+          {
+            "name": "client-call-settled-within-request-bound",
+            "passed": true
+          }
+        ],
+        "passed": true,
+        "secondsFromRevocationApplyStartToClientSettlement": 4.487,
+        "clientResult": {
+          "http": 502,
+          "error": "NativeCommandFailed",
+          "returnedTask": false
+        },
+        "before": {
+          "authorizedMcpCalls": 0,
+          "authorizedInvocations": 0,
+          "authorizedModelCalls": 0,
+          "deniedRequests": 6
+        },
+        "atObservedDispatch": {
+          "authorizedMcpCalls": 0,
+          "authorizedInvocations": 1,
+          "authorizedModelCalls": 1,
+          "deniedRequests": 6
+        },
+        "afterApprovalRestore": {
+          "authorizedMcpCalls": 0,
+          "authorizedInvocations": 1,
+          "authorizedModelCalls": 1,
+          "deniedRequests": 10
+        },
+        "limit": "Already-dispatched provider work may complete. This measures client settlement and authorization counters, not provider cancellation or token renewal."
+      }
+    },
+    "admission-outage": {
+      "sourceArtifact": "admission-outage-v1/summary.json",
+      "sourceSha256": "5be4fa91ba93569dfafcc56b97b23e79427421678a5f8b8aa5c72ecf5ac9bca4",
+      "receipt": {
+        "namespace": "secure-byo-kro",
+        "checks": [
+          {
+            "name": "unavailable-matching-webhook-fails-closed",
+            "passed": true
+          },
+          {
+            "name": "unmatched-control-still-admitted",
+            "passed": true
+          },
+          {
+            "name": "admission-recovers-after-harness-removal",
+            "passed": true
+          }
+        ],
+        "passed": true,
+        "scope": "Scoped clone of a live fail-closed Kyverno validating webhook with an unavailable Service. Shared Kyverno was not stopped.",
+        "denial": "Error from server (InternalError): error when creating \"STDIN\": Internal error occurred: failed calling webhook \"unavailable.secure-byo.test\": failed to call webhook: Post \"https://secure-byo-intentionally-unavailable.kyverno.svc:443/validate/fail?timeout=1s\": service \"secure-byo-intentionally-unavailable\" not found\n"
+      }
+    }
+  },
+  "finalState": {
+    "parents": {
+      "secure-byo-hosted": {
+        "requestUID": "5f459e89-8f08-425a-9a2b-b19d0a24d20e",
+        "requestStatus": {
+          "conditions": [
+            {
+              "lastTransitionTime": "2026-11-03T09:43:09Z",
+              "observedGeneration": 1,
+              "reason": "RuntimeReady",
+              "status": "True",
+              "type": "Ready"
+            }
+          ],
+          "inventory": [
+            {
+              "apiVersion": "api.kagent.dev/v1alpha3",
+              "kind": "ModelConfig",
+              "name": "approved-model",
+              "uid": "ac0711b3-74ab-47b4-94c9-0ad50a8826e2"
+            },
+            {
+              "apiVersion": "api.kagent.dev/v1alpha3",
+              "kind": "Harness",
+              "name": "approved-harness",
+              "uid": "97e7b4cc-8021-4df4-8b50-89e1d19c45f8"
+            },
+            {
+              "apiVersion": "api.kagent.dev/v1alpha3",
+              "kind": "RemoteMCPServer",
+              "name": "approved-mcp",
+              "uid": "43e92290-3e1c-479d-a79a-bc22c49281a4"
+            },
+            {
+              "apiVersion": "api.kagent.dev/v1alpha3",
+              "kind": "AgentTemplate",
+              "name": "demo-template",
+              "uid": "a43e94f5-53a7-478b-98fd-2ad2cb35925e"
+            },
+            {
+              "apiVersion": "api.kagent.dev/v1alpha3",
+              "kind": "Agent",
+              "name": "demo",
+              "uid": "d53d79f0-9edc-4efe-a142-b74dec049b47"
+            },
+            {
+              "apiVersion": "v1",
+              "kind": "ConfigMap",
+              "name": "demo-frontdoor",
+              "uid": "a6540b35-e3e9-4815-b8b5-54566bcd05d2"
+            },
+            {
+              "apiVersion": "v1",
+              "kind": "Service",
+              "name": "demo-frontdoor",
+              "uid": "9cb05587-64b2-4787-be2b-d75fdeac8a76"
+            },
+            {
+              "apiVersion": "apps/v1",
+              "kind": "Deployment",
+              "name": "demo-frontdoor",
+              "uid": "974f2399-236f-4134-8021-ce011e9b520a"
+            },
+            {
+              "apiVersion": "gateway.networking.k8s.io/v1beta1",
+              "kind": "ReferenceGrant",
+              "name": "demo-frontdoor",
+              "uid": "45909b41-e4a1-4117-af91-f76cc239a7d1"
+            }
+          ],
+          "observedGeneration": 1,
+          "profileSha256": "9082df404be7cfa844b365e76d85dfed6344af5d796d4452cd97b3c3d2f08c39"
+        },
+        "agentUID": "d53d79f0-9edc-4efe-a142-b74dec049b47",
+        "agentGeneration": 1,
+        "agentStatus": {
+          "conditions": [
+            {
+              "lastTransitionTime": "2026-11-03T09:43:06Z",
+              "message": "Agent explicitly selects its template and harness",
+              "observedGeneration": 1,
+              "reason": "Accepted",
+              "status": "True",
+              "type": "Accepted"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T09:43:06Z",
+              "message": "All requested egress grants are admitted",
+              "observedGeneration": 1,
+              "reason": "Applied",
+              "status": "True",
+              "type": "EgressPoliciesApplied"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T09:43:06Z",
+              "message": "All runtime references resolved",
+              "observedGeneration": 1,
+              "reason": "Resolved",
+              "status": "True",
+              "type": "ResolvedRefs"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T09:43:06Z",
+              "message": "Resolved configuration is compatible with the Harness",
+              "observedGeneration": 1,
+              "reason": "Compatible",
+              "status": "True",
+              "type": "Compatible"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T09:43:08Z",
+              "message": "ActorTemplate golden snapshot is ready",
+              "observedGeneration": 1,
+              "reason": "Ready",
+              "status": "True",
+              "type": "Ready"
+            }
+          ],
+          "desiredRevision": "ea678ad55eb301f54846baa3ee5c3c6ab9c33ead01b9c1227a0fbfa440cf92c1",
+          "latestSuccessfulRevision": "ea678ad55eb301f54846baa3ee5c3c6ab9c33ead01b9c1227a0fbfa440cf92c1",
+          "observedGeneration": 1,
+          "workloadImage": "ghcr.io/kagent-dev/kagent/golang-adk@sha256:d20d411759d7bb549f00b7d6e8d669b91694aeb57dce847dcd2cbb68aa0d45f3"
+        },
+        "frontdoorImages": [
+          "docker.io/library/secure-byo-runtime@sha256:0694408ef6b8000ed3143bfa91bb80e660cc9377aa899ba986a4a5614eaa3d1b"
+        ]
+      },
+      "secure-byo-kro": {
+        "requestUID": "0da1b103-4875-4c5c-af05-5327356fa908",
+        "requestStatus": {
+          "conditions": [
+            {
+              "lastTransitionTime": "2026-11-03T09:42:41Z",
+              "message": "instance is properly managed with finalizers and labels",
+              "observedGeneration": 1,
+              "reason": "Managed",
+              "status": "True",
+              "type": "InstanceManaged"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T09:42:41Z",
+              "message": "runtime graph created and all resources resolved",
+              "observedGeneration": 1,
+              "reason": "Resolved",
+              "status": "True",
+              "type": "GraphResolved"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T09:42:48Z",
+              "message": "all resources are created and ready",
+              "observedGeneration": 1,
+              "reason": "AllResourcesReady",
+              "status": "True",
+              "type": "ResourcesReady"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T09:42:48Z",
+              "message": "",
+              "observedGeneration": 1,
+              "reason": "Ready",
+              "status": "True",
+              "type": "Ready"
+            }
+          ],
+          "profile": "secure-readonly-v1",
+          "state": "ACTIVE"
+        },
+        "agentUID": "eae2580c-4a29-4d88-84a1-8ff82c5ddcb6",
+        "agentGeneration": 1,
+        "agentStatus": {
+          "conditions": [
+            {
+              "lastTransitionTime": "2026-11-03T09:42:42Z",
+              "message": "Agent explicitly selects its template and harness",
+              "observedGeneration": 1,
+              "reason": "Accepted",
+              "status": "True",
+              "type": "Accepted"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T09:42:42Z",
+              "message": "All requested egress grants are admitted",
+              "observedGeneration": 1,
+              "reason": "Applied",
+              "status": "True",
+              "type": "EgressPoliciesApplied"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T09:42:42Z",
+              "message": "All runtime references resolved",
+              "observedGeneration": 1,
+              "reason": "Resolved",
+              "status": "True",
+              "type": "ResolvedRefs"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T09:42:42Z",
+              "message": "Resolved configuration is compatible with the Harness",
+              "observedGeneration": 1,
+              "reason": "Compatible",
+              "status": "True",
+              "type": "Compatible"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T09:42:48Z",
+              "message": "ActorTemplate golden snapshot is ready",
+              "observedGeneration": 1,
+              "reason": "Ready",
+              "status": "True",
+              "type": "Ready"
+            }
+          ],
+          "desiredRevision": "950a5b1596f46145207d675c907e431ae0d3266bb750b925e77937122ebde04a",
+          "latestSuccessfulRevision": "950a5b1596f46145207d675c907e431ae0d3266bb750b925e77937122ebde04a",
+          "observedGeneration": 1,
+          "workloadImage": "ghcr.io/kagent-dev/kagent/golang-adk@sha256:d20d411759d7bb549f00b7d6e8d669b91694aeb57dce847dcd2cbb68aa0d45f3"
+        },
+        "frontdoorImages": [
+          "docker.io/library/secure-byo-runtime@sha256:0694408ef6b8000ed3143bfa91bb80e660cc9377aa899ba986a4a5614eaa3d1b"
+        ]
+      }
+    },
+    "controllers": {
+      "kagent-controller": {
+        "watchNamespaces": [
+          "kagent"
+        ],
+        "leaderElection": "release default",
+        "schema": "kagent",
+        "replicas": 1,
+        "availableReplicas": 1,
+        "strategy": {
+          "rollingUpdate": {
+            "maxSurge": "25%",
+            "maxUnavailable": "25%"
+          },
+          "type": "RollingUpdate"
+        },
+        "image": "ghcr.io/kagent-dev/kagent/controller:1.0.0-alpha17"
+      },
+      "secure-byo-native-controller": {
+        "watchNamespaces": [
+          "secure-byo-hosted",
+          "secure-byo-kro"
+        ],
+        "leaderElection": false,
+        "schema": "secure_byo",
+        "replicas": 1,
+        "availableReplicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "image": "ghcr.io/kagent-dev/kagent/controller:1.0.0-alpha17"
+      }
+    },
+    "gatewayRoutes": {
+      "secure-byo-hosted": {
+        "parents": [
+          {
+            "conditions": [
+              {
+                "lastTransitionTime": "2026-11-03T08:48:29Z",
+                "message": "",
+                "observedGeneration": 1,
+                "reason": "Accepted",
+                "status": "True",
+                "type": "Accepted"
+              },
+              {
+                "lastTransitionTime": "2026-11-03T09:43:06Z",
+                "message": "",
+                "observedGeneration": 1,
+                "reason": "ResolvedRefs",
+                "status": "True",
+                "type": "ResolvedRefs"
+              }
+            ],
+            "controllerName": "agentgateway.dev/agentgateway",
+            "parentRef": {
+              "group": "gateway.networking.k8s.io",
+              "kind": "Gateway",
+              "name": "secure-byo",
+              "namespace": "secure-byo-gateway-system",
+              "sectionName": "hosted"
+            }
+          }
+        ]
+      },
+      "secure-byo-kro": {
+        "parents": [
+          {
+            "conditions": [
+              {
+                "lastTransitionTime": "2026-11-03T08:48:29Z",
+                "message": "",
+                "observedGeneration": 1,
+                "reason": "Accepted",
+                "status": "True",
+                "type": "Accepted"
+              },
+              {
+                "lastTransitionTime": "2026-11-03T09:42:42Z",
+                "message": "",
+                "observedGeneration": 1,
+                "reason": "ResolvedRefs",
+                "status": "True",
+                "type": "ResolvedRefs"
+              }
+            ],
+            "controllerName": "agentgateway.dev/agentgateway",
+            "parentRef": {
+              "group": "gateway.networking.k8s.io",
+              "kind": "Gateway",
+              "name": "secure-byo",
+              "namespace": "secure-byo-gateway-system",
+              "sectionName": "kro"
+            }
+          }
+        ]
+      },
+      "secure-byo-hosted-model": {
+        "parents": [
+          {
+            "conditions": [
+              {
+                "lastTransitionTime": "2026-11-03T08:57:45Z",
+                "message": "",
+                "observedGeneration": 1,
+                "reason": "Accepted",
+                "status": "True",
+                "type": "Accepted"
+              },
+              {
+                "lastTransitionTime": "2026-11-03T09:43:06Z",
+                "message": "",
+                "observedGeneration": 1,
+                "reason": "ResolvedRefs",
+                "status": "True",
+                "type": "ResolvedRefs"
+              }
+            ],
+            "controllerName": "agentgateway.dev/agentgateway",
+            "parentRef": {
+              "group": "gateway.networking.k8s.io",
+              "kind": "Gateway",
+              "name": "secure-byo",
+              "namespace": "secure-byo-gateway-system",
+              "sectionName": "hosted-model"
+            }
+          }
+        ]
+      },
+      "secure-byo-kro-model": {
+        "parents": [
+          {
+            "conditions": [
+              {
+                "lastTransitionTime": "2026-11-03T08:57:45Z",
+                "message": "",
+                "observedGeneration": 1,
+                "reason": "Accepted",
+                "status": "True",
+                "type": "Accepted"
+              },
+              {
+                "lastTransitionTime": "2026-11-03T09:42:42Z",
+                "message": "",
+                "observedGeneration": 1,
+                "reason": "ResolvedRefs",
+                "status": "True",
+                "type": "ResolvedRefs"
+              }
+            ],
+            "controllerName": "agentgateway.dev/agentgateway",
+            "parentRef": {
+              "group": "gateway.networking.k8s.io",
+              "kind": "Gateway",
+              "name": "secure-byo",
+              "namespace": "secure-byo-gateway-system",
+              "sectionName": "kro-model"
+            }
+          }
+        ]
+      }
+    },
+    "policyProvider": {
+      "currentNumberScheduled": 1,
+      "desiredNumberScheduled": 1,
+      "numberAvailable": 1,
+      "numberMisscheduled": 0,
+      "numberReady": 1,
+      "observedGeneration": 1,
+      "updatedNumberScheduled": 1
+    },
+    "outageHarnessAbsent": true,
+    "contentConsumption": "Warm Substrate cache; deterministic source rebuild separately verified. Cold registry transfer not tested."
+  }
+}

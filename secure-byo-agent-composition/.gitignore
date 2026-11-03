@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+bundle.manifest.json
+/kagent
+/actor-probe
+/network-probe
+/settings*.json
+/profile*.json
+/private*/
+/.rendered/
+/evidence-private/
+*.zip

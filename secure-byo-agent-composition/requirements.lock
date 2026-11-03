@@ -1,0 +1,2 @@
+# Only YAML import/export tooling needs PyYAML. Controllers and packaging use Python's standard library.
+PyYAML==6.0.3

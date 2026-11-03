@@ -1,0 +1,148 @@
+{
+  "format": "secure-byo-reviewed-content-v1",
+  "packages": {
+    "aks-known-issues": {
+      "config": {
+        "architecture": "amd64",
+        "config": {},
+        "history": [],
+        "os": "linux",
+        "rootfs": {
+          "diff_ids": [
+            "sha256:ea1c460711516facc4a052760edc0b7c15714b1b4f05d774aba10974c71f9a28"
+          ],
+          "type": "layers"
+        }
+      },
+      "expectedManifestDigest": "sha256:84b5a6a8f85db941e2ec588016e0b48d4906bcf4001f45f6ebcc33a2075a34fc",
+      "files": {
+        "LICENSE": "92b556ec5ae47bb5ba07e2ebfe1c5dba656d65beabcf1a3f129e48b1e6855ccb",
+        "SKILL.md": "a7c484cf36fe1f9bb6741c29ef0007e71c9d6abfc74e83da150e2d89485768a6",
+        "references/error-code-map.md": "22fd4350d803c8ab6e00f41bc50d03a4f49aef879e6ac99e351c06800d1e0f45",
+        "references/release-proof.txt": "37cde664128431a43ae1dbe2abc43c41d9e46b35867f8c496cf17e370b26df1d",
+        "upstream-frontmatter.yaml": "b0eca659ebae3456738df4a7a653150acc25225ed63953c32a26aafc0dd12814",
+        "upstream-provenance.json": "3c2401fe7bdba0670e5732e5671b780f9d9aa16412ed3b5c8d45dc8374c8cdd9"
+      },
+      "manifest": {
+        "annotations": {
+          "dev.kagent.platform.content-sha256": "1906dd0e228bcbc5d08d792d318917f0f9a6e1f663fc3ee0075df68dda2bb07e",
+          "dev.kagent.platform.kind": "Skill",
+          "dev.kagent.platform.package-name": "aks-known-issues",
+          "dev.kagent.platform.packaging": "reviewed-content-ustar-v3",
+          "dev.kagent.platform.source-path": "skills/aks-known-issues",
+          "org.opencontainers.image.revision": "75192c5ef918b775c6f8c03135caa93ba43d9abf"
+        },
+        "config": {
+          "digest": "sha256:9fe0a482145691849232b3c4ee2b0c525f8f2a17a20ea85d50f8cd0181fdaf38",
+          "mediaType": "application/vnd.oci.image.config.v1+json",
+          "size": 176
+        },
+        "layers": [
+          {
+            "digest": "sha256:ea1c460711516facc4a052760edc0b7c15714b1b4f05d774aba10974c71f9a28",
+            "mediaType": "application/vnd.oci.image.layer.v1.tar",
+            "size": 40960
+          }
+        ],
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "schemaVersion": 2
+      },
+      "release": {
+        "apiVersion": "skills.platform.kagent.dev/v1alpha1",
+        "kind": "Skill",
+        "metadata": {
+          "name": "aks-known-issues-v1",
+          "namespace": "kagent"
+        },
+        "spec": {
+          "contentSha256": "1906dd0e228bcbc5d08d792d318917f0f9a6e1f663fc3ee0075df68dda2bb07e",
+          "files": {
+            "LICENSE": "92b556ec5ae47bb5ba07e2ebfe1c5dba656d65beabcf1a3f129e48b1e6855ccb",
+            "SKILL.md": "a7c484cf36fe1f9bb6741c29ef0007e71c9d6abfc74e83da150e2d89485768a6",
+            "references/error-code-map.md": "22fd4350d803c8ab6e00f41bc50d03a4f49aef879e6ac99e351c06800d1e0f45",
+            "upstream-frontmatter.yaml": "b0eca659ebae3456738df4a7a653150acc25225ed63953c32a26aafc0dd12814",
+            "upstream-provenance.json": "3c2401fe7bdba0670e5732e5671b780f9d9aa16412ed3b5c8d45dc8374c8cdd9"
+          },
+          "path": "skills/aks-known-issues",
+          "skillName": "aks-known-issues",
+          "sourceCommit": "75192c5ef918b775c6f8c03135caa93ba43d9abf",
+          "sourceRef": {
+            "name": "aks-known-issues-v1-source"
+          }
+        }
+      }
+    },
+    "kb-aks-bootstrap": {
+      "config": {
+        "architecture": "amd64",
+        "config": {},
+        "history": [],
+        "os": "linux",
+        "rootfs": {
+          "diff_ids": [
+            "sha256:24e9aba761c7e46d72c80209bd381bbd945b8ef6bb86de1dec172204c06c28c4"
+          ],
+          "type": "layers"
+        }
+      },
+      "expectedManifestDigest": "sha256:99872678014bef62bc8709ae30342246f7616d7f20d695b8a16500d3c54c1e2b",
+      "files": {
+        "SKILL.md": "1a30ebe96484fb644085b26ce9b8916967877ea47fec8334e6d3c5ddd9a53a54",
+        "references/oras-pull-unauthorized.md": "2c4cc4b89a8a4141d65ced9c42cdc099f17637bd9151fa8d7f495d29582b1282",
+        "references/release-proof.txt": "b24af057d1cf5ffc17e093fb83f80436b5814db70a838fb6ec4184dc22d83ae3"
+      },
+      "manifest": {
+        "annotations": {
+          "dev.kagent.platform.content-sha256": "d4d8813c621f3e4ab96804616250da1571ae9b4ca79e0594e89c1bdc0251790f",
+          "dev.kagent.platform.kind": "KnowledgeBase",
+          "dev.kagent.platform.package-name": "aks-bootstrap",
+          "dev.kagent.platform.packaging": "reviewed-content-ustar-v3",
+          "dev.kagent.platform.source-path": "knowledge/aks-bootstrap",
+          "org.opencontainers.image.revision": "75192c5ef918b775c6f8c03135caa93ba43d9abf"
+        },
+        "config": {
+          "digest": "sha256:33ae30e13c732b0c0ee01960b7fad9dbdf19c4b3fd447698cfa18c4a25430a7b",
+          "mediaType": "application/vnd.oci.image.config.v1+json",
+          "size": 176
+        },
+        "layers": [
+          {
+            "digest": "sha256:24e9aba761c7e46d72c80209bd381bbd945b8ef6bb86de1dec172204c06c28c4",
+            "mediaType": "application/vnd.oci.image.layer.v1.tar",
+            "size": 10240
+          }
+        ],
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "schemaVersion": 2
+      },
+      "release": {
+        "apiVersion": "skills.platform.kagent.dev/v1alpha1",
+        "kind": "KnowledgeBase",
+        "metadata": {
+          "name": "aks-bootstrap-v1",
+          "namespace": "kagent"
+        },
+        "spec": {
+          "contentSha256": "d4d8813c621f3e4ab96804616250da1571ae9b4ca79e0594e89c1bdc0251790f",
+          "documents": [
+            {
+              "path": "oras-pull-unauthorized.md",
+              "reviewedAt": "2026-10-21",
+              "sourceURL": "https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/error-codes/vmextensionerror-oraspullunauthorized",
+              "title": "AKS bootstrap registry authorization"
+            }
+          ],
+          "files": {
+            "oras-pull-unauthorized.md": "2c4cc4b89a8a4141d65ced9c42cdc099f17637bd9151fa8d7f495d29582b1282"
+          },
+          "knowledgeBaseName": "aks-bootstrap",
+          "path": "knowledge/aks-bootstrap",
+          "sourceCommit": "75192c5ef918b775c6f8c03135caa93ba43d9abf",
+          "sourceRef": {
+            "name": "aks-bootstrap-v1-source"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "observedDeployedImage": "docker.io/library/secure-byo-runtime@sha256:0694408ef6b8000ed3143bfa91bb80e660cc9377aa899ba986a4a5614eaa3d1b",
+  "deployedSourceSha256": {
+    "composition/controller.py": "ea21ec092fb54159fc4934ca1011f3e17492cc07738840d3be2bcb165e47bb46",
+    "runtime/server.py": "9b06913d895132d90acd66b19f4414cda107083d6812fcf82bd7c4ca6982c71a"
+  },
+  "pythonTests": {
+    "passed": 61,
+    "command": "python3 -m unittest discover -s tests -p 'test_*.py'"
+  },
+  "goDiagnosticTests": {
+    "passed": 2,
+    "command": "GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off go test ./..."
+  },
+  "contentDigestsReproduced": [
+    "sha256:84b5a6a8f85db941e2ec588016e0b48d4906bcf4001f45f6ebcc33a2075a34fc",
+    "sha256:99872678014bef62bc8709ae30342246f7616d7f20d695b8a16500d3c54c1e2b"
+  ],
+  "actorDiagnosticBinarySha256": "7b1c3775d9f107f7ff0b278e7d35399f1733a33b380815f3464b9d1413b2fc8d",
+  "publicSafetyHits": 0,
+  "gitleaksFindings": 0,
+  "scope": "Local source checks plus live container-file hash comparison. This does not establish workplace execution.",
+  "oneFileOwnerServerDryRun": {
+    "hosted": true,
+    "kro": true
+  }
+}

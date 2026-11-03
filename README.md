@@ -31,6 +31,7 @@ Start with [the office handoff](office-demo-security-2026-10-23/README.md).
 
 | Folder | Entry point |
 | --- | --- |
+| Secure BYO composition, existing HostedAgent continuation, and KRO comparison | [Front sheet](secure-byo-agent-composition/FRONT-SHEET.md), [human prerequisites](secure-byo-agent-composition/HUMAN-PREREQUISITES.md), and [agent prompt](secure-byo-agent-composition/WORK-AGENT-PROMPT.md). Copy the existing `agent-platform-four-crds/` folder with it. |
 | Kyverno permissions monitoring and compliance | [kyverno-runtime-permissions-lab/](kyverno-runtime-permissions-lab/WORKPLACE-START-HERE.md) |
 | Kagent remediation demo built on 1 November, with OTel and human approval | [otel-agent-flow/](otel-agent-flow/KYVERNO-RECOVERY.md) and [kyverno-application-specialist/](kyverno-application-specialist/OFFICE-HANDOFF.md) |
 | CRDs, skills, knowledge and combined dashboard | [agent-platform-four-crds/](agent-platform-four-crds/FRONT-SHEET.md) |

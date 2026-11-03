@@ -1,0 +1,8 @@
+apiVersion: secure.platform.kagent.dev/v1alpha1
+kind: HostedSecureAgent
+metadata:
+  name: demo
+  namespace: secure-byo-hosted
+spec:
+  profileRef: secure-readonly-v1
+  instructions: Load both reviewed skills, read their references, and call get_demo_status. Report only observed synthetic evidence.

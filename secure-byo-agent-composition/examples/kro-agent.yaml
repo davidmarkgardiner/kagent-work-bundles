@@ -1,0 +1,8 @@
+apiVersion: kro.run/v1alpha1
+kind: SecureAgent
+metadata:
+  name: demo
+  namespace: secure-byo-kro
+spec:
+  profileRef: secure-readonly-v1
+  instructions: Load both reviewed skills, read their references, and call get_demo_status. Report only observed synthetic evidence.

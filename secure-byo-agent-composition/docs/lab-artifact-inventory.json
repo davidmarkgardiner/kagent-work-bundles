@@ -1,0 +1,157 @@
+{
+  "capturedAt": "2026-11-03",
+  "scope": "Observed selected live Pod images plus native ADK. Does not include all dormant hooks, unlaunched snapshots or content OCI dependencies.",
+  "images": [
+    {
+      "image": "ghcr.io/kagent-dev/substrate/objectstore-plugin:v0.6.0-alpha3",
+      "observedImageID": "ghcr.io/kagent-dev/substrate/objectstore-plugin@sha256:f02f0f43f5dd8d581b0e64f1db58dcc933193ef994118e74f9ea4904d44c02a2",
+      "namespace": "ate-system"
+    },
+    {
+      "image": "ghcr.io/kagent-dev/substrate/ateapi:v0.6.0-alpha3",
+      "observedImageID": "ghcr.io/kagent-dev/substrate/ateapi@sha256:2e407835500099245642e6a7c4f5d132c05fb3714148ecf16f4b04e5357c0d2a",
+      "namespace": "ate-system"
+    },
+    {
+      "image": "ghcr.io/kagent-dev/substrate/atecontroller:v0.6.0-alpha3",
+      "observedImageID": "ghcr.io/kagent-dev/substrate/atecontroller@sha256:756edc83f0d5a82d90920b2ca78a6202487953ecc40bc8cada14fe8912092e24",
+      "namespace": "ate-system"
+    },
+    {
+      "image": "ghcr.io/kagent-dev/substrate/ate-idp-server:v0.6.0-alpha3",
+      "observedImageID": "ghcr.io/kagent-dev/substrate/ate-idp-server@sha256:fb60d2e8d23298983a38f2a66e9970a67a4fbf2148a5e5478865c9516064b7fb",
+      "namespace": "ate-system"
+    },
+    {
+      "image": "ghcr.io/kagent-dev/substrate/atelet:v0.6.0-alpha3",
+      "observedImageID": "ghcr.io/kagent-dev/substrate/atelet@sha256:2cce945439d6be52f1d6ce244794db2a30349936b33206bc4c8702f40659d736",
+      "namespace": "ate-system"
+    },
+    {
+      "image": "ghcr.io/kagent-dev/substrate/agentgateway:3554db38a0b2@sha256:309f6811560635471958db67b0f68dd083d84048dffc681967599d159ebfc83d",
+      "observedImageID": "ghcr.io/kagent-dev/substrate/agentgateway@sha256:309f6811560635471958db67b0f68dd083d84048dffc681967599d159ebfc83d",
+      "namespace": "ate-system"
+    },
+    {
+      "image": "ghcr.io/kagent-dev/substrate/kubernetes-secrets:v0.6.0-alpha3",
+      "observedImageID": "ghcr.io/kagent-dev/substrate/kubernetes-secrets@sha256:ed1330f38c5b1dc7ce59a858bc94f620dd736762e9213a9db32278673481dc1e",
+      "namespace": "ate-system"
+    },
+    {
+      "image": "rustfs/rustfs:1.0.0-beta.3@sha256:378642b05b7dcb4849fb77ebe6aca4ced1c3f66e7e504247df95a5c9018d3358",
+      "observedImageID": "docker.io/rustfs/rustfs@sha256:378642b05b7dcb4849fb77ebe6aca4ced1c3f66e7e504247df95a5c9018d3358",
+      "namespace": "ate-system"
+    },
+    {
+      "image": "amazon/aws-cli:2.17.0@sha256:643507c10ada7964ca6157b3d799f030b90577643da9955d319a77399ed80d73",
+      "observedImageID": "docker.io/amazon/aws-cli@sha256:643507c10ada7964ca6157b3d799f030b90577643da9955d319a77399ed80d73",
+      "namespace": "ate-system"
+    },
+    {
+      "image": "ghcr.io/kagent-dev/substrate/ateworker-gvisor:v0.6.0-alpha3",
+      "observedImageID": "ghcr.io/kagent-dev/substrate/ateworker-gvisor@sha256:56e6231c3ed48d54afd3068b6313a1545df1277e0ac1faa6090085cc480d573e",
+      "namespace": "kagent"
+    },
+    {
+      "image": "ghcr.io/kagent-dev/kagent/controller:1.0.0-alpha17",
+      "observedImageID": "ghcr.io/kagent-dev/kagent/controller@sha256:d0c5c21998f7492fe42636c9216accc7f263ee3087729989d9b3cb78e427c5f5",
+      "namespace": "kagent"
+    },
+    {
+      "image": "postgres:18-alpine@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15",
+      "observedImageID": "docker.io/library/postgres@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15",
+      "namespace": "kagent"
+    },
+    {
+      "image": "reg.kyverno.io/kyverno/kyvernopre:v1.17.1",
+      "observedImageID": "reg.kyverno.io/kyverno/kyvernopre@sha256:13bb0430078d3e36cfa3a1c905d915fb7ad1a3a936fefa75092b6a480d2e2c2e",
+      "namespace": "kyverno"
+    },
+    {
+      "image": "reg.kyverno.io/kyverno/kyverno:v1.17.1",
+      "observedImageID": "reg.kyverno.io/kyverno/kyverno@sha256:f3138bcbd7314b1f66984cde24ea953dc300b36a3bf2f408ac2fe2897dcc40bf",
+      "namespace": "kyverno"
+    },
+    {
+      "image": "reg.kyverno.io/kyverno/background-controller:v1.17.1",
+      "observedImageID": "reg.kyverno.io/kyverno/background-controller@sha256:6d694a404b54368f5ad429f9341e2a9e4e17b8d83bd2ec74643cdaed845d6ea8",
+      "namespace": "kyverno"
+    },
+    {
+      "image": "reg.kyverno.io/kyverno/cleanup-controller:v1.17.1",
+      "observedImageID": "reg.kyverno.io/kyverno/cleanup-controller@sha256:8789cbf5a89cbc97240de9d07be44a504d76e937fa75a43b27cb891b3d2b01c6",
+      "namespace": "kyverno"
+    },
+    {
+      "image": "reg.kyverno.io/kyverno/reports-controller:v1.17.1",
+      "observedImageID": "reg.kyverno.io/kyverno/reports-controller@sha256:7eb66e1fead6a3791209e1a0869d0217f9c89886a6809e99d3094b750e2b731d",
+      "namespace": "kyverno"
+    },
+    {
+      "image": "cr.agentgateway.dev/controller:v1.5.0",
+      "observedImageID": "cr.agentgateway.dev/controller@sha256:319489cb86b7f901a52a3fc532ad07f136c92756f88cf02a4040909e20001120",
+      "namespace": "secure-byo-gateway-system"
+    },
+    {
+      "image": "cr.agentgateway.dev/agentgateway:v1.5.0",
+      "observedImageID": "cr.agentgateway.dev/agentgateway@sha256:bf2f339ef326d32def2aaeb44b1b4549801293c19b89e764a4228667d97d9896",
+      "namespace": "secure-byo-gateway-system"
+    },
+    {
+      "image": "ghcr.io/kagent-dev/substrate/ateworker-gvisor@sha256:56e6231c3ed48d54afd3068b6313a1545df1277e0ac1faa6090085cc480d573e",
+      "observedImageID": "ghcr.io/kagent-dev/substrate/ateworker-gvisor@sha256:56e6231c3ed48d54afd3068b6313a1545df1277e0ac1faa6090085cc480d573e",
+      "namespace": "secure-byo-hosted"
+    },
+    {
+      "image": "docker.io/library/secure-byo-runtime@sha256:0694408ef6b8000ed3143bfa91bb80e660cc9377aa899ba986a4a5614eaa3d1b",
+      "observedImageID": "docker.io/library/secure-byo-runtime@sha256:0694408ef6b8000ed3143bfa91bb80e660cc9377aa899ba986a4a5614eaa3d1b",
+      "namespace": "secure-byo-hosted"
+    },
+    {
+      "image": "registry.k8s.io/kro/kro:v0.9.4",
+      "observedImageID": "registry.k8s.io/kro/kro@sha256:eaf9fbaddd9d7f6cf400a8d47ab066b14cbef22b92a79be7bbdc7b3673376fb9",
+      "namespace": "secure-byo-kro-system"
+    },
+    {
+      "image": "ghcr.io/kagent-dev/substrate/ateworker-gvisor@sha256:56e6231c3ed48d54afd3068b6313a1545df1277e0ac1faa6090085cc480d573e",
+      "observedImageID": "ghcr.io/kagent-dev/substrate/ateworker-gvisor@sha256:56e6231c3ed48d54afd3068b6313a1545df1277e0ac1faa6090085cc480d573e",
+      "namespace": "secure-byo-kro"
+    },
+    {
+      "image": "docker.io/library/secure-byo-runtime@sha256:0694408ef6b8000ed3143bfa91bb80e660cc9377aa899ba986a4a5614eaa3d1b",
+      "observedImageID": "docker.io/library/secure-byo-runtime@sha256:0694408ef6b8000ed3143bfa91bb80e660cc9377aa899ba986a4a5614eaa3d1b",
+      "namespace": "secure-byo-kro"
+    },
+    {
+      "image": "ghcr.io/kagent-dev/kagent/golang-adk@sha256:d20d411759d7bb549f00b7d6e8d669b91694aeb57dce847dcd2cbb68aa0d45f3",
+      "source": "native AgentTemplate spec, not Pod container"
+    }
+  ],
+  "usage": "Source provenance and partial home-lab observations only. Rebase to approved internal destinations; do not fetch public references from the workplace. Complete target inventory and cold import proof remain required.",
+  "sandboxAssets": [
+    {
+      "source": "gs://gvisor/releases/nightly/2026-10-17/x86_64/gvisor.tar.zstd",
+      "sha256": "fa72f0d45756c69a30beec21222c78241b0d330c36f4f2185648617cc23415c8",
+      "evidence": "Observed native session snapshot manifest"
+    },
+    {
+      "source": "registry.k8s.io/pause@sha256:f548e0e8e3dc1896ca956272154dde3314e8cc4fde0a57577ee9fa1c63f5baf4",
+      "evidence": "Observed native session snapshot manifest",
+      "sourceTagParts": [
+        3,
+        10,
+        2
+      ]
+    }
+  ],
+  "reviewedContent": [
+    {
+      "source": "localhost:5002/reviewed-aks-known-issues@sha256:84b5a6a8f85db941e2ec588016e0b48d4906bcf4001f45f6ebcc33a2075a34fc",
+      "evidence": "Selected native AgentTemplate skill source; warm-cache consumption only"
+    },
+    {
+      "source": "localhost:5002/reviewed-kb-aks-bootstrap@sha256:99872678014bef62bc8709ae30342246f7616d7f20d695b8a16500d3c54c1e2b",
+      "evidence": "Selected native AgentTemplate skill source; warm-cache consumption only"
+    }
+  ]
+}

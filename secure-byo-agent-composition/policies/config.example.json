@@ -1,0 +1,16 @@
+{
+  "namespaces": ["secure-byo-hosted", "secure-byo-kro"],
+  "composerUsers": ["system:serviceaccount:secure-byo-system:hosted-composer", "system:serviceaccount:kro-system:kro"],
+  "platformUsers": ["platform-bootstrap"],
+  "nativeControllerUsers": ["system:serviceaccount:kagent:kagent-controller"],
+  "garbageCollectorUsers": ["system:serviceaccount:kube-system:generic-garbage-collector"],
+  "modelConfig": "approved-model",
+  "harness": "approved-harness",
+  "contentImages": ["registry.example.invalid/reviewed/content@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+  "templateTools": [{"mcp": {"server": {"kind": "RemoteMCPServer", "name": "approved-mcp"}, "tools": ["get_demo_status"]}}],
+  "requestKinds": ["secure.platform.kagent.dev/v1alpha1/HostedSecureAgent", "kro.run/v1alpha1/SecureAgent"],
+  "requestEquals": {"profileRef": "secure-readonly-v1"},
+  "workloadServiceAccounts": ["secure-byo-runtime"],
+  "workloadImages": ["registry.example.invalid/reviewed/runtime@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"],
+  "reservedLabelPrefixes": ["secure-byo.platform/"]
+}
