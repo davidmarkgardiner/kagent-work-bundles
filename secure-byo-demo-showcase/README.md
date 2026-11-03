@@ -6,6 +6,8 @@ Copy this folder beside `secure-byo-agentgateway-jwt-otel-amendment`, `agentgate
 
 The outcome is one newly named owner YAML producing a complete agent, secured Gateway wiring, automatic security checks and a passing GoldenScenario, **without Substrate**. The team watches actual creation, readiness and calls. Shared infrastructure and imported images/content are prerequisites.
 
+The interactive agent must remain available through a protected endpoint in an approved standalone Deployment. The scenario may run as a Job; the old completed agent Job alone is not the live-agent demonstration.
+
 This addition authorizes the small read-only onboarding/evidence view needed for that demonstration. It supersedes earlier dashboard exclusions only for this bounded view. Reuse the existing OTel/LGTM and dashboard; do not build a replacement observability stack or redesign unrelated Grafana dashboards.
 
 The HTML and PDF are prepared briefing materials, not a live dashboard or a completed office case study. [The live-view handoff](LIVE-OBSERVABILITY-HANDOFF.md) defines what the work agent must connect and verify. [The claim map](CLAIM-EVIDENCE.md) separates actual lab results from remaining office gates.

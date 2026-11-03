@@ -7,7 +7,7 @@ Use two windows: a terminal for the approved delivery commands and the existing 
 | Done | Private prerequisite |
 | --- | --- |
 | [ ] | Target context, namespace, audience and bounded drill/reset scope agreed |
-| [ ] | Existing operator/CRDs, approved no-Substrate runtime and actual workload kind verified |
+| [ ] | Existing operator/CRDs and approved no-Substrate agent Deployment with protected live endpoint verified |
 | [ ] | Gateway/controller/proxies at the approved version; internal images/charts/content already imported |
 | [ ] | Approved JWT identity, model/MCP/content access and independent verifier/publisher available |
 | [ ] | Final owner YAML and field guide validated against the actual served schema |
