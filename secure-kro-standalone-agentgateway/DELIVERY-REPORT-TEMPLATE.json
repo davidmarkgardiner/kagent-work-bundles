@@ -1,0 +1,33 @@
+{
+  "format": "secure-kro-standalone-delivery-v1",
+  "environment": "{{TARGET_ENVIRONMENT}}",
+  "sourceRevision": "{{VERIFIED_SOURCE_REVISION}}",
+  "verifiedAtUTC": null,
+  "requestName": "{{NAME}}",
+  "requestUID": null,
+  "approvalExpiresAtUTC": null,
+  "checks": {
+    "platformTrustReviewed": false,
+    "noSubstrateRuntime": false,
+    "automaticFirstNameComposition": false,
+    "automaticSecondNameComposition": false,
+    "routeAndPolicyCurrent": false,
+    "exactReferenceGrant": false,
+    "independentFreshVerification": false,
+    "actualModelSkillsKnowledgeMCP": false,
+    "jwtAndLaneDenialsNoForbiddenDispatch": false,
+    "admissionAndApprovalOwnership": false,
+    "runtimeNetworkIsolation": false,
+    "revocationExpiryPinAndRecreation": false,
+    "officeContractAdaptation": false,
+    "currentObservabilityEvidence": false,
+    "presenterRehearsal": false,
+    "approvedExistingImagesVerified": false,
+    "immutableCodeAndEntrypointAdmission": false
+  },
+  "evidencePaths": [],
+  "blockers": [],
+  "demoReady": false,
+  "existingHelperImageDigest": null,
+  "payloadSha256": null
+}

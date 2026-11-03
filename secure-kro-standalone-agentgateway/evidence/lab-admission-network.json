@@ -1,0 +1,197 @@
+{
+  "format": "secure-kro-standalone-admission-network-v1",
+  "scope": "actual final-source server admission and running-runtime network checks; no successful model claim",
+  "observations": [
+    {
+      "probe": "approved-code-no-label",
+      "allowed": true,
+      "expected": true,
+      "detail": "configmap/probe-runtime-code"
+    },
+    {
+      "probe": "tampered-code",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource ConfigMap/secure-kro-standalone/probe-runtime-code was blocked due to the following policies \n\nstandalone-secure-code:\n  standalone-code-bytes: 'validation error: only the reviewed immutable code bytes.\n    rule standalone-code-bytes failed at path /binaryData/f0000/'"
+    },
+    {
+      "probe": "extra-code-key",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource ConfigMap/secure-kro-standalone/probe-runtime-code was blocked due to the following policies \n\nstandalone-secure-code:\n  standalone-code-keyset: code ConfigMaps have exactly the approved binaryData keys,\n    immutable true and no alternate data"
+    },
+    {
+      "probe": "alternate-data",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource ConfigMap/secure-kro-standalone/probe-runtime-code was blocked due to the following policies \n\nstandalone-secure-code:\n  standalone-code-keyset: code ConfigMaps have exactly the approved binaryData keys,\n    immutable true and no alternate data"
+    },
+    {
+      "probe": "mutable-code",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource ConfigMap/secure-kro-standalone/probe-runtime-code was blocked due to the following policies \n\nstandalone-secure-code:\n  standalone-code-bytes: 'validation error: only the reviewed immutable code bytes.\n    rule standalone-code-bytes failed at path /immutable/'\n  standalone-code-keyset: code ConfigMaps have exactly the approved binaryData keys,\n    immutable true and no alternate data"
+    },
+    {
+      "probe": "approved-golden-job",
+      "allowed": true,
+      "expected": true,
+      "detail": "job.batch/docs-yaml-a-golden"
+    },
+    {
+      "probe": "shell-command",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Job/secure-kro-standalone/docs-yaml-a-golden was blocked due to the following policies \n\nstandalone-secure-workloads:\n  standalone-golden-jobs: verifier templates must have the exact restricted Python\n    execution shape"
+    },
+    {
+      "probe": "shadow-mount",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Job/secure-kro-standalone/docs-yaml-a-golden was blocked due to the following policies \n\nstandalone-secure-workloads:\n  standalone-golden-jobs: verifier templates must have exact code, mounts and environment"
+    },
+    {
+      "probe": "code-source",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Job/secure-kro-standalone/docs-yaml-a-golden was blocked due to the following policies \n\nstandalone-secure-workloads:\n  standalone-golden-jobs: verifier templates must have exact code, mounts and environment"
+    },
+    {
+      "probe": "env-injection",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Job/secure-kro-standalone/docs-yaml-a-golden was blocked due to the following policies \n\nstandalone-secure-workloads:\n  standalone-golden-jobs: verifier templates must have exact code, mounts and environment"
+    },
+    {
+      "probe": "lifecycle-exec",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Job/secure-kro-standalone/docs-yaml-a-golden was blocked due to the following policies \n\nstandalone-secure-workloads:\n  standalone-golden-jobs: verifier templates must have the exact restricted Python\n    execution shape"
+    },
+    {
+      "probe": "sidecar",
+      "allowed": false,
+      "expected": false,
+      "detail": "The Job \"docs-yaml-a-golden\" is invalid: spec.template.spec.containers[1].name: Duplicate value: \"golden\""
+    },
+    {
+      "policies": [
+        {
+          "name": "standalone-secure-workloads",
+          "conditions": [
+            {
+              "lastTransitionTime": "2026-11-03T22:59:04Z",
+              "message": "Ready",
+              "reason": "Succeeded",
+              "status": "True",
+              "type": "Ready"
+            }
+          ]
+        },
+        {
+          "name": "standalone-secure-code",
+          "conditions": [
+            {
+              "lastTransitionTime": "2026-11-03T23:43:04Z",
+              "message": "Ready",
+              "reason": "Succeeded",
+              "status": "True",
+              "type": "Ready"
+            }
+          ]
+        },
+        {
+          "name": "standalone-secure-requests",
+          "conditions": [
+            {
+              "lastTransitionTime": "2026-11-03T23:03:56Z",
+              "message": "Ready",
+              "reason": "Succeeded",
+              "status": "True",
+              "type": "Ready"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "probe": "approved-owner",
+      "allowed": true,
+      "expected": true,
+      "detail": "standalonesecureagent.kro.run/docs-yaml-a"
+    },
+    {
+      "probe": "composer-self-approval",
+      "denied": true,
+      "detail": "The configmaps \"docs-yaml-a-approval\" is invalid: : ValidatingAdmissionPolicy 'standalone-secure-approval-data' with binding 'standalone-secure-approval-data' denied request: only the shared verifier may change approval data (composer self-approval denied)"
+    },
+    {
+      "probe": "approved-pod",
+      "allowed": true,
+      "expected": true,
+      "detail": "pod/approved-runtime-probe"
+    },
+    {
+      "probe": "exec-probe",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-kro-standalone/approved-runtime-probe was blocked due to the following policies \n\nstandalone-secure-workloads:\n  standalone-pods: only the approved helper, Python command and restricted execution\n    shape"
+    },
+    {
+      "probe": "extra-container",
+      "allowed": false,
+      "expected": false,
+      "detail": "Warning: spec.containers[1].ports[0]: duplicate port definition with spec.containers[0].ports[0]\nWarning: spec.containers[1].ports[0]: duplicate port name \"http\" with spec.containers[0].ports[0], services and probes that select ports by name will use spec.containers[0].ports[0]\nError from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-kro-standalone/approved-runtime-probe was blocked due to the following policies \n\nstandalone-secure-workloads:\n  standalone-pods: only the approved helper, Python command and restricted execution\n    shape"
+    },
+    {
+      "probe": "projection-path",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-kro-standalone/approved-runtime-probe was blocked due to the following policies \n\nstandalone-secure-workloads:\n  standalone-pods: exact role code source, projection items, read-only mounts, environment\n    and probes are required"
+    },
+    {
+      "probe": "working-dir",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-kro-standalone/approved-runtime-probe was blocked due to the following policies \n\nstandalone-secure-workloads:\n  standalone-pods: only the approved helper, Python command and restricted execution\n    shape"
+    },
+    {
+      "probe": "extra-env",
+      "allowed": false,
+      "expected": false,
+      "detail": "Error from server: error when creating \"STDIN\": admission webhook \"validate.kyverno.svc-fail\" denied the request: \n\nresource Pod/secure-kro-standalone/approved-runtime-probe was blocked due to the following policies \n\nstandalone-secure-workloads:\n  standalone-pods: exact role code source, projection items, read-only mounts, environment\n    and probes are required"
+    },
+    {
+      "network": [
+        {
+          "probe": "cluster-dns",
+          "resolved": true
+        },
+        {
+          "probe": "gateway-positive",
+          "connected": true,
+          "expected": true
+        },
+        {
+          "probe": "direct-facade-denied",
+          "connected": false,
+          "expected": false
+        },
+        {
+          "probe": "direct-model-denied",
+          "connected": false,
+          "expected": false
+        },
+        {
+          "probe": "direct-api-denied",
+          "connected": false,
+          "expected": false
+        },
+        {
+          "probe": "no-api-token-mount",
+          "absent": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "secure-kro-standalone-settings/v1",
+  "standaloneNamespace": "secure-kro-standalone",
+  "image": "{{INTERNAL_REGISTRY}}/python-helper@sha256:{{APPROVED_HELPER_IMAGE_DIGEST_64_HEX}}",
+  "imagePullSecrets": [],
+  "gateway": {
+    "create": true,
+    "name": "standalone-secure",
+    "namespace": "secure-byo-gateway-system",
+    "className": "agentgateway",
+    "controllerName": "agentgateway.dev/agentgateway",
+    "listenerName": "agents",
+    "port": 8080,
+    "serviceHost": "{{GATEWAY_DATAPLANE_SERVICE}}.secure-byo-gateway-system.svc.cluster.local",
+    "podLabels": {"gateway.networking.k8s.io/gateway-name": "standalone-secure"}
+  },
+  "jwt": {
+    "issuer": "{{CLUSTER_SERVICE_ACCOUNT_ISSUER}}",
+    "jwks": {"keys": ["{{CLUSTER_PUBLIC_SIGNING_KEYS_FROM_/openid/v1/jwks}}"]}
+  },
+  "model": {
+    "upstreamURL": "http://{{MODEL_SERVICE}}.{{MODEL_NAMESPACE}}.svc.cluster.local:{{MODEL_PORT}}/v1/chat/completions",
+    "name": "{{APPROVED_MODEL_NAME}}",
+    "podLabels": {"{{MODEL_POD_LABEL_KEY}}": "{{MODEL_POD_LABEL_VALUE}}"}
+  },
+  "apiServer": {"cidrs": ["{{API_SERVER_ENDPOINT_IP}}/32"], "ports": [443]},
+  "dns": {"namespace": "kube-system", "podLabels": {"k8s-app": "kube-dns"}},
+  "approval": {"verifyingSeconds": 900, "activeSeconds": 14400},
+  "limits": {
+    "maxModelCalls": 6, "maxToolCalls": 16, "maxMcpCalls": 1, "maxTokens": 2048,
+    "requestTimeoutSeconds": 60, "deadlineSeconds": 180, "maxResponseBytes": 131072
+  },
+  "revokers": {"users": [], "groups": ["{{PLATFORM_REVOKER_GROUP}}"]},
+  "submitters": {"users": [], "groups": ["{{PLATFORM_SUBMITTER_GROUP}}"]}
+}

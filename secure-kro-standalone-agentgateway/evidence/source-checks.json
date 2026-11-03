@@ -1,0 +1,29 @@
+{
+  "format": "secure-kro-standalone-source-checks-v1",
+  "recordedAtUTC": "2026-11-03T23:56:53.244054+00:00",
+  "unitAndLoopbackTests": 68,
+  "result": "PASS",
+  "command": "python3 -B -W error::ResourceWarning -m unittest discover -s tests",
+  "scope": "fixture, renderer, content and actual loopback HTTP transport tests; not target Golden success",
+  "rendererSha256": "ffb9701e054ddca2d42a695bc651025eb50d653e95ce523ae708a279ff2994ea",
+  "payloadBindings": {
+    "contentSha256": "d7d311b6e51e3476d3dbebc411438e0e6fdfab0d65e5054e633f63a142a1060d",
+    "modelSha256": "ae881202db7b31fcd7e8e0ffc7a38774f0d169535b510961d51b72b3869170e8",
+    "payloadSha256": "c55b9ca781a34e490a4c066879afb86672c7d40b057139305866c9a61979b462",
+    "runtimeSha256": "7623e727ee895c9c9529be85a132bd9254f507aafc21c672e8b5b837353b88d0",
+    "workerSha256": "26ecad1695f01a60a4a1fe106c074d96b23d570a62351d79ca7f6fa1e85c6e6b"
+  },
+  "customImageBuildRequired": false,
+  "pythonCommand": [
+    "/usr/local/bin/python3",
+    "-B",
+    "-E",
+    "-s",
+    "/agent/main.py"
+  ],
+  "htmlRealChromeViewports": [
+    360,
+    1200
+  ],
+  "htmlDocumentOverflow": false
+}

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Secure agent onboarding · KRO without Substrate</title>
+<style>
+:root{--paper:#faf9f5;--ink:#141413;--muted:#575750;--line:#d1cfc5;--accent:#b85c3e}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.55 system-ui,-apple-system,sans-serif}
+main{max-width:1120px;margin:auto;padding:52px 30px}h1,h2{font-family:Georgia,serif;font-weight:normal;line-height:1.12}h1{font-size:clamp(38px,5.4vw,62px);letter-spacing:-.018em;max-width:850px;margin:16px 0 24px}h2{font-size:31px;margin:0 0 20px}h3{font-size:18px}p{max-width:840px}.eyebrow{font:12px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}.notice{border-left:4px solid var(--accent);padding:12px 20px;background:#f0eee6}.meta{color:var(--muted);font-size:14px}section{border-top:1px solid var(--line);margin-top:42px;padding-top:34px}.flow{overflow:auto}svg{display:block;width:100%;min-width:680px;height:auto}svg text{font-family:system-ui,sans-serif;font-size:16px}svg .small{font-size:13px;fill:var(--muted)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}.grid>div{border-top:3px solid var(--line);padding-top:8px}a{color:#8f4329;text-underline-offset:3px}code{font:14px ui-monospace,monospace;overflow-wrap:anywhere}li{margin:9px 0}table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:13px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;overflow-wrap:anywhere}th:first-child{width:24%}@media(max-width:720px){main{padding:30px 20px}.grid{grid-template-columns:1fr}table{font-size:14px}th,td{padding:10px 6px}}@media print{main{padding:0}section{break-inside:avoid}.notice{background:white}a{color:inherit}body{font-size:12px}.flow svg{min-width:0}}
+</style>
+<main>
+<div class="eyebrow">Platform demonstration · standalone reference</div>
+<h1>One request.<br><em>Secure</em> agent onboarding.</h1>
+<p>An owner chooses an approved profile and supplies instructions. KRO composes the agent and its Gateway resources. Independent verification must succeed before normal callers can use it.</p>
+<div class="notice"><strong>Offline briefing. Lab Golden gate blocked by model HTTP 429.</strong> This page explains the implementation and rehearsal. Read <a href="LAB-RESULTS.md">the recorded lab results</a> for verified scope and freshness. A work deployment needs its own current receipts.</div>
+
+<section aria-labelledby="composition"><h2 id="composition">What the request creates</h2>
+<div class="flow"><svg role="img" aria-labelledby="flow-title flow-desc" viewBox="0 0 1020 255">
+<title id="flow-title">Standalone secure-agent composition</title><desc id="flow-desc">A protected request goes to KRO, which creates the agent, Gateway route and policy, ReferenceGrant and verification Job. Independent verification grants time-limited access.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#575750"/></marker></defs>
+<g fill="white" stroke="#d1cfc5"><rect x="5" y="78" width="175" height="92" rx="3"/><rect x="218" y="78" width="150" height="92" rx="3"/><rect x="414" y="10" width="260" height="62" rx="3"/><rect x="414" y="91" width="260" height="62" rx="3"/><rect x="414" y="172" width="260" height="62" rx="3"/><rect x="734" y="78" width="275" height="92" rx="3"/></g>
+<g fill="#141413"><text x="22" y="110">Owner request</text><text class="small" x="22" y="137">Profile + instructions</text><text x="240" y="110">KRO graph</text><text class="small" x="240" y="137">Protected platform</text><text x="432" y="36">Agent Deployment</text><text class="small" x="432" y="57">Model + pinned skills / knowledge</text><text x="432" y="117">Route + JWT policy + grant</text><text class="small" x="432" y="138">Exact cross-namespace Service</text><text x="432" y="198">Verification Job</text><text class="small" x="432" y="219">Real execution + security checks</text><text x="752" y="110">Current verified access</text><text class="small" x="752" y="137">UID / pins / expiry / revocation</text></g>
+<g fill="none" stroke="#575750" marker-end="url(#arrow)"><path d="M180 124H211"/><path d="M368 124H390V41H407"/><path d="M390 124H407"/><path d="M390 124V203H407"/><path d="M674 203H705V124H727"/></g>
+</svg></div>
+<p>The runtime is a normal long-running Deployment using an existing approved Python helper image and immutable code/content ConfigMaps. No new custom-image build is required. It does not need Substrate, native worker pools, Harness, actors or the native CLI. Shared Gateway, authorization, verification and policy services are installed once as platform prerequisites.</p>
+</section>
+
+<section aria-labelledby="traffic"><h2 id="traffic">The secured execution path</h2><ol>
+<li>The caller presents an audience-bound JWT to Agent Gateway. The generated HTTPRoute targets the exact front Service; a destination ReferenceGrant consents to that cross-namespace reference.</li>
+<li>The trusted facade performs TokenReview and checks current request identity, resource pins and approval. It gives the runtime a private, short-lived invocation handle.</li>
+<li>The runtime uses its projected worker JWT and handle through the Gateway for the approved model and typed MCP operation. It receives no provider key or API-audience credential.</li>
+<li>The independent verifier runs the documentation scenario, checks actual model/tool/content evidence and denial behavior, then publishes time-limited approval. Expiry, revocation or changed authority denies fresh work.</li>
+</ol><p class="meta">A ReferenceGrant supplies destination consent; caller authentication and authorization remain separate checks. Platform/KRO administrators and approved profile authors are trust roots.</p></section>
+
+<section aria-labelledby="demo"><h2 id="demo">What to show the team</h2><div class="grid">
+<div><h3>Apply and observe</h3><p>Submit a new name. Watch configuration, Deployment, route, policy, grant and verifier appear without manual per-agent Gateway edits.</p></div>
+<div><h3>Execute and inspect</h3><p>Show the fresh verification receipt, actual skill/knowledge reads, real bounded model execution and synthetic read-only MCP result.</p></div>
+<div><h3>Deny and recover</h3><p>Demonstrate invalid tokens, worker-lane misuse, revoked access and lost consent. Onboard a second name using the same graph.</p></div>
+</div><p>Use the <a href="DEMO-WALKTHROUGH.md">rehearsal walkthrough</a> and existing observability handoff for live telemetry. Missing Tempo/log/metrics or agent ancestry remains visible as an evidence gap; this page does not simulate it.</p></section>
+
+<section aria-labelledby="boundary"><h2 id="boundary">Reference and office boundaries</h2><table><thead><tr><th>Area</th><th>This reference</th><th>Office delivery gate</th></tr></thead><tbody>
+<tr><th>Runtime / identity</th><td>Standalone Deployment; Kubernetes JWT now</td><td>Approved internal runtime, issuer/JWKS and TLS; Entra later</td></tr>
+<tr><th>Skills / knowledge</th><td>Pinned documentation/code ConfigMaps, model configuration bindings</td><td>Adapt existing ModelConfig, Skill and KnowledgeBase contracts; preserve the four CRDs</td></tr>
+<tr><th>Verification</th><td>Separate trusted Job and receipt</td><td>Integrate existing GoldenScenario contract and prove final target revision</td></tr>
+<tr><th>Delivery</th><td>RGD, resource YAML and pinned code/content source</td><td>Reuse approved installed images; import missing prerequisites through the approved process</td></tr>
+<tr><th>Security</th><td>Admission, JWT, live authorization and NetworkPolicy</td><td>Review controller privileges and prove target CNI/admission enforcement</td></tr>
+</tbody></table><p><a href="docs/COMPARISON.md">HostedAgent versus KRO comparison</a> · <a href="HUMAN-PREREQUISITES.md">Human prerequisite sheet</a> · <a href="WORK-AGENT-PROMPT.md">Work-agent prompt</a></p></section>
+</main>
+</html>

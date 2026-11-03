@@ -1,0 +1,330 @@
+{
+  "format": "secure-kro-standalone-lab-snapshot-v1",
+  "recordedAtUTC": "2026-11-03T23:55:18.198598+00:00",
+  "modelGate": "BLOCKED_PROVIDER_HTTP_429",
+  "demoReady": false,
+  "metadataOnlyComposerSSA": {
+    "manager": "kro.run/applyset",
+    "preservedVerifierData": true,
+    "dataSha256": "4f9c1973706b21a292fb6b77c55394ea320cd26a93d0429c0f5b10e3965deb1a"
+  },
+  "owner": {
+    "name": "docs-yaml-a",
+    "uid": "df7b9c22-24f8-4b98-97f6-b68510b7766e",
+    "generation": 1,
+    "status": {
+      "approvalExpiresAt": "2026-11-03T23:53:14Z",
+      "approvalState": "Failed",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-11-03T23:53:08Z",
+          "message": "instance is properly managed with finalizers and labels",
+          "observedGeneration": 1,
+          "reason": "Managed",
+          "status": "True",
+          "type": "InstanceManaged"
+        },
+        {
+          "lastTransitionTime": "2026-11-03T23:53:08Z",
+          "message": "runtime graph created and all resources resolved",
+          "observedGeneration": 1,
+          "reason": "Resolved",
+          "status": "True",
+          "type": "GraphResolved"
+        },
+        {
+          "lastTransitionTime": "2026-11-03T23:53:08Z",
+          "message": "resource reconciliation failed: apply results contain errors: waiting for node \"golden\": node \"golden\": failed to evaluate readyWhen expression: \"golden.status.succeeded == 1\" (waiting for readiness)\nwaiting for node \"approval\": readyWhen condition evaluated to false: \"approval.data.state == 'Active'\" (waiting for readiness)",
+          "observedGeneration": 1,
+          "reason": "NotReady",
+          "status": "False",
+          "type": "ResourcesReady"
+        },
+        {
+          "lastTransitionTime": "2026-11-03T23:53:08Z",
+          "message": "resource reconciliation failed: apply results contain errors: waiting for node \"golden\": node \"golden\": failed to evaluate readyWhen expression: \"golden.status.succeeded == 1\" (waiting for readiness)\nwaiting for node \"approval\": readyWhen condition evaluated to false: \"approval.data.state == 'Active'\" (waiting for readiness)",
+          "observedGeneration": 1,
+          "reason": "NotReady",
+          "status": "False",
+          "type": "Ready"
+        }
+      ],
+      "state": "IN_PROGRESS"
+    }
+  },
+  "runtime": {
+    "generation": 1,
+    "status": {
+      "availableReplicas": 1,
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-11-03T23:53:10Z",
+          "lastUpdateTime": "2026-11-03T23:53:10Z",
+          "message": "Deployment has minimum availability.",
+          "reason": "MinimumReplicasAvailable",
+          "status": "True",
+          "type": "Available"
+        },
+        {
+          "lastTransitionTime": "2026-11-03T23:53:08Z",
+          "lastUpdateTime": "2026-11-03T23:53:10Z",
+          "message": "ReplicaSet \"docs-yaml-a-runtime-54f9569b4d\" has successfully progressed.",
+          "reason": "NewReplicaSetAvailable",
+          "status": "True",
+          "type": "Progressing"
+        }
+      ],
+      "observedGeneration": 1,
+      "readyReplicas": 1,
+      "replicas": 1,
+      "terminatingReplicas": 0,
+      "updatedReplicas": 1
+    },
+    "image": "docker.io/library/python@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c",
+    "command": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-E",
+      "-s",
+      "/agent/main.py"
+    ]
+  },
+  "rgd": {
+    "generation": 4,
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-11-03T23:03:10Z",
+          "message": "resource graph and schema are valid",
+          "observedGeneration": 4,
+          "reason": "Valid",
+          "status": "True",
+          "type": "GraphAccepted"
+        },
+        {
+          "lastTransitionTime": "2026-11-03T23:03:11Z",
+          "message": "kind StandaloneSecureAgent has been accepted and ready",
+          "observedGeneration": 4,
+          "reason": "Ready",
+          "status": "True",
+          "type": "KindReady"
+        },
+        {
+          "lastTransitionTime": "2026-11-03T23:03:12Z",
+          "message": "controller is running",
+          "observedGeneration": 4,
+          "reason": "Running",
+          "status": "True",
+          "type": "ControllerReady"
+        },
+        {
+          "lastTransitionTime": "2026-11-03T23:52:33Z",
+          "message": "revision 3 compiled and active",
+          "observedGeneration": 4,
+          "reason": "Resolved",
+          "status": "True",
+          "type": "GraphRevisionsResolved"
+        },
+        {
+          "lastTransitionTime": "2026-11-03T23:52:33Z",
+          "message": "",
+          "observedGeneration": 4,
+          "reason": "Ready",
+          "status": "True",
+          "type": "Ready"
+        }
+      ],
+      "lastIssuedRevision": 3,
+      "resources": [
+        {
+          "dependencies": [
+            {
+              "id": "workerAccount"
+            },
+            {
+              "id": "modelBinding"
+            },
+            {
+              "id": "contentBinding"
+            },
+            {
+              "id": "runtimeCode"
+            }
+          ],
+          "id": "agentDeployment"
+        },
+        {
+          "dependencies": [
+            {
+              "id": "frontService"
+            }
+          ],
+          "id": "frontGrant"
+        },
+        {
+          "dependencies": [
+            {
+              "id": "frontGrant"
+            },
+            {
+              "id": "frontService"
+            }
+          ],
+          "id": "route"
+        },
+        {
+          "dependencies": [
+            {
+              "id": "route"
+            }
+          ],
+          "id": "routePolicy"
+        },
+        {
+          "dependencies": [
+            {
+              "id": "agentDeployment"
+            },
+            {
+              "id": "route"
+            },
+            {
+              "id": "routePolicy"
+            },
+            {
+              "id": "runtimeCode"
+            }
+          ],
+          "id": "golden"
+        }
+      ],
+      "state": "Active",
+      "topologicalOrder": [
+        "workerAccount",
+        "callerAccount",
+        "modelBinding",
+        "contentBinding",
+        "runtimeCode",
+        "agentDeployment",
+        "runtimeService",
+        "frontService",
+        "frontGrant",
+        "route",
+        "routePolicy",
+        "approval",
+        "golden"
+      ]
+    }
+  },
+  "route": {
+    "generation": 1,
+    "status": {
+      "parents": [
+        {
+          "conditions": [
+            {
+              "lastTransitionTime": "2026-11-03T23:53:08Z",
+              "message": "",
+              "observedGeneration": 1,
+              "reason": "Accepted",
+              "status": "True",
+              "type": "Accepted"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T23:53:08Z",
+              "message": "",
+              "observedGeneration": 1,
+              "reason": "ResolvedRefs",
+              "status": "True",
+              "type": "ResolvedRefs"
+            }
+          ],
+          "controllerName": "agentgateway.dev/agentgateway",
+          "parentRef": {
+            "group": "gateway.networking.k8s.io",
+            "kind": "Gateway",
+            "name": "standalone-secure",
+            "namespace": "secure-byo-gateway-system",
+            "sectionName": "agents"
+          }
+        }
+      ]
+    }
+  },
+  "policy": {
+    "generation": 1,
+    "status": {
+      "ancestors": [
+        {
+          "ancestorRef": {
+            "group": "gateway.networking.k8s.io",
+            "kind": "Gateway",
+            "name": "standalone-secure",
+            "namespace": "secure-byo-gateway-system"
+          },
+          "conditions": [
+            {
+              "lastTransitionTime": "2026-11-03T23:53:09Z",
+              "message": "Policy accepted",
+              "observedGeneration": 1,
+              "reason": "Valid",
+              "status": "True",
+              "type": "Accepted"
+            },
+            {
+              "lastTransitionTime": "2026-11-03T23:53:09Z",
+              "message": "Attached to all targets",
+              "observedGeneration": 1,
+              "reason": "Attached",
+              "status": "True",
+              "type": "Attached"
+            }
+          ],
+          "controllerName": "agentgateway.dev/agentgateway"
+        }
+      ]
+    }
+  },
+  "referenceGrantSpec": {
+    "from": [
+      {
+        "group": "gateway.networking.k8s.io",
+        "kind": "HTTPRoute",
+        "namespace": "secure-byo-gateway-system"
+      }
+    ],
+    "to": [
+      {
+        "group": "",
+        "kind": "Service",
+        "name": "docs-yaml-a-front"
+      }
+    ]
+  },
+  "goldenReceipt": {
+    "agent": "docs-yaml-a",
+    "event": "golden-receipt",
+    "imageDigest": "sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c",
+    "podUID": "c3014a25-1458-4ddd-95d9-32e73357156d",
+    "probes": {
+      "forgedToken": 401,
+      "goldenHTTPStatus": 502,
+      "goldenRuntimeReason": "ProviderHTTP502",
+      "missingToken": 401,
+      "verifierBeforeVerifying": 403,
+      "wrongAudience": 401,
+      "wrongLaneMcp": 403,
+      "wrongLaneModel": 403,
+      "wrongSubject": 403
+    },
+    "proofScope": "standalone KRO reference runtime with ConfigMap bindings and synthetic MCP; not native kagent Agent, Harness, ModelConfig, Skill or Substrate proof",
+    "reason": "GoldenInvokeRejected",
+    "requestUID": "df7b9c22-24f8-4b98-97f6-b68510b7766e",
+    "result": "Failed",
+    "scenario": "golden-docs-readonly-v1",
+    "state": "Failed",
+    "verifierJobUID": "e29ae907-006d-42ac-a5ca-facb4556f838"
+  },
+  "approvalState": "Failed",
+  "jobFailed": 1
+}

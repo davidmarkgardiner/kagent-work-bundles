@@ -1,0 +1,10 @@
+{
+  "probe": "final-failed-approval-caller",
+  "status": 403,
+  "body": {
+    "error": "ApprovalFailed"
+  },
+  "ownerlessVerifierCreateDenied": true,
+  "ownerlessDenialLayer": "Kyverno standalone-secure-workloads",
+  "approvalPolicyCELTypeWarnings": []
+}

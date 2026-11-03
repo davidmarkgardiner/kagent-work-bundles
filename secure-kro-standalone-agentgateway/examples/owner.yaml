@@ -1,0 +1,7 @@
+apiVersion: kro.run/v1alpha1
+kind: StandaloneSecureAgent
+metadata:
+  name: docs-demo
+spec:
+  profileRef: docs-readonly-v1
+  instructions: "Use only the reviewed AKS documentation packages. Explain proposed read-only checks, cite exact sources and state that no operational investigation or changes were performed."

@@ -1,0 +1,38 @@
+{
+  "scope": "existing model Gateway to collector to metadata viewer only",
+  "traceId": "14a8b7ea10f4820744a3014dec837b94",
+  "found": true,
+  "tempoVerified": false,
+  "fullAgentAncestryVerified": false,
+  "status": "error",
+  "durationMs": 931.091068,
+  "spanCount": 2,
+  "components": [
+    "agentgateway",
+    "model"
+  ],
+  "receivedAt": 1793749998.9088311,
+  "inputTokens": null,
+  "outputTokens": null,
+  "usageComplete": false,
+  "spans": [
+    {
+      "spanId": "8fbaef926ad66bd0",
+      "parentSpanId": "",
+      "service": "agentgateway",
+      "component": "agentgateway",
+      "name": "POST request",
+      "status": "ok",
+      "durationMs": 931.091068
+    },
+    {
+      "spanId": "760fb89c85965db1",
+      "parentSpanId": "8fbaef926ad66bd0",
+      "service": "agentgateway",
+      "component": "agentgateway",
+      "name": "POST request",
+      "status": "error",
+      "durationMs": 929.416103
+    }
+  ]
+}

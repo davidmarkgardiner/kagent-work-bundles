@@ -1,0 +1,61 @@
+{
+  "format": "secure-kro-standalone-artifact-reference-v1",
+  "substrateRequired": false,
+  "officeArtifactReadinessVerified": false,
+  "runtimeSourceIncluded": true,
+  "reviewedDataIncluded": true,
+  "binaryArtifactsIncluded": false,
+  "components": [
+    {
+      "component": "existing-approved-python-helper",
+      "labPlatform": "linux/amd64",
+      "destinationReference": null,
+      "destinationVerifiedDigest": null,
+      "sourceReference": "docker.io/library/python:3.12.12-slim-bookworm",
+      "sourceIndexDigest": "sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c",
+      "sourcePlatformManifestDigest": "sha256:2986c55feb36e6cae00fa1fefb454283e4b33f35e75ff8bdd123b134130be301",
+      "sourceImageConfigDigest": "sha256:9cb180cb36bd45dc786105b834d3cb5f3b1d69a6a63c79ca10fc64f108aa649a",
+      "requiredAction": "Reuse existing internal helper digest after interpreter/CA/architecture/restricted-execution checks; import only if absent"
+    },
+    {
+      "component": "runtime-facade-verifier-code",
+      "delivery": "immutable ConfigMaps generated from reviewed app/vendor/content source",
+      "sourceIncluded": true,
+      "requiresNewImage": false,
+      "payloadDigestVerifiedOnOfficeTarget": false
+    },
+    {
+      "component": "kro",
+      "labVersion": "v0.9.4",
+      "labImageReference": "registry.k8s.io/kro/kro:v0.9.4",
+      "sourceCommit": "d587de7321eec33c1bed578af6fca4da22ec0df3",
+      "requiredAction": "Reuse the compatible installed owner or stage approved chart, controller and rollback artifacts; verify internal manifests and permissions",
+      "destinationVerifiedDigest": null
+    },
+    {
+      "component": "agentgateway",
+      "labVersion": "v1.7.0",
+      "artifactReference": "https://github.com/davidmarkgardiner/kagent-work-bundles/blob/main/agentgateway-1-7-upgrade/artifact-inventory.json",
+      "requiredAction": "Reuse the compatible installed controller and Gateway API; stage all rendered images/charts when missing",
+      "destinationVerifiedDigest": null
+    },
+    {
+      "component": "admission-networking-and-client",
+      "labMatrix": "Kubernetes 1.35.0, Gateway API 1.6.2, Kyverno 1.17.1, CNI with enforced NetworkPolicy, matching kubectl",
+      "requiredAction": "Inventory installed schemas and enforcement; stage missing approved artifacts through platform owners",
+      "destinationVerifiedDigest": null
+    }
+  ],
+  "additionalPrivateInputs": [
+    "approved target, context and fixed namespace/Gateway profile",
+    "JWT issuer/JWKS/audience and protected identity delivery",
+    "internal model destination and existing credential ownership",
+    "approved skill/knowledge/tool contracts and content pins",
+    "API-server and CNI paths, DNS, TLS/CA and internal registry access",
+    "existing collector and LGTM query/view access"
+  ],
+  "customImageBuildRequired": false,
+  "codeDelivery": "approved immutable ConfigMap payload with fixed Python entrypoint",
+  "labFullDemoVerified": false,
+  "labModelGate": "BLOCKED_PROVIDER_HTTP_429"
+}

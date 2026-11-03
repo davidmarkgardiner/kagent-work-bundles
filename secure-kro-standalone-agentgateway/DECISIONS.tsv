@@ -1,0 +1,5 @@
+ts	phase	decision	why	evidence	result
+2026-11-03T21:53:48Z	design	Use a standalone Deployment, platform facade/verifier and cluster-scoped KRO composition	Avoid native runtime dependencies and invalid namespace ownership while generating central routes and destination consent	docs/DESIGN.md	Implementation and actual lab verification in progress
+2026-11-03	existing-image-delivery	Main path uses approved Python helper plus immutable code/content ConfigMaps; optional custom build is not required
+2026-11-03	terminal-gc	Permit only terminal Pod owner-reference removal during metadata update; retain exact execution contracts
+2026-11-03	provider-limit	Real model Gateway recorded upstream HTTP429; stop model-dependent work and keep approval Failed

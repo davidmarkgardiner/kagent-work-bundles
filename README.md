@@ -189,3 +189,11 @@ verify the per-bundle manifest, and preserve unrelated folders.
 
 The Radar bundle's reusable KB deployment/indexer source is in the primary repo:
 https://github.com/davidmarkgardiner/kagent-public/tree/6ab7e2f24d7a56bf99809696433d76665022c797/ai-platform/kagent-knowledge-base
+
+## Secure KRO onboarding without Substrate
+
+Use [secure-kro-standalone-agentgateway](secure-kro-standalone-agentgateway/README.md) for the separate long-running KRO reference with Agent Gateway 1.7, HTTPRoute, destination ReferenceGrant, JWT policies and independent Golden verification. The main path uses RGD/resource YAML and immutable code/content ConfigMaps with an existing approved Python helper image. A new custom-image build is not required.
+
+Start at its [work-agent prompt](secure-kro-standalone-agentgateway/WORK-AGENT-PROMPT.md), [human prerequisites](secure-kro-standalone-agentgateway/HUMAN-PREREQUISITES.md), [runbook](secure-kro-standalone-agentgateway/RUNBOOK.md) and [lab results](secure-kro-standalone-agentgateway/LAB-RESULTS.md). The [HostedAgent/KRO comparison](secure-kro-standalone-agentgateway/docs/COMPARISON.md) explains the tradeoffs. Existing native/four-CRD and office integrations keep their recorded proof boundaries.
+
+The current standalone lab model gate is blocked by provider HTTP 429. Composition/security checks are recorded; a complete successful Golden demonstration is not yet verified.

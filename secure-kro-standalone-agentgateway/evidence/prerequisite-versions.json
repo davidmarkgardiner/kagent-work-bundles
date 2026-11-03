@@ -1,0 +1,17 @@
+{
+  "observedAtUTC": "2026-11-03T22:04:09.775049+00:00",
+  "server": "v1.35.0",
+  "kro": [
+    "registry.k8s.io/kro/kro:v0.9.4"
+  ],
+  "gatewayController": [
+    "cr.agentgateway.dev/controller:v1.7.0@sha256:87c1363bf0cbc7fdb375866e592294114c8763097d2d0c9fc45fcb1fe00a4ab8"
+  ],
+  "gatewayAPI": "v1.6.2",
+  "kyverno": [
+    "reg.kyverno.io/kyverno/kyverno:v1.17.1"
+  ],
+  "scope": "Read-only prerequisite version discovery; not standalone deployment verification",
+  "kroSourceCommit": "d587de7321eec33c1bed578af6fca4da22ec0df3",
+  "agentgatewaySourceCommit": "26f5aebe99a36a037fe54f8080a608aca5547e15"
+}

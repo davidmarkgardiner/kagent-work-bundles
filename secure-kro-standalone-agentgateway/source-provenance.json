@@ -1,0 +1,11 @@
+{
+  "workerSource": "agent-platform-four-crds/standalone/worker.py",
+  "workerSourceSha256": "40e23b80969ff18d54e4250224a1fde62ba96055e8aaa22a95bce9ca55af9367",
+  "contentSource": "secure-byo-agent-composition/content",
+  "scope": "existing bounded standalone documentation loop and reviewed data-only content; not native runtime proof",
+  "workerAdapterSha256": "26ecad1695f01a60a4a1fe106c074d96b23d570a62351d79ca7f6fa1e85c6e6b",
+  "workerAdapterDelta": "app/vendor/worker_base.delta.patch",
+  "workerAdapterDeltaSha256": "6343d1991dfdf776d8c1097dbf7d633d2bfa0a57df39a3ab55387e4fea1c3416",
+  "contentReadmeAdapted": true,
+  "adapterScope": "fixed model transport/credential hooks, typed empty-argument status MCP hook and verified answer return; original no-hook CLI remains"
+}
