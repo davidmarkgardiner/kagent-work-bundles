@@ -1,0 +1,16 @@
+{
+  "gatewayNamespace": "{{APPROVED_GATEWAY_NAMESPACE}}",
+  "gatewayName": "{{EXISTING_GATEWAY_NAME}}",
+  "policyName": "secure-agent-demo-observability",
+  "collectorNamespace": "{{EXISTING_COLLECTOR_NAMESPACE}}",
+  "collectorService": "{{EXISTING_COLLECTOR_SERVICE}}",
+  "collectorPort": 4317,
+  "collectorPodPort": 4317,
+  "protocol": "GRPC",
+  "sampleRatio": "1.0",
+  "serviceName": "agentgateway-secure-onboarding",
+  "gatewayPodLabels": {"gateway.networking.k8s.io/gateway-name": "{{EXISTING_GATEWAY_NAME}}"},
+  "collectorPodLabels": {"{{ACTUAL_LABEL_KEY}}": "{{ACTUAL_LABEL_VALUE}}"},
+  "approvedGatewayScope": false,
+  "privacyReviewReference": "{{METADATA_ONLY_COLLECTOR_REVIEW_REFERENCE}}"
+}

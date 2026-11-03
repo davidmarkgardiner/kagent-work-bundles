@@ -1,0 +1,49 @@
+{
+  "format": "gateway-jwt-otel-amendment-v1",
+  "repository": "https://github.com/davidmarkgardiner/kagent-work-bundles",
+  "inspectedBaseCommit": "4bfb61fc197a94157dcbebcaf1143cbf9f398b13",
+  "copyMode": "Sibling folder; merge reviewed changes into existing office work. Do not replace or add files inside a hash-verified base bundle.",
+  "identityScope": "Approved Kubernetes JWT/TokenReview for this demo; Entra later",
+  "nativeGatewayReference": "agentgateway v1.5.0",
+  "gatewayUpstreamCommit": "fe6732474a96a0363dfb9822859af4e9bab360fa",
+  "sourcePins": {
+    "secure-byo-agent-composition/bundle.manifest.json": {
+      "sha256": "592d6be7f05e667bb94be7e6f638e1716814a3429b4ab5a1de15e827ba4ec0d8",
+      "gitBlobSha": "4f46ac90d312b6c1f5dcf673e7414becfd5660b7"
+    },
+    "secure-byo-agent-composition/scripts/gateway.py": {
+      "sha256": "b049d4b5ae2e6ff1a31e6b2f398cbbbd279641cfcaf3baa3854cd66d1662a026",
+      "gitBlobSha": "f4c173c4812b81a291483addaa372784716b239a"
+    },
+    "secure-byo-agent-composition/scripts/deploy.py": {
+      "sha256": "97f78252ce72c9341039f51bb8037a8eae09b0d0aa347cfdb2d42fdade550772",
+      "gitBlobSha": "deefd4596a5da6580e26a3e8d2e1fb554e4d78e0"
+    },
+    "secure-byo-agent-composition/runtime/server.py": {
+      "sha256": "9b06913d895132d90acd66b19f4414cda107083d6812fcf82bd7c4ca6982c71a",
+      "gitBlobSha": "77edc1bdf0f00896b2256a91e5998653fcf73d21"
+    },
+    "secure-byo-agent-composition/DESIRED-STATE.md": {
+      "sha256": "2de4eadc631e0b9ee5989ebd5cb894c07a717237b95037748e3085149c8f9d6d",
+      "gitBlobSha": "ccb9a3836d9974536ce197dd43c986eae6bdb9d2"
+    },
+    "agent-platform-four-crds/KAGENT-1.0-WORK-AGENT-PROMPT.md": {
+      "sha256": "6daddcb6d71d851bc32c1dffad55fa51f9f0b13922ed2b885dfbe4e7ca1ed28f",
+      "gitBlobSha": "9bd335bb7ed2cc8341bf1d76c235d46b2dde0ddf"
+    },
+    "otel-agent-flow/NATIVE-KAGENT-OTEL.md": {
+      "sha256": "5f974002ca5e7737fcc517864f4b30b7086ae6a846db868073b589f56e8e8c96",
+      "gitBlobSha": "8ff11091644df9282c08edb93a1e6dee4d784479"
+    },
+    "otel-agent-flow/scripts/platform-telemetry.py": {
+      "sha256": "c7fdbdf8034c470b1399737b28f8d442b5e25f626c034b88e1980c17f7478c9a",
+      "gitBlobSha": "83679fc79d215ce557e0d1283a5953878489c6bd"
+    },
+    "otel-agent-flow/telemetry.py": {
+      "sha256": "2e7354896adb2e67b3182fc16b2b928c157b2fd938862a38b0354ce1e092733f",
+      "gitBlobSha": "c5cec21cfcfadcc77a245f26b2dc47cea3793ac3"
+    }
+  },
+  "officeIntegrationVerified": false,
+  "dashboardsIncluded": false
+}

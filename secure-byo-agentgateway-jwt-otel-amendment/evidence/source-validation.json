@@ -1,0 +1,44 @@
+{
+  "scope": "Amendment source, bounded local tests and native-lab server dry-run only; not applied and no office or new telemetry runtime result",
+  "date": "2026-11-03",
+  "unitTests": 12,
+  "installedPolicyCrdSha256": "ed525d14096fbc558367b61b3b0eb82232d87fd9080bf44f7a0c27627f6ec415",
+  "tracingSchemaFields": [
+    "attributes",
+    "backendRef",
+    "clientSampling",
+    "filter",
+    "path",
+    "protocol",
+    "randomSampling",
+    "resources",
+    "url"
+  ],
+  "serverDryRun": {
+    "objects": 2,
+    "passed": true,
+    "outputs": [
+      "AgentgatewayPolicy secure-onboarding-observability created (server dry run)",
+      "ReferenceGrant secure-onboarding-observability-collector created (server dry run)"
+    ],
+    "applied": false,
+    "resourcesUnchangedAfterNetworkPortFix": true
+  },
+  "readOnlyFindings": {
+    "secureJwtPolicies": 4,
+    "acceptedAttached": true,
+    "secureGatewayFrontendTelemetryConfigured": false,
+    "inspectedCollectorExporterIds": [
+      "otlp_http/viewer",
+      "otlp_http/old_demo"
+    ],
+    "collectorTempoLokiExporterObserved": false,
+    "otherLgtmPathsRuledOut": false
+  },
+  "newGatewayLgtmRuntimeProof": false,
+  "officeAutomationVerified": false,
+  "dashboardWorkIncluded": false,
+  "localCliTransportFixtureVerified": true,
+  "fixtureIsGatewayLgtmRuntimeProof": false,
+  "serviceAndPodPortsSeparatelyValidated": true
+}

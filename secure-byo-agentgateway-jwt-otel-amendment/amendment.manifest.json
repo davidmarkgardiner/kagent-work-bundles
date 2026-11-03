@@ -1,0 +1,85 @@
+{
+  "files": {
+    ".gitignore": {
+      "bytes": 38,
+      "sha256": "05b2a29d407f02b477afc5362670d00718a6c37239ce9f8570f74a8ba83a508f"
+    },
+    "DECISIONS.tsv": {
+      "bytes": 3132,
+      "sha256": "9506427552d7ab081c1b7ef029490db0e2360a73f8beb57b433a5be832b1e70c"
+    },
+    "DEMO-RUNBOOK.md": {
+      "bytes": 2680,
+      "sha256": "10e574e21540574ce57aaa8bfcac186f9ee73f067ef587b7b925dd36502769a7"
+    },
+    "DEPENDENCIES.json": {
+      "bytes": 2513,
+      "sha256": "703dc3475850dafa409b24a4ddb2f1e8689275438f43603338582bc2e7568133"
+    },
+    "DESIGN.md": {
+      "bytes": 2492,
+      "sha256": "3d5d7128bec1e4b12b172123495e0d706ff7da27d644cb3ccd32ff45f4ddea3f"
+    },
+    "ONBOARDING-AUTOMATION.md": {
+      "bytes": 5547,
+      "sha256": "cacc7143ea95e0141e7e31145a472944786deec660f2b84c461fc98babdb7d64"
+    },
+    "OTEL-INTEGRATION.md": {
+      "bytes": 10418,
+      "sha256": "a3a3c78ed696a74e8690cb77554ba2b7d21aa12a5c38991732ff10d8dbe0fda5"
+    },
+    "PREREQUISITES.md": {
+      "bytes": 2213,
+      "sha256": "99cc717404de882c1125bd1a35a0ec3e89b1b7a3be9361f7daf095548c067bfe"
+    },
+    "README.md": {
+      "bytes": 2119,
+      "sha256": "42dca142d06f5008b5b3906aba386457d6467c2a026dcbe95cf0d1e073a290f4"
+    },
+    "VALIDATION.md": {
+      "bytes": 3402,
+      "sha256": "d60ffe7d0f2bc83494eb4af56936e36a54fe8c40802548abc42b5b8b188d27b3"
+    },
+    "WORK-AGENT-AMENDMENT.md": {
+      "bytes": 3674,
+      "sha256": "1b6bef1bfe2b17f747a8011a93999de9adf8e6670db07b5f41196e83f049bbfd"
+    },
+    "evidence/REVIEW.md": {
+      "bytes": 1091,
+      "sha256": "7abf9d75abeedb53e7bbb82f343e2db1b4baa2ca8d314b2912b5f790abe91234"
+    },
+    "evidence/source-validation.json": {
+      "bytes": 1379,
+      "sha256": "b32aa05e998ed54711ee3dc7a7b78f7e58b6548124fbaae64fcc38b3416f3b8e"
+    },
+    "examples/amendment-outcome.example.json": {
+      "bytes": 1042,
+      "sha256": "f029ba11fef636dea4206434d9d074b32ff15e15df7317be1e1eef7f3c67efa4"
+    },
+    "examples/invoke-payload.json": {
+      "bytes": 223,
+      "sha256": "5475088706d8eb8554c33d7dbb36204ddcdd0a6ae44465d6f6c5e1b7145457b8"
+    },
+    "examples/telemetry-settings.json": {
+      "bytes": 702,
+      "sha256": "bf907a8135a7db58837ec683339b9a9c900ca0688c1da330de906aa5b373cc92"
+    },
+    "probe_trace.py": {
+      "bytes": 10852,
+      "sha256": "acf4249688ab1e7efb9c0d4c1fdeb8aa46132af55cc4e54565ee9db4095c972b"
+    },
+    "render_telemetry.py": {
+      "bytes": 8775,
+      "sha256": "c18e03a48362e284db13d70c5f10c9e79ed463b0e356e43764735776c3ffd10f"
+    },
+    "tests/test_amendment.py": {
+      "bytes": 11760,
+      "sha256": "0f1b85aa6656b992aade0938da95dbbaf7c71b6be25c8c13735f45e0b076a73f"
+    },
+    "verify.py": {
+      "bytes": 3619,
+      "sha256": "01a5e39f9d5096297e6bde3e22d4f6732245c628281fbe83c18ba245928a4767"
+    }
+  },
+  "format": "secure-gateway-amendment-v1"
+}

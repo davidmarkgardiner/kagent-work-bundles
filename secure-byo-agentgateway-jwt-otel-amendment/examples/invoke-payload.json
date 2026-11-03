@@ -1,0 +1,3 @@
+{
+  "prompt": "Synthetic documentation case only. Load both reviewed skills, read their AKS bootstrap references, call the approved get_demo_status operation, and cite the supplied sources. Do not execute Azure actions."
+}
