@@ -1,0 +1,22 @@
+{
+  "format": "agentgateway-1-7-office-outcome-v1",
+  "state": "in-progress",
+  "finalSourceRevision": null,
+  "runtimeProfile": "{{EXISTING_NO_SUBSTRATE_PROFILE}}",
+  "runtimeWorkloadKind": "{{ACTUAL_DEPLOYMENT_OR_JOB}}",
+  "substrateRequired": false,
+  "entraDeferred": true,
+  "artifactsImportedAndVerified": false,
+  "crdAndControllerReleasesVerified": false,
+  "allInScopeProxyDigestsVerified": false,
+  "jwtAndBackendChecksVerified": false,
+  "newNamedRequestAutomationVerified": false,
+  "actualStandaloneAgentWorkflowVerified": false,
+  "gatewaySpansAndAccessLogsVerified": false,
+  "tempoQueryVerified": false,
+  "logAndMetricsStoresVerified": false,
+  "rollbackPlanVerifiedForTarget": false,
+  "finalRevisionDemoRehearsalVerified": false,
+  "receipts": [],
+  "blockersAndOwners": []
+}

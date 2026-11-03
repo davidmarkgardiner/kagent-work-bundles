@@ -1,0 +1,71 @@
+{
+  "format": "agentgateway-1-7-artifact-reference-v1",
+  "version": "v1.7.0",
+  "sourceCommit": "26f5aebe99a36a037fe54f8080a608aca5547e15",
+  "substrateRequired": false,
+  "images": [
+    {
+      "component": "controller",
+      "source": "cr.agentgateway.dev/controller:v1.7.0",
+      "sourceIndexDigest": "sha256:87c1363bf0cbc7fdb375866e592294114c8763097d2d0c9fc45fcb1fe00a4ab8",
+      "labImportedPlatform": "linux/amd64",
+      "destinationReference": null,
+      "destinationVerifiedManifestDigest": null,
+      "includedInZip": false
+    },
+    {
+      "component": "proxy",
+      "source": "cr.agentgateway.dev/agentgateway:v1.7.0",
+      "sourceIndexDigest": "sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b",
+      "labImportedPlatform": "linux/amd64",
+      "destinationReference": null,
+      "destinationVerifiedManifestDigest": null,
+      "includedInZip": false
+    }
+  ],
+  "charts": [
+    {
+      "name": "agentgateway",
+      "version": "v1.7.0",
+      "source": "oci://cr.agentgateway.dev/charts/agentgateway",
+      "sourceOciManifestDigest": "sha256:40340d639e35206317c934e9af3e29575cf7c5377b2940679732baac6e108c15",
+      "archiveFileName": "agentgateway-v1.7.0.tgz",
+      "archiveSha256": "00c63256acd5c4305b2e7eab1da56c3e3a35a74a8f04e34aca58641dfdbc6037",
+      "archiveBytes": 13263,
+      "required": "for existing separate CRD/controller Helm ownership",
+      "includedInZip": false
+    },
+    {
+      "name": "agentgateway-crds",
+      "version": "v1.7.0",
+      "source": "oci://cr.agentgateway.dev/charts/agentgateway-crds",
+      "sourceOciManifestDigest": "sha256:946b739c0fcda4d47a72d1589d184b6fd507772e733cbedf02789bafd0468064",
+      "archiveFileName": "agentgateway-crds-v1.7.0.tgz",
+      "archiveSha256": "abf0327cd44f89bc263d86f155db4094166cb2e6b920805bcf879d426ecd6d91",
+      "archiveBytes": 263071,
+      "required": "for existing separate CRD/controller Helm ownership",
+      "includedInZip": false
+    },
+    {
+      "name": "agentgateway-standalone",
+      "version": "v1.7.0",
+      "source": "oci://cr.agentgateway.dev/charts/agentgateway-standalone",
+      "sourceOciManifestDigest": "sha256:f8e74f989c6705e3e1aaaaabacf554d594e2a24867eb4097b216e019a88c14a6",
+      "archiveFileName": "agentgateway-standalone-v1.7.0.tgz",
+      "archiveSha256": "26664b924328700612aaf465d7657bd8b8e56e1011f0a73b9f384f3a8f51c040",
+      "archiveBytes": 9147,
+      "required": "only if existing standalone proxy uses this chart",
+      "includedInZip": false
+    }
+  ],
+  "additionalRequiredInputs": [
+    "actual target architectures and rendered sidecar/init images",
+    "current-version rollback artifacts",
+    "existing Gateway API CRDs and supported Kubernetes",
+    "approved model/MCP credentials and JWT identity references",
+    "existing collector and LGTM query access",
+    "persistent session Secret where needed",
+    "approved kubectl within supported API-server version skew"
+  ],
+  "officeArtifactReadinessVerified": false
+}

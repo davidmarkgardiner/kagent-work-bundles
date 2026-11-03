@@ -1,0 +1,24 @@
+{
+  "agentgatewayModels": {
+    "enabled": false
+  },
+  "controller": {
+    "image": {
+      "registry": "{{INTERNAL_REGISTRY}}",
+      "repository": "{{CONTROLLER_REPOSITORY}}",
+      "tag": "v1.7.0@sha256:{{VERIFIED_DESTINATION_CONTROLLER_DIGEST}}"
+    }
+  },
+  "proxy": {
+    "image": {
+      "registry": "{{INTERNAL_REGISTRY}}",
+      "repository": "{{PROXY_REPOSITORY}}",
+      "tag": "v1.7.0@sha256:{{VERIFIED_DESTINATION_PROXY_DIGEST}}"
+    }
+  },
+  "imagePullSecrets": [
+    {
+      "name": "{{EXISTING_CONTROLLER_PULL_SECRET}}"
+    }
+  ]
+}

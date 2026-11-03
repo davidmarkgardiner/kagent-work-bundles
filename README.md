@@ -32,6 +32,7 @@ Start with [the office handoff](office-demo-security-2026-10-23/README.md).
 | Folder | Entry point |
 | --- | --- |
 | Secure BYO composition, existing HostedAgent continuation, and KRO comparison | [Front sheet](secure-byo-agent-composition/FRONT-SHEET.md), [human prerequisites](secure-byo-agent-composition/HUMAN-PREREQUISITES.md), and [agent prompt](secure-byo-agent-composition/WORK-AGENT-PROMPT.md). Copy the existing `agent-platform-four-crds/` folder with it. |
+| Agent Gateway 1.7 upgrade without Substrate | [Upgrade bundle](agentgateway-1-7-upgrade/README.md), [work-agent prompt](agentgateway-1-7-upgrade/WORK-AGENT-PROMPT.md), and [human prerequisites](agentgateway-1-7-upgrade/HUMAN-PREREQUISITES.md). Includes air-gap artifact pins and bounded lab receipts. |
 | Agent Gateway onboarding, JWT and OTel amendment | [Separate amendment](secure-byo-agentgateway-jwt-otel-amendment/README.md) and [work-agent prompt](secure-byo-agentgateway-jwt-otel-amendment/WORK-AGENT-AMENDMENT.md). Copy beside existing folders; preserves the base bundle. |
 | Kyverno permissions monitoring and compliance | [kyverno-runtime-permissions-lab/](kyverno-runtime-permissions-lab/WORKPLACE-START-HERE.md) |
 | Kagent remediation demo built on 1 November, with OTel and human approval | [otel-agent-flow/](otel-agent-flow/KYVERNO-RECOVERY.md) and [kyverno-application-specialist/](kyverno-application-specialist/OFFICE-HANDOFF.md) |

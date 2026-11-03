@@ -1,0 +1,25 @@
+{
+  "spec": {
+    "template": {
+      "spec": {
+        "containers": [
+          {
+            "name": "{{EXISTING_GATEWAY_CONTAINER_NAME}}",
+            "image": "{{INTERNAL_PROXY_IMAGE}}@sha256:{{VERIFIED_DESTINATION_DIGEST}}",
+            "env": [
+              {
+                "name": "SESSION_KEY",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "{{EXISTING_OR_APPROVED_SESSION_SECRET}}",
+                    "key": "{{SESSION_KEY_ENTRY}}"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
