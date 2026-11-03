@@ -4,6 +4,8 @@ Copy **only this amendment folder** beside the folders already given to the offi
 
 **Run the current office demo without Substrate.** Use the existing standalone application/agent profile. Substrate installation and native actor demonstrations are deferred and must not block this work. The amendment prompt overrides older runtime-choice instructions.
 
+The [desired demo outcome](DESIRED-DEMO-OUTCOME.md) requires one owner YAML to produce all agent/content/model/MCP/Gateway bindings, automatic security checks and a fresh passing GoldenScenario. The operator process must derive the scenario and its pins. Manual per-agent repairs or a separately prepared test Job do not pass this gate.
+
 The baseline is `secure-byo-agent-composition` at `4bfb61fc197a94157dcbebcaf1143cbf9f398b13`, plus `agent-platform-four-crds`. Reuse the existing Gateway, OTel collector and LGTM services where compatible. No dashboard implementation or platform upgrade is assigned here.
 
 The base includes strict JWT issuer/audience/subject checks, agent/model/MCP HTTPRoutes, ReferenceGrants, call-time authorization, RBAC, Kyverno, network controls and exact native runtime RPC routes. This amendment adds automated Gateway onboarding and fresh telemetry evidence as delivery requirements.

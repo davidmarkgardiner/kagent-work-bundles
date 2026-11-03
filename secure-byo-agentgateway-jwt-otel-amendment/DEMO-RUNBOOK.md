@@ -8,7 +8,7 @@ Run without Substrate using the existing standalone profile. Do not wait for its
 | --- | --- | --- |
 | 1. Platform boundary | Existing operator, approved profile, Gateway, collector and LGTM roles | Runtime path, versions and shared/dedicated ownership |
 | 2. One-file onboarding | Apply a newly named HostedAgent request as the restricted owner | Automatic runtime/front-door inventory, HTTPRoute, JWT policy, grants and model/MCP binding; no manual per-agent fixups |
-| 3. Authorized workflow | Invoke with a fresh approved JWT and the synthetic documentation case | Actual skill/knowledge use, approved model operation, MCP result and current task or completed Job identity |
+| 3. Automatic GoldenScenario | Watch the platform verification identity execute the generated scenario through the secured new endpoint | Fresh passing result pinned to this owner/spec and actual model, MCP, skill and knowledge evidence; no separate hand-prepared Job |
 | 4. Enforced denial | Missing, wrong-audience, wrong-subject and expired JWTs; forbidden tool and unsafe mutation | Exact enforcing layer and admitted controls; unchanged forbidden backend counters |
 | 5. Gateway observability | Locate the request's actual Gateway span and access log; inspect status, route/backend and duration | Observed trace/span IDs, log correlation and separate metrics scrape evidence |
 | 6. Existing OTel/LGTM | Query Tempo by an observed trace ID, then hand over to existing Grafana Explore or separate dashboards | Actual returned trace data and correct collector export path; an empty result is not a pass |
@@ -23,3 +23,5 @@ Exclude prompts, messages, tool data, headers, baggage and raw bodies before exp
 Show a standalone Job as a completed Job, not native actor/Harness or KRO proof. The fixed MCP result is synthetic, not an Azure investigation.
 
 Record revision, identities, commands, receipts, observed IDs, timing bounds and limits. After repairs, repeat the full rehearsal. Leave the agreed stable state without temporary drill resources. Entra remains next iteration.
+
+Use [the desired outcome](DESIRED-DEMO-OUTCOME.md) as the completion gate. After the automatic checks pass, show a normal approved caller invoking the agent. Do not expose normal owner access merely to bypass a failed scenario or missing verification authority.

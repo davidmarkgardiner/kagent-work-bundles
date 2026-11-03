@@ -8,6 +8,7 @@
   "identityScope": "approved-kubernetes-jwt-tokenreview",
   "entraDeferred": true,
   "dashboardsExcluded": true,
+  "automaticGoldenScenario": {"verified": false, "scenarioRef": null, "ownerUid": null, "ownerSpecSha256": null, "receipt": null},
   "newNamedRequestAutomation": {"verified": false, "ownerYaml": null, "inventoryReceipt": null},
   "jwtPositiveAndNegativeCases": {"verified": false, "receipts": []},
   "gatewayPoliciesAttached": {"verified": false, "receipt": null},

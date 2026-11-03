@@ -5,12 +5,12 @@
       "sha256": "05b2a29d407f02b477afc5362670d00718a6c37239ce9f8570f74a8ba83a508f"
     },
     "DECISIONS.tsv": {
-      "bytes": 3456,
-      "sha256": "8b4fd05b5dc6da79a5e8c49c1700249e31f87b12b3db32fa0a99d86721a36373"
+      "bytes": 4052,
+      "sha256": "d4dce5c8f10a0ffceb9d081e411eadec7e1d119647ca6ee6ae77e515c02128ee"
     },
     "DEMO-RUNBOOK.md": {
-      "bytes": 2950,
-      "sha256": "59a52732f010c057cf98c5e5f05d5fa2fc78bc20e46c2adbf56cc28c90c5896e"
+      "bytes": 3275,
+      "sha256": "c62658585ab87e1cd9409eca75ee013d481ab2dd6bc3cabe495f248e55e0c1a7"
     },
     "DEPENDENCIES.json": {
       "bytes": 2613,
@@ -19,6 +19,10 @@
     "DESIGN.md": {
       "bytes": 2492,
       "sha256": "3d5d7128bec1e4b12b172123495e0d706ff7da27d644cb3ccd32ff45f4ddea3f"
+    },
+    "DESIRED-DEMO-OUTCOME.md": {
+      "bytes": 7623,
+      "sha256": "4b314c587e0b0c06dbf3d71dfb452f5f8642d699f9789ed750cdc893f763d11f"
     },
     "ONBOARDING-AUTOMATION.md": {
       "bytes": 5547,
@@ -33,28 +37,28 @@
       "sha256": "4dedf916bcf5a18ae9395bb985e6fc6e619f1e1d0cae6530bec40ee9001a2b64"
     },
     "README.md": {
-      "bytes": 2390,
-      "sha256": "9a9f982445e64223ff1ac91f84cf421d8cf9a5a012264ea13f866f5959427858"
+      "bytes": 2728,
+      "sha256": "eddfb035eb157f8acb56b626b28e084712b987988287653b2f790c42e7f9ab0a"
     },
     "VALIDATION.md": {
       "bytes": 3725,
       "sha256": "5a566a95758898f6e0183f2977edf294a503fa54f8f49104600925f400d3f727"
     },
     "WORK-AGENT-AMENDMENT.md": {
-      "bytes": 4408,
-      "sha256": "4e5a6451c38542f5b92d7e2917b98bdae1ecb356e46c5d75af4e769f1dd9a46a"
+      "bytes": 5046,
+      "sha256": "72d0fa447fa60eff6e48ac32f344f6aeaadb3f1121d9f0a39bcf8c0b1f308689"
     },
     "evidence/REVIEW.md": {
-      "bytes": 1091,
-      "sha256": "7abf9d75abeedb53e7bbb82f343e2db1b4baa2ca8d314b2912b5f790abe91234"
+      "bytes": 1517,
+      "sha256": "eb98dc3a0bd2b032f1f604c841a7fb62a7219ff08d5e02b34be9eaaef5a331f9"
     },
     "evidence/source-validation.json": {
       "bytes": 1379,
       "sha256": "b32aa05e998ed54711ee3dc7a7b78f7e58b6548124fbaae64fcc38b3416f3b8e"
     },
     "examples/amendment-outcome.example.json": {
-      "bytes": 1119,
-      "sha256": "91e7741b9ec8090476637da1f2b2abf8b42531e740adc180788a0c4a22fd7d9c"
+      "bytes": 1250,
+      "sha256": "85266e8d1a0646d201e4be11d9348da4c8c2c1af416c001e6808dc0ac23222a4"
     },
     "examples/invoke-payload.json": {
       "bytes": 223,
