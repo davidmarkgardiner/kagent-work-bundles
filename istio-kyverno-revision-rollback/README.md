@@ -1,32 +1,106 @@
-# Correct a PeerAuthentication revision label to 1-29
+# Recover PeerAuthentication revision selection
 
 Incident issue: https://github.com/davidmarkgardiner/kagent-work-bundles/issues/3
 
 Follow the complete operational sequence in [INCIDENT-RECOVERY-PROCESS.md](INCIDENT-RECOVERY-PROCESS.md), including verification and the conditional canary restart.
 
+## Confirm the revision before any patch
+
+**The latest request mentioned changing back to `1-23`. That conflicts with the earlier report that `1-23` caused the incident and installed Istio is 1.29. The target revision is awaiting operator confirmation.** The numeric examples later in this bundle describe the earlier `1-23 -> 1-29` recovery, not confirmation that either direction is now approved to execute.
+
+Check the actual configured istiod revision and the intended policy scope. Set the observed wrong value and confirmed target explicitly. Do not infer a policy revision from the image version alone.
+
+## Follow this recovery order
+
+1. Confirm the revision and the named affected PeerAuthentications.
+2. Stop or correct the offending Kyverno admission and mutate-existing mutation. Confirm the live change.
+3. If emergency manual repair requires a Flux pause, suspend only the owning reconcilers using the commands below.
+4. Preview and patch each named PeerAuthentication. Preserve its mTLS mode, selector and port overrides.
+5. Verify the stored label, effective proxy configuration, actual application traffic and authenticated mTLS.
+6. If evidence requires a restart, restart one affected Deployment as a canary, then verify before controlled batches.
+7. Correct GitOps desired state before resuming the reconcilers you paused.
+
+**A Flux pause does not stop a live Kyverno mutation. A policy-label patch does not require an automatic cluster-wide restart or node reboot.**
+
+## Pause the specific Flux owner if emergency repair requires it
+
+If the desired fix can reconcile through GitOps, use that path without a pause. If a manual patch needs protection from reconciliation, identify its actual owner first. Record each owner's current `spec.suspend` value and preserve any pre-existing suspension.
+
+Changing validation to Audit or setting `background: false` does not generally stop admission mutation.
+
+Do not suspend the owner before it delivers a needed Kyverno correction. Confirm the bad live mutation has stopped first, or use the incident's separately reviewed containment procedure.
+
+For the owning Kustomization:
+
+```bash
+flux --context 'WORK_CONTEXT' suspend kustomization \
+  'OWNER_KUSTOMIZATION' -n 'FLUX_NAMESPACE'
+
+kubectl --context 'WORK_CONTEXT' -n 'FLUX_NAMESPACE' \
+  get kustomizations.kustomize.toolkit.fluxcd.io 'OWNER_KUSTOMIZATION' \
+  -o jsonpath='{.spec.suspend}{"\n"}'
+```
+
+The readback must show `true`. A suspension does not cancel a reconciliation already running. Confirm that any in-progress write has finished before a manual patch.
+
+If a HelmRelease directly manages the affected policy, suspend that release as well:
+
+```bash
+flux --context 'WORK_CONTEXT' suspend helmrelease \
+  'OWNER_HELMRELEASE' -n 'RELEASE_NAMESPACE'
+
+kubectl --context 'WORK_CONTEXT' -n 'RELEASE_NAMESPACE' \
+  get helmreleases.helm.toolkit.fluxcd.io 'OWNER_HELMRELEASE' \
+  -o jsonpath='{.spec.suspend}{"\n"}'
+```
+
+A parent Kustomization may restore a child's suspension setting. Account for the owning parent chain and suspend the relevant parent first when needed. Record that broader scope. A Kustomization pause alone does not stop an independent HelmRelease controller or Kyverno controller.
+
+## Preview and apply the confirmed policy label
+
+Replace every placeholder. These commands contain no assumed target revision:
+
+```bash
+bash patch-peerauthentication-revision.sh \
+  'WORK_CONTEXT' 'POLICY_NAMESPACE' 'POLICY_NAME' \
+  'OBSERVED_WRONG_REV' 'CONFIRMED_TARGET_REV'
+
+bash patch-peerauthentication-revision.sh \
+  'WORK_CONTEXT' 'POLICY_NAMESPACE' 'POLICY_NAME' \
+  'OBSERVED_WRONG_REV' 'CONFIRMED_TARGET_REV' --apply
+```
+
+If the actual target remains `1-29`, substitute bad revision `1-23` and target `1-29`. If the operator intentionally chooses `1-23`, first establish that it is the correct configured policy revision for the affected control plane. Do not reverse the arguments merely to suppress an error.
+
+The script only patches one named PeerAuthentication. It does not disable Flux, disable Kyverno, create a Job, restart workloads or reboot nodes.
+
+## Resume Flux after desired state is corrected
+
+Confirm the GitOps source and any live HelmRelease values contain the intended policy label and corrected mutation rule. Resume only the objects you suspended for this incident. Coordinate parent resumption because it may resume children too.
+
+```bash
+# Only if this incident suspended the release.
+flux --context 'WORK_CONTEXT' resume helmrelease \
+  'OWNER_HELMRELEASE' -n 'RELEASE_NAMESPACE'
+
+# Only if this incident suspended the Kustomization.
+flux --context 'WORK_CONTEXT' resume kustomization \
+  'OWNER_KUSTOMIZATION' -n 'FLUX_NAMESPACE'
+```
+
+Check reconciliation health, then repeat the policy-label and application mTLS checks. Confirm the correction persists through the relevant reconciliation cycle. If the label changes unexpectedly or traffic worsens, stop further changes and inspect the private evidence.
+
+For conditional canary restart commands, follow [step 6 of the incident process](INCIDENT-RECOVERY-PROCESS.md#6-restart-one-deployment-only-if-evidence-requires-it). Do not reboot nodes or restart every Deployment as part of this label-only correction.
+
+## Earlier confirmed incident direction and evidence
+
 **Corrected operator report:** the installed Istio is 1.29. A `PeerAuthentication` was incorrectly labelled `istio.io/rev: "1-23"`. The intended correction is **1-23 -> 1-29 on that policy's metadata label**. This supersedes the initial namespace/proxy downgrade hypothesis. The old `rollback-one-deployment.sh` now refuses execution. Do not run the earlier commit's namespace rollback for this incident.
 
 The label key is assumed to be `metadata.labels["istio.io/rev"]`; confirm that from the actual object. A different field, such as `spec.selector.matchLabels`, requires a different patch. Verify the actual istiod revision is literally `1-29`, rather than deriving it from the binary version. Policy metadata labels are filtered against the configured control-plane revision; a sidecar injection tag is not automatically interchangeable with that revision here.
 
-## Patch one policy after stopping the bad mutation
+## Script checks and private evidence
 
 Requires Bash, kubectl and jq. Run from the work operator's authenticated environment.
-
-1. Stop or correct the exact Kyverno mutation through its GitOps owner, including mutate-existing/background work. Confirm the live policy changed or was pruned. Audit validation mode and `background: false` do not generally stop admission mutation. Align the PeerAuthentication's GitOps desired label to `1-29` so reconciliation does not reintroduce `1-23`.
-2. Inspect the named PeerAuthentication and its current label, complete spec, namespace and scope. Inspect the healthy installed istiod revision and the affected proxies' connection. A policy without a selector in the mesh root namespace can have mesh-wide scope. Keep that existing scope unchanged.
-3. Preview the change, replacing every placeholder:
-
-```bash
-bash patch-peerauthentication-revision.sh \
-  'WORK_CONTEXT' 'POLICY_NAMESPACE' 'POLICY_NAME' '1-23' '1-29'
-```
-
-4. Apply the same correction:
-
-```bash
-bash patch-peerauthentication-revision.sh \
-  'WORK_CONTEXT' 'POLICY_NAMESPACE' 'POLICY_NAME' '1-23' '1-29' --apply
-```
 
 The script saves private before/after evidence and a JSON Patch. It tests the object's UID, resourceVersion and existing bad label before replacing that label. It performs a server-side dry-run first and refuses a changed spec or incorrect label. After the write, it reads the object back and verifies the desired label and unchanged spec. An already-correct label causes no write. Conflicts and mismatches stop without retry or automatic undo.
 
@@ -64,5 +138,9 @@ Istio 1.29.0's CRD client filters config through `LabelsInRevision`. That functi
 - https://istio.io/v1.29/docs/reference/config/security/peer_authentication/
 - https://istio.io/latest/docs/tasks/security/authentication/authn-policy/
 - https://kyverno.io/docs/policy-types/cluster-policy/mutate/
+- https://fluxcd.io/flux/cmd/flux_suspend_kustomization/
+- https://fluxcd.io/flux/cmd/flux_suspend_helmrelease/
+- https://fluxcd.io/flux/cmd/flux_resume_kustomization/
+- https://fluxcd.io/flux/cmd/flux_resume_helmrelease/
 
 Source behavior was checked on 2026-11-04. The actual installed patch version, vendor customization, configured revision and effective workload policy still require workplace evidence.

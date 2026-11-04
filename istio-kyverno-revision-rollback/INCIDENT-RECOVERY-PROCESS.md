@@ -1,5 +1,7 @@
 # Recover after an incorrect PeerAuthentication revision label
 
+**Revision confirmation is pending.** A later request mentioned reversing to `1-23`, which conflicts with the earlier recovery target below. Confirm the intended revision before running numeric patch commands. See [the README confirmation and Flux pause/resume procedure](README.md#confirm-the-revision-before-any-patch). This runbook's `1-23 -> 1-29` examples apply only if `1-29` is confirmed.
+
 Use this process for the reported `PeerAuthentication` label correction **1-23 -> 1-29**, after stopping the offending Kyverno mutation through GitOps.
 
 The installed Istio is reported as 1.29. Confirm the actual configured control-plane revision is exactly `1-29`. This process corrects `metadata.labels["istio.io/rev"]` on identified policies. It does not downgrade Istio or change namespace injection labels.
@@ -51,6 +53,8 @@ Identify every affected policy explicitly. A policy without a selector in the me
 Changing validation to Audit or setting `background: false` does not generally disable admission mutation. Do not proceed while an active reconciler keeps restoring `1-23`.
 
 If GitOps already corrected the stored policy, the script reports an already-correct label and performs no write. Continue with verification.
+
+If emergency repair requires a Flux pause, follow [the targeted pause and resume commands](README.md#pause-the-specific-flux-owner-if-emergency-repair-requires-it). Confirm the bad live Kyverno mutation is stopped first. Preserve pre-existing suspension states, account for parent reconcilers, and confirm in-progress reconciliation has finished.
 
 ## 3. Preview and apply one policy correction
 
@@ -148,6 +152,7 @@ Complete this checklist with fresh workplace evidence:
 - [ ] Approved application tests pass on new connections.
 - [ ] Authenticated mTLS is verified on the affected traffic paths.
 - [ ] Any required canary and subsequent restarts passed verification, or restarts were unnecessary.
+- [ ] Corrected GitOps desired state is delivered and incident-paused Flux owners are resumed, preserving pre-existing suspensions.
 - [ ] The correction persists through reconciliation and the agreed observation period.
 - [ ] Private evidence and timestamps are attached to the internal incident record.
 
