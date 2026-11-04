@@ -34,6 +34,10 @@ KRO creates an approval ConfigMap shell without owning its data. A separate trus
 
 The verifier Job must not depend on approval readiness, even through a reference to the approval object's name. It derives names directly from the owner request. KRO 0.9.4 `readyWhen` expressions can reference only their own resource; expected request UID is therefore projected into approval metadata for comparison with its own data. Backend checks still compare against the live request.
 
+The verifier and configured revoker identities may create or update ConfigMaps only when the name ends in `-approval`. A separate fail-closed admission policy confines their namespace-wide RBAC patch permission to those records. The existing approval-data policy then limits the permitted state transitions and fields. This also prevents those identities from updating the namespace API trust ConfigMap. Use separate platform-maintenance identities: an identity in a configured revoker group receives this restriction even when it has additional RBAC roles. The supplied verifier/revoker roles grant no ConfigMap delete permission; the writer-scope admission policy covers CREATE and UPDATE. Administrators with broader permissions remain trusted platform actors.
+
+Every rendered Kyverno validation rule explicitly sets `allowExistingViolations: false`. Do not rely on the server's default, which allows already-violating resources to continue violating a policy. Current positive and negative admission tests remain required after installation.
+
 During a bounded verification lease, only the verifier may invoke. A worker token alone cannot initiate model/MCP work; the facade must issue a live invocation handle. Ordinary callers become eligible only after the current scenario passes. A stale Job/receipt cannot approve a new UID. No automatic lease renewal or permanent session/task persistence is implied.
 
 Resource readiness and current access authority remain separate checks. A historical Ready or completed Job does not waive a current lease, revocation or pin failure. The evidence view must display current expiry and freshness.

@@ -355,6 +355,7 @@ def approval_admission(s):
         ('!variables.changed || variables.verifier || !variables.revoker || (%s)' % revoke_rule,
          'revokers may only change state to Revoked, preserving all other approval data')]
     name = 'standalone-secure-approval-data'
+    scope_name = 'standalone-secure-configmap-writers'
     return [
         {'apiVersion': 'admissionregistration.k8s.io/v1', 'kind': 'ValidatingAdmissionPolicy', 'metadata': meta(name),
          'spec': {'failurePolicy': 'Fail',
@@ -367,6 +368,20 @@ def approval_admission(s):
         {'apiVersion': 'admissionregistration.k8s.io/v1', 'kind': 'ValidatingAdmissionPolicyBinding',
          'metadata': meta(name),
          'spec': {'policyName': name, 'validationActions': ['Deny'],
+                  'matchResources': {'namespaceSelector': {'matchLabels': {'kubernetes.io/metadata.name': ns}}}}},
+        {'apiVersion': 'admissionregistration.k8s.io/v1', 'kind': 'ValidatingAdmissionPolicy',
+         'metadata': meta(scope_name),
+         'spec': {'failurePolicy': 'Fail',
+                  'matchConstraints': {'resourceRules': [{'apiGroups': [''], 'apiVersions': ['v1'],
+                                                          'operations': ['CREATE', 'UPDATE'], 'resources': ['configmaps']}]},
+                  'matchConditions': [{'name': 'standalone-approval-writers',
+                                       'expression': "request.namespace == '%s' && (request.userInfo.username == '%s' || (%s))"
+                                                     % (ns, verifier, revoker)}],
+                  'validations': [{'expression': "object.metadata.name.endsWith('-approval')",
+                                   'message': 'verifier and revoker ConfigMap writes are limited to approval records'}]}},
+        {'apiVersion': 'admissionregistration.k8s.io/v1', 'kind': 'ValidatingAdmissionPolicyBinding',
+         'metadata': meta(scope_name),
+         'spec': {'policyName': scope_name, 'validationActions': ['Deny'],
                   'matchResources': {'namespaceSelector': {'matchLabels': {'kubernetes.io/metadata.name': ns}}}}}]
 
 
@@ -381,7 +396,7 @@ def cel_rule(name, kinds, namespaces, expressions, variables=()):
     if namespaces:
         match['namespaces'] = namespaces
     return {'name': name, 'match': {'any': [{'resources': match}]},
-            'validate': {'failureAction': 'Enforce', 'cel': {
+            'validate': {'failureAction': 'Enforce', 'allowExistingViolations': False, 'cel': {
                 'variables': [{'name': n, 'expression': e} for n, e in variables],
                 'expressions': [{'expression': e, 'message': m} for e, m in expressions]}}}
 
@@ -586,7 +601,8 @@ def code_guard(s, code):
                                    'namespaces': [s['standaloneNamespace']],
                                    'names': [PLATFORM_CODE, '*-runtime-code']}}]}
     exact = {'name': 'standalone-code-bytes', 'match': match,
-             'validate': {'failureAction': 'Enforce', 'message': 'only the reviewed immutable code bytes',
+             'validate': {'failureAction': 'Enforce', 'allowExistingViolations': False,
+                          'message': 'only the reviewed immutable code bytes',
                           'pattern': {'immutable': True, 'binaryData': code.binary_data}}}
     keys = cel_rule('standalone-code-keyset', ['ConfigMap'], [s['standaloneNamespace']], [
         ('!has(object.data) && has(object.immutable) && object.immutable == true && has(object.binaryData)'

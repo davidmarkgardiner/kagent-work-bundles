@@ -1,0 +1,50 @@
+{
+  "format": "secure-kro-standalone-source-checks/v2",
+  "recordedAtUTC": "2026-11-04T08:51:44.698038+00:00",
+  "baselineTests": {
+    "result": "PASS",
+    "tests": 68,
+    "independentExecutors": [
+      "coordinator",
+      "claude-sonnet-5-5",
+      "claude-opus-5-5"
+    ]
+  },
+  "runtimeSourceChanged": false,
+  "rendererChanged": true,
+  "changes": "policy renderer hardening, documentation and dated evidence",
+  "finalSourceIntegrityAndLinks": "PASS",
+  "publicSafeScan": "PASS",
+  "gitleaks": "PASS",
+  "foldedOwnerYaml": "PASS strict server admission dry-run; not persisted",
+  "currentRenderedBrowserReview": "UNAVAILABLE_BROWSER_ACCESS_HOST",
+  "previousRenderedReview": "historical source-checks.json only",
+  "fullGolden": "BLOCKED_PROVIDER_HTTP_429",
+  "officeDeploymentVerified": false,
+  "postHardeningCoordinatorTests": {
+    "result": "PASS",
+    "tests": 68
+  },
+  "postHardeningIndependentReviews": [
+    {
+      "model": [
+        "claude-sonnet-5-5"
+      ],
+      "tests": 68,
+      "source": "PASS",
+      "hardeningReview": "PASS",
+      "liveSecurityChecks": "PASS",
+      "golden": "BLOCKED"
+    },
+    {
+      "model": [
+        "claude-opus-5-5"
+      ],
+      "tests": 68,
+      "source": "PASS",
+      "hardeningReview": "PASS",
+      "liveSecurityChecks": "PASS",
+      "golden": "BLOCKED"
+    }
+  ]
+}

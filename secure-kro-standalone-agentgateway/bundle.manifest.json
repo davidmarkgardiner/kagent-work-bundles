@@ -13,32 +13,36 @@
       "sha256": "06f2086e214bdeae1dd961bf4615bf4c544308d56743b53dee451894015f4236"
     },
     "DEMO-WALKTHROUGH.md": {
-      "bytes": 2756,
-      "sha256": "b5c2c8a530c3b969a4debeb2f6b52c1ff9f965811a4099b11b56d009fa7df7a8"
+      "bytes": 3184,
+      "sha256": "5c0f051ddb6ff641a3fb4638c31c800f53a5ab24adefc5f758e40f97f13cc8fd"
     },
     "HUMAN-PREREQUISITES.md": {
-      "bytes": 2740,
-      "sha256": "7ac88cf9b555ab0a43ed8fa7e4def5b39c8fabac5556b0cc8e0d1e4c1033b2b0"
+      "bytes": 2963,
+      "sha256": "93e79d552699905b26eb9af2518cf02541b341307f66b92170f6b8c5d7b12c83"
     },
     "LAB-RESULTS.md": {
-      "bytes": 5512,
-      "sha256": "70ea5b7f74e7ee8a869a27caba18105707c17afb570522c284ef565d8682e38e"
+      "bytes": 5664,
+      "sha256": "0acfa2970975972b41d7f430cc35bfcc1d4104f36d8c6021b7e7537672b54ff0"
     },
     "README.md": {
-      "bytes": 3278,
-      "sha256": "3c0c4a6d49f4226551c3c67c3a64a6bb31477096e8dadc218c3b1cb2a159e72e"
+      "bytes": 3678,
+      "sha256": "6bdcb510910b3b1ac60e8323af758dabb85016b3a73d8fcd48d0e0fc23b9b0cf"
+    },
+    "RECHECK-2026-11-04.md": {
+      "bytes": 5838,
+      "sha256": "5097b351727ab5e27d03a5b747802188f84f5c4a9ecaa703611452ec41cbcc69"
     },
     "RUNBOOK.md": {
-      "bytes": 6248,
-      "sha256": "b1477cfa83368fa7d416e6cd397214114db3e0167e2ebeac9dcbb07fb2d08bae"
+      "bytes": 6713,
+      "sha256": "8188582163f8003d4dab609d9f71c987010d47dc9a5cc2e1a8cdcfbdb87c970d"
     },
     "SHOWCASE.html": {
-      "bytes": 8080,
-      "sha256": "2b4b81025c0b5d0ba95ce1eca0d5eb58a09376130035bd6e45fae7e926a3b908"
+      "bytes": 8155,
+      "sha256": "488d56edd29fd20b83da06fdbab0168c3806c8ceb3b8c39e80f19b9aab5e582f"
     },
     "WORK-AGENT-PROMPT.md": {
-      "bytes": 6255,
-      "sha256": "17a43d26fa1424c808ca14883c78b3828f55ee074ddecfa111aecd36a573788a"
+      "bytes": 6543,
+      "sha256": "ff07e0d31e5a67b1b77c6018a11c7ec212f25cccf7a74efcb59108a7b9b49ef5"
     },
     "app/agent.py": {
       "bytes": 9416,
@@ -144,6 +148,10 @@
       "bytes": 6333,
       "sha256": "d9c51e079d98e2c140acde3c00566feb049e5628f33ead32783713db51af6238"
     },
+    "docs/BUILDER-HANDOFF.md": {
+      "bytes": 3022,
+      "sha256": "5694b57a511166769af529e5db9e017110085289b59328331d9dc47fbe6d6def"
+    },
     "docs/CODE-DELIVERY.md": {
       "bytes": 2501,
       "sha256": "a6bab326b1762548010b6cf8f79996c8db8e3174b0e1a661b19f1a9e9a99fb3e"
@@ -153,12 +161,16 @@
       "sha256": "c263095b531ebd5b62bcf54e4011cd204bc0634389f1cb89bb66b65fc186f77a"
     },
     "docs/DESIGN.md": {
-      "bytes": 7794,
-      "sha256": "89fd9cc5fab0c7a97c99746106d4c889d825ccddfa450424e2d92fce4033ec15"
+      "bytes": 8841,
+      "sha256": "6bc427a1c1d7327d88919655458f908e88e3dc7ed1bfbc27757bd6214fb64169"
     },
     "docs/OBSERVABILITY.md": {
       "bytes": 2529,
       "sha256": "164a4b24b59527eda36e0f56472a3614b9d984adfdedf26323fcf77115019404"
+    },
+    "docs/OWNER-CONTRACT.md": {
+      "bytes": 4462,
+      "sha256": "03a0016cbe8f06c3e8a0b5a0c18eb502776619881646d7b373e37a6f87776eaa"
     },
     "docs/UPSTREAMS.md": {
       "bytes": 884,
@@ -184,9 +196,29 @@
       "bytes": 926,
       "sha256": "d5c6b45f48cb93a520b9012513713012b5ffdffb9521f2bdaf435276a6c4a543"
     },
+    "evidence/policy-hardening-2026-11-04.json": {
+      "bytes": 3762,
+      "sha256": "cea6c2d3c4fe534bcb6b6f535d7075b832f5be70f51895a52257a56ead9c829f"
+    },
     "evidence/prerequisite-versions.json": {
       "bytes": 605,
       "sha256": "a483ef18f32d724f2cd409fc7b6045d38ea896d15e5530600e4827d6c7e06f75"
+    },
+    "evidence/recheck-2026-11-04.json": {
+      "bytes": 11496,
+      "sha256": "813a4892a0dda4b6988f441a6b11a0f574a4835da268142924b0e7a70f4f97b5"
+    },
+    "evidence/recheck-decisions.tsv": {
+      "bytes": 1711,
+      "sha256": "28155d063d8bb075b1e76a87ac9a823d60cfd64808417870d37daf2773bd1811"
+    },
+    "evidence/reviews-2026-11-04.json": {
+      "bytes": 10776,
+      "sha256": "1b55b80506edce25973dcc43ebcaaae8e4747c8bff004f46b41d6166bfc23453"
+    },
+    "evidence/source-checks-2026-11-04.json": {
+      "bytes": 1337,
+      "sha256": "94e42ec5918c7ebcab007ef5ae2b1f9cc3debaa1c817e296f6db0eed67004397"
     },
     "evidence/source-checks.json": {
       "bytes": 1142,
@@ -197,8 +229,8 @@
       "sha256": "f0cbc342ffc11e5c0b76be5679a34a1615fea8300e6229de224dbc2d059779fe"
     },
     "render.py": {
-      "bytes": 58735,
-      "sha256": "ffb9701e054ddca2d42a695bc651025eb50d653e95ce523ae708a279ff2994ea"
+      "bytes": 60124,
+      "sha256": "30d2316e61fe05ed049cc0c96239bcbe696fd9da5903a7fe835c124c49425c7c"
     },
     "scripts/verify-source.py": {
       "bytes": 3187,
@@ -238,6 +270,6 @@
     }
   },
   "format": "secure-kro-standalone-source-v1",
-  "recordedAtUTC": "2026-11-03T23:57:57.747472+00:00",
+  "recordedAtUTC": "2026-11-04T08:52:23.987707+00:00",
   "scope": "portable source inventory; not successful target Golden or office delivery proof"
 }

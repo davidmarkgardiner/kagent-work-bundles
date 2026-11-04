@@ -1,0 +1,232 @@
+{
+  "format": "secure-kro-standalone-review-receipt/v1",
+  "sourceManifestSha256": "3c7430bc76d70ee9bf6ea1c777c056c237c9b18d5773f20b4b60b650a58f8187",
+  "publishedSourceBase": "da40ab92a7a9876997e43fa2eebb0e152175d9ad",
+  "reviews": [
+    {
+      "requestedModel": "sonnet",
+      "reportedModels": [
+        "claude-sonnet-5-5"
+      ],
+      "status": "complete",
+      "reviewType": "scoped live execution and unchanged baseline tests",
+      "commands": [
+        {
+          "commandName": "check-source",
+          "toolResultError": false,
+          "observedTests68Passed": true,
+          "observedCaller403": false,
+          "observedNetworkChecks": false,
+          "observedGoldenFailed": false,
+          "toolResultSha256": "c85ae87e10ea04b4d63ac9fee9f3f2c4d3a3e698245a46b6fff73283b41b3768"
+        },
+        {
+          "commandName": "check-live",
+          "toolResultError": false,
+          "observedTests68Passed": false,
+          "observedCaller403": true,
+          "observedNetworkChecks": true,
+          "observedGoldenFailed": true,
+          "toolResultSha256": "064d4641a40967a3793c13b4a5cc056b834e1a7e1c34319a4bd6c27b611cb92f"
+        }
+      ],
+      "rawTranscriptSha256": "92cb3e7d01f5e0301869e0622e47603f6929a47fc56c50967ce4c6ea2020180d",
+      "sourceTests": "PASS_68",
+      "liveSecurityChecks": "EXPECTED_DENIALS_OBSERVED; reviewer caveats reconciled by coordinator evidence",
+      "successfulGolden": "BLOCKED",
+      "successfulCallerAnswer": false,
+      "limits": [
+        "Scoped commands authored and reviewed by coordinator; model independently initiated execution.",
+        "Admission mutation checks are server dry-run.",
+        "Review covers unchanged runtime source, not new documentation bytes.",
+        "Prior packaged-launcher execution attempts were blocked and do not count as live proof."
+      ],
+      "reviewerLiveVerdict": "PASS_WITH_DISCREPANCY",
+      "coordinatorReconciliation": {
+        "upstream429VersusGolden502": "Different hops; live observedTrace in recheck receipt proves upstream 429. Golden records facade 502.",
+        "terminalState": "Golden Job and approval are terminal failed; owner remains IN_PROGRESS.",
+        "admissionDryRun": "Coordinator read exact executed helper and confirmed --dry-run=server; approved-runtime-probe does not exist.",
+        "sourceIdentity": "Coordinator verified full manifest SHA and byte equality with published main at da40ab92a7a9876997e43fa2eebb0e152175d9ad.",
+        "upstreamGatewayStatus": 429
+      }
+    },
+    {
+      "requestedModel": "opus",
+      "reportedModels": [
+        "claude-opus-5-5"
+      ],
+      "status": "complete",
+      "reviewType": "scoped live execution and unchanged baseline tests",
+      "commands": [
+        {
+          "commandName": "check-source",
+          "toolResultError": false,
+          "observedTests68Passed": true,
+          "observedCaller403": false,
+          "observedNetworkChecks": false,
+          "observedGoldenFailed": false,
+          "toolResultSha256": "73d7b4cae1c813e9c0c4668982a68eb140f41cbcb69a40c861c7dddb89916647"
+        },
+        {
+          "commandName": "check-live",
+          "toolResultError": false,
+          "observedTests68Passed": false,
+          "observedCaller403": true,
+          "observedNetworkChecks": true,
+          "observedGoldenFailed": true,
+          "toolResultSha256": "b874ca4a87cc0de8ff68ca4f38e6056d0057243c2bb20dcaaa1ba2830858b8fc"
+        }
+      ],
+      "rawTranscriptSha256": "26507da629276b1233d2177a3044b3ac6f3734b5a48e91deba7ece078edec440",
+      "sourceTests": "PASS_68",
+      "liveSecurityChecks": "EXPECTED_DENIALS_OBSERVED; reviewer caveats reconciled by coordinator evidence",
+      "successfulGolden": "BLOCKED",
+      "successfulCallerAnswer": false,
+      "limits": [
+        "Scoped commands authored and reviewed by coordinator; model independently initiated execution.",
+        "Admission mutation checks are server dry-run.",
+        "Review covers unchanged runtime source, not new documentation bytes.",
+        "Prior packaged-launcher execution attempts were blocked and do not count as live proof."
+      ],
+      "reviewerLiveVerdict": "ISSUES",
+      "coordinatorReconciliation": {
+        "upstream429VersusGolden502": "Different hops; live observedTrace in recheck receipt proves upstream 429. Golden records facade 502.",
+        "terminalState": "Golden Job and approval are terminal failed; owner remains IN_PROGRESS.",
+        "admissionDryRun": "Coordinator read exact executed helper and confirmed --dry-run=server; approved-runtime-probe does not exist.",
+        "sourceIdentity": "Coordinator verified full manifest SHA and byte equality with published main at da40ab92a7a9876997e43fa2eebb0e152175d9ad.",
+        "upstreamGatewayStatus": 429
+      }
+    }
+  ],
+  "kimi31": {
+    "requestedModel": "kimi-code/k3.1-pro",
+    "status": "BLOCKED",
+    "reason": "HTTP 429 weekly (7-day) usage limit before review",
+    "reviewPerformed": false,
+    "liveDemoPerformed": false,
+    "substituteUsed": false
+  },
+  "baselineDeepReview": {
+    "requestedModel": "opus",
+    "reportedModel": "claude-opus-5-5",
+    "status": "complete",
+    "modelVerified": true,
+    "verdict": "ISSUES; no exploitable security defect found by reviewer",
+    "reportSha256": "4ebb70f0338fc38711e49065aba1fbf8ddd227dd30941671e9cb9234573a95c5",
+    "findings": [
+      {
+        "issue": "upstream status is bounded to 502",
+        "resolution": "Observed upstream trace with HTTP429 is included; future structured upstream status remains follow-up."
+      },
+      {
+        "issue": "HTTP429 headline lacked public trace status",
+        "resolution": "Current dated receipt now includes actual sanitized Gateway status attributes."
+      },
+      {
+        "issue": "revoker and verifier ConfigMap patch scope",
+        "resolution": "Fixed by new writer-scope admission; actual before/after admission proof recorded."
+      },
+      {
+        "issue": "Kyverno allowExistingViolations defaults true",
+        "resolution": "Fixed explicitly false on all five rules; verified stored and repeated admission checks."
+      },
+      {
+        "issue": "owner remains IN_PROGRESS after failed Golden",
+        "resolution": "Document current Job/approval versus KRO state; full model gate remains failed."
+      }
+    ]
+  },
+  "finalAudit": {
+    "reportedModel": "claude-opus-5-5",
+    "scope": "evidence and decision-trail reconciliation before the policy fixes",
+    "verdict": "Publishable with demoReady=false after reviewer label correction and manifest regeneration",
+    "reportSha256": "a768d59b2c02f381822ccbf78dcf01f831dce6b821e01a2119b69837ba349d58",
+    "coordinatorActions": [
+      "Kept reviewer successfulGolden value BLOCKED; upstream429 interpretation is separate.",
+      "Captured exact executed helper SHA and timestamped post-review Pod absence.",
+      "Verified published baseline byte equality and preserved source identities.",
+      "Regenerated dated manifest and retained final source checks.",
+      "Clarified terminal Job wording and extended decision trail."
+    ]
+  },
+  "postHardeningFinalReviews": [
+    {
+      "requestedModel": "sonnet",
+      "reportedModels": [
+        "claude-sonnet-5-5"
+      ],
+      "status": "PASS source, hardening review and scoped live security checks",
+      "successfulGolden": "BLOCKED",
+      "personallyInitiatedCommands": [
+        {
+          "commandName": "check-source",
+          "toolResultSha256": "7b9405ddee8287c6cda82be825cc6030a3a1cbb78a9864e6043983bda988b1b1",
+          "successfulExecution": true,
+          "source68TestsPassed": true,
+          "actualHTTPAndNetworkChecks": false,
+          "policyScopePositiveAndNegativeControls": false,
+          "timestampedProbePodAbsence": false
+        },
+        {
+          "commandName": "check-live",
+          "toolResultSha256": "1ba2551834ea05f8804165355f3041cadce21220151fca4a2e79f3aca7c09f2e",
+          "successfulExecution": true,
+          "source68TestsPassed": false,
+          "actualHTTPAndNetworkChecks": true,
+          "policyScopePositiveAndNegativeControls": true,
+          "timestampedProbePodAbsence": true
+        }
+      ],
+      "additionalReadOnlyCommands": [
+        {
+          "command": "grep -n against own source/render.py",
+          "executed": true,
+          "scope": "read-only source inspection",
+          "instructionDeviation": "Additional shell read beyond the two wrapper commands; final self-report omitted this. No mutation or out-of-scope file access observed."
+        }
+      ],
+      "deniedExtraCommandAttempts": 0,
+      "rawTranscriptSha256": "03cbb72f309ea28f144e35df531248b4fd3ef0c6df30f1e4f3f9d6dd75054447",
+      "rendererSha256": "30d2316e61fe05ed049cc0c96239bcbe696fd9da5903a7fe835c124c49425c7c",
+      "sourceSnapshotManifestSha256": "6d22cfcf0a814a095fc63c247189d034bc0d201cf543f6098685f6c3a5733eb3",
+      "sourceFilesAtReview": 67,
+      "scope": "Actual HTTP/network checks and live server admission dry-runs; no model retries or successful caller answer."
+    },
+    {
+      "requestedModel": "opus",
+      "reportedModels": [
+        "claude-opus-5-5"
+      ],
+      "status": "PASS source, hardening review and scoped live security checks",
+      "successfulGolden": "BLOCKED",
+      "personallyInitiatedCommands": [
+        {
+          "commandName": "check-source",
+          "toolResultSha256": "0d122fc17afd10418ee8a32e5ab08b5dba2b67ff9685fb9e2a3db25de88d7896",
+          "successfulExecution": true,
+          "source68TestsPassed": true,
+          "actualHTTPAndNetworkChecks": false,
+          "policyScopePositiveAndNegativeControls": false,
+          "timestampedProbePodAbsence": false
+        },
+        {
+          "commandName": "check-live",
+          "toolResultSha256": "16828b8a94359ce34b79fc834843169f99c23baa90542c031a2a8f5de56bc185",
+          "successfulExecution": true,
+          "source68TestsPassed": false,
+          "actualHTTPAndNetworkChecks": true,
+          "policyScopePositiveAndNegativeControls": true,
+          "timestampedProbePodAbsence": true
+        }
+      ],
+      "additionalReadOnlyCommands": [],
+      "deniedExtraCommandAttempts": 0,
+      "rawTranscriptSha256": "ab7f21fe266114f4fed16636e50ccd8657fed2787569f8e01bb3fb2aa23a7e9d",
+      "rendererSha256": "30d2316e61fe05ed049cc0c96239bcbe696fd9da5903a7fe835c124c49425c7c",
+      "sourceSnapshotManifestSha256": "6d22cfcf0a814a095fc63c247189d034bc0d201cf543f6098685f6c3a5733eb3",
+      "sourceFilesAtReview": 67,
+      "scope": "Actual HTTP/network checks and live server admission dry-runs; no model retries or successful caller answer."
+    }
+  ],
+  "finalRendererSha256": "30d2316e61fe05ed049cc0c96239bcbe696fd9da5903a7fe835c124c49425c7c"
+}

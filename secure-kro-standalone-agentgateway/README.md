@@ -1,10 +1,12 @@
 # Secure KRO agent and Agent Gateway without Substrate
 
-**Lab status: composition and security checks passed, but the real model returned HTTP 429. The complete Golden/demo gate is blocked. Read [the recorded results](LAB-RESULTS.md).**
+**4 November live recheck: a new owner request composed automatically, but the real model still returned HTTP 429. Golden failed and caller access remained denied. Read [today's recheck](RECHECK-2026-11-04.md) and [the previous results](LAB-RESULTS.md).**
 
 This is a separate standalone reference implementation. It replaces the native/Substrate execution dependency for this KRO demonstration with a normal long-running Deployment. Keep the earlier native composition and HostedAgent operator bundles unchanged.
 
 The owner submits one immutable request selecting an approved profile and instructions. KRO creates the runtime/configuration, central HTTPRoute and JWT policy, destination ReferenceGrant and automatic verification Job. Shared platform services supply trusted authentication/authorization and independent verification. No per-agent manual Gateway repair is part of successful onboarding.
+
+Read [the owner field guide](docs/OWNER-CONTRACT.md) for the exact YAML and model/skill/knowledge/tool mapping. Individual dependency choices are currently fixed by one approved profile. The [builder handoff](docs/BUILDER-HANDOFF.md) defines how a future UI or agent can produce this request through the protected pipeline.
 
 The main office path is **RGD and resource YAML using an existing approved Python helper image**. Reviewed application code and content are supplied through immutable, pinned ConfigMaps. It does not require building or importing a new custom image when that compatible helper image is already available. The existing KRO, Gateway and policy-controller images remain platform prerequisites. See [code delivery](docs/CODE-DELIVERY.md).
 

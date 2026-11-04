@@ -1,0 +1,161 @@
+{
+  "format": "secure-kro-standalone-policy-hardening/v1",
+  "observedAtUTC": "2026-11-04T08:45:35.468712+00:00",
+  "before": {
+    "verifierUnrelatedConfigMapPatch": {
+      "allowed": true,
+      "denial": null
+    }
+  },
+  "appliedPolicies": [
+    {
+      "kind": "ValidatingAdmissionPolicy",
+      "name": "standalone-secure-configmap-writers"
+    },
+    {
+      "kind": "ValidatingAdmissionPolicyBinding",
+      "name": "standalone-secure-configmap-writers"
+    }
+  ],
+  "kyverno": [
+    {
+      "policy": "standalone-secure-workloads",
+      "rules": 2,
+      "allowExistingViolations": false
+    },
+    {
+      "policy": "standalone-secure-code",
+      "rules": 2,
+      "allowExistingViolations": false
+    },
+    {
+      "policy": "standalone-secure-requests",
+      "rules": 1,
+      "allowExistingViolations": false
+    }
+  ],
+  "after": {
+    "verifierUnrelatedConfigMapPatch": {
+      "allowed": false,
+      "writerScopePolicyDenied": true
+    },
+    "verifierApprovalMetadataPatch": {
+      "allowed": true,
+      "writerScopePolicyDenied": false
+    },
+    "revokerUnrelatedConfigMapPatch": {
+      "allowed": false,
+      "writerScopePolicyDenied": true
+    },
+    "revokerApprovalMetadataPatch": {
+      "allowed": true,
+      "writerScopePolicyDenied": false
+    }
+  },
+  "probeMode": "live API-server admission dry-run; ConfigMap data unchanged",
+  "modelInvocations": 0,
+  "newPolicyCELWarnings": [],
+  "executedHelperSha256": "1b0afec4fccdb2fd2e359ff2a48206bebb46ca552df80945c8bba34d686771aa",
+  "executedHelperUsesServerDryRun": true,
+  "probePodAbsentAtUTC": "2026-11-04T08:46:07.450404+00:00",
+  "probePodAbsent": true,
+  "postHardeningSecurityProbes": [
+    {
+      "probe": "caller-after-failed",
+      "status": 403,
+      "body": {
+        "error": "ApprovalFailed"
+      }
+    },
+    {
+      "probe": "worker-wrong-lane",
+      "status": 403,
+      "body": {
+        "error": "LaneNotPermitted"
+      }
+    },
+    {
+      "probe": "worker-inactive-model",
+      "status": 403,
+      "body": {
+        "error": "ApprovalFailed"
+      }
+    },
+    {
+      "probe": "composer-self-approval",
+      "denied": true
+    },
+    {
+      "probe": "approved-pod",
+      "allowed": true,
+      "expected": true
+    },
+    {
+      "probe": "exec-probe",
+      "allowed": false,
+      "expected": false
+    },
+    {
+      "probe": "extra-container",
+      "allowed": false,
+      "expected": false
+    },
+    {
+      "probe": "projection-path",
+      "allowed": false,
+      "expected": false
+    },
+    {
+      "probe": "working-dir",
+      "allowed": false,
+      "expected": false
+    },
+    {
+      "probe": "extra-env",
+      "allowed": false,
+      "expected": false
+    },
+    {
+      "network": [
+        {
+          "probe": "cluster-dns",
+          "resolved": true
+        },
+        {
+          "probe": "gateway-positive",
+          "connected": true,
+          "expected": true
+        },
+        {
+          "probe": "direct-facade-denied",
+          "connected": false,
+          "expected": false
+        },
+        {
+          "probe": "direct-model-denied",
+          "connected": false,
+          "expected": false
+        },
+        {
+          "probe": "direct-api-denied",
+          "connected": false,
+          "expected": false
+        },
+        {
+          "probe": "no-api-token-mount",
+          "absent": true
+        }
+      ]
+    }
+  ],
+  "composerMetadataSSAAfterHardening": "PASS server dry-run; verifier-owned data unchanged",
+  "composerCheckAtUTC": "2026-11-04T08:49:25.760502+00:00",
+  "finalGoldenState": {
+    "checkedAtUTC": "2026-11-04T08:50:12.918985+00:00",
+    "sameJobUID": true,
+    "failedPods": 1,
+    "approvalState": "Failed",
+    "kroState": "IN_PROGRESS",
+    "newModelAttempt": false
+  }
+}

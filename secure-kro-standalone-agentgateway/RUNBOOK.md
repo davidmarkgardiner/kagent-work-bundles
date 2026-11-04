@@ -30,6 +30,8 @@ Inspect admission policy status, current graph generation and Gateway conditions
 
 Edit only the request name and bounded instructions in `examples/owner.yaml`. Keep `profileRef` at `docs-readonly-v1`. This example API deliberately exposes one reviewed profile. Additional models, content and MCP capabilities require platform profiles and tests before owners can select them.
 
+See [the owner field guide](docs/OWNER-CONTRACT.md) for the complete contract. Use YAML `>-` to fold a wrapped prompt into the required single paragraph. The resource is cluster-scoped and its spec is immutable.
+
 ```sh
 kubectl --context '{{TARGET_CONTEXT}}' apply --dry-run=server --validate=strict -f '{{OWNER_FILE}}'
 kubectl --context '{{TARGET_CONTEXT}}' apply --server-side --field-manager=standalone-secure-demo -f '{{OWNER_FILE}}'
@@ -37,6 +39,8 @@ kubectl --context '{{TARGET_CONTEXT}}' get standalonesecureagent '{{NAME}}' -w
 ```
 
 In another terminal, observe the generated resources. Do not send repeated invocation probes while Golden verification is running. Its negative and scenario probes compare a quiet counter window.
+
+All reviewers must wait for that request's Golden Job to become terminal before sending any endpoint probe. Read-only Kubernetes GETs do not affect the facade counters. Run endpoint probes only against the agreed request whose Golden Job is terminal.
 
 ```sh
 kubectl --context '{{TARGET_CONTEXT}}' get pods,jobs,services,configmaps,referencegrants -n '{{STANDALONE_NAMESPACE}}'

@@ -15,6 +15,7 @@ Fill this privately. Unchecked means unverified. The work agent discovers facts 
 | [ ] | Fixed model destination/identifier works and permits one bounded real scenario | Model owner |
 | [ ] | Approved pinned skill/knowledge source and typed MCP capability mapped to existing work contracts | Content/tool owners |
 | [ ] | JWT issuer/JWKS/audience, caller/worker/verifier subjects, token delivery and clock synchronization agreed | Identity owner |
+| [ ] | Dedicated revoker identities/groups are separate from platform ConfigMap-maintenance identities; admission restricts configured revokers even if additional RBAC roles grant wider writes | Identity/platform owners |
 | [ ] | Independent approval publication, expiry/revocation and manual renewal limitations understood | Platform owner |
 | [ ] | Exact final owner YAML, variable fields, apply/watch/invoke/reset commands and second request name prepared | Work agent |
 | [ ] | Actual model/tool/content, auth, grant, network, data-ownership and recreation receipts pass | Work agent |

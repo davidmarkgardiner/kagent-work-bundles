@@ -1,0 +1,433 @@
+{
+  "format": "secure-kro-standalone-recheck/v1",
+  "observedAtUTC": "2026-11-04T08:32:38.478588+00:00",
+  "source": {
+    "bundleManifestSha256": "3c7430bc76d70ee9bf6ea1c777c056c237c9b18d5773f20b4b60b650a58f8187",
+    "publishedBase": "da40ab92a7a9876997e43fa2eebb0e152175d9ad",
+    "tests": 68
+  },
+  "request": {
+    "name": "docs-check-1104-a",
+    "uid": "fce47a21-4574-4414-ae59-81944bc18ac6",
+    "generation": 1,
+    "spec": {
+      "instructions": "Use only the reviewed AKS documentation packages. Explain proposed read-only checks, cite exact sources and state that no operational investigation or changes were performed.",
+      "profileRef": "docs-readonly-v1"
+    },
+    "conditions": [
+      {
+        "type": "InstanceManaged",
+        "status": "True",
+        "reason": "Managed",
+        "observedGeneration": 1
+      },
+      {
+        "type": "GraphResolved",
+        "status": "True",
+        "reason": "Resolved",
+        "observedGeneration": 1
+      },
+      {
+        "type": "ResourcesReady",
+        "status": "False",
+        "reason": "NotReady",
+        "observedGeneration": 1
+      },
+      {
+        "type": "Ready",
+        "status": "False",
+        "reason": "NotReady",
+        "observedGeneration": 1
+      }
+    ]
+  },
+  "routeParents": [
+    {
+      "controllerName": "agentgateway.dev/agentgateway",
+      "conditions": [
+        {
+          "type": "Accepted",
+          "status": "True",
+          "reason": "Accepted",
+          "observedGeneration": 1
+        },
+        {
+          "type": "ResolvedRefs",
+          "status": "True",
+          "reason": "ResolvedRefs",
+          "observedGeneration": 1
+        }
+      ]
+    }
+  ],
+  "policyAncestors": [
+    {
+      "controllerName": "agentgateway.dev/agentgateway",
+      "conditions": [
+        {
+          "type": "Accepted",
+          "status": "True",
+          "reason": "Valid",
+          "observedGeneration": 1
+        },
+        {
+          "type": "Attached",
+          "status": "True",
+          "reason": "Attached",
+          "observedGeneration": 1
+        }
+      ]
+    }
+  ],
+  "referenceGrant": {
+    "from": [
+      {
+        "group": "gateway.networking.k8s.io",
+        "kind": "HTTPRoute",
+        "namespace": "secure-byo-gateway-system"
+      }
+    ],
+    "to": [
+      {
+        "group": "",
+        "kind": "Service",
+        "name": "docs-check-1104-a-front"
+      }
+    ]
+  },
+  "golden": {
+    "agent": "docs-check-1104-a",
+    "event": "golden-receipt",
+    "imageDigest": "sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c",
+    "podUID": "6c156e9a-8bbf-4136-8ba5-067dc48cc5e3",
+    "probes": {
+      "forgedToken": 401,
+      "goldenHTTPStatus": 502,
+      "goldenRuntimeReason": "ProviderHTTP502",
+      "missingToken": 401,
+      "verifierBeforeVerifying": 403,
+      "wrongAudience": 401,
+      "wrongLaneMcp": 403,
+      "wrongLaneModel": 403,
+      "wrongSubject": 403
+    },
+    "proofScope": "standalone KRO reference runtime with ConfigMap bindings and synthetic MCP; not native kagent Agent, Harness, ModelConfig, Skill or Substrate proof",
+    "reason": "GoldenInvokeRejected",
+    "requestUID": "fce47a21-4574-4414-ae59-81944bc18ac6",
+    "result": "Failed",
+    "scenario": "golden-docs-readonly-v1",
+    "state": "Failed",
+    "verifierJobUID": "2528ae66-066b-4ad2-88a7-182d630b4067"
+  },
+  "jobConditions": [
+    {
+      "type": "FailureTarget",
+      "status": "True",
+      "reason": "BackoffLimitExceeded",
+      "observedGeneration": null
+    },
+    {
+      "type": "Failed",
+      "status": "True",
+      "reason": "BackoffLimitExceeded",
+      "observedGeneration": null
+    }
+  ],
+  "approval": {
+    "state": "Failed",
+    "requestUID": "fce47a21-4574-4414-ae59-81944bc18ac6",
+    "expiresAt": "2026-11-04T08:26:26Z"
+  },
+  "securityProbes": [
+    {
+      "probe": "caller-after-failed",
+      "status": 403,
+      "body": {
+        "error": "ApprovalFailed"
+      }
+    },
+    {
+      "probe": "worker-wrong-lane",
+      "status": 403,
+      "body": {
+        "error": "LaneNotPermitted"
+      }
+    },
+    {
+      "probe": "worker-inactive-model",
+      "status": 403,
+      "body": {
+        "error": "ApprovalFailed"
+      }
+    },
+    {
+      "probe": "composer-self-approval",
+      "denied": true
+    },
+    {
+      "probe": "approved-pod",
+      "allowed": true,
+      "expected": true
+    },
+    {
+      "probe": "exec-probe",
+      "allowed": false,
+      "expected": false
+    },
+    {
+      "probe": "extra-container",
+      "allowed": false,
+      "expected": false
+    },
+    {
+      "probe": "projection-path",
+      "allowed": false,
+      "expected": false
+    },
+    {
+      "probe": "working-dir",
+      "allowed": false,
+      "expected": false
+    },
+    {
+      "probe": "extra-env",
+      "allowed": false,
+      "expected": false
+    },
+    {
+      "network": [
+        {
+          "probe": "cluster-dns",
+          "resolved": true
+        },
+        {
+          "probe": "gateway-positive",
+          "connected": true,
+          "expected": true
+        },
+        {
+          "probe": "direct-facade-denied",
+          "connected": false,
+          "expected": false
+        },
+        {
+          "probe": "direct-model-denied",
+          "connected": false,
+          "expected": false
+        },
+        {
+          "probe": "direct-api-denied",
+          "connected": false,
+          "expected": false
+        },
+        {
+          "probe": "no-api-token-mount",
+          "absent": true
+        }
+      ]
+    }
+  ],
+  "probeBoundaries": {
+    "ownerSubmitted": true,
+    "goldenActuallyExecuted": true,
+    "httpDenialsActuallyExecuted": true,
+    "runtimeNetworkActuallyExecuted": true,
+    "admissionMutations": "server dry-run against live admission; rejected workloads not deployed",
+    "admissionProbePodAbsentAfterChecks": true
+  },
+  "provider": {
+    "model": "kimi-for-coding",
+    "upstreamHTTPStatus": 429,
+    "traceId": "229454a5fba914df079030bc35d7cb69",
+    "gatewayVersion": "1.7.0",
+    "successfulModelAnswer": false,
+    "tempoVerified": false,
+    "fullAgentAncestryVerified": false,
+    "observedTrace": {
+      "traceId": "229454a5fba914df079030bc35d7cb69",
+      "status": "error",
+      "receivedAt": 1793780791.0922992,
+      "spans": [
+        {
+          "name": "POST request",
+          "status": "ok",
+          "attributes": {
+            "service.name": "agentgateway",
+            "service.version": "1.7.0",
+            "http.request.method": "POST",
+            "http.response.status_code": "429",
+            "gen_ai.operation.name": "chat",
+            "gen_ai.provider.name": "openai",
+            "gen_ai.request.model": "kimi-for-coding"
+          }
+        },
+        {
+          "name": "POST request",
+          "status": "error",
+          "attributes": {
+            "service.name": "agentgateway",
+            "service.version": "1.7.0",
+            "http.method": "POST",
+            "http.path": "/coding/v1/chat/completions",
+            "http.status": "429"
+          }
+        }
+      ]
+    }
+  },
+  "demoReady": false,
+  "nativeKagentIntegrationVerified": false,
+  "officeReady": false,
+  "versions": {
+    "kro": [
+      "registry.k8s.io/kro/kro:v0.9.4"
+    ],
+    "gatewayController": [
+      "cr.agentgateway.dev/controller:v1.7.0@sha256:87c1363bf0cbc7fdb375866e592294114c8763097d2d0c9fc45fcb1fe00a4ab8"
+    ],
+    "gateway": [
+      "cr.agentgateway.dev/agentgateway:v1.7.0@sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b"
+    ],
+    "kyverno": [
+      "reg.kyverno.io/kyverno/kyverno:v1.17.1"
+    ]
+  },
+  "rgd": {
+    "generation": 4,
+    "conditions": [
+      {
+        "type": "GraphAccepted",
+        "status": "True",
+        "reason": "Valid",
+        "observedGeneration": 4
+      },
+      {
+        "type": "KindReady",
+        "status": "True",
+        "reason": "Ready",
+        "observedGeneration": 4
+      },
+      {
+        "type": "ControllerReady",
+        "status": "True",
+        "reason": "Running",
+        "observedGeneration": 4
+      },
+      {
+        "type": "GraphRevisionsResolved",
+        "status": "True",
+        "reason": "Resolved",
+        "observedGeneration": 4
+      },
+      {
+        "type": "Ready",
+        "status": "True",
+        "reason": "Ready",
+        "observedGeneration": 4
+      }
+    ],
+    "resources": 13
+  },
+  "actualGeneratedResources": [
+    {
+      "id": "workerAccount",
+      "kind": "ServiceAccount",
+      "name": "docs-check-1104-a-worker",
+      "namespace": "secure-kro-standalone",
+      "uid": "6a6252ee-90a8-4795-9c53-7f947e45c0ac"
+    },
+    {
+      "id": "callerAccount",
+      "kind": "ServiceAccount",
+      "name": "docs-check-1104-a-caller",
+      "namespace": "secure-kro-standalone",
+      "uid": "62ea6675-974a-44c4-8bed-7bd79d034aa8"
+    },
+    {
+      "id": "modelBinding",
+      "kind": "ConfigMap",
+      "name": "docs-check-1104-a-model",
+      "namespace": "secure-kro-standalone",
+      "uid": "348582de-7152-40f9-a782-a0bdc9ae3ec8"
+    },
+    {
+      "id": "contentBinding",
+      "kind": "ConfigMap",
+      "name": "docs-check-1104-a-content",
+      "namespace": "secure-kro-standalone",
+      "uid": "83e363be-5f2b-4e3c-9587-126209dfc944"
+    },
+    {
+      "id": "runtimeCode",
+      "kind": "ConfigMap",
+      "name": "docs-check-1104-a-runtime-code",
+      "namespace": "secure-kro-standalone",
+      "uid": "969906dd-6a73-416e-9756-1a56051f2a94"
+    },
+    {
+      "id": "agentDeployment",
+      "kind": "Deployment",
+      "name": "docs-check-1104-a-runtime",
+      "namespace": "secure-kro-standalone",
+      "uid": "e508f0e7-a2e3-4663-a37c-3bad98a30558"
+    },
+    {
+      "id": "runtimeService",
+      "kind": "Service",
+      "name": "docs-check-1104-a-runtime",
+      "namespace": "secure-kro-standalone",
+      "uid": "27cf7e64-010d-4084-874f-2988dea28f22"
+    },
+    {
+      "id": "frontService",
+      "kind": "Service",
+      "name": "docs-check-1104-a-front",
+      "namespace": "secure-kro-standalone",
+      "uid": "5400d11f-1976-4d26-b296-125d3ab8438c"
+    },
+    {
+      "id": "frontGrant",
+      "kind": "ReferenceGrant",
+      "name": "docs-check-1104-a-front",
+      "namespace": "secure-kro-standalone",
+      "uid": "400cf6ce-127c-429b-8f44-14a52155b160"
+    },
+    {
+      "id": "route",
+      "kind": "HTTPRoute",
+      "name": "kro-standalone-docs-check-1104-a",
+      "namespace": "secure-byo-gateway-system",
+      "uid": "05fc602b-c314-4503-a61b-b5404fa87279"
+    },
+    {
+      "id": "routePolicy",
+      "kind": "AgentgatewayPolicy",
+      "name": "kro-standalone-docs-check-1104-a",
+      "namespace": "secure-byo-gateway-system",
+      "uid": "171ceb5c-2d9c-4138-a28a-410f2dc1bdb8"
+    },
+    {
+      "id": "approval",
+      "kind": "ConfigMap",
+      "name": "docs-check-1104-a-approval",
+      "namespace": "secure-kro-standalone",
+      "uid": "ecc918bb-e54e-47f0-ad97-4ca6d875f3d4"
+    },
+    {
+      "id": "golden",
+      "kind": "Job",
+      "name": "docs-check-1104-a-golden",
+      "namespace": "secure-kro-standalone",
+      "uid": "2528ae66-066b-4ad2-88a7-182d630b4067"
+    }
+  ],
+  "approvalCELTypeWarnings": [],
+  "statusInterpretation": {
+    "kroInstance": "IN_PROGRESS, Ready=False; success-only graph readiness",
+    "goldenJob": "Failed=True, backoffLimit=0",
+    "approval": "Failed",
+    "upstreamStatus": 429,
+    "facadeAndGoldenStatus": 502
+  },
+  "foldedOwnerFormSchemaAdmission": "PASS live server dry-run with strict validation; request not persisted"
+}
