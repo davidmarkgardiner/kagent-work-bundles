@@ -655,5 +655,15 @@
     "providerTemplateStrictServerDryRun": "PASS",
     "runtimeSourceChanged": false,
     "rendererChangedSincePolicyReview": false
+  },
+  "expiryProof": {
+    "observedAtUTC": "2026-11-04T09:29:25.113016+00:00",
+    "approvalExpiresAtUTC": "2026-11-04T09:28:37Z",
+    "callerHTTP": 403,
+    "body": {
+      "error": "ApprovalExpired"
+    },
+    "freshCallerToken": true,
+    "approvalPatched": false
   }
 }

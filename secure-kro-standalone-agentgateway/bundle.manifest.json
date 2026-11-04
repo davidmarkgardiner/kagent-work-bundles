@@ -9,8 +9,8 @@
       "sha256": "a80ba4de0c33cde3548bc9bfd205c89235acb6c4acbf8e036147619f4ffd9fc0"
     },
     "DEEPSEEK-RESULTS-2026-11-04.md": {
-      "bytes": 3817,
-      "sha256": "54a5fcb2f15dd12331b59afc6ace44bbb017fe3281b78576b6b6e63c7a9f988d"
+      "bytes": 3920,
+      "sha256": "14d34665e128006b3726d6975e96c93f837adc9b3bfe9d79bccb21f22e2f22cf"
     },
     "DELIVERY-REPORT-TEMPLATE.json": {
       "bytes": 1103,
@@ -189,8 +189,8 @@
       "sha256": "51d07ef506249fe3ed1795d0dfe6df52e4edf8da3916e764473f6c368d470519"
     },
     "evidence/deepseek-success-2026-11-04.json": {
-      "bytes": 23231,
-      "sha256": "012385b4d7e1df8b6f93013759e42217a6969482b7ce3e2ac3668488a04c2476"
+      "bytes": 23500,
+      "sha256": "651a68a71653cd025f729d3d10c29eaed4cc3911e5a401e7f4348b08acb45d2b"
     },
     "evidence/final-denial.json": {
       "bytes": 255,
@@ -286,6 +286,6 @@
     }
   },
   "format": "secure-kro-standalone-source-v1",
-  "recordedAtUTC": "2026-11-04T09:28:06.004245+00:00",
+  "recordedAtUTC": "2026-11-04T09:29:50.458070+00:00",
   "scope": "portable source inventory; not successful target Golden or office delivery proof"
 }

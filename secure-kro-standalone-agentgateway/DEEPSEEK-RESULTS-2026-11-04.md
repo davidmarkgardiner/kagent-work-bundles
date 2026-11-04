@@ -13,7 +13,7 @@ Read [the machine-readable receipts](evidence/deepseek-success-2026-11-04.json) 
 - Missing and wrong-audience credentials were denied with 401. Wrong-subject, wrong-lane, and worker-token-without-handle requests were denied with 403. Model/MCP dispatch counters remained unchanged during denial probes. The empty-prompt input-validation control intentionally returned 400.
 - Actual runtime socket checks reached the central Gateway. Direct facade, DeepSeek bridge, provider HTTPS, and Kubernetes API connections were blocked, with DNS resolution confirmed. No Kubernetes API token was mounted in the runtime.
 
-The lab approval was Active during the successful calls and expires at **2026-11-04 09:28:37 UTC**. This is recorded execution proof, not a claim of continuing access. There is no automatic renewal or manual approval extension in this reference. A later rehearsal needs a newly named request and a fresh Golden pass.
+The lab approval was Active during the successful calls and expires at **2026-11-04 09:28:37 UTC**. This is recorded execution proof, not a claim of continuing access. There is no automatic renewal or manual approval extension in this reference. A later rehearsal needs a newly named request and a fresh Golden pass. After expiry, a fresh valid caller token received HTTP 403 `ApprovalExpired`; no approval was patched.
 
 ## Maintenance issue found and corrected
 
