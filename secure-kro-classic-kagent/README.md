@@ -2,10 +2,11 @@
 
 This is a separate work bundle for the normal `kagent.dev/v1alpha2` declarative
 Agent runtime. Kagent creates an ordinary Deployment and Service. This bundle
-uses **KRO 0.9.4** and a **kagent 0.8.0-beta4 reference schema and lab controller**.
+uses **KRO 0.9.4** and a **kagent 0.10.4 schema, controller and runtime**.
 It does not require AgentTemplate, Harness, actors, snapshots, a 1.x CLI or a
-custom agent runtime. Run the preflight against the actual work version before
-using these manifests.
+custom agent runtime. Use the matching controller, CRD chart and runtime images.
+The [image inventory](IMAGES.md) lists exact tags, digests and optional components.
+Run the preflight against the actual work installation before using the manifests.
 
 The customer deploys one [ClassicSecureAgent instance](examples/agent.yaml).
 The platform installs the resource graph and security baseline once. The graph
@@ -13,7 +14,7 @@ creates the native Agent, restricted ServiceAccounts, NetworkPolicies, protected
 Golden configuration and Job.
 Kagent owns the native runtime Deployment and its generated configuration Secret.
 
-The [live evidence](evidence/live-classic-2026-11-04.json) records a real native
+The [live evidence](evidence/live-classic-0.10.4-2026-11-04.json) records a real native
 Deployment, successful Golden PONG, a separate caller PONG, missing-token HTTP 401
 and verifier-on-caller HTTP 403. KRO reported the current instance Ready. The
 existing Substrate demo remained Ready and uses a separate controller and API.
@@ -92,24 +93,91 @@ python3 preflight.py --context '{{WORK_KUBECTL_CONTEXT}}' \
   --kro-namespace '{{KRO_NAMESPACE}}' --kro-deployment '{{KRO_DEPLOYMENT}}'
 ```
 
-The preflight requires served `kagent.dev/v1alpha2` Agent, ModelConfig and
-RemoteMCPServer APIs, the classic declarative fields and a KRO 0.9.4 controller
-tag. It reports the actual controller images. A different 0.x release can use the
-same API version while differing in supported fields or runtime behavior. Use
-server validation and a real receiving-cluster test before accepting that version.
-For a digest-pinned KRO image, verify the approved digest separately if the
-preflight cannot establish the version from its tag.
+The preflight requires the pinned kagent 0.10.4 controller rollout to be complete,
+served `kagent.dev/v1alpha2` Agent, ModelConfig and RemoteMCPServer schemas with
+matching hashes, matching controller runtime settings, no Substrate endpoints,
+and the pinned KRO 0.9.4 image. It rejects the previous 0.8.0-beta4 baseline and
+the different 1.x API. Mirrored controller and runtime repositories are accepted
+when their manifest digests match the lock. It does not establish model or MCP
+connectivity; the live acceptance checks do that.
+
+## Install matching versions without Substrate
+
+As checked on 2026-11-04, upstream's latest overall release is `1.0.0-rc1`.
+Its native agent lifecycle depends on Substrate ActorTemplates and snapshots.
+Disabling installation of the runtime does not give that release the classic
+Deployment backend. **0.10.4 is the latest released 0.10.x runtime** and supports
+the normal declarative Agent without Substrate. Keep these API families separate:
+
+| Installation | Native agent API | Agent runtime |
+| --- | --- | --- |
+| This bundle, kagent 0.10.4 | `kagent.dev/v1alpha2` | Kubernetes Deployment and Service |
+| kagent 1.0.0-rc1 | `api.kagent.dev/v1alpha3` | Harness and AgentTemplate with Substrate |
+
+Updating image tags alone does not migrate between these APIs. CRDs, controller,
+normal/full runtime images and skills-init must match. This bundle's
+[versions.lock.json](versions.lock.json) is the parity contract.
+
+For an existing 0.x installation, export its Helm values and preserve its database,
+model credentials, existing agents, MCP servers and identity settings. Back up the
+PostgreSQL database before allowing the new controller to migrate it. If the old
+installation uses SQLite, prepare PostgreSQL first; this bundle does not migrate
+historical SQLite sessions. Do not point the controller at a different release's
+live database. The reference lab uses a dedicated demo PostgreSQL database.
+
+Use the approved installation's release name, namespace and private values. The
+following commands are a reviewed installation sequence, not a blanket upgrade
+of every kagent release on a cluster:
+
+```sh
+helm pull oci://ghcr.io/kagent-dev/kagent/helm/kagent-crds --version 0.10.4
+helm pull oci://ghcr.io/kagent-dev/kagent/helm/kagent --version 0.10.4
+```
+
+Check the downloaded OCI chart digests against the lock. Install or upgrade the
+existing CRD release first, using its real release name and ownership. Disable
+both CRD dependencies so the classic installation cannot downgrade an existing
+Substrate CRD or take ownership of an existing kmcp CRD. The six classic API
+resources and two optional kagent sandbox API resources are still included.
+Those optional API definitions do not install a Substrate runtime. No kmcp
+controller is needed for the RemoteMCPServer references used in this bundle.
+
+```sh
+helm upgrade --install '{{KAGENT_CRD_RELEASE}}' ./kagent-crds-0.10.4.tgz \
+  --namespace '{{KAGENT_NAMESPACE}}' \
+  --set substrate.enabled=false --set kmcp.enabled=false
+helm upgrade --install '{{KAGENT_RELEASE}}' ./kagent-0.10.4.tgz \
+  --namespace '{{KAGENT_NAMESPACE}}' \
+  -f /private/existing-kagent-values.yaml -f helm-values-no-substrate.yaml
+```
+
+The base values disable the Substrate subchart, controller integration and
+WorkerPool creation. They disable bundled agents, bundled tools and kmcp, set UI
+replicas to zero, and pin the runtime image family. Review those choices against
+an existing shared installation before applying. Preserve any required shared UI
+or bundled tools through explicit private overrides. Work MCP catalogs continue
+to refer to the existing approved RemoteMCPServer objects.
+
+PostgreSQL is required. The base values disable the development database and
+expect the existing private values to provide `database.postgres.url` or
+`urlFile`, with the corresponding approved Secret mounts. A clean lab may add
+`-f helm-values-demo-db.yaml` as the last values file. That optional database uses
+the official chart's public demo credentials and is not a workplace database
+configuration. It is not required when the approved PostgreSQL service already
+exists. Version 0.10.4 has charts and runtime images but no matching CLI binary;
+use Helm, kubectl and query.py for this demonstration.
 
 Reference source:
-https://github.com/kagent-dev/kagent/tree/v0.8.0-beta4
+https://github.com/kagent-dev/kagent/tree/v0.10.4
 
 Native deployment and skills documentation:
 https://kagent.dev/docs/kagent/0.x/concepts/agents/
 
 ## Prepare the platform once
 
-1. Use the work installation's existing classic kagent controller. Do not upgrade
-   it to 1.x or install Substrate for this bundle. The isolated lab controller was
+1. Establish kagent 0.10.4 using the matching chart, CRDs and image inventory.
+   Keep `substrate.enabled`, `controller.substrate.enabled` and
+   `substrateWorkerPool.create` false. The lab classic controller remains
    separate from the existing Substrate controller.
 2. Create or reuse approved ModelConfig and RemoteMCPServer objects in the agent
    namespace. Their authentication stays in the existing Secrets. The graph

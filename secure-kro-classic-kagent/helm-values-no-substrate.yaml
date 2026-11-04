@@ -1,0 +1,55 @@
+# Merge with the approved existing installation values. A PostgreSQL connection is required.
+tag: ''
+substrate:
+  enabled: false
+substrateWorkerPool:
+  create: false
+controller:
+  substrate:
+    enabled: false
+  image:
+    tag: 0.10.4@sha256:e284fbddd327b06649f7e5ea4bc9df5e840c4b493538f07b4a36d9fa154e4af3
+  agentImage:
+    tag: 0.10.4@sha256:b811b0ddbf30d75976e2d29c2c9a0e8a604dcc04076f6eebda0f2dca9667f4f8
+    fullDigest: sha256:77ed9a2e43b84920119746cf8bdb9d9ff95167a22e11a78a1b4d5d9634d65cd0
+  goAgentImage:
+    tag: 0.10.4@sha256:89d5a7df2c5da68797e2d9d78fa2f6531260f3836f51d2ac2fd9b4119fe518ed
+    fullDigest: sha256:aa068ef1c3a76b8a030268ac08707f356aa07a5738cd0a4e19fe457f2bbb9c8d
+  skillsInitImage:
+    tag: 0.10.4@sha256:5be7cb94c912a2f1b6d84450b31f1e2592d96c38e8a7ef65cbe1f270e01ee2fd
+database:
+  postgres:
+    bundled:
+      enabled: false
+ui:
+  replicas: 0
+  image:
+    tag: 0.10.4@sha256:a6edf70c6e8e76a94582ee563652cfa2a8c5f74f5df5d4832b2f250e49655899
+kmcp:
+  enabled: false
+kagent-tools:
+  enabled: false
+grafana-mcp:
+  enabled: false
+k8s-agent:
+  enabled: false
+kgateway-agent:
+  enabled: false
+istio-agent:
+  enabled: false
+promql-agent:
+  enabled: false
+observability-agent:
+  enabled: false
+argo-rollouts-agent:
+  enabled: false
+helm-agent:
+  enabled: false
+cilium-policy-agent:
+  enabled: false
+cilium-manager-agent:
+  enabled: false
+cilium-debug-agent:
+  enabled: false
+oauth2-proxy:
+  enabled: false

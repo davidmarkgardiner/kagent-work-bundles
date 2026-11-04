@@ -1,19 +1,152 @@
 {
+  "verifiedOn": "2026-11-04",
   "kro": "0.9.4",
-  "kagentReference": "0.8.0-beta4",
+  "kagentReference": "0.10.4",
   "nativeAPI": "kagent.dev/v1alpha2",
   "agentgatewayReference": "1.7.0",
   "substrateRequired": false,
   "agentTemplateRequired": false,
-  "referenceSource": "https://github.com/kagent-dev/kagent/tree/v0.8.0-beta4",
+  "latestOverallObserved": "1.0.0-rc1",
+  "latestOverallRequiresSubstrateForNativeAgents": true,
+  "referenceSource": "https://github.com/kagent-dev/kagent/tree/v0.10.4",
   "crdSchemas": {
-    "agents.kagent.dev": "f8709405457b0dcc644bdd18d70f7d572b67295f93665ed5a265eb6278ce5bfb",
-    "modelconfigs.kagent.dev": "9aadec34d326c11f1c8d7be58dc3e3b4eb27b403b12da8f2a9064caa40f998ef",
-    "remotemcpservers.kagent.dev": "ee2f33777eceaf311c864531201446da8b9437ca85f1c45bcdc678cef78e450b",
-    "memories.kagent.dev": "e369fe95946b119b061344b707f4762b900ab6e1b9b2d1902a2696d24ce2d8ca",
-    "modelproviderconfigs.kagent.dev": "4289182007c035412e718bf29652f6b1298019982a5505c4af83b0ff597bb054",
-    "toolservers.kagent.dev": "e8c837d8dc1d5333bd523893978966ef5402f1324e2bfc8f9a85000c12a3957a"
+    "agents.kagent.dev": "f48367c543d21bb201ecec7286811a556b8c32bc50c7dc1bb142c5dddfa6f19b",
+    "modelconfigs.kagent.dev": "35657b26f89835f8ca91e738390a49d63902ef2b1671e4800780c0784d25b80f",
+    "remotemcpservers.kagent.dev": "d99d8013c8509b2930c228463293d970cb3ef6e89342b33b29ab11d819c820a6"
   },
-  "goldenPythonBase": "python@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c",
-  "referenceChartDigest": "sha256:25eb090928701daeb7d4073f41e9261d37acc3dadf6b40efcd06fbe99c66b129"
+  "referenceChartDigest": "sha256:c512bb714c8589a0c187ea7ea3d65216261a48349a69c11acbf360083e2f408d",
+  "referenceCRDChartDigest": "sha256:41e0658314e666d916b35987bf2cc15f2a7ff4c041730a7e5e1f475526d43b7c",
+  "images": {
+    "controller": {
+      "tag": "ghcr.io/kagent-dev/kagent/controller:0.10.4",
+      "digest": "sha256:e284fbddd327b06649f7e5ea4bc9df5e840c4b493538f07b4a36d9fa154e4af3",
+      "reference": "ghcr.io/kagent-dev/kagent/controller:0.10.4@sha256:e284fbddd327b06649f7e5ea4bc9df5e840c4b493538f07b4a36d9fa154e4af3",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      ]
+    },
+    "goAgent": {
+      "tag": "ghcr.io/kagent-dev/kagent/golang-adk:0.10.4",
+      "digest": "sha256:89d5a7df2c5da68797e2d9d78fa2f6531260f3836f51d2ac2fd9b4119fe518ed",
+      "reference": "ghcr.io/kagent-dev/kagent/golang-adk:0.10.4@sha256:89d5a7df2c5da68797e2d9d78fa2f6531260f3836f51d2ac2fd9b4119fe518ed",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      ]
+    },
+    "goAgentWithSkills": {
+      "tag": "ghcr.io/kagent-dev/kagent/golang-adk:0.10.4-full",
+      "digest": "sha256:aa068ef1c3a76b8a030268ac08707f356aa07a5738cd0a4e19fe457f2bbb9c8d",
+      "reference": "ghcr.io/kagent-dev/kagent/golang-adk:0.10.4-full@sha256:aa068ef1c3a76b8a030268ac08707f356aa07a5738cd0a4e19fe457f2bbb9c8d",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      ]
+    },
+    "skillsInit": {
+      "tag": "ghcr.io/kagent-dev/kagent/skills-init:0.10.4",
+      "digest": "sha256:5be7cb94c912a2f1b6d84450b31f1e2592d96c38e8a7ef65cbe1f270e01ee2fd",
+      "reference": "ghcr.io/kagent-dev/kagent/skills-init:0.10.4@sha256:5be7cb94c912a2f1b6d84450b31f1e2592d96c38e8a7ef65cbe1f270e01ee2fd",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      ]
+    },
+    "pythonAgent": {
+      "tag": "ghcr.io/kagent-dev/kagent/app:0.10.4",
+      "digest": "sha256:b811b0ddbf30d75976e2d29c2c9a0e8a604dcc04076f6eebda0f2dca9667f4f8",
+      "reference": "ghcr.io/kagent-dev/kagent/app:0.10.4@sha256:b811b0ddbf30d75976e2d29c2c9a0e8a604dcc04076f6eebda0f2dca9667f4f8",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      ]
+    },
+    "pythonAgentWithSkills": {
+      "tag": "ghcr.io/kagent-dev/kagent/app:0.10.4-full",
+      "digest": "sha256:77ed9a2e43b84920119746cf8bdb9d9ff95167a22e11a78a1b4d5d9634d65cd0",
+      "reference": "ghcr.io/kagent-dev/kagent/app:0.10.4-full@sha256:77ed9a2e43b84920119746cf8bdb9d9ff95167a22e11a78a1b4d5d9634d65cd0",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      ]
+    },
+    "ui": {
+      "tag": "ghcr.io/kagent-dev/kagent/ui:0.10.4",
+      "digest": "sha256:a6edf70c6e8e76a94582ee563652cfa2a8c5f74f5df5d4832b2f250e49655899",
+      "reference": "ghcr.io/kagent-dev/kagent/ui:0.10.4@sha256:a6edf70c6e8e76a94582ee563652cfa2a8c5f74f5df5d4832b2f250e49655899",
+      "platforms": [
+        {
+          "architecture": "amd64",
+          "os": "linux"
+        },
+        {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      ]
+    },
+    "kro": {
+      "tag": "registry.k8s.io/kro/kro:v0.9.4",
+      "digest": "sha256:eaf9fbaddd9d7f6cf400a8d47ab066b14cbef22b92a79be7bbdc7b3673376fb9",
+      "reference": "registry.k8s.io/kro/kro:v0.9.4@sha256:eaf9fbaddd9d7f6cf400a8d47ab066b14cbef22b92a79be7bbdc7b3673376fb9"
+    },
+    "agentgatewayController": {
+      "tag": "cr.agentgateway.dev/controller:v1.7.0",
+      "digest": "sha256:87c1363bf0cbc7fdb375866e592294114c8763097d2d0c9fc45fcb1fe00a4ab8",
+      "reference": "cr.agentgateway.dev/controller:v1.7.0@sha256:87c1363bf0cbc7fdb375866e592294114c8763097d2d0c9fc45fcb1fe00a4ab8"
+    },
+    "agentgateway": {
+      "tag": "cr.agentgateway.dev/agentgateway:v1.7.0",
+      "digest": "sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b",
+      "reference": "cr.agentgateway.dev/agentgateway:v1.7.0@sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b"
+    },
+    "demoPostgres": {
+      "tag": "docker.io/library/postgres:18.6-alpine3.23",
+      "digest": "sha256:1a0c23d53c1ad77468c8653fa6eed4f4105cfbef9e6f027bc1dfeb16949a8c29",
+      "reference": "docker.io/library/postgres:18.6-alpine3.23@sha256:1a0c23d53c1ad77468c8653fa6eed4f4105cfbef9e6f027bc1dfeb16949a8c29"
+    },
+    "golden": {
+      "reference": "{{WORK_REGISTRY}}/classic-golden@sha256:{{BUILT_GOLDEN_IMAGE_DIGEST}}",
+      "buildContext": "runtime/",
+      "base": "python@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c",
+      "publishedByThisBundle": false
+    }
+  }
 }

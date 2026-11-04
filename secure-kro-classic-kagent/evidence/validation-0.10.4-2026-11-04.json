@@ -1,0 +1,20 @@
+{
+  "behaviorTestsPassed": 11,
+  "helmLint": {
+    "chartsLinted": 1,
+    "chartsFailed": 0
+  },
+  "jsonYamlParsing": true,
+  "relativeDocumentationLinks": true,
+  "publicSafety": {
+    "gitleaks": "No leaks found",
+    "sharedScannerRawHits": 68,
+    "rawScannerIssue": "The IPv4 fragment rule matches the public version literal 0.10.4. A temporary text copy masking only that literal produced zero hits. Original source was also scanned with gitleaks.",
+    "sharedScannerAfterVersionLiteralMask": {
+      "clean": true,
+      "hits": 0
+    }
+  },
+  "liveEvidence": "evidence/live-classic-0.10.4-2026-11-04.json",
+  "checksDoNotProve": "Workplace deployment, skill loading or MCP backend reads."
+}

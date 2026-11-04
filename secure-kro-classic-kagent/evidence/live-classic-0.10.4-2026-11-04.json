@@ -1,0 +1,123 @@
+{
+  "checkedAt": "2026-11-04T18:48:45.882406+00:00",
+  "result": "LIVE_CLASSIC_0_10_4_NATIVE_VERIFIED",
+  "versions": {
+    "kro": "0.9.4",
+    "kagent": "0.10.4",
+    "agentgateway": "1.7.0"
+  },
+  "nativeAPI": "kagent.dev/v1alpha2",
+  "nativeRuntime": "go",
+  "runtimeUsesSubstrate": false,
+  "sharedLabClusterAlsoHasSeparateSubstrateInstallation": true,
+  "nativeDeploymentOwnedByAgent": true,
+  "resourceGraphCurrentGenerationReady": true,
+  "instanceReady": true,
+  "instanceUID": "ac665be9-2ddc-48c5-b538-ac03474eec95",
+  "graphNodes": 14,
+  "callerAccessRetiredBeforeUpgrade": true,
+  "preflight": {
+    "result": "NonSubstrateParityEstablished",
+    "kagent": "0.10.4",
+    "nativeAPI": "kagent.dev/v1alpha2",
+    "kagentControllerImage": "ghcr.io/kagent-dev/kagent/controller:0.10.4",
+    "runtimeTags": {
+      "IMAGE_TAG": "0.10.4",
+      "GO_IMAGE_TAG": "0.10.4",
+      "SKILLS_INIT_IMAGE_TAG": "0.10.4"
+    },
+    "kroControllerImages": [
+      "registry.k8s.io/kro/kro:v0.9.4"
+    ],
+    "nativeSchemaHashesMatch": true,
+    "substrateRequired": false
+  },
+  "golden": {
+    "checks": [
+      {
+        "name": "NativeAgentCard",
+        "passed": true
+      },
+      {
+        "http": 401,
+        "name": "MissingTokenDenied",
+        "passed": true
+      },
+      {
+        "http": 401,
+        "name": "InvalidTokenDenied",
+        "passed": true
+      },
+      {
+        "http": 404,
+        "name": "VerifierCannotUseCallerListener",
+        "passed": true
+      },
+      {
+        "name": "NativeModelPong",
+        "passed": true
+      }
+    ],
+    "completedAt": "2026-11-04T18:46:32.817395+00:00",
+    "contextID": "233571c5-3de4-4800-8f3e-d490382c5159",
+    "passed": true,
+    "requestUID": "ac665be9-2ddc-48c5-b538-ac03474eec95",
+    "responseSha256": "aa0b1c0e3efca0eb30a6b17d4db87442e1a55ca7656325188746666bc0f5c280",
+    "schemaVersion": "classic-golden/v1",
+    "scope": "native-agent-model-pong",
+    "taskID": "01a1a7e2-5a19-72d9-b283-9cd12533fdd1"
+  },
+  "callerSmoke": {
+    "taskID": "01a1a7e3-2e3f-7227-8635-ae5809881063",
+    "contextID": "ff3d33f3-5f40-4527-83b1-cc40d1e005e5",
+    "responseSha256": "1ba73a79f0c216337a120cef3b03ca9433dd895504b5d3ee3c92ecb27d803062",
+    "passed": true
+  },
+  "callerNegativeControls": {
+    "missingCallerJWT": {
+      "http": 401,
+      "passed": true
+    },
+    "verifierOnCaller": {
+      "http": 403,
+      "passed": true
+    }
+  },
+  "callerRouteCreatedAt": "2026-11-04T18:46:38Z",
+  "goldenCompletedBeforeCallerRoute": true,
+  "actualPodImages": [
+    {
+      "namespace": "classic-agents",
+      "pod": "classic-demo-b8599c674-hcctm",
+      "image": "cr.agentgateway.dev/agentgateway:v1.7.0",
+      "imageID": "cr.agentgateway.dev/agentgateway@sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b"
+    },
+    {
+      "namespace": "classic-agents",
+      "pod": "demo-68db4d6746-dz9qc",
+      "image": "ghcr.io/kagent-dev/kagent/golang-adk:0.10.4",
+      "imageID": "ghcr.io/kagent-dev/kagent/golang-adk@sha256:89d5a7df2c5da68797e2d9d78fa2f6531260f3836f51d2ac2fd9b4119fe518ed"
+    },
+    {
+      "namespace": "classic-agents",
+      "pod": "demo-golden-6885r",
+      "image": "docker.io/library/classic-golden:v1",
+      "imageID": "sha256:2428d570dd7a44feadece7a2d465e068fe80c5fc2b9aaadc79b7c725355005c4"
+    },
+    {
+      "namespace": "classic-system",
+      "pod": "classic-controller-ff7cf9f44-dtlkk",
+      "image": "ghcr.io/kagent-dev/kagent/controller:0.10.4",
+      "imageID": "ghcr.io/kagent-dev/kagent/controller@sha256:e284fbddd327b06649f7e5ea4bc9df5e840c4b493538f07b4a36d9fa154e4af3"
+    },
+    {
+      "namespace": "classic-system",
+      "pod": "classic-postgresql-65cf4fbd44-4hht8",
+      "image": "docker.io/library/postgres:18.6-alpine3.23",
+      "imageID": "docker.io/library/postgres@sha256:1a0c23d53c1ad77468c8653fa6eed4f4105cfbef9e6f027bc1dfeb16949a8c29"
+    }
+  ],
+  "scope": "Real model PONG and Gateway authentication controls on kagent 0.10.4. Skill fetching and Kubernetes, GitLab or Denodo backend reads were not exercised.",
+  "previousEvidence": "live-classic-2026-11-04.json is the earlier retired 0.8.0-beta4 proof, not current-version evidence.",
+  "verifierImageDelivery": "Lab-local classic-golden:v1 image. Receiving platform must build and push runtime/Dockerfile to its approved registry."
+}

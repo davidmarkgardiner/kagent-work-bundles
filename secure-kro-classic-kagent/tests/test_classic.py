@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import compose
 import gateway_baseline
+import preflight
+from types import SimpleNamespace
 spec = importlib.util.spec_from_file_location('classic_golden', ROOT / 'runtime/golden.py')
 golden = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(golden)
@@ -75,3 +77,52 @@ class ClassicTests(unittest.TestCase):
         self.assertIn('refs', agent['spec']['skills'])
         self.assertEqual(owner['spec']['skills'], ['kb'])
         self.assertIn('minItems=1', graph['spec']['schema']['spec']['skills'])
+
+
+class ParityTests(unittest.TestCase):
+    def setup_case(self):
+        lock = json.loads((ROOT / 'versions.lock.json').read_text())
+        version = {'name': 'v1alpha2', 'served': True, 'schema': {'openAPIV3Schema': {'type': 'object'}}}
+        lock['crdSchemas'] = {'agents.kagent.dev': preflight.schema_hash(version)}
+        controller = {'metadata': {'generation': 2}, 'spec': {'replicas': 1, 'template': {'spec': {'containers': [{
+            'name': 'controller', 'image': lock['images']['controller']['reference'],
+            'env': [{'name': key, 'value': value} for key, value in {
+                'IMAGE_TAG': '0.10.4', 'IMAGE_REGISTRY': 'ghcr.io', 'IMAGE_REPOSITORY': 'kagent-dev/kagent/app',
+                'GO_IMAGE_TAG': '0.10.4', 'GO_IMAGE_REGISTRY': 'ghcr.io', 'GO_IMAGE_REPOSITORY': 'kagent-dev/kagent/golang-adk',
+                'SKILLS_INIT_IMAGE_TAG': '0.10.4', 'SKILLS_INIT_IMAGE_REGISTRY': 'ghcr.io', 'SKILLS_INIT_IMAGE_REPOSITORY': 'kagent-dev/kagent/skills-init',
+            }.items()]}]}}}, 'status': {'observedGeneration': 2, 'replicas': 1, 'updatedReplicas': 1, 'availableReplicas': 1}}
+        args = SimpleNamespace(kagent_deployment='controller', kagent_namespace='kagent', kro_deployment='kro', kro_namespace='kro')
+        def get(*command):
+            if command[0] == 'crd':
+                return {'spec': {'versions': [version]}}
+            if command[1] == 'controller':
+                return controller
+            return {'spec': {'template': {'spec': {'containers': [{'image': lock['images']['kro']['tag']}]}}}}
+        return lock, version, controller, args, get
+
+    def test_matching_parity_is_accepted(self):
+        lock, _, _, args, get = self.setup_case()
+        self.assertEqual(preflight.check(get, args, lock)['result'], 'NonSubstrateParityEstablished')
+
+    def test_old_controller_is_rejected_even_with_the_same_api(self):
+        lock, _, controller, args, get = self.setup_case()
+        controller['spec']['template']['spec']['containers'][0]['image'] = 'ghcr.io/kagent-dev/kagent/controller:0.8.0-beta4'
+        with self.assertRaisesRegex(ValueError, 'pinned kagent 0.10.4'):
+            preflight.check(get, args, lock)
+
+    def test_incomplete_rollout_is_not_parity(self):
+        lock, _, controller, args, get = self.setup_case()
+        controller['status']['replicas'] = 2
+        with self.assertRaisesRegex(ValueError, 'rollout is not complete'):
+            preflight.check(get, args, lock)
+
+    def test_matching_api_name_with_different_schema_is_rejected(self):
+        lock, version, _, args, get = self.setup_case()
+        version['schema']['openAPIV3Schema']['description'] = 'different schema'
+        with self.assertRaisesRegex(ValueError, 'CRD schema differs'):
+            preflight.check(get, args, lock)
+
+    def test_mirror_requires_the_pinned_digest(self):
+        expected = json.loads((ROOT / 'versions.lock.json').read_text())['images']['controller']
+        self.assertTrue(preflight.image_matches('mirror.example.com/controller@' + expected['digest'], expected))
+        self.assertFalse(preflight.image_matches('mirror.example.com/controller:0.10.4', expected))
