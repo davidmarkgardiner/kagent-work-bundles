@@ -10,6 +10,36 @@ Follow the complete operational sequence in [INCIDENT-RECOVERY-PROCESS.md](INCID
 
 Verify that `1-23` is the correct configured control-plane revision for the affected policies. Istio was previously reported as installed version 1.29. A version number and configured revision are different values. If istiod is configured only as `1-29`, changing the policy label to `1-23` may exclude the policy from that control plane. This patch does not install or downgrade Istio, and no healthy `1-23` control plane has been verified here.
 
+## Inspect PeerAuthentication labels before patching
+
+Show every PeerAuthentication and its metadata labels in the current cluster:
+
+```bash
+kubectl get peerauthentications.security.istio.io -A --show-labels
+```
+
+Describe every policy across all namespaces. Inspect the `Labels:` section for `istio.io/rev`:
+
+```bash
+kubectl describe peerauthentications.security.istio.io -A
+```
+
+To inspect one policy in detail:
+
+```bash
+kubectl -n 'POLICY_NAMESPACE' \
+  describe peerauthentications.security.istio.io 'POLICY_NAME'
+```
+
+To list only policies currently labelled `1-29`, which match the current rollback loop:
+
+```bash
+kubectl get peerauthentications.security.istio.io -A \
+  -l 'istio.io/rev=1-29' --show-labels
+```
+
+These commands are read-only. The metadata label `istio.io/rev` is different from workload labels under `spec.selector.matchLabels`. Inspect the metadata label before choosing a patch. Keep detailed workplace output private.
+
 ## Follow this recovery order
 
 1. Confirm the revision and the named affected PeerAuthentications.
