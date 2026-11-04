@@ -1,0 +1,659 @@
+{
+  "format": "secure-kro-standalone-deepseek-success/v1",
+  "observedAtUTC": "2026-11-04T09:24:14.959226+00:00",
+  "model": "deepseek-flash",
+  "thinking": "disabled by dedicated model bridge override",
+  "credential": {
+    "matchedUserSuppliedHint": true,
+    "keyPublished": false,
+    "heldOnlyByModelBridge": true
+  },
+  "providerPreflight": {
+    "balanceHTTP": 200,
+    "balanceAvailable": true,
+    "modelsHTTP": 200
+  },
+  "request": {
+    "name": "docs-deepseek-b",
+    "uid": "7dad898b-1736-4321-a670-e669206e8e2e",
+    "generation": 1,
+    "state": "ACTIVE",
+    "conditions": [
+      {
+        "type": "InstanceManaged",
+        "status": "True",
+        "reason": "Managed",
+        "observedGeneration": 1
+      },
+      {
+        "type": "GraphResolved",
+        "status": "True",
+        "reason": "Resolved",
+        "observedGeneration": 1
+      },
+      {
+        "type": "ResourcesReady",
+        "status": "True",
+        "reason": "AllResourcesReady",
+        "observedGeneration": 1
+      },
+      {
+        "type": "Ready",
+        "status": "True",
+        "reason": "Ready",
+        "observedGeneration": 1
+      }
+    ]
+  },
+  "golden": {
+    "agent": "docs-deepseek-b",
+    "event": "golden-receipt",
+    "expiresAt": "2026-11-04T09:28:37Z",
+    "golden": {
+      "answerSha256": "521ba852039f6d01637aa9f420bb747bf4b67833edf666eef8bd12ed4247cdf4",
+      "facadeEvidenceSha256": "d03cf0abc72db9892b5324b6a61e929a15ffed3248fd4f37fd33ce34fe3ef16a",
+      "mcpCalls": 1,
+      "modelCalls": 3,
+      "payloadSha256": "c55b9ca781a34e490a4c066879afb86672c7d40b057139305866c9a61979b462",
+      "runId": "5346879e1b897f2c6b3b7d589b9af089",
+      "runtimeSha256": "7623e727ee895c9c9529be85a132bd9254f507aafc21c672e8b5b837353b88d0",
+      "scenario": "golden-docs-readonly-v1",
+      "toolCalls": 7,
+      "toolEvidenceSha256": "1118c654598ed21d3394cbe693be8ecb91a69c3568902be374b382f5377bb39a",
+      "workerSha256": "26ecad1695f01a60a4a1fe106c074d96b23d570a62351d79ca7f6fa1e85c6e6b"
+    },
+    "imageDigest": "sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c",
+    "podUID": "5c534045-2119-4f57-babb-dadbb79688c9",
+    "probes": {
+      "forgedToken": 401,
+      "missingToken": 401,
+      "verifierBeforeVerifying": 403,
+      "wrongAudience": 401,
+      "wrongLaneMcp": 403,
+      "wrongLaneModel": 403,
+      "wrongSubject": 403
+    },
+    "proofScope": "standalone KRO reference runtime with ConfigMap bindings and synthetic MCP; not native kagent Agent, Harness, ModelConfig, Skill or Substrate proof",
+    "reason": "GoldenScenarioVerified",
+    "requestUID": "7dad898b-1736-4321-a670-e669206e8e2e",
+    "result": "Passed",
+    "scenario": "golden-docs-readonly-v1",
+    "state": "Active",
+    "verifierJobUID": "0a4e19b7-ee1b-4cbb-b763-a452d567b556"
+  },
+  "caller": {
+    "httpStatus": 200,
+    "receipt": {
+      "runtime": "standalone-kro-v1",
+      "proofScope": "standalone KRO reference runtime with ConfigMap bindings and synthetic MCP; not native kagent Agent, Harness, ModelConfig, Skill or Substrate proof",
+      "profile": "docs-readonly-v1",
+      "agent": "docs-deepseek-b",
+      "runId": "89a0533f9154f59ab8402288a76b7df1",
+      "result": "Passed",
+      "reason": "RequiredToolsAndAnswerVerified",
+      "modelCalls": 3,
+      "toolCalls": 7,
+      "mcpCalls": 1,
+      "responseBytes": 9143,
+      "toolEvidence": [
+        {
+          "name": "load_skill",
+          "argumentsSha256": "c366461bac52bc617585b38dac1e30e6c3509615484ff13e0687583d70424513",
+          "resultSha256": "7d9fdeec028af3325601b5f69807f02d73a95af7249b05b4a793cc2f8ec9e129"
+        },
+        {
+          "name": "load_skill",
+          "argumentsSha256": "ed84de9d630d7f38dfd5fbe6464bcf89cd87ef13389f700c9e0eb9b62e1c2765",
+          "resultSha256": "a5f91eae56117d3bd768c0a1f372f1e1e6ca730c3c3b0575b06ce3d78697062d"
+        },
+        {
+          "name": "get_demo_status",
+          "argumentsSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "resultSha256": "99427b0501f2f2de1ff92c7aeb024e096c92c7a585286351133b052dfda8e99f"
+        },
+        {
+          "name": "load_skill_resource",
+          "argumentsSha256": "8739c0c192b8442a208bef52f7d0c236b13333c08b09888afec8878dc5f6f6c7",
+          "resultSha256": "892bf91fa1642cb3877d2f77b0796a2474246c00a573a963d5e55660cafd1b19"
+        },
+        {
+          "name": "load_skill_resource",
+          "argumentsSha256": "ea29e1f9ca1080487855c0fe4efe54550a267c06b34f8a33af2b55f86ecb779e",
+          "resultSha256": "b5f0b59b4b3f9b146551e57ff7124255487998a1e24136ede3fde33f88b9ea2c"
+        },
+        {
+          "name": "load_skill_resource",
+          "argumentsSha256": "760ef06384aac397e675f638aaa4ee8c4e4c9be89680f8edd38b924218ebc7f2",
+          "resultSha256": "66d64cfca7f967f871427fc5f0a7ce158895a701fc6cf1fdb1b8b12a214744ed"
+        },
+        {
+          "name": "load_skill_resource",
+          "argumentsSha256": "7802eeb4c74d395bd87dd54d0f09cda9453559af446bbc43361d83d41b6e8f1c",
+          "resultSha256": "f3736b378410ab58a4da9eb5f83218e6eebc0ff09886243315c3ee1dba8a9fda"
+        }
+      ],
+      "inputSha256": "ff04125db2704ee6405f5aadd48a0ade9be386f163cbcbb583c7e2ab19cc9f9d",
+      "contentSha256": "d7d311b6e51e3476d3dbebc411438e0e6fdfab0d65e5054e633f63a142a1060d",
+      "payloadSha256": "c55b9ca781a34e490a4c066879afb86672c7d40b057139305866c9a61979b462",
+      "runtimeSha256": "7623e727ee895c9c9529be85a132bd9254f507aafc21c672e8b5b837353b88d0",
+      "workerSha256": "26ecad1695f01a60a4a1fe106c074d96b23d570a62351d79ca7f6fa1e85c6e6b",
+      "answerSha256": "fbc31ec7da3a958c26aba010f43cc6b094a572ca55e99b45dcd83681fe4bb4ae",
+      "mcpProofSha256": [
+        "3d76bf57c48395a27da418914def4bb63d9a57c7d51965224bac3f8e83b4937f"
+      ]
+    },
+    "facade": {
+      "modelDispatches": 3,
+      "mcpDispatches": 1
+    }
+  },
+  "negativeChecks": {
+    "negativeProbes": [
+      {
+        "probe": "active-caller-validated",
+        "status": 400,
+        "body": {
+          "error": "PromptOnly"
+        }
+      },
+      {
+        "probe": "caller-model-denied",
+        "status": 403,
+        "body": {
+          "error": "LaneNotPermitted"
+        }
+      },
+      {
+        "probe": "caller-mcp-denied",
+        "status": 403,
+        "body": {
+          "error": "LaneNotPermitted"
+        }
+      },
+      {
+        "probe": "caller-witness-denied",
+        "status": 403,
+        "body": {
+          "error": "LaneNotPermitted"
+        }
+      },
+      {
+        "probe": "worker-invoke-denied",
+        "status": 403,
+        "body": {
+          "error": "LaneNotPermitted"
+        }
+      },
+      {
+        "probe": "worker-token-alone-model",
+        "status": 403,
+        "body": {
+          "error": "ExecutionHandleRequired"
+        }
+      },
+      {
+        "probe": "worker-token-alone-mcp",
+        "status": 403,
+        "body": {
+          "error": "ExecutionHandleRequired"
+        }
+      },
+      {
+        "probe": "missing-jwt",
+        "status": 401,
+        "body": "authentication failed"
+      },
+      {
+        "probe": "wrong-audience",
+        "status": 401,
+        "body": "authentication failed"
+      },
+      {
+        "probe": "cross-agent-subject",
+        "status": 403,
+        "body": "authorization failed"
+      }
+    ],
+    "forbiddenDispatchCountersUnchanged": true,
+    "before": {
+      "received": 14,
+      "denied": 9,
+      "invocations": 1,
+      "handlesMinted": 1,
+      "modelDispatches": 3,
+      "mcpDispatches": 1
+    },
+    "after": {
+      "received": 20,
+      "denied": 15,
+      "invocations": 1,
+      "handlesMinted": 1,
+      "modelDispatches": 3,
+      "mcpDispatches": 1
+    }
+  },
+  "approval": {
+    "state": "Active",
+    "expiresAtUTC": "2026-11-04T09:28:37Z",
+    "automaticRenewal": false
+  },
+  "mountedConfig": {
+    "observedAtUTC": "2026-11-04T09:18:07.412920+00:00",
+    "actual": {
+      "model": "deepseek-flash",
+      "configSha256": "f2f77933c8e83b42b5d258b7487bd62c6c37a991af8e7942b7880ed47554134e",
+      "modelSha256": "9d2f66cc8c4ecace1bdc4548b6d2d9a1138bf0a793c5f0bf614ecae70ae2ce78"
+    },
+    "matches": true,
+    "servedConfigSha256": "f2f77933c8e83b42b5d258b7487bd62c6c37a991af8e7942b7880ed47554134e"
+  },
+  "migration": {
+    "sharedKimiRoutesChanged": false,
+    "failedRequestsArchivedAndRetired": [
+      "docs-yaml-a",
+      "docs-check-1104-a"
+    ],
+    "initialDeepSeekRequest": {
+      "name": "docs-deepseek-a",
+      "result": "Failed",
+      "reason": "BindingContentMismatch",
+      "modelCalls": 0,
+      "receipt": {
+        "agent": "docs-deepseek-a",
+        "event": "golden-receipt",
+        "imageDigest": "sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c",
+        "podUID": "40796c8a-78dd-4c9c-839f-e15d1cd5b9f5",
+        "probes": {},
+        "proofScope": "standalone KRO reference runtime with ConfigMap bindings and synthetic MCP; not native kagent Agent, Harness, ModelConfig, Skill or Substrate proof",
+        "reason": "BindingContentMismatch",
+        "requestUID": "7e15bdbc-cde2-4264-b349-190dcbf3015a",
+        "result": "Failed",
+        "scenario": "golden-docs-readonly-v1",
+        "state": "Failed"
+      }
+    },
+    "cause": "API ConfigMap changed but live immutable mounts retained prior model configuration",
+    "correction": "Retire exact archived terminal verifier Pods, stop all platform ConfigMap consumers, restart facade and compare its complete mounted JSON hash to the API before a new owner name.",
+    "retiredTerminalAuditPods": [
+      {
+        "name": "docs-check-1104-a-golden-9pcqm",
+        "uid": "6c156e9a-8bbf-4136-8ba5-067dc48cc5e3",
+        "phase": "Failed"
+      },
+      {
+        "name": "docs-deepseek-a-golden-p2j9q",
+        "uid": "40796c8a-78dd-4c9c-839f-e15d1cd5b9f5",
+        "phase": "Failed"
+      },
+      {
+        "name": "docs-yaml-a-golden-bxvb7",
+        "uid": "5973fecc-86d0-44d9-9989-d4c187334b04",
+        "phase": "Failed"
+      },
+      {
+        "name": "docs-yaml-a-golden-f6zrk",
+        "uid": "c3014a25-1458-4ddd-95d9-32e73357156d",
+        "phase": "Failed"
+      }
+    ]
+  },
+  "runtimeSourceChanged": false,
+  "rendererSha256": "30d2316e61fe05ed049cc0c96239bcbe696fd9da5903a7fe835c124c49425c7c",
+  "imageBuildRequired": false,
+  "proofScope": "Standalone KRO runtime with pinned content and typed synthetic MCP; not native kagent, Azure execution or office readiness",
+  "recordedGoldenAndCallerPass": true,
+  "officeReady": false,
+  "kimi31Reviewer": "Unavailable because weekly CLI quota; DeepSeek model success does not count as Kimi review",
+  "providerTemplateValidation": {
+    "yamlParsed": true,
+    "filledTemplateEqualsActualDeployedModelBridge": true,
+    "strictServerDryRun": "PASS",
+    "objects": 5
+  },
+  "independentSuccessfulCallerReviews": [
+    {
+      "reportedModels": [
+        "claude-sonnet-5-5"
+      ],
+      "personallyInitiatedInvocation": true,
+      "invocationCommandExecutions": 1,
+      "additionalLocalCommands": [],
+      "serializedBy": "flock for one shared runtime and counter window",
+      "callerHTTP": 200,
+      "callerReceipt": {
+        "runtime": "standalone-kro-v1",
+        "proofScope": "standalone KRO reference runtime with ConfigMap bindings and synthetic MCP; not native kagent Agent, Harness, ModelConfig, Skill or Substrate proof",
+        "profile": "docs-readonly-v1",
+        "agent": "docs-deepseek-b",
+        "runId": "5c224e5b343f6dc4e28763535c887bfa",
+        "result": "Passed",
+        "reason": "RequiredToolsAndAnswerVerified",
+        "modelCalls": 3,
+        "toolCalls": 7,
+        "mcpCalls": 1,
+        "responseBytes": 6992,
+        "toolEvidence": [
+          {
+            "name": "load_skill",
+            "argumentsSha256": "c366461bac52bc617585b38dac1e30e6c3509615484ff13e0687583d70424513",
+            "resultSha256": "7d9fdeec028af3325601b5f69807f02d73a95af7249b05b4a793cc2f8ec9e129"
+          },
+          {
+            "name": "load_skill",
+            "argumentsSha256": "ed84de9d630d7f38dfd5fbe6464bcf89cd87ef13389f700c9e0eb9b62e1c2765",
+            "resultSha256": "a5f91eae56117d3bd768c0a1f372f1e1e6ca730c3c3b0575b06ce3d78697062d"
+          },
+          {
+            "name": "get_demo_status",
+            "argumentsSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "resultSha256": "c30dfb612d15f396a0e69ef0f70bca7c2a004ba6ec4310f50d7ad873abd17168"
+          },
+          {
+            "name": "load_skill_resource",
+            "argumentsSha256": "8739c0c192b8442a208bef52f7d0c236b13333c08b09888afec8878dc5f6f6c7",
+            "resultSha256": "892bf91fa1642cb3877d2f77b0796a2474246c00a573a963d5e55660cafd1b19"
+          },
+          {
+            "name": "load_skill_resource",
+            "argumentsSha256": "ea29e1f9ca1080487855c0fe4efe54550a267c06b34f8a33af2b55f86ecb779e",
+            "resultSha256": "b5f0b59b4b3f9b146551e57ff7124255487998a1e24136ede3fde33f88b9ea2c"
+          },
+          {
+            "name": "load_skill_resource",
+            "argumentsSha256": "760ef06384aac397e675f638aaa4ee8c4e4c9be89680f8edd38b924218ebc7f2",
+            "resultSha256": "66d64cfca7f967f871427fc5f0a7ce158895a701fc6cf1fdb1b8b12a214744ed"
+          },
+          {
+            "name": "load_skill_resource",
+            "argumentsSha256": "7802eeb4c74d395bd87dd54d0f09cda9453559af446bbc43361d83d41b6e8f1c",
+            "resultSha256": "f3736b378410ab58a4da9eb5f83218e6eebc0ff09886243315c3ee1dba8a9fda"
+          }
+        ],
+        "inputSha256": "ff04125db2704ee6405f5aadd48a0ade9be386f163cbcbb583c7e2ab19cc9f9d",
+        "contentSha256": "d7d311b6e51e3476d3dbebc411438e0e6fdfab0d65e5054e633f63a142a1060d",
+        "payloadSha256": "c55b9ca781a34e490a4c066879afb86672c7d40b057139305866c9a61979b462",
+        "runtimeSha256": "7623e727ee895c9c9529be85a132bd9254f507aafc21c672e8b5b837353b88d0",
+        "workerSha256": "26ecad1695f01a60a4a1fe106c074d96b23d570a62351d79ca7f6fa1e85c6e6b",
+        "answerSha256": "b434b4d5c45f9e0c821df878f6c75f56d4691acc0d3bfb6a1addc30a39a1d057",
+        "mcpProofSha256": [
+          "2a355f539967094d2ade3cb2662796521a464d3b27a7ba350c4ee43e2fd9fa4f"
+        ]
+      },
+      "facade": {
+        "modelDispatches": 3,
+        "mcpDispatches": 1
+      },
+      "forbiddenDispatchCountersUnchanged": true,
+      "negativeProbes": [
+        {
+          "probe": "active-caller-validated",
+          "status": 400,
+          "body": {
+            "error": "PromptOnly"
+          }
+        },
+        {
+          "probe": "caller-model-denied",
+          "status": 403,
+          "body": {
+            "error": "LaneNotPermitted"
+          }
+        },
+        {
+          "probe": "caller-mcp-denied",
+          "status": 403,
+          "body": {
+            "error": "LaneNotPermitted"
+          }
+        },
+        {
+          "probe": "caller-witness-denied",
+          "status": 403,
+          "body": {
+            "error": "LaneNotPermitted"
+          }
+        },
+        {
+          "probe": "worker-invoke-denied",
+          "status": 403,
+          "body": {
+            "error": "LaneNotPermitted"
+          }
+        },
+        {
+          "probe": "worker-token-alone-model",
+          "status": 403,
+          "body": {
+            "error": "ExecutionHandleRequired"
+          }
+        },
+        {
+          "probe": "worker-token-alone-mcp",
+          "status": 403,
+          "body": {
+            "error": "ExecutionHandleRequired"
+          }
+        },
+        {
+          "probe": "missing-jwt",
+          "status": 401,
+          "body": "authentication failed"
+        },
+        {
+          "probe": "wrong-audience",
+          "status": 401,
+          "body": "authentication failed"
+        },
+        {
+          "probe": "cross-agent-subject",
+          "status": 403,
+          "body": "authorization failed"
+        }
+      ],
+      "approvalExpiresAtUTC": "2026-11-04T09:28:37Z",
+      "rawToolResultSha256": "a393618214d084b77044f78e88bcf90787a0e828fee43df75f5bbe96e16b6846",
+      "rawTranscriptSha256": "20b70d5b62c9a667e11972713da52d9c9cdc0be41c2d1f75328a49d256ebb756"
+    },
+    {
+      "reportedModels": [
+        "claude-opus-5-5"
+      ],
+      "personallyInitiatedInvocation": true,
+      "invocationCommandExecutions": 1,
+      "additionalLocalCommands": [
+        {
+          "kind": "local ls/file/date metadata inspection",
+          "executed": true,
+          "mutations": false,
+          "networkRequests": false,
+          "instructionDeviation": "Additional read-only shell inspection beyond the requested wrapper."
+        }
+      ],
+      "serializedBy": "flock for one shared runtime and counter window",
+      "callerHTTP": 200,
+      "callerReceipt": {
+        "runtime": "standalone-kro-v1",
+        "proofScope": "standalone KRO reference runtime with ConfigMap bindings and synthetic MCP; not native kagent Agent, Harness, ModelConfig, Skill or Substrate proof",
+        "profile": "docs-readonly-v1",
+        "agent": "docs-deepseek-b",
+        "runId": "b9204974ed9e4944dc8167c5fe344545",
+        "result": "Passed",
+        "reason": "RequiredToolsAndAnswerVerified",
+        "modelCalls": 3,
+        "toolCalls": 7,
+        "mcpCalls": 1,
+        "responseBytes": 10195,
+        "toolEvidence": [
+          {
+            "name": "load_skill",
+            "argumentsSha256": "c366461bac52bc617585b38dac1e30e6c3509615484ff13e0687583d70424513",
+            "resultSha256": "7d9fdeec028af3325601b5f69807f02d73a95af7249b05b4a793cc2f8ec9e129"
+          },
+          {
+            "name": "load_skill",
+            "argumentsSha256": "ed84de9d630d7f38dfd5fbe6464bcf89cd87ef13389f700c9e0eb9b62e1c2765",
+            "resultSha256": "a5f91eae56117d3bd768c0a1f372f1e1e6ca730c3c3b0575b06ce3d78697062d"
+          },
+          {
+            "name": "get_demo_status",
+            "argumentsSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "resultSha256": "f6447ff184b01a64b200d3eac59b042ad987c272b896e2ff797b5ea5871054c2"
+          },
+          {
+            "name": "load_skill_resource",
+            "argumentsSha256": "8739c0c192b8442a208bef52f7d0c236b13333c08b09888afec8878dc5f6f6c7",
+            "resultSha256": "892bf91fa1642cb3877d2f77b0796a2474246c00a573a963d5e55660cafd1b19"
+          },
+          {
+            "name": "load_skill_resource",
+            "argumentsSha256": "ea29e1f9ca1080487855c0fe4efe54550a267c06b34f8a33af2b55f86ecb779e",
+            "resultSha256": "b5f0b59b4b3f9b146551e57ff7124255487998a1e24136ede3fde33f88b9ea2c"
+          },
+          {
+            "name": "load_skill_resource",
+            "argumentsSha256": "760ef06384aac397e675f638aaa4ee8c4e4c9be89680f8edd38b924218ebc7f2",
+            "resultSha256": "66d64cfca7f967f871427fc5f0a7ce158895a701fc6cf1fdb1b8b12a214744ed"
+          },
+          {
+            "name": "load_skill_resource",
+            "argumentsSha256": "7802eeb4c74d395bd87dd54d0f09cda9453559af446bbc43361d83d41b6e8f1c",
+            "resultSha256": "f3736b378410ab58a4da9eb5f83218e6eebc0ff09886243315c3ee1dba8a9fda"
+          }
+        ],
+        "inputSha256": "ff04125db2704ee6405f5aadd48a0ade9be386f163cbcbb583c7e2ab19cc9f9d",
+        "contentSha256": "d7d311b6e51e3476d3dbebc411438e0e6fdfab0d65e5054e633f63a142a1060d",
+        "payloadSha256": "c55b9ca781a34e490a4c066879afb86672c7d40b057139305866c9a61979b462",
+        "runtimeSha256": "7623e727ee895c9c9529be85a132bd9254f507aafc21c672e8b5b837353b88d0",
+        "workerSha256": "26ecad1695f01a60a4a1fe106c074d96b23d570a62351d79ca7f6fa1e85c6e6b",
+        "answerSha256": "ce82d10fb45bf85b5776338577042217baf3919a4171401dfab17edd58465071",
+        "mcpProofSha256": [
+          "9222a92fb523f64d2f080b3f5374c960b7591f542848b2e591965b50e7d306c0"
+        ]
+      },
+      "facade": {
+        "modelDispatches": 3,
+        "mcpDispatches": 1
+      },
+      "forbiddenDispatchCountersUnchanged": true,
+      "negativeProbes": [
+        {
+          "probe": "active-caller-validated",
+          "status": 400,
+          "body": {
+            "error": "PromptOnly"
+          }
+        },
+        {
+          "probe": "caller-model-denied",
+          "status": 403,
+          "body": {
+            "error": "LaneNotPermitted"
+          }
+        },
+        {
+          "probe": "caller-mcp-denied",
+          "status": 403,
+          "body": {
+            "error": "LaneNotPermitted"
+          }
+        },
+        {
+          "probe": "caller-witness-denied",
+          "status": 403,
+          "body": {
+            "error": "LaneNotPermitted"
+          }
+        },
+        {
+          "probe": "worker-invoke-denied",
+          "status": 403,
+          "body": {
+            "error": "LaneNotPermitted"
+          }
+        },
+        {
+          "probe": "worker-token-alone-model",
+          "status": 403,
+          "body": {
+            "error": "ExecutionHandleRequired"
+          }
+        },
+        {
+          "probe": "worker-token-alone-mcp",
+          "status": 403,
+          "body": {
+            "error": "ExecutionHandleRequired"
+          }
+        },
+        {
+          "probe": "missing-jwt",
+          "status": 401,
+          "body": "authentication failed"
+        },
+        {
+          "probe": "wrong-audience",
+          "status": 401,
+          "body": "authentication failed"
+        },
+        {
+          "probe": "cross-agent-subject",
+          "status": 403,
+          "body": "authorization failed"
+        }
+      ],
+      "approvalExpiresAtUTC": "2026-11-04T09:28:37Z",
+      "rawToolResultSha256": "518e64b2d4a13b6bc42a12e5a3e00f169ee2b10b7a92de833c81b5ac7d809027",
+      "rawTranscriptSha256": "c963542dc22a42b91182b6e236d04c1229e4dd6ddd283494ed4a5abaf24e815a"
+    }
+  ],
+  "notes": [
+    "Caller input-validation control intentionally expects HTTP400 PromptOnly; authorization denials are separate.",
+    "A prior MCP probe used an invalid empty RPC and got HTTP400; it was corrected to a valid typed MCP call before making successful caller requests.",
+    "No approval was manually activated, extended or renewed."
+  ],
+  "runtimeNetworkChecks": {
+    "observedAtUTC": "2026-11-04T09:26:38.251663+00:00",
+    "network": [
+      {
+        "probe": "gateway-positive",
+        "ipv4DNSResolved": true,
+        "connected": true,
+        "expected": true
+      },
+      {
+        "probe": "direct-facade-denied",
+        "ipv4DNSResolved": true,
+        "connected": false,
+        "expected": false
+      },
+      {
+        "probe": "direct-deepseek-bridge-denied",
+        "ipv4DNSResolved": true,
+        "connected": false,
+        "expected": false
+      },
+      {
+        "probe": "direct-api-denied",
+        "ipv4DNSResolved": true,
+        "connected": false,
+        "expected": false
+      },
+      {
+        "probe": "direct-provider-denied",
+        "ipv4DNSResolved": true,
+        "connected": false,
+        "expected": false
+      }
+    ],
+    "apiTokenMountAbsent": true,
+    "modelCalls": 0
+  },
+  "sourceChecks": {
+    "sourceIntegrityAndLinks": "PASS",
+    "unitAndLoopbackTests": 68,
+    "unitAndLoopbackResult": "PASS",
+    "providerTemplateStrictServerDryRun": "PASS",
+    "runtimeSourceChanged": false,
+    "rendererChangedSincePolicyReview": false
+  }
+}

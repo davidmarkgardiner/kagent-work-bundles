@@ -44,6 +44,16 @@
       "labMatrix": "Kubernetes 1.35.0, Gateway API 1.6.2, Kyverno 1.17.1, CNI with enforced NetworkPolicy, matching kubectl",
       "requiredAction": "Inventory installed schemas and enforcement; stage missing approved artifacts through platform owners",
       "destinationVerifiedDigest": null
+    },
+    {
+      "component": "optional-deepseek-model-bridge",
+      "delivery": "examples/deepseek-model-gateway.yaml",
+      "labImageReference": "cr.agentgateway.dev/agentgateway:v1.7.0@sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b",
+      "provider": "DeepSeek",
+      "model": "deepseek-flash",
+      "secretValueIncluded": false,
+      "requiredAction": "Reuse the approved internal Gateway image and protected model credential process; fill placeholders privately and validate target policies.",
+      "destinationVerifiedDigest": null
     }
   ],
   "additionalPrivateInputs": [
@@ -57,5 +67,7 @@
   "customImageBuildRequired": false,
   "codeDelivery": "approved immutable ConfigMap payload with fixed Python entrypoint",
   "labFullDemoVerified": false,
-  "labModelGate": "BLOCKED_PROVIDER_HTTP_429"
+  "labModelGate": "PASSED_DEEPSEEK_FLASH_2026_11_04",
+  "labGoldenAndCallerVerified": true,
+  "remainingLabScope": "Broader lifecycle/consent/recreation drills, complete telemetry-store proof and unavailable Kimi reviewer remain separate gates."
 }

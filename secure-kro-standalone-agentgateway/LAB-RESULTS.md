@@ -2,6 +2,8 @@
 
 This page preserves the 3 November run. Read [the 4 November live recheck](RECHECK-2026-11-04.md) for the new request and independent review evidence.
 
+The subsequent [DeepSeek Golden and caller scenario passed live](DEEPSEEK-RESULTS-2026-11-04.md). Preserve this older failed-provider record when assessing the later result.
+
 **The complete demonstration is blocked. The real model provider returned HTTP 429. Golden verification failed and approval remains Failed. Normal callers are denied. A fresh valid caller token received 403 `ApprovalFailed`, as recorded in [the final denial check](evidence/final-denial.json).** No successful model, skill/knowledge/MCP scenario, Active lease or office delivery is claimed. No model retry or provider substitution followed that limit.
 
 This record was captured on 3 November 2026 against Kubernetes 1.35.0, KRO 0.9.4, Agent Gateway/controller 1.7.0, Gateway API 1.6.2 and Kyverno 1.17.1. The runtime uses the existing digest-pinned Python helper image and immutable code/content ConfigMaps. The final path built no custom image and installed no Python packages.

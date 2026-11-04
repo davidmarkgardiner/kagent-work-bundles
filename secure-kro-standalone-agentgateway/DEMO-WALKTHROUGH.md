@@ -2,7 +2,7 @@
 
 Complete the prerequisite sheet and rehearse against the final target revision. Use the separate showcase folder for the HTML/PDF briefing and presenter report. The live demo uses the actual Kubernetes state, current scenario receipt and received telemetry.
 
-For the current provider-blocked run, follow [the 4 November recheck](RECHECK-2026-11-04.md). Show automatic composition, the actual failed Golden Job, the upstream 429 versus facade 502 observations, and denied access. The successful-execution steps below remain blocked until quota is restored. [The owner contract](docs/OWNER-CONTRACT.md) separates current fields from the [future builder process](docs/BUILDER-HANDOFF.md).
+For the recorded successful scenario, follow [the DeepSeek results](DEEPSEEK-RESULTS-2026-11-04.md) and [model setup guide](docs/DEEPSEEK-MODEL.md). Check the recorded lease expiry before invoking. The earlier [Kimi failure](RECHECK-2026-11-04.md) demonstrates denied access after failed verification. [The owner contract](docs/OWNER-CONTRACT.md) separates current fields from the [future builder process](docs/BUILDER-HANDOFF.md).
 
 1. Show the fixed approved profile and owner variable fields. Explain that the image, model/capability destinations, content pins, namespaces and security policy are platform-controlled.
 2. Validate and submit a newly named owner request through the approved platform process. Watch KRO create the Deployment/configuration/Services, central HTTPRoute/policy, destination ReferenceGrant and verification Job. No per-agent route/grant or scenario repair is permitted.

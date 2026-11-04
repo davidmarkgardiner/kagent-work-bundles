@@ -26,6 +26,8 @@ kubectl --context '{{TARGET_CONTEXT}}' apply --server-side --field-manager=stand
 
 Inspect admission policy status, current graph generation and Gateway conditions. Stop on compilation warnings or failed positive admission. Existing immutable platform/code ConfigMaps cannot be replaced with a normal in-place apply. For a profile/source change, use a reviewed maintenance procedure with no active requests, new source pins and independent re-verification. Do not delete shared office configuration to resolve an apply error.
 
+For an existing-profile change, follow [the immutable ConfigMap consumer and mounted-hash checks](docs/DEEPSEEK-MODEL.md#change-an-existing-immutable-profile-safely). Require RGD Ready at its current observed generation and matching mounted/API profile hashes before creating a new owner.
+
 ## Submit the agent file
 
 Edit only the request name and bounded instructions in `examples/owner.yaml`. Keep `profileRef` at `docs-readonly-v1`. This example API deliberately exposes one reviewed profile. Additional models, content and MCP capabilities require platform profiles and tests before owners can select them.

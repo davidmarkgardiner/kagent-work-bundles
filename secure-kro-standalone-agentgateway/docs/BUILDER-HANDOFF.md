@@ -25,4 +25,4 @@ Map the existing native resources using the table in [the owner contract](OWNER-
 
 The builder's authority is to propose approved selections and submit an authorized request. The platform remains responsible for privileges and security policy. Text in a system prompt is not an access-control grant.
 
-The first end-to-end acceptance case is the documentation request above. Require a real fresh Golden pass and caller answer before claiming a successful builder-to-agent demonstration. The [4 November recheck](../RECHECK-2026-11-04.md) records the current provider blocker.
+The first end-to-end acceptance case is the documentation request above. Require a real fresh Golden pass and caller answer before claiming a successful builder-to-agent demonstration. The [DeepSeek results](../DEEPSEEK-RESULTS-2026-11-04.md) record that standalone scenario passing. The builder UI and native dependency selection remain future work.

@@ -1,0 +1,160 @@
+# Platform-owned model bridge. Replace placeholders privately and provision the referenced Secret through the approved process.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: standalone-deepseek-model
+  namespace: '{{MODEL_NAMESPACE}}'
+  labels:
+    app: standalone-deepseek-model
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: standalone-deepseek-model
+  namespace: '{{MODEL_NAMESPACE}}'
+  labels:
+    app: standalone-deepseek-model
+immutable: true
+data:
+  config.yaml: "frontendPolicies:\n  tracing:\n    host: {{OTEL_COLLECTOR_SERVICE}}.{{MODEL_NAMESPACE}}.svc.cluster.local:4317\n\
+    \    protocol: grpc\n    randomSampling: 1\n  accessLog:\n    otlp:\n      host:\
+    \ {{OTEL_COLLECTOR_SERVICE}}.{{MODEL_NAMESPACE}}.svc.cluster.local:4317\n    \
+    \  protocol: grpc\nbinds:\n- port: 8081\n  listeners:\n  - protocol: HTTP\n  \
+    \  routes:\n    - backends:\n      - ai:\n          name: deepseek-flash\n   \
+    \       provider:\n            openAI:\n              model: deepseek-flash\n\
+    \          hostOverride: api.deepseek.com:443\n          pathOverride: /chat/completions\n\
+    \          policies:\n            backendAuth:\n              key: $DEEPSEEK_API_KEY\n\
+    \            backendTLS: {}\n            ai:\n              overrides:\n     \
+    \           thinking:\n                  type: disabled\n"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: standalone-deepseek-model
+  namespace: '{{MODEL_NAMESPACE}}'
+  labels:
+    app: standalone-deepseek-model
+spec:
+  selector:
+    app: standalone-deepseek-model
+  ports:
+  - name: http
+    port: 8081
+    targetPort: 8081
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: standalone-deepseek-model
+  namespace: '{{MODEL_NAMESPACE}}'
+  labels:
+    app: standalone-deepseek-model
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: standalone-deepseek-model
+  template:
+    metadata:
+      labels:
+        app: standalone-deepseek-model
+    spec:
+      serviceAccountName: standalone-deepseek-model
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: gateway
+        image: '{{APPROVED_AGENTGATEWAY_IMAGE_AT_DIGEST}}'
+        imagePullPolicy: IfNotPresent
+        args:
+        - -f
+        - /config/config.yaml
+        ports:
+        - name: http
+          containerPort: 8081
+        env:
+        - name: DEEPSEEK_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: standalone-deepseek-model
+              key: api-key
+        resources:
+          requests:
+            cpu: 25m
+            memory: 32Mi
+          limits:
+            cpu: '1'
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          readOnly: true
+        readinessProbe:
+          tcpSocket:
+            port: http
+          periodSeconds: 3
+      volumes:
+      - name: config
+        configMap:
+          name: standalone-deepseek-model
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: standalone-deepseek-model
+  namespace: '{{MODEL_NAMESPACE}}'
+  labels:
+    app: standalone-deepseek-model
+spec:
+  podSelector:
+    matchLabels:
+      app: standalone-deepseek-model
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: '{{STANDALONE_NAMESPACE}}'
+      podSelector:
+        matchLabels:
+          standalone-secure.platform/role: facade
+    ports:
+    - protocol: TCP
+      port: 8081
+  egress:
+  - ports:
+    - protocol: TCP
+      port: 443
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:
+    - podSelector:
+        matchLabels:
+          app: flow-collector
+    ports:
+    - protocol: TCP
+      port: 4317
