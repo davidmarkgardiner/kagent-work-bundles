@@ -1,0 +1,27 @@
+https://raw.githubusercontent.com/istio/istio/1.29.0/pilot/pkg/config/kube/crdclient/client.go
+445: 		},
+446: 	}
+447: }
+448:
+449: func (cl *Client) inRevision(obj any) bool {
+450: 	object := controllers.ExtractObject(obj)
+451: 	if object == nil {
+452: 		return false
+453: 	}
+454: 	return config.LabelsInRevision(object.GetLabels(), cl.revision)
+455: }
+
+https://raw.githubusercontent.com/istio/istio/1.29.0/pkg/config/model.go
+111: func LabelsInRevision(lbls map[string]string, rev string) bool {
+112: 	configEnv, f := lbls[label.IoIstioRev.Name]
+113: 	if !f {
+114: 		// This is a global object, and always included
+115: 		return true
+116: 	}
+117: 	// If the revision is empty, this means we don't specify a revision, and
+118: 	// we should always include it
+119: 	if rev == "" {
+120: 		return true
+121: 	}
+122: 	// Otherwise, only return true if revisions equal
+123: 	return configEnv == rev

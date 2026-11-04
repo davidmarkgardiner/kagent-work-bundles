@@ -1,6 +1,9 @@
-PASS normal apply=False: writes=[]
-PASS wrong-namespace apply=True: writes=[]
-PASS policy-active apply=True: writes=[]
-PASS wrong-proxy apply=True: writes=['namespace']
-PASS normal apply=True: writes=['namespace', 'deployment']
-5 API-simulation cases passed. This does not prove live injection or application recovery.
+PASS normal apply=False: patch attempts=0; exit=0
+PASS normal apply=True: patch attempts=1; exit=0
+PASS already-good apply=True: patch attempts=0; exit=0
+PASS wrong-label apply=True: patch attempts=0; exit=1
+PASS active-mutator apply=True: patch attempts=0; exit=1
+PASS mutated-spec apply=True: patch attempts=0; exit=1
+PASS reverted-after-write apply=True: patch attempts=1; exit=1
+PASS conflict apply=True: patch attempts=1; exit=1
+8 simulated API cases passed. No live policy propagation or traffic recovery was tested.

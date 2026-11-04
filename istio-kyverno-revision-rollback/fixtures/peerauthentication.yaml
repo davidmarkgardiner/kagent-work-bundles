@@ -1,0 +1,10 @@
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: repro-peer-mtls
+  namespace: istio-rollback-repro
+  labels:
+    istio.io/rev: "1-29"
+spec:
+  mtls:
+    mode: STRICT

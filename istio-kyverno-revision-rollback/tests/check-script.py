@@ -1,62 +1,67 @@
 #!/usr/bin/env python3
-"""Exercise the rollback shell against a simulated API. No cluster access."""
+"""Test patch write boundaries using a simulated API; never access a cluster."""
 import json
 import os
 from pathlib import Path
 import subprocess
 import tempfile
 
-script = Path(__file__).resolve().parents[1] / 'rollback-one-deployment.sh'
+script = Path(__file__).resolve().parents[1] / 'patch-peerauthentication-revision.sh'
 mock = '''#!/usr/bin/env python3
 import json, os, sys
 from pathlib import Path
-args = sys.argv[1:]
-scenario = os.environ['SCENARIO']
-with open(os.environ['CALLS'], 'a') as f: f.write(json.dumps(args) + '\\n')
-ns = {"metadata":{"resourceVersion":"1","labels":{"istio.io/rev":"other" if scenario == 'wrong-namespace' else "1-29"}}}
-dep = {"metadata":{"resourceVersion":"2"},"spec":{"replicas":1,"template":{"metadata":{"labels":{"app":"demo","istio.io/rev":"1-29"}},"spec":{"containers":[{"name":"app","image":"example/app:1"}]}}}}
-if 'get' in args:
-    print(json.dumps(ns if 'namespace' in args else dep))
-elif 'patch' in args:
-    obj = ns if 'namespace' in args else dep
-    patch = json.loads(Path(args[args.index('--patch-file')+1]).read_text())
-    for op in patch:
-        if op['op'] == 'test': continue
-        parts = [p.replace('~1','/') for p in op['path'].split('/')[1:]]
-        target = obj
-        for part in parts[:-1]: target = target[part]
-        target[parts[-1]] = op['value']
-    if scenario == 'policy-active' and 'namespace' in args:
-        obj['metadata']['labels']['istio.io/rev'] = '1-29'
-    print(json.dumps(obj))
-elif 'create' in args:
-    pod = json.loads(Path(args[args.index('-f')+1]).read_text())
-    pod['spec']['containers'].append({'name':'istio-proxy','image':'example/proxy:1.29' if scenario == 'wrong-proxy' else 'example/proxy:1.23'})
-    print(json.dumps(pod))
-elif 'rollout' in args:
-    print('deployment successfully rolled out')
-else: sys.exit(20)
+args=sys.argv[1:]
+scenario=os.environ['SCENARIO']
+root=Path(os.environ['CASE_ROOT'])
+with (root/'calls').open('a') as f: f.write(json.dumps(args)+'\\n')
+state=root/'state'
+obj=json.loads(state.read_text()) if state.exists() else {
+  'apiVersion':'security.istio.io/v1','kind':'PeerAuthentication',
+  'metadata':{'uid':'synthetic-policy-id','resourceVersion':'5','labels':{'istio.io/rev':
+     '1-29' if scenario=='already-good' else 'unexpected' if scenario=='wrong-label' else '1-23'}},
+  'spec':{'mtls':{'mode':'STRICT'},'selector':{'matchLabels':{'app':'demo'}},'portLevelMtls':{'8080':{'mode':'PERMISSIVE'}}}}
+if 'patch' in args:
+    patch=json.loads(Path(args[args.index('--patch-file')+1]).read_text())
+    for operation in patch:
+        target=obj
+        parts=[s.replace('~1','/') for s in operation['path'].split('/')[1:]]
+        for part in parts[:-1]: target=target[part]
+        if operation['op']=='test':
+            if scenario=='conflict' and '--dry-run=server' not in args: sys.exit(1)
+            assert target[parts[-1]]==operation['value']
+        else: target[parts[-1]]=operation['value']
+    if scenario=='active-mutator': obj['metadata']['labels']['istio.io/rev']='1-23'
+    if scenario=='mutated-spec': obj['spec']['mtls']['mode']='DISABLE'
+    if scenario=='reverted-after-write' and '--dry-run=server' not in args:
+        obj['metadata']['labels']['istio.io/rev']='1-23'
+    if '--dry-run=server' not in args: state.write_text(json.dumps(obj))
+print(json.dumps(obj))
 '''
-for scenario, apply, expected, expected_writes in [
-    ('normal', False, 0, []),
-    ('wrong-namespace', True, 1, []),
-    ('policy-active', True, 1, []),
-    ('wrong-proxy', True, 1, ['namespace']),
-    ('normal', True, 0, ['namespace', 'deployment']),
+for scenario, apply, expected, writes in [
+    ('normal',False,0,0), ('normal',True,0,1), ('already-good',True,0,0),
+    ('wrong-label',True,1,0), ('active-mutator',True,1,0),
+    ('mutated-spec',True,1,0), ('reverted-after-write',True,1,1),
+    ('conflict',True,1,1),
 ]:
     with tempfile.TemporaryDirectory() as directory:
-        root = Path(directory)
-        (root / 'kubectl').write_text(mock)
-        (root / 'kubectl').chmod(0o755)
-        env = dict(os.environ, PATH=f'{root}:{os.environ["PATH"]}', SCENARIO=scenario,
-                   CALLS=str(root / 'calls'), TMPDIR=directory)
-        args = ['bash', str(script), 'test-context', 'demo', 'demo', '1-29', '1-23', 'example/proxy:1.23']
+        root=Path(directory)
+        (root/'kubectl').write_text(mock)
+        (root/'kubectl').chmod(0o755)
+        env=dict(os.environ, PATH=f'{root}:{os.environ["PATH"]}', SCENARIO=scenario,
+                 CASE_ROOT=directory,TMPDIR=directory)
+        args=['bash',str(script),'test-context','demo','policy','1-23','1-29']
         if apply: args.append('--apply')
-        result = subprocess.run(args, env=env, text=True, capture_output=True)
-        calls = [json.loads(line) for line in (root / 'calls').read_text().splitlines()]
-        writes = [call[call.index('patch')+1] for call in calls if 'patch' in call and '--dry-run=server' not in call]
-        assert result.returncode == expected, (scenario, result.stdout, result.stderr)
-        assert writes == expected_writes, (scenario, writes)
-        if scenario == 'wrong-proxy': assert not any('rollout' in c for c in calls)
-        print(f'PASS {scenario} apply={apply}: writes={writes}')
-print('5 API-simulation cases passed. This does not prove live injection or application recovery.')
+        result=subprocess.run(args,env=env,text=True,capture_output=True)
+        calls=[json.loads(line) for line in (root/'calls').read_text().splitlines()]
+        actual_writes=[c for c in calls if 'patch' in c and '--dry-run=server' not in c]
+        assert result.returncode==expected,(scenario,result.stdout,result.stderr)
+        assert len(actual_writes)==writes,(scenario,calls)
+        assert all('peerauthentications.security.istio.io' in c for c in calls),calls
+        if scenario=='normal' and apply:
+            stored=json.loads((root/'state').read_text())
+            assert stored['metadata']['labels']['istio.io/rev']=='1-29'
+            assert stored['spec']['mtls']['mode']=='STRICT'
+            assert stored['spec']['portLevelMtls']['8080']['mode']=='PERMISSIVE'
+            assert stored['spec']['selector']['matchLabels']=={'app':'demo'}
+        print(f'PASS {scenario} apply={apply}: patch attempts={writes}; exit={expected}')
+print('8 simulated API cases passed. No live policy propagation or traffic recovery was tested.')

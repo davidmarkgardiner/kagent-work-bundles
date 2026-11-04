@@ -1,53 +1,66 @@
-# Restore Istio revision selection after a Kyverno mutation
+# Correct a PeerAuthentication revision label to 1-29
 
 Incident issue: https://github.com/davidmarkgardiner/kagent-work-bundles/issues/3
 
-Use `rollback-one-deployment.sh` after the GitOps owner stops the bad Kyverno mutation. This handles **namespace or Pod-template `istio.io/rev` label mutation only**, with an existing healthy previous control plane and injector. It does not downgrade an in-place control-plane upgrade, repair gateways, restore mesh configuration, or reverse direct proxy-image mutation. The reported 1.23 to 1.29 versions remain unconfirmed. The fixtures use synthetic revision strings `1-23` and `1-29`; use your exact installed revision or tag, such as `asm-1-23` if applicable.
+**Corrected operator report:** the installed Istio is 1.29. A `PeerAuthentication` was incorrectly labelled `istio.io/rev: "1-23"`. The intended correction is **1-23 -> 1-29 on that policy's metadata label**. This supersedes the initial namespace/proxy downgrade hypothesis. The old `rollback-one-deployment.sh` now refuses execution. Do not run the earlier commit's namespace rollback for this incident.
 
-## Run the patch
+The label key is assumed to be `metadata.labels["istio.io/rev"]`; confirm that from the actual object. A different field, such as `spec.selector.matchLabels`, requires a different patch. Verify the actual istiod revision is literally `1-29`, rather than deriving it from the binary version. Policy metadata labels are filtered against the configured control-plane revision; a sidecar injection tag is not automatically interchangeable with that revision here.
 
-Requires Bash, kubectl and jq. The default mode plans the change and performs a server-side namespace dry-run. Only `--apply` writes.
+## Patch one policy after stopping the bad mutation
 
-1. Disable or revert the exact offending policy through its GitOps owner. Confirm the live policy and stop BOTH admission and mutate-existing rules. `validationFailureAction: Audit` and `background: false` do not generally disable admission mutation. For a removed policy, check GitOps pruning actually removed the live object. Review pending background work. Preserve existing unrelated security policies.
-2. Set the GitOps desired namespace and Pod-template labels to the previous revision so reconciliation does not restore the bad labels. Verify the old istiod, Service endpoints, injector webhook, revision tag mapping and gateway health. A revision label is a selector, not proof the old control plane still exists. Do not uninstall either control plane during recovery.
-3. Choose one affected Deployment, its namespace and the exact expected proxy image including registry and tag or digest. Get the image from trusted known-good configuration or a verified healthy Pod. Review the Deployment rollout strategy and available capacity. A namespace label change affects future Pods from every workload in that namespace, although the script rolls only the named Deployment.
-4. Run the plan, then the patch using the SAME arguments:
+Requires Bash, kubectl and jq. Run from the work operator's authenticated environment.
+
+1. Stop or correct the exact Kyverno mutation through its GitOps owner, including mutate-existing/background work. Confirm the live policy changed or was pruned. Audit validation mode and `background: false` do not generally stop admission mutation. Align the PeerAuthentication's GitOps desired label to `1-29` so reconciliation does not reintroduce `1-23`.
+2. Inspect the named PeerAuthentication and its current label, complete spec, namespace and scope. Inspect the healthy installed istiod revision and the affected proxies' connection. A policy without a selector in the mesh root namespace can have mesh-wide scope. Keep that existing scope unchanged.
+3. Preview the change, replacing every placeholder:
 
 ```bash
-bash rollback-one-deployment.sh \
-  'WORK_CONTEXT' 'APP_NAMESPACE' 'CANARY_DEPLOYMENT' \
-  'EXACT_BAD_REV' 'EXACT_GOOD_REV' 'EXACT_EXPECTED_PROXY_IMAGE'
-
-bash rollback-one-deployment.sh \
-  'WORK_CONTEXT' 'APP_NAMESPACE' 'CANARY_DEPLOYMENT' \
-  'EXACT_BAD_REV' 'EXACT_GOOD_REV' 'EXACT_EXPECTED_PROXY_IMAGE' --apply
+bash patch-peerauthentication-revision.sh \
+  'WORK_CONTEXT' 'POLICY_NAMESPACE' 'POLICY_NAME' '1-23' '1-29'
 ```
 
-The script saves private before/after JSON and patches. It checks the observed namespace and Deployment versions with JSON Patch resourceVersion tests. After restoring the namespace label, it submits a dry-run Pod built from the application template. The returned Pod must contain the exact expected proxy image before the Deployment changes. It also dry-runs the Deployment patch. It stops on an unexpected revision, legacy injection label, ambient mode, unsupported Deployment, manual sidecar, injection opt-out, active mutator, image mismatch or API error. It does not retry automatically.
+4. Apply the same correction:
 
-The dry-run Pod is never persisted. Admission dry-runs do not prove connectivity or prevent an asynchronous controller changing labels later. If the script stops after restoring the namespace, that change remains in place. Inspect the printed evidence directory and incident state before any retry. There is no automatic undo into the bad state.
+```bash
+bash patch-peerauthentication-revision.sh \
+  'WORK_CONTEXT' 'POLICY_NAMESPACE' 'POLICY_NAME' '1-23' '1-29' --apply
+```
 
-5. Inspect actual replacement Pods, including native sidecars in `initContainers`. Check exact proxy images and readiness, then use `istioctl proxy-status` with the matching Istio CLI and explicit work context. Check the application through its real traffic path, including errors, latency, TLS and dependencies. Rollout readiness alone does not establish recovery. Repeat the controlled rollout only after canary acceptance. StatefulSets, DaemonSets, Jobs and gateways need separate reviewed procedures.
+The script saves private before/after evidence and a JSON Patch. It tests the object's UID, resourceVersion and existing bad label before replacing that label. It performs a server-side dry-run first and refuses a changed spec or incorrect label. After the write, it reads the object back and verifies the desired label and unchanged spec. An already-correct label causes no write. Conflicts and mismatches stop without retry or automatic undo.
 
-The script never edits existing Pod labels as a proxy downgrade and never patches a running `istio-proxy` image. Istio injection happens when new Pods are created. Keep all saved workplace JSON PRIVATE; it may include application configuration, identifiers and environment values. Do not commit the generated evidence directory.
+The patch preserves `spec.mtls`, `spec.portLevelMtls` and `spec.selector`. It changes no namespaces, workloads, sidecar images or control planes. It does not restart Pods or reinstall Istio. A write may have occurred before a failed post-write check; inspect the saved evidence and active reconcilers before another action. A successful readback is a point-in-time storage check, not proof a background controller cannot change it later.
 
-## Reproduce the mutation offline
+Keep generated evidence PRIVATE. It contains workplace resource names and configuration. Publish only sanitized summaries.
 
-Do not apply the fixture policies to any cluster. This reproduction uses the real Kyverno CLI without cluster access:
+## Verify mTLS and application recovery
+
+Check policy propagation and the effective configuration on representative affected proxies using the matching 1.29 `istioctl`, the explicit work context and the intended revision. Inspect `istioctl proxy-status`, and inbound listeners and outbound clusters with `istioctl proxy-config`. An ACK or a stored label alone does not prove encryption.
+
+Use the approved application test through the affected client/server path. Check new connections, application errors and TLS failures. Verify authenticated mTLS for the actual traffic, for example trusted Istio traffic telemetry with `connection_security_policy="mutual_tls"`. If the effective policy is STRICT, verify plaintext rejection using an existing approved test. Review more-specific PeerAuthentications and DestinationRules if behavior still differs. `PeerAuthentication` governs inbound acceptance; outbound TLS and policy precedence also matter. Do not change STRICT to PERMISSIVE or DISABLE as part of this label correction.
+
+The reported encryption impact remains unverified here. A revision mismatch can exclude the intended policy, but does not by itself prove all traffic became plaintext. No work cluster was accessed or changed. Do not restart applications as an automatic first step for this configuration-only correction.
+
+## Reproduce the reported mutation offline
+
+Never apply these fixture policies to production.
 
 ```bash
 bash reproduce-offline.sh
 python3 tests/check-script.py
 ```
 
-The bad policy changes the synthetic Namespace from `1-23` to `1-29`. The restored policy changes that result back to `1-23`. This demonstrates admission mutation, not application breakage, webhook ordering, background mutation, live reinjection or workplace root cause. Deleting the bad policy alone is not a reverse mutation of persisted labels.
+The real Kyverno CLI mutates a synthetic PeerAuthentication from `1-29` to the erroneous `1-23`, then the corrected policy restores `1-29`. This proves the label mutation mechanism only. It does not reproduce TLS failure, background reconciliation, live policy propagation or workplace recovery.
 
-`evidence/` contains only synthetic outputs with trailing whitespace normalized, captured with Kyverno CLI 1.14.4 on 2026-11-04. Five API-simulation cases check the shell's write boundaries. No production context has been accessed or changed. No live Istio recovery has been performed.
+`evidence/` records Kyverno CLI 1.14.4 output and eight simulated API checks from 2026-11-04. Trailing whitespace in captured outputs is normalized. The checked cases cover plan-only, successful patch with unchanged spec, already-correct no-op, unexpected label, active mutation, spec mutation, post-write reversion and resource-version conflict.
 
-## Sources
+## Source evidence
 
-- https://istio.io/latest/docs/setup/upgrade/canary/
-- https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/
+Istio 1.29.0's CRD client filters config through `LabelsInRevision`. That function includes unlabelled config and includes all config when the control plane revision is empty; otherwise it requires exact equality with `istio.io/rev`.
+
+- https://github.com/istio/istio/blob/1.29.0/pilot/pkg/config/kube/crdclient/client.go#L454
+- https://github.com/istio/istio/blob/1.29.0/pkg/config/model.go#L111-L123
+- https://istio.io/v1.29/docs/reference/config/security/peer_authentication/
+- https://istio.io/latest/docs/tasks/security/authentication/authn-policy/
 - https://kyverno.io/docs/policy-types/cluster-policy/mutate/
 
-These were checked on 2026-11-04. Use installed-version documentation and observed webhook configuration when adapting the bundle.
+Source behavior was checked on 2026-11-04. The actual installed patch version, vendor customization, configured revision and effective workload policy still require workplace evidence.

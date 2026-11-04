@@ -2,18 +2,19 @@
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: repro-istio-revision
+  name: repro-peer-revision
 spec:
   background: false
   rules:
-    - name: force-revision
+    - name: force-wrong-revision
       match:
         any:
           - resources:
-              kinds: [Namespace]
-              names: [istio-rollback-repro]
+              kinds: [PeerAuthentication]
+              namespaces: [istio-rollback-repro]
+              names: [repro-peer-mtls]
       mutate:
         patchStrategicMerge:
           metadata:
             labels:
-              istio.io/rev: "1-29"
+              istio.io/rev: "1-23"
