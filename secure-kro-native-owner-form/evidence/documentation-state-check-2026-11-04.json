@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-11-04T13:01:51.091682+00:00",
+  "secureAgentReady": true,
+  "goldenSucceeded": 1,
+  "jobComplete": true,
+  "frontdoorAvailableReplicas": 1,
+  "storedApprovalState": "Active",
+  "expiresAt": "2026-11-04T15:28:12.789368Z",
+  "leaseCurrentlyValid": true,
+  "goldenPassed": true,
+  "callerPongPassed": true,
+  "receiptSha256": "0f2667398836fe8532c0435058fa4aa6def00cc8a2d542ad78651bf7e0faae94"
+}

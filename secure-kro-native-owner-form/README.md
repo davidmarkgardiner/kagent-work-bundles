@@ -1,5 +1,9 @@
 # One YAML to deploy a secure native kagent agent
 
+For the work-agent explanation of both ConfigMaps, the approval record, the
+Golden Job and PONG, read
+[FRONTDOOR-AND-GOLDEN-README.md](FRONTDOOR-AND-GOLDEN-README.md).
+
 **Live native demo passed on 4 November 2026 at 11:28 UTC.** The customer provides
 `systemPrompt`, `modelConfig`, `skills` and selected MCP `tools` in one KRO
 `SecureAgent`. KRO creates ordinary native kagent resources and their security

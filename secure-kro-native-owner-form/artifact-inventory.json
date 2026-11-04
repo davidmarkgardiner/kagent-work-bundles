@@ -1,9 +1,14 @@
 {
   "files": [
     {
+      "path": "FRONTDOOR-AND-GOLDEN-README.md",
+      "bytes": 16089,
+      "sha256": "bbeedafdc92e83d2561ade90ab6ffbe08c759d656b875edd2bd6bd45d7ab9cbb"
+    },
+    {
       "path": "README.md",
-      "bytes": 7025,
-      "sha256": "9801fcc38d098e33bb38af819363bb1ecfb518a07059ff2f64d3ce577f34b51a"
+      "bytes": 7194,
+      "sha256": "8cded53e4d4a03f63f2ec2f180ce40cff40681ddaf8cdffec288d5c042d2ddd5"
     },
     {
       "path": "SHOWCASE.html",
@@ -19,6 +24,11 @@
       "path": "build.py",
       "bytes": 1416,
       "sha256": "0d8c3f505b708ac61f0ff607d0c821b05a8809aa156f6c7d669f3c9a746e3b86"
+    },
+    {
+      "path": "evidence/documentation-state-check-2026-11-04.json",
+      "bytes": 415,
+      "sha256": "813c5ee1f798bb97e3b3e25c2339cc30fe121d6b944856bf7648796087b698f0"
     },
     {
       "path": "evidence/live-composition-2026-11-04.json",
