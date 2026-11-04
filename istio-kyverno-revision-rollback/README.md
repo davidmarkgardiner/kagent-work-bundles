@@ -151,6 +151,28 @@ kubectl --context "$CTX" get peerauthentications.security.istio.io \
 
 No matching objects is only a label inventory result. Verify effective policy, authenticated mTLS and application traffic for the affected paths, then confirm the correction survives reconciliation. The loop does not restart Deployments, reboot nodes or resume Flux.
 
+## Patch matching policies using the current kube context
+
+Use this kubectl-only command for the confirmed **1-23 -> 1-29** correction in the cluster you are already logged into. It needs no Flux CLI, jq or local patch script. Stop the offending Kyverno mutation first and pause the relevant Flux owners if required. Confirm every matched policy should target `1-29`, including mesh-root policies. If you actually intend `1-23`, do not run this command.
+
+```bash
+(
+  set -euo pipefail
+  kubectl get peerauthentications.security.istio.io -A \
+    -l 'istio.io/rev=1-23' \
+    -o jsonpath='{range .items[*]}{.metadata.namespace}{"\t"}{.metadata.name}{"\n"}{end}' |
+  while read -r ns name; do
+    kubectl -n "$ns" patch peerauthentications.security.istio.io "$name" \
+      --type=json -p='[
+        {"op":"test","path":"/metadata/labels/istio.io~1rev","value":"1-23"},
+        {"op":"replace","path":"/metadata/labels/istio.io~1rev","value":"1-29"}
+      ]'
+  done
+)
+```
+
+This changes only matching policies' metadata revision labels. It stops on the first API or patch failure, with earlier writes left applied. It does not perform the bundled script's evidence capture, admission dry-run or post-write spec checks. An active mutator can overwrite the repair. Verify stored labels, effective mTLS and application traffic afterward. Do not automatically restart workloads or reboot nodes.
+
 ## Resume Flux after desired state is corrected
 
 Confirm the GitOps source and any live HelmRelease values contain the intended policy label and corrected mutation rule. Resume only the objects you suspended for this incident. Coordinate parent resumption because it may resume children too.
