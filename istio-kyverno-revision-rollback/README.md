@@ -74,6 +74,36 @@ If the actual target remains `1-29`, substitute bad revision `1-23` and target `
 
 The script only patches one named PeerAuthentication. It does not disable Flux, disable Kyverno, create a Job, restart workloads or reboot nodes.
 
+## Direct command with hardcoded revisions: 1-23 to 1-29
+
+**Run this only if the confirmed recovery target is `1-29`.** A later request mentioned reversing to `1-23`; that direction remains unconfirmed. Do not run this example if `1-23` is the intended target.
+
+First stop the offending live Kyverno mutation and, if manual repair requires it, pause the specific Flux owners using the procedure above. Save the current policy as private incident evidence. Replace `WORK_CONTEXT`, `POLICY_NAMESPACE` and `POLICY_NAME` with the actual values.
+
+The command tests that the current metadata revision label is `1-23`, then replaces only that label with `1-29`:
+
+```bash
+kubectl --context 'WORK_CONTEXT' -n 'POLICY_NAMESPACE' \
+  patch peerauthentications.security.istio.io 'POLICY_NAME' \
+  --type=json \
+  -p='[
+    {"op":"test","path":"/metadata/labels/istio.io~1rev","value":"1-23"},
+    {"op":"replace","path":"/metadata/labels/istio.io~1rev","value":"1-29"}
+  ]'
+```
+
+Read the stored label back:
+
+```bash
+kubectl --context 'WORK_CONTEXT' -n 'POLICY_NAMESPACE' \
+  get peerauthentications.security.istio.io 'POLICY_NAME' \
+  -o jsonpath='{.metadata.labels.istio\.io/rev}{"\n"}'
+```
+
+Expected output is `1-29`. If the JSON Patch test fails, inspect the current object before another action. Do not remove the test or reverse the values merely to make the command succeed.
+
+This direct command does not save evidence, dry-run admission, check resourceVersion, or compare the spec after the write. Use the bundled script above when those additional checks are required. In both cases, verify the effective mTLS policy and application traffic before considering a targeted restart. Do not reboot nodes or restart every Deployment for this label correction.
+
 ## Resume Flux after desired state is corrected
 
 Confirm the GitOps source and any live HelmRelease values contain the intended policy label and corrected mutation rule. Resume only the objects you suspended for this incident. Coordinate parent resumption because it may resume children too.
