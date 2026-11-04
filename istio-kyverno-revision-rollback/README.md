@@ -104,6 +104,53 @@ Expected output is `1-29`. If the JSON Patch test fails, inspect the current obj
 
 This direct command does not save evidence, dry-run admission, check resourceVersion, or compare the spec after the write. Use the bundled script above when those additional checks are required. In both cases, verify the effective mTLS policy and application traffic before considering a targeted restart. Do not reboot nodes or restart every Deployment for this label correction.
 
+## Loop over matching policies across all namespaces: 1-23 to 1-29
+
+**Use this only after confirming that every matched policy should target `1-29`.** If the target is still uncertain, or some policies intentionally belong to `1-23`, use individual named-policy patches instead. A mesh-root policy may affect the whole mesh.
+
+First stop the offending Kyverno admission and mutate-existing mutation. Pause the relevant Flux owners if manual repair requires it, and account for their parent reconcilers. The loop does not perform those containment steps.
+
+From the bundle directory, replace `WORK_CONTEXT` and preview all policies that currently carry the incorrect metadata label:
+
+```bash
+CTX='WORK_CONTEXT'
+
+kubectl --context "$CTX" get peerauthentications.security.istio.io \
+  -A -l 'istio.io/rev=1-23'
+```
+
+Review every namespace and policy name. The apply command queries the matching set again, so include any changes since the preview in the incident review. Run in the same Bash session:
+
+```bash
+(
+  set -euo pipefail
+  : "${CTX:?Set CTX to the work context first}"
+
+  kubectl --context "$CTX" get peerauthentications.security.istio.io \
+    -A -l 'istio.io/rev=1-23' -o json |
+  jq -r '.items[] | [.metadata.namespace, .metadata.name] | @tsv' |
+  while IFS=$'\t' read -r ns name; do
+    echo "Patching PeerAuthentication $ns/$name: 1-23 -> 1-29"
+
+    bash ./patch-peerauthentication-revision.sh \
+      "$CTX" "$ns" "$name" '1-23' '1-29' --apply
+  done
+)
+```
+
+Requires the local `patch-peerauthentication-revision.sh`, Bash, kubectl and jq. Each script invocation saves private evidence, dry-runs admission, checks object identity and resourceVersion, and verifies the desired label and unchanged policy spec.
+
+The loop stops on the first failure. Earlier successful patches remain applied. There is no batch rollback or automatic retry. Keep each printed evidence directory in the private incident record. A failed post-write check means the current policy may also have been changed.
+
+Read back any remaining `1-23` labels:
+
+```bash
+kubectl --context "$CTX" get peerauthentications.security.istio.io \
+  -A -l 'istio.io/rev=1-23'
+```
+
+No matching objects is only a label inventory result. Verify effective policy, authenticated mTLS and application traffic for the affected paths, then confirm the correction survives reconciliation. The loop does not restart Deployments, reboot nodes or resume Flux.
+
 ## Resume Flux after desired state is corrected
 
 Confirm the GitOps source and any live HelmRelease values contain the intended policy label and corrected mutation rule. Resume only the objects you suspended for this incident. Coordinate parent resumption because it may resume children too.

@@ -76,7 +76,7 @@ bash patch-peerauthentication-revision.sh \
 
 The script tests the UID, resourceVersion and current bad label, then replaces only that label. It reads the policy back and checks the desired label and unchanged spec. Record the printed evidence directory in the private incident record.
 
-Repeat only for the explicitly identified affected policies. The script handles one named policy per invocation. It is a shell script, not a Kubernetes Job. If your organisation requires a Job, use the existing approved runner and reviewed identity; do not grant cluster-wide patch or restart access to run this script.
+Repeat only for the explicitly identified affected policies. If every policy labelled `1-23` should target `1-29`, use [the reviewed cluster-wide loop](README.md#loop-over-matching-policies-across-all-namespaces-1-23-to-1-29). Confirm every match, including mesh-root policies, before applying. The loop stops on the first failure and does not undo earlier successful patches. The script handles one named policy per invocation. It is a shell script, not a Kubernetes Job. If your organisation requires a Job, use the existing approved runner and reviewed identity; do not grant cluster-wide patch or restart access to run this script.
 
 If the script stops, inspect its evidence before another attempt. A post-write failure means a write may already have occurred. There is no automatic retry or undo into `1-23`.
 
