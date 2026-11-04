@@ -1,0 +1,1 @@
+Describe the approved inventory data product and its response limits, then return the number of distinct namespaces using the Denodo MCP tools. Do not fetch raw inventory rows.

@@ -1,0 +1,1 @@
+Read the configured demo project. What is its default branch, and what is the status and ref of its latest pipeline? Use the GitLab MCP tools; do not trigger anything.

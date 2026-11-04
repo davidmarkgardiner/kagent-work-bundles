@@ -1,0 +1,28 @@
+# Workplace adapter example. Not accepted by the unchanged synthetic lab profile.
+# Reuse the existing MCP endpoint; update the platform catalog and backend verification first.
+apiVersion: kro.run/v1alpha1
+kind: SecureAgent
+metadata:
+  name: demo
+  namespace: secure-byo-kro
+  annotations:
+    demo.kagent.dev/adapter: 01-kubernetes
+    demo.kagent.dev/status: requires-workplace-adapter
+spec:
+  modelConfig:
+    name: approved-model
+  systemPrompt: You are a read-only Kubernetes diagnostics assistant. Use only the
+    approved MCP operations and the namespace provided by the user. Report observed
+    resource names, readiness and warning events. Keep results bounded to at most
+    five resources and five events. Cite the namespace and observation time. Suggest
+    changes for review; never perform writes or shell commands. Do not infer live
+    cluster state from general knowledge.
+  skills: []
+  tools:
+  - mcp:
+      server:
+        kind: RemoteMCPServer
+        name: '{{APPROVED_KUBERNETES_MCP_SERVER}}'
+      tools:
+      - k8s_get_resources
+      - k8s_get_events

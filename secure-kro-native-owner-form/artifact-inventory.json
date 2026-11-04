@@ -7,13 +7,18 @@
     },
     {
       "path": "README.md",
-      "bytes": 7194,
-      "sha256": "8cded53e4d4a03f63f2ec2f180ce40cff40681ddaf8cdffec288d5c042d2ddd5"
+      "bytes": 7432,
+      "sha256": "875f99aa71133d90c6b678b6620ce60e5594981698d588452a8176b036d7c3f6"
     },
     {
       "path": "SHOWCASE.html",
       "bytes": 89139,
       "sha256": "a732bd011eee55d631055c872a2ebc00720fde9b2fc87028dd1e943b5a35b5f6"
+    },
+    {
+      "path": "WORK-AGENT-DEMO-HANDOFF.md",
+      "bytes": 2330,
+      "sha256": "45f51da3397fcb88ab5923a0ba9a4a867395cff229af8062d4e9b4ede46a59bc"
     },
     {
       "path": "build/Dockerfile",
@@ -24,6 +29,66 @@
       "path": "build.py",
       "bytes": 1416,
       "sha256": "0d8c3f505b708ac61f0ff607d0c821b05a8809aa156f6c7d669f3c9a746e3b86"
+    },
+    {
+      "path": "demo/README.md",
+      "bytes": 11030,
+      "sha256": "dd0386ebd10f1e153e7d61549b1df4bb1caa1fb7b15e60637f426ee88f2de2d6"
+    },
+    {
+      "path": "demo/agent-catalog.json",
+      "bytes": 2334,
+      "sha256": "69383e71513610783ce866ccd723063a1344420f4de13261da5e0c0859794195"
+    },
+    {
+      "path": "demo/agents/01-kubernetes.yaml",
+      "bytes": 1080,
+      "sha256": "31a4a968dabcdcc170b993490f39026555a1996602563eaa4b3cf510e56b9c11"
+    },
+    {
+      "path": "demo/agents/02-gitlab.yaml",
+      "bytes": 1050,
+      "sha256": "7fcd9a2cdb142f448f6f262876ad8f8a3708c91597628f3f435e92aa15ecf4fd"
+    },
+    {
+      "path": "demo/agents/03-denodo.yaml",
+      "bytes": 1176,
+      "sha256": "c5d6fd3e61209273c7dfce99262e6e7b01106d217ad82f9eb1424ea13d7a41da"
+    },
+    {
+      "path": "demo/agents/04-documentation.yaml",
+      "bytes": 866,
+      "sha256": "3d0fe538950546b731265b0a57b761b999e36508ae4b494ec11131467f5cf481"
+    },
+    {
+      "path": "demo/prompts/01-kubernetes.txt",
+      "bytes": 166,
+      "sha256": "1a420d290e3106a41b370018f44509bb362cae85be82fb72ea7de4fe2591e133"
+    },
+    {
+      "path": "demo/prompts/02-gitlab.txt",
+      "bytes": 168,
+      "sha256": "c9bcf1a6ca609fda4a5d1b6b7ea187ef52b2bc3075b6bc5142bb180aa9dabeaf"
+    },
+    {
+      "path": "demo/prompts/03-denodo.txt",
+      "bytes": 177,
+      "sha256": "06ad95db9e0a90563a6170374a1d68fbad25131522b238de41f2d1707b89641b"
+    },
+    {
+      "path": "demo/prompts/04-documentation.txt",
+      "bytes": 252,
+      "sha256": "7d57230fa8b78be364cab526ad62dce80600992e193a656225718cb4811efe53"
+    },
+    {
+      "path": "demo/prompts/pong.txt",
+      "bytes": 47,
+      "sha256": "f7c3ae2b974cbb4a2322f0a55d8835267c11055a9f1224340baa245aa41b8644"
+    },
+    {
+      "path": "demo/terminal_demo.py",
+      "bytes": 14784,
+      "sha256": "0cc7249b62d8a06babae766ad775dd1dec44911e987996d81a9edf13a523df8f"
     },
     {
       "path": "evidence/documentation-state-check-2026-11-04.json",
@@ -49,6 +114,11 @@
       "path": "evidence/review-status-2026-11-04.json",
       "bytes": 923,
       "sha256": "a1fbfa841873f7805528aaa2a3842a7c5d4a228a390e2327de72ba793adb6089"
+    },
+    {
+      "path": "evidence/terminal-demo-2026-11-04.json",
+      "bytes": 1880,
+      "sha256": "e0adfd8c41528a3bbf2ec64f55e305e4336a444f83b95ef7a313ebee93b35ce7"
     },
     {
       "path": "examples/golden-config.json",
@@ -139,6 +209,11 @@
       "path": "tests/test_native_gate.py",
       "bytes": 27978,
       "sha256": "435136440b2211e361c3eee801fca8b6a8b5d6f49b5696e41d2ba1992fee71e5"
+    },
+    {
+      "path": "tests/test_terminal_demo.py",
+      "bytes": 2863,
+      "sha256": "8c5846cc0de99d5dc2fd79048b828adf78960be4d0380c435f0021eff8eb35c3"
     },
     {
       "path": "versions.lock.json",

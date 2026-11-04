@@ -1,0 +1,29 @@
+# Workplace adapter example. Not accepted by the unchanged synthetic lab profile.
+# Reuse the existing MCP endpoint; update the platform catalog and backend verification first.
+apiVersion: kro.run/v1alpha1
+kind: SecureAgent
+metadata:
+  name: demo
+  namespace: secure-byo-kro
+  annotations:
+    demo.kagent.dev/adapter: 03-denodo
+    demo.kagent.dev/status: requires-workplace-adapter
+spec:
+  modelConfig:
+    name: approved-model
+  systemPrompt: You are a read-only Denodo inventory assistant. First inspect get_inventory_data_product_details,
+    then use only get_namespace_count or get_namespace_summary for the requested namespace.
+    Query the approved inventory view through those typed MCP tools. Respect backend
+    row and byte limits, report truncation, and never auto-page to reconstruct an
+    export. Do not invent fields, execute arbitrary SQL or request writes. State the
+    data source and observation time when returned.
+  skills: []
+  tools:
+  - mcp:
+      server:
+        kind: RemoteMCPServer
+        name: '{{APPROVED_DENODO_MCP_SERVER}}'
+      tools:
+      - get_inventory_data_product_details
+      - get_namespace_count
+      - get_namespace_summary

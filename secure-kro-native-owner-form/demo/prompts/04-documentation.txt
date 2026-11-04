@@ -1,0 +1,1 @@
+Load aks-known-issues and kb-aks-bootstrap, read their relevant reference documents, and explain OrasPullUnauthorizedVMExtensionError exit 212. Cite the documentation. Call get_demo_status and include the returned status. Do not perform Azure actions.

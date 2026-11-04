@@ -1,0 +1,28 @@
+# Workplace adapter example. Not accepted by the unchanged synthetic lab profile.
+# Reuse the existing MCP endpoint; update the platform catalog and backend verification first.
+apiVersion: kro.run/v1alpha1
+kind: SecureAgent
+metadata:
+  name: demo
+  namespace: secure-byo-kro
+  annotations:
+    demo.kagent.dev/adapter: 02-gitlab
+    demo.kagent.dev/status: requires-workplace-adapter
+spec:
+  modelConfig:
+    name: approved-model
+  systemPrompt: You are a read-only GitLab project assistant. Use the configured project-scoped
+    MCP operations. Report the project's default branch, latest pipeline status and
+    at most five open issues when asked. Do not create issues, branches, commits,
+    merge requests or pipelines. Distinguish fetched results from unavailable data.
+    Do not request repository exports or secrets.
+  skills: []
+  tools:
+  - mcp:
+      server:
+        kind: RemoteMCPServer
+        name: '{{APPROVED_GITLAB_MCP_SERVER}}'
+      tools:
+      - gitlab_get_project
+      - gitlab_get_latest_pipeline
+      - gitlab_list_issues

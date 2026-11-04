@@ -1,0 +1,58 @@
+{
+  "kro": "0.9.4",
+  "kagent": "1.0.0-alpha17",
+  "agentgateway": "1.7.0",
+  "scope": "Four alternative examples for the single bounded demo slot. Three require workplace adapters. They are not four simultaneous live deployments.",
+  "agents": [
+    {
+      "agent": "01-kubernetes",
+      "status": "requires-workplace-adapter",
+      "instance": "demo/agents/01-kubernetes.yaml",
+      "prompt": "demo/prompts/01-kubernetes.txt",
+      "remoteMCPServer": "{{APPROVED_KUBERNETES_MCP_SERVER}}",
+      "toolNames": [
+        "k8s_get_resources",
+        "k8s_get_events"
+      ],
+      "verificationNeeded": "Positive paired native MCP response and backend-specific read assertion, plus protected caller PONG. Existing synthetic get_demo_status Golden is insufficient."
+    },
+    {
+      "agent": "02-gitlab",
+      "status": "requires-workplace-adapter",
+      "instance": "demo/agents/02-gitlab.yaml",
+      "prompt": "demo/prompts/02-gitlab.txt",
+      "remoteMCPServer": "{{APPROVED_GITLAB_MCP_SERVER}}",
+      "toolNames": [
+        "gitlab_get_project",
+        "gitlab_get_latest_pipeline",
+        "gitlab_list_issues"
+      ],
+      "verificationNeeded": "Positive paired native MCP response and backend-specific read assertion, plus protected caller PONG. Existing synthetic get_demo_status Golden is insufficient."
+    },
+    {
+      "agent": "03-denodo",
+      "status": "requires-workplace-adapter",
+      "instance": "demo/agents/03-denodo.yaml",
+      "prompt": "demo/prompts/03-denodo.txt",
+      "remoteMCPServer": "{{APPROVED_DENODO_MCP_SERVER}}",
+      "toolNames": [
+        "get_inventory_data_product_details",
+        "get_namespace_count",
+        "get_namespace_summary"
+      ],
+      "verificationNeeded": "Positive paired native MCP response and backend-specific read assertion, plus protected caller PONG. Existing synthetic get_demo_status Golden is insufficient."
+    },
+    {
+      "agent": "04-documentation",
+      "status": "lab-profile-live-verified-2026-11-04",
+      "instance": "demo/agents/04-documentation.yaml",
+      "prompt": "demo/prompts/04-documentation.txt",
+      "toolNames": [
+        "load_skill",
+        "load_skill_resource",
+        "get_demo_status"
+      ],
+      "verificationNeeded": "Receiving cluster must produce its own Golden Job receipt and caller PONG."
+    }
+  ]
+}

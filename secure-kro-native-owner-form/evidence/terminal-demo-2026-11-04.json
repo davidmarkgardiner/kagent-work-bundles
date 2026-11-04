@@ -1,0 +1,53 @@
+{
+  "recordedAt": "2026-11-04T13:14:27.069918+00:00",
+  "platform": {
+    "kro": "0.9.4",
+    "kagent": "1.0.0-alpha17",
+    "agentgateway": "1.7.0"
+  },
+  "observeExisting": {
+    "mode": "observe",
+    "checkedAt": "2026-11-04T13:12:54.409650+00:00",
+    "ownerUID": "0da1b103-4875-4c5c-af05-5327356fa908",
+    "goldenCompletedAt": "2026-11-04T11:28:12.789356Z",
+    "expiresAt": "2026-11-04T15:28:12.789368Z",
+    "witnessDeltas": {
+      "mcpCalls": 1,
+      "modelCalls": 3
+    },
+    "callerSmoke": {
+      "completedAt": "2026-11-04T11:28:14.719599Z",
+      "contextID": "01a1a651-1101-7429-85fe-077a7703f0f4",
+      "passed": true,
+      "responseSha256": "d1277aac8f4fd246dac2127985819f9e563868460a9ad71d0bdbcf9b1cd34878",
+      "taskID": "01a1a651-128c-763c-b7cb-fe9c45b9ac71"
+    },
+    "receiptSha256": "0f2667398836fe8532c0435058fa4aa6def00cc8a2d542ad78651bf7e0faae94",
+    "passed": true
+  },
+  "freshPongQuery": {
+    "passed": true,
+    "taskID": "01a1a6b1-4ad2-7bd6-8dc9-262119a45058",
+    "contextID": "01a1a6b1-48bf-752b-86da-f5e9d6ffb442",
+    "pairedTools": [],
+    "responseSha256": "0597ebe27d4ced927ec2c0c11277c274099d9acf34a4ea3e9743ffc62075c494"
+  },
+  "freshDocumentationQuery": {
+    "passed": true,
+    "taskID": "01a1a6b1-8eaa-7dc9-b14b-a9f6d1309411",
+    "contextID": "01a1a6b1-8d1c-7289-b751-91c68d872a20",
+    "pairedTools": [
+      "get_demo_status",
+      "load_skill",
+      "load_skill_resource"
+    ],
+    "responseSha256": "10f73cb87131d01442464d3e1c61e51c5f2fd8af551564f19284b4c974f00fd9"
+  },
+  "freshInstanceAppliedInThisRunnerCheck": false,
+  "integrationExamples": {
+    "kubernetes": "workplace-adapter-required; not deployed by this demo",
+    "gitlab": "workplace-adapter-required; not deployed by this demo",
+    "denodo": "workplace-adapter-required; not deployed by this demo"
+  },
+  "existingInstanceRefusedWithoutApply": true
+}

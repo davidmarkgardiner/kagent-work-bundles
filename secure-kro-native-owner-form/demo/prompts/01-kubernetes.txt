@@ -1,0 +1,1 @@
+In namespace {{DEMO_NAMESPACE}}, show up to five pods with their readiness and up to five recent warning events. Report the observation time. Do not change anything.
