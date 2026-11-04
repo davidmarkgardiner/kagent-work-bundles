@@ -1,0 +1,7 @@
+
+Applying 1 policy rule(s) to 1 resource(s)...
+
+
+Mutation:
+Mutation has been applied successfully.
+pass: 1, fail: 0, warn: 0, error: 0, skip: 0

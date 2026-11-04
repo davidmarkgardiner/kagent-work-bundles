@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    istio.io/rev: 1-29
+  name: istio-rollback-repro
+  namespace: default
+
+---

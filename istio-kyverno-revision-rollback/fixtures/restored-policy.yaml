@@ -1,0 +1,19 @@
+# OFFLINE REPRODUCTION ONLY. Never apply this policy to production.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: repro-istio-revision
+spec:
+  background: false
+  rules:
+    - name: force-revision
+      match:
+        any:
+          - resources:
+              kinds: [Namespace]
+              names: [istio-rollback-repro]
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            labels:
+              istio.io/rev: "1-23"

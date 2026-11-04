@@ -1,0 +1,6 @@
+PASS normal apply=False: writes=[]
+PASS wrong-namespace apply=True: writes=[]
+PASS policy-active apply=True: writes=[]
+PASS wrong-proxy apply=True: writes=['namespace']
+PASS normal apply=True: writes=['namespace', 'deployment']
+5 API-simulation cases passed. This does not prove live injection or application recovery.
