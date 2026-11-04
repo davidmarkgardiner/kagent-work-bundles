@@ -1,0 +1,58 @@
+{
+  "activeTTLSeconds": 14400,
+  "agentName": "demo",
+  "approvalName": "demo-approval",
+  "dependencyNames": {
+    "agenttemplates": "demo-template",
+    "harnesses": "approved-harness",
+    "modelconfigs": "approved-model",
+    "remotemcpservers": "approved-mcp"
+  },
+  "gatewayURL": "{{APPROVED_GATEWAY_INVOKE_URL}}",
+  "maxTTLSeconds": 600,
+  "namespace": "secure-byo-kro",
+  "request": {
+    "apiVersion": "kro.run/v1alpha1",
+    "name": "demo",
+    "plural": "secureagents"
+  },
+  "requestUID": "${schema.metadata.uid}",
+  "skills": [
+    {
+      "name": "aks-known-issues",
+      "proofTerms": [
+        "aks-known-issues"
+      ],
+      "references": [
+        {
+          "path": "references/error-code-map.md",
+          "proofTerms": [
+            "OrasPullUnauthorized"
+          ]
+        }
+      ],
+      "source": {
+        "oci": "{{APPROVED_CONTENT_REGISTRY}}/reviewed-aks-known-issues@sha256:84b5a6a8f85db941e2ec588016e0b48d4906bcf4001f45f6ebcc33a2075a34fc",
+        "path": "skill"
+      }
+    },
+    {
+      "name": "kb-aks-bootstrap",
+      "proofTerms": [
+        "kb-aks-bootstrap"
+      ],
+      "references": [
+        {
+          "path": "references/oras-pull-unauthorized.md",
+          "proofTerms": [
+            "AKS-KB-ORAS-212-R1"
+          ]
+        }
+      ],
+      "source": {
+        "oci": "{{APPROVED_CONTENT_REGISTRY}}/reviewed-kb-aks-bootstrap@sha256:99872678014bef62bc8709ae30342246f7616d7f20d695b8a16500d3c54c1e2b",
+        "path": "skill"
+      }
+    }
+  ]
+}

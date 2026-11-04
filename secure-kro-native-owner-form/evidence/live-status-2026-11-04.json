@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-04",
+  "result": "LIVE_NATIVE_GOLDEN_PASSED",
+  "model": "deepseek-flash",
+  "kro": "0.9.4",
+  "kagent": "1.0.0-alpha17",
+  "agentgateway": "1.7.0",
+  "resourceGraphNodes": 11,
+  "resourceGraphReady": true,
+  "ownerReady": true,
+  "goldenJobComplete": true,
+  "leaseExpiresAt": "2026-11-04T15:28:12.789368Z",
+  "nativeModelCallsDuringScenario": 3,
+  "nativeSkillLoads": 2,
+  "nativeSkillReferenceReads": 2,
+  "fixedSyntheticMcpCalls": 1,
+  "ordinaryCallerPongPassed": true,
+  "scope": "One agent per protected namespace; native OCI skills and fixed synthetic read-only MCP. Kubernetes backend operations and Entra/UAMI not exercised.",
+  "repairs": [
+    "Corrected native frontdoor entrypoint",
+    "Handled plain-text gateway rejection responses",
+    "Bounded verifier Job pod admission exception",
+    "Ordered verifier after current frontdoor rollout",
+    "Replaced isolated demo worker pod after native router connection-refused errors"
+  ],
+  "failedAttemptsRetainedPrivately": 6,
+  "externalReviews": "Stopped at user request after quota failures"
+}

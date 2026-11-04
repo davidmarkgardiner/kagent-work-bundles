@@ -1,0 +1,106 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "name": "demo-golden",
+    "namespace": "secure-byo-kro",
+    "annotations": {
+      "secure-byo.platform/frontdoor": "${resource7.metadata.name}"
+    },
+    "labels": {
+      "secure-byo.platform/request-uid": "${schema.metadata.uid}"
+    }
+  },
+  "spec": {
+    "backoffLimit": 0,
+    "activeDeadlineSeconds": 600,
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "native-golden",
+          "secure-byo.platform/request-uid": "${schema.metadata.uid}"
+        }
+      },
+      "spec": {
+        "serviceAccountName": "approved-verifier",
+        "restartPolicy": "Never",
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 65532,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "containers": [
+          {
+            "name": "golden",
+            "image": "{{APPROVED_SECURITY_FRONTDOOR_IMAGE_AT_DIGEST}}",
+            "command": [
+              "python3",
+              "-B",
+              "/app/golden.py",
+              "--config",
+              "/golden/config.json"
+            ],
+            "env": [
+              {
+                "name": "JOB_NAME",
+                "value": "demo-golden"
+              },
+              {
+                "name": "POD_NAME",
+                "valueFrom": {
+                  "fieldRef": {
+                    "fieldPath": "metadata.name"
+                  }
+                }
+              },
+              {
+                "name": "POD_UID",
+                "valueFrom": {
+                  "fieldRef": {
+                    "fieldPath": "metadata.uid"
+                  }
+                }
+              }
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "25m",
+                "memory": "48Mi"
+              },
+              "limits": {
+                "cpu": "500m",
+                "memory": "256Mi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "golden",
+                "mountPath": "/golden",
+                "readOnly": true
+              }
+            ]
+          }
+        ],
+        "volumes": [
+          {
+            "name": "golden",
+            "configMap": {
+              "name": "${goldenConfig.metadata.name}"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

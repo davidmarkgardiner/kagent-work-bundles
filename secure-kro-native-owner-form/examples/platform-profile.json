@@ -12,10 +12,10 @@
       "spec": {
         "apiKeySecret": "secure-byo-mcp-token",
         "apiKeySecretKey": "token",
-        "model": "kimi-for-coding",
+        "model": "deepseek-flash",
         "openAI": {
           "apiFormat": "chatCompletions",
-          "baseUrl": "{{APPROVED_CLUSTER_SERVICE_URL}}/v1",
+          "baseUrl": "{{APPROVED_CLUSTER_SERVICE_URL}}",
           "maxTokens": 1200,
           "timeout": 90
         },
@@ -67,7 +67,7 @@
         "protocol": "STREAMABLE_HTTP",
         "terminateOnClose": true,
         "timeout": "15s",
-        "url": "{{APPROVED_CLUSTER_SERVICE_URL}}/mcp"
+        "url": "{{APPROVED_CLUSTER_SERVICE_URL}}"
       }
     },
     {
@@ -135,7 +135,7 @@
     {
       "apiVersion": "v1",
       "data": {
-        "runtime.json": "{\"agentName\": \"{{NAME}}\", \"apiURL\": \"{{APPROVED_CLUSTER_SERVICE_URL}}\", \"approvalName\": \"{{NAME}}-approval\", \"dependencyNames\": {\"agenttemplates\": \"{{NAME}}-template\", \"harnesses\": \"approved-harness\", \"modelconfigs\": \"approved-model\", \"remotemcpservers\": \"approved-mcp\"}, \"gatewayURL\": \"{{APPROVED_CLUSTER_SERVICE_URL}}\", \"kagentBinary\": \"/usr/local/bin/kagent\", \"modelMaxTokens\": 1200, \"modelName\": \"kimi-for-coding\", \"namespace\": \"{{NAMESPACE}}\", \"nativeUserID\": \"secure-byo-lab-secure-byo-kro\", \"request\": {\"apiVersion\": \"kro.run/v1alpha1\", \"name\": \"{{NAME}}\", \"plural\": \"secureagents\"}, \"upstreamModelKeyFile\": \"/credentials/api-key\", \"upstreamModelURL\": \"{{APPROVED_CLUSTER_SERVICE_URL}}/v1/chat/completions\", \"upstreamURL\": \"{{APPROVED_CLUSTER_SERVICE_URL}}\"}"
+        "runtime.json": "{\"agentName\": \"{{NAME}}\", \"apiURL\": \"{{APPROVED_CLUSTER_SERVICE_URL}}\", \"approvalName\": \"{{NAME}}-approval\", \"dependencyNames\": {\"agenttemplates\": \"{{NAME}}-template\", \"harnesses\": \"approved-harness\", \"modelconfigs\": \"approved-model\", \"remotemcpservers\": \"approved-mcp\"}, \"gatewayURL\": \"{{APPROVED_CLUSTER_SERVICE_URL}}\", \"kagentBinary\": \"/usr/local/bin/kagent\", \"modelMaxTokens\": 1200, \"modelName\": \"deepseek-flash\", \"namespace\": \"{{NAMESPACE}}\", \"nativeUserID\": \"secure-byo-lab-secure-byo-kro\", \"request\": {\"apiVersion\": \"kro.run/v1alpha1\", \"name\": \"{{NAME}}\", \"plural\": \"secureagents\"}, \"requireGoldenProof\": true, \"upstreamModelKeyFile\": \"/credentials/token\", \"upstreamModelURL\": \"{{APPROVED_CLUSTER_SERVICE_URL}}\", \"upstreamURL\": \"{{APPROVED_CLUSTER_SERVICE_URL}}\", \"verificationBudgets\": {\"invocations\": 1, \"mcpCalls\": 4, \"modelCalls\": 12}, \"verifierSubject\": \"system:serviceaccount:secure-byo-kro:approved-verifier\"}"
       },
       "kind": "ConfigMap",
       "metadata": {
@@ -248,6 +248,13 @@
                     "mountPath": "/tmp",
                     "name": "tmp"
                   }
+                ],
+                "command": [
+                  "python3",
+                  "-B",
+                  "/app/server.py",
+                  "--config",
+                  "/config/runtime.json"
                 ]
               }
             ],
@@ -263,7 +270,7 @@
               {
                 "name": "upstream-key",
                 "secret": {
-                  "secretName": "secure-byo-model-token"
+                  "secretName": "secure-byo-mcp-token"
                 }
               },
               {

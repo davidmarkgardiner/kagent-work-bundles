@@ -1,0 +1,18 @@
+{
+  "kubernetes": "v1.35.0",
+  "kagent": "1.0.0-alpha17",
+  "substrate": "0.6.0-alpha3",
+  "kyverno": "1.17.1",
+  "kro": "0.9.4",
+  "agentgateway": "v1.7.0",
+  "gatewayAPI": "v1.6.2",
+  "labPolicyProvider": "kube-router:v2.7.1 policy-only",
+  "pythonBaseDigest": "sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30",
+  "linuxAmd64CLI": {
+    "source": "https://github.com/kagent-dev/kagent/releases/download/v1.0.0-alpha17/kagent-linux-amd64",
+    "sha256": "01fb21bc46130dcffac5b5a720d903122563a4d926f4455cd8234c6112d338a3"
+  },
+  "chartDigests": {
+    "kro": "sha256:4e8de4d34b7e2c3cede958e140e26cd6d34a377062e63caf355a636d2bf4a67c"
+  }
+}

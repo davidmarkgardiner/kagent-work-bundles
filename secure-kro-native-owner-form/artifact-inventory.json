@@ -2,13 +2,23 @@
   "files": [
     {
       "path": "README.md",
-      "bytes": 4841,
-      "sha256": "eb58819560009dbe2fa622093805eb4885e8a8eb0c566c9e73db8047e87a7810"
+      "bytes": 7025,
+      "sha256": "9801fcc38d098e33bb38af819363bb1ecfb518a07059ff2f64d3ce577f34b51a"
     },
     {
       "path": "SHOWCASE.html",
-      "bytes": 89019,
-      "sha256": "e83195946c69bea892a6136b9be26b166c66a77c3a3c36f1c8286b9202a44398"
+      "bytes": 89139,
+      "sha256": "a732bd011eee55d631055c872a2ebc00720fde9b2fc87028dd1e943b5a35b5f6"
+    },
+    {
+      "path": "build/Dockerfile",
+      "bytes": 371,
+      "sha256": "bdf38a714758fa779a146de922eced157ec112e810ab267ff0b6eeba2391e1fd"
+    },
+    {
+      "path": "build.py",
+      "bytes": 1416,
+      "sha256": "0d8c3f505b708ac61f0ff607d0c821b05a8809aa156f6c7d669f3c9a746e3b86"
     },
     {
       "path": "evidence/live-composition-2026-11-04.json",
@@ -16,9 +26,39 @@
       "sha256": "2df756b7f6cac7abd0f91180467c4e2e48bde49344fdf4943b7d202fd818401d"
     },
     {
+      "path": "evidence/live-native-golden-2026-11-04.json",
+      "bytes": 4973,
+      "sha256": "05794b019d0b07c18024f3bbf9eaf42a68a6c2fa5ca0d47db407ea340761b0b0"
+    },
+    {
+      "path": "evidence/live-status-2026-11-04.json",
+      "bytes": 1080,
+      "sha256": "e29888dd52ac9bdccc62d85cf16a27917d6f390ccf3afebbfd831ac67615e329"
+    },
+    {
       "path": "evidence/review-status-2026-11-04.json",
       "bytes": 923,
       "sha256": "a1fbfa841873f7805528aaa2a3842a7c5d4a228a390e2327de72ba793adb6089"
+    },
+    {
+      "path": "examples/golden-config.json",
+      "bytes": 1502,
+      "sha256": "bbe9a617c639ca2528fede0421972842f8ad057c819c639416dbde79fafe015e"
+    },
+    {
+      "path": "examples/golden-job.json",
+      "bytes": 2664,
+      "sha256": "db61d60926dd87ebfc26b476d1ea5ad9d04a5117321a9bed58526e5dc4f8d9fa"
+    },
+    {
+      "path": "examples/golden-platform.json",
+      "bytes": 84387,
+      "sha256": "f8064e9f29db5410b892188f5a3f489ab785d1d5d9c1a72fd2cbad67549f3aa2"
+    },
+    {
+      "path": "examples/model-provider-bridge.json",
+      "bytes": 7982,
+      "sha256": "411ba3a6d11e7ceebee122879c0d3c30df69068dbf050765e0c8776fb0430c98"
     },
     {
       "path": "examples/owner-binding.yaml",
@@ -32,18 +72,23 @@
     },
     {
       "path": "examples/platform-profile.json",
-      "bytes": 9258,
-      "sha256": "a2dc718d85a17f82d7e88e048b4a1d950a481efa95952ff2fd01b5ecb6d9833a"
+      "bytes": 9628,
+      "sha256": "8cc043f08e53506886777ea57802d79faa8867d9235ce8143fb36073ab4cecc0"
     },
     {
       "path": "examples/resourcegraphdefinition.yaml",
-      "bytes": 10863,
-      "sha256": "fc17f8419f098423228a5cc281a72c3a83e25fc331ecaad13a722b47331d751f"
+      "bytes": 15033,
+      "sha256": "9eb6f1fd149df59791c8466540d4178fb8a2f70b98d5266557b51d7daa2a0250"
     },
     {
       "path": "examples/secure-agent.yaml",
       "bytes": 787,
       "sha256": "074b2efd2c8fa28f4fe36a77a22c42587e6bcd03e29192df2973b004b4926765"
+    },
+    {
+      "path": "golden_graph.py",
+      "bytes": 1990,
+      "sha256": "62ef301c17a856f51d5adb4b40ed9e497c11cddeb3c2c925638a60339b56d9f2"
     },
     {
       "path": "owner_schema.py",
@@ -52,13 +97,43 @@
     },
     {
       "path": "render.py",
-      "bytes": 1128,
-      "sha256": "0e7ee27e4b6432a943a78d5d747b5ec108bd3d96ccb201c8ad5e6c9e73d6c264"
+      "bytes": 1410,
+      "sha256": "b74f4fc3529020c643fe8b057e5c7e94b9f958a03b2763feceec948e830459d2"
+    },
+    {
+      "path": "runtime/golden.py",
+      "bytes": 31853,
+      "sha256": "8ea2f93372d434903a6f15295833589eb648ff3fbd915194b9453632afcd79e3"
+    },
+    {
+      "path": "runtime/server.py",
+      "bytes": 33385,
+      "sha256": "d6cb718aa749e4de9d0d80b99f41b91729c353ec1cb17311bbe5bcd7ab49cc2f"
+    },
+    {
+      "path": "tests/legacy_runtime.py",
+      "bytes": 20342,
+      "sha256": "f9fe9eb12e17fd5eab090782d3d28bd16443defb5958f15c3fdb61a4a004c8a4"
     },
     {
       "path": "tests/test_contract.py",
       "bytes": 1949,
       "sha256": "bbbab299d63d249f48f03030e056afd7e6abe20288593d6681dd672767e73e68"
+    },
+    {
+      "path": "tests/test_gateway_response.py",
+      "bytes": 1622,
+      "sha256": "dd1ad9936a9ac1a623f16f54ee2714a91a185c9e3946d3ad882dc404904593ff"
+    },
+    {
+      "path": "tests/test_native_gate.py",
+      "bytes": 27978,
+      "sha256": "435136440b2211e361c3eee801fca8b6a8b5d6f49b5696e41d2ba1992fee71e5"
+    },
+    {
+      "path": "versions.lock.json",
+      "bytes": 662,
+      "sha256": "41f912329083281d6af59b5ea434f373ea4079378ed36c0a0f2fefb0edcbb550"
     }
   ]
 }

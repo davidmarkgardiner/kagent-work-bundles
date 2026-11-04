@@ -1846,7 +1846,7 @@ html&gt;body{padding:0}&lt;/style&gt;
     &lt;p class=&quot;text-small&quot; data-note&gt;&lt;/p&gt;
     &lt;a class=&quot;text-small&quot; data-source href=&quot;https://kagent.dev/docs/kagent/1.x/skills-and-mcp/skills/&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;https://kagent.dev/docs/kagent/1.x/skills-and-mcp/skills/&lt;/a&gt;
   &lt;/div&gt;
-  &lt;p class=&quot;text-small text-muted&quot;&gt;Live composition checked on Proxmox, 4 Nov 2026. Native kagent Ready; provider inference not rerun. GitLab and Entra are not live proofs.&lt;/p&gt;
+  &lt;p class=&quot;text-small text-muted&quot;&gt;Live native Golden passed on Proxmox, 4 Nov 2026 at 11:28 UTC. DeepSeek model, both OCI skills, fixed MCP and ordinary-caller PONG verified. GitLab and Entra remain untested.&lt;/p&gt;
   &lt;script&gt;
     (() =&gt; {
       const root = document.getElementById(&#x27;kro-native-agent-1104&#x27;);
@@ -1915,7 +1915,7 @@ sharedPlatformSecurity:
 later:
   - Entra caller authentication
   - agent-to-MCP workload identity`,
-          note: &#x27;The existing gateway and network baseline was retained. Catalog admission rejected an unapproved model, forbidden MCP operation, unrestricted MCP list and extra URL field. This composition check is not a new model-backed Golden result.&#x27;
+          note: &#x27;The existing gateway and network baseline was retained. Catalog admission rejected an unapproved model, forbidden MCP operation, unrestricted MCP list and extra URL field. Native Golden subsequently passed with three DeepSeek calls, two skill loads, two reference reads, one fixed MCP call and an ordinary-caller PONG.&#x27;
         }
       };
       root.querySelector(&#x27;[data-security-labels]&#x27;).textContent = registry.security.resources.join(&#x27; · &#x27;);
