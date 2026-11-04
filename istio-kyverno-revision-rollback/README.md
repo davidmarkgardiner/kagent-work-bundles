@@ -2,6 +2,8 @@
 
 Incident issue: https://github.com/davidmarkgardiner/kagent-work-bundles/issues/3
 
+Follow the complete operational sequence in [INCIDENT-RECOVERY-PROCESS.md](INCIDENT-RECOVERY-PROCESS.md), including verification and the conditional canary restart.
+
 **Corrected operator report:** the installed Istio is 1.29. A `PeerAuthentication` was incorrectly labelled `istio.io/rev: "1-23"`. The intended correction is **1-23 -> 1-29 on that policy's metadata label**. This supersedes the initial namespace/proxy downgrade hypothesis. The old `rollback-one-deployment.sh` now refuses execution. Do not run the earlier commit's namespace rollback for this incident.
 
 The label key is assumed to be `metadata.labels["istio.io/rev"]`; confirm that from the actual object. A different field, such as `spec.selector.matchLabels`, requires a different patch. Verify the actual istiod revision is literally `1-29`, rather than deriving it from the binary version. Policy metadata labels are filtered against the configured control-plane revision; a sidecar injection tag is not automatically interchangeable with that revision here.
