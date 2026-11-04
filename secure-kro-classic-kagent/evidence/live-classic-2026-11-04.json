@@ -1,0 +1,81 @@
+{
+  "checkedAt": "2026-11-04T14:27:03.909971+00:00",
+  "result": "LIVE_CLASSIC_NATIVE_VERIFIED",
+  "versions": {
+    "kro": "0.9.4",
+    "kagent": "0.8.0-beta4",
+    "agentgateway": "1.7.0"
+  },
+  "nativeAPI": "kagent.dev/v1alpha2",
+  "nativeRuntime": "go",
+  "nativeDeploymentImage": "ghcr.io/kagent-dev/kagent/golang-adk:0.8.0-beta4",
+  "nativeDeploymentOwnedByAgent": true,
+  "runtimeUsesSubstrate": false,
+  "sharedLabClusterAlsoHasSeparateSubstrateDeployment": true,
+  "graphNodes": 14,
+  "resourceGraphCurrentGenerationReady": true,
+  "instanceReady": true,
+  "instanceUID": "a97245f3-bf8c-446e-9b36-08e54aa7286e",
+  "golden": {
+    "checks": [
+      {
+        "name": "NativeAgentCard",
+        "passed": true
+      },
+      {
+        "http": 401,
+        "name": "MissingTokenDenied",
+        "passed": true
+      },
+      {
+        "http": 401,
+        "name": "InvalidTokenDenied",
+        "passed": true
+      },
+      {
+        "http": 404,
+        "name": "VerifierCannotUseCallerListener",
+        "passed": true
+      },
+      {
+        "name": "NativeModelPong",
+        "passed": true
+      }
+    ],
+    "completedAt": "2026-11-04T14:22:28.282348+00:00",
+    "contextID": "13092235-4422-4a6c-b800-3216cdf22588",
+    "passed": true,
+    "requestUID": "a97245f3-bf8c-446e-9b36-08e54aa7286e",
+    "responseSha256": "c04f0fbb47e35e655e46076313306b7d60b5a85179265f34a7465eafaed5743a",
+    "schemaVersion": "classic-golden/v1",
+    "scope": "native-agent-model-pong",
+    "taskID": "01a1a6f0-792b-7763-b872-09762500e18b"
+  },
+  "callerSmoke": {
+    "taskID": "01a1a6f3-5525-7542-b046-cb4cc6666191",
+    "contextID": "dfac3434-6a72-463e-97b3-08283211f856",
+    "responseSha256": "83353b1d5a4763d761c0262b69b83287bdd17bda07f343b554713701167a41e0",
+    "passed": true
+  },
+  "callerNegativeControls": {
+    "MissingCallerToken": {
+      "passed": true,
+      "http": 401
+    },
+    "VerifierOnCallerRoute": {
+      "passed": true,
+      "http": 403
+    }
+  },
+  "callerRouteCreatedAt": "2026-11-04T14:22:30Z",
+  "goldenCompletedBeforeCallerRoute": true,
+  "existingSubstrateInstanceStillReady": true,
+  "scope": "Real model PONG and Gateway authentication controls. Skill loading and Kubernetes, GitLab or Denodo backend reads were not exercised.",
+  "repairs": [
+    "Reduced demo runtime memory requests for the bounded lab capacity",
+    "Allowed verifier to reach both Gateway listeners for its negative control",
+    "Used an ordinary KRO dependency for the caller route",
+    "Omitted empty verifier ingress list to stop repeated NetworkPolicy SSA updates and allow KRO Ready"
+  ],
+  "verifierImageDelivery": "Lab-local image tag. Receiving platform must build and push its own digest-pinned verifier image."
+}

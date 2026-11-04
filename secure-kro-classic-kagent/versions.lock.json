@@ -1,0 +1,19 @@
+{
+  "kro": "0.9.4",
+  "kagentReference": "0.8.0-beta4",
+  "nativeAPI": "kagent.dev/v1alpha2",
+  "agentgatewayReference": "1.7.0",
+  "substrateRequired": false,
+  "agentTemplateRequired": false,
+  "referenceSource": "https://github.com/kagent-dev/kagent/tree/v0.8.0-beta4",
+  "crdSchemas": {
+    "agents.kagent.dev": "f8709405457b0dcc644bdd18d70f7d572b67295f93665ed5a265eb6278ce5bfb",
+    "modelconfigs.kagent.dev": "9aadec34d326c11f1c8d7be58dc3e3b4eb27b403b12da8f2a9064caa40f998ef",
+    "remotemcpservers.kagent.dev": "ee2f33777eceaf311c864531201446da8b9437ca85f1c45bcdc678cef78e450b",
+    "memories.kagent.dev": "e369fe95946b119b061344b707f4762b900ab6e1b9b2d1902a2696d24ce2d8ca",
+    "modelproviderconfigs.kagent.dev": "4289182007c035412e718bf29652f6b1298019982a5505c4af83b0ff597bb054",
+    "toolservers.kagent.dev": "e8c837d8dc1d5333bd523893978966ef5402f1324e2bfc8f9a85000c12a3957a"
+  },
+  "goldenPythonBase": "python@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c",
+  "referenceChartDigest": "sha256:25eb090928701daeb7d4073f41e9261d37acc3dadf6b40efcd06fbe99c66b129"
+}

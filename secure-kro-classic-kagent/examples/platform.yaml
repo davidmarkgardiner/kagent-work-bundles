@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: classic-agents
+- apiVersion: gateway.networking.k8s.io/v1
+  kind: Gateway
+  metadata:
+    name: classic-demo
+    namespace: classic-agents
+  spec:
+    gatewayClassName: agentgateway
+    listeners:
+    - name: caller
+      port: 8080
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: classic-agents
+    - name: verify
+      port: 8081
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: classic-agents
+- apiVersion: agentgateway.dev/v1alpha1
+  kind: AgentgatewayPolicy
+  metadata:
+    name: classic-listener-verify
+    namespace: classic-agents
+  spec:
+    targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: classic-demo
+      sectionName: verify
+    traffic:
+      jwtAuthentication:
+        mode: Strict
+        preserveToken: false
+        providers:
+        - issuer: '{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}'
+          audiences:
+          - secure-agent-classic
+          jwks:
+            inline: '{{KUBERNETES_JWKS_JSON}}'
+      authorization:
+        action: Require
+        policy:
+          matchExpressions:
+          - jwt.sub == "system:serviceaccount:classic-agents:demo-verifier"
+- apiVersion: agentgateway.dev/v1alpha1
+  kind: AgentgatewayPolicy
+  metadata:
+    name: classic-listener-caller
+    namespace: classic-agents
+  spec:
+    targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: classic-demo
+      sectionName: caller
+    traffic:
+      jwtAuthentication:
+        mode: Strict
+        preserveToken: false
+        providers:
+        - issuer: '{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}'
+          audiences:
+          - secure-agent-classic
+          jwks:
+            inline: '{{KUBERNETES_JWKS_JSON}}'
+      authorization:
+        action: Require
+        policy:
+          matchExpressions:
+          - jwt.sub == "system:serviceaccount:classic-agents:demo-caller"

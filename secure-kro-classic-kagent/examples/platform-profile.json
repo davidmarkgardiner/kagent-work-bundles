@@ -1,0 +1,111 @@
+{
+  "nativeAPI": "kagent.dev/v1alpha2",
+  "namespace": "classic-agents",
+  "runtime": "go",
+  "models": [
+    "approved-model"
+  ],
+  "skills": {},
+  "tools": {},
+  "gatewayNamespace": "classic-agents",
+  "gatewayName": "classic-demo",
+  "gatewayClass": "agentgateway",
+  "verifyListener": "verify",
+  "callerListener": "caller",
+  "gatewayPort": 8081,
+  "callerPort": 8080,
+  "verifyGatewayURL": "http://classic-demo.classic-agents.svc.cluster.local:8081",
+  "callerGatewayURL": "http://classic-demo.classic-agents.svc.cluster.local:8080",
+  "issuer": "{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}",
+  "jwks": "{{KUBERNETES_JWKS_JSON}}",
+  "audience": "secure-agent-classic",
+  "verifierImage": "{{APPROVED_GOLDEN_IMAGE_AT_DIGEST}}",
+  "dnsEgress": {
+    "to": [
+      {
+        "namespaceSelector": {
+          "matchLabels": {
+            "kubernetes.io/metadata.name": "kube-system"
+          }
+        }
+      }
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "port": 53
+      },
+      {
+        "protocol": "TCP",
+        "port": 53
+      }
+    ]
+  },
+  "agentEgress": [
+    {
+      "to": [
+        {
+          "namespaceSelector": {
+            "matchLabels": {
+              "kubernetes.io/metadata.name": "kube-system"
+            }
+          }
+        }
+      ],
+      "ports": [
+        {
+          "protocol": "UDP",
+          "port": 53
+        },
+        {
+          "protocol": "TCP",
+          "port": 53
+        }
+      ]
+    },
+    {
+      "to": [
+        {
+          "namespaceSelector": {
+            "matchLabels": {
+              "kubernetes.io/metadata.name": "{{MODEL_GATEWAY_NAMESPACE}}"
+            }
+          },
+          "podSelector": {
+            "matchLabels": {
+              "app": "{{MODEL_GATEWAY_POD_LABEL}}"
+            }
+          }
+        }
+      ],
+      "ports": [
+        {
+          "protocol": "TCP",
+          "port": 8081
+        }
+      ]
+    },
+    {
+      "to": [
+        {
+          "namespaceSelector": {
+            "matchLabels": {
+              "kubernetes.io/metadata.name": "{{KAGENT_CONTROLLER_NAMESPACE}}"
+            }
+          },
+          "podSelector": {
+            "matchLabels": {
+              "app.kubernetes.io/name": "{{KAGENT_CONTROLLER_LABEL}}"
+            }
+          }
+        }
+      ],
+      "ports": [
+        {
+          "protocol": "TCP",
+          "port": 8083
+        }
+      ]
+    }
+  ]
+}

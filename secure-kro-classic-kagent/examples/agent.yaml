@@ -1,0 +1,10 @@
+apiVersion: demo.kagent.dev/v1alpha1
+kind: ClassicSecureAgent
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  modelConfig: approved-model
+  systemPrompt: Reply accurately and concisely. Use only the approved tools when asked.
+  skills: []
+  tools: []

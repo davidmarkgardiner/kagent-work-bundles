@@ -1,0 +1,15 @@
+# Workplace adapter example. Resolve the catalog and run a real backend query before claiming success.
+apiVersion: demo.kagent.dev/v1alpha1
+kind: ClassicSecureAgent
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  modelConfig: approved-model
+  systemPrompt: Read the approved Kubernetes demo namespace. Report up to five pod
+    readiness results and five warning events. Do not write resources or run shell
+    commands.
+  skills:
+  - work-guidance
+  tools:
+  - kubernetes-readonly

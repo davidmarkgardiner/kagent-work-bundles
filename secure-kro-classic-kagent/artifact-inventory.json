@@ -1,0 +1,104 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 12417,
+      "sha256": "490cfba177af67f23090daa5f3cc6b7bccf3e572df6c50c2333c802ed46e6428"
+    },
+    {
+      "path": "WORK-AGENT-HANDOFF.md",
+      "bytes": 2093,
+      "sha256": "cb705cdba89be295981b5bcb3f8042a1bfd32e13431f51d05e2588414543a03a"
+    },
+    {
+      "path": "compose.py",
+      "bytes": 12899,
+      "sha256": "b87e7af47d7d80bee2af36a5005be6e94c992b9d62c8e06bf73bfd9723c67420"
+    },
+    {
+      "path": "evidence/live-classic-2026-11-04.json",
+      "bytes": 2725,
+      "sha256": "c0b2e3b4ffd27d8018ac5d69700c59be96afa36cb380a6f758defda8709e83b3"
+    },
+    {
+      "path": "examples/agent-denodo.yaml",
+      "bytes": 518,
+      "sha256": "69af5fe7ee41565b6d440ee3e3e1cd44dca3feca48766d6c055386ca96efa027"
+    },
+    {
+      "path": "examples/agent-gitlab.yaml",
+      "bytes": 503,
+      "sha256": "59985a483c5b761b73740622798e08f8b5aa5759e5b468f80a972b9b542ccc8b"
+    },
+    {
+      "path": "examples/agent-kubernetes.yaml",
+      "bytes": 493,
+      "sha256": "0a93f4812a031718293f2d80847fc8acbcc800226f91e0d8c0a442a0039bd3eb"
+    },
+    {
+      "path": "examples/agent-with-catalog.yaml",
+      "bytes": 339,
+      "sha256": "137b1b35e5a9a4ca0cbc270bd76bcbab4339c0da12c8f119ec2c40902b688e63"
+    },
+    {
+      "path": "examples/agent.yaml",
+      "bytes": 262,
+      "sha256": "c07e6b8626600392dc8b983e8b73f4d75cf30a89f774fc4da39602f1f778f394"
+    },
+    {
+      "path": "examples/platform-profile-with-catalog.json",
+      "bytes": 3630,
+      "sha256": "4c59364158dc55cc79b3fcd11933a2e014e5be49b059e87afe3888486f6101ba"
+    },
+    {
+      "path": "examples/platform-profile.json",
+      "bytes": 2384,
+      "sha256": "4cee4ad52acf308eb579f18bbf05c3318d31a8a72136a6f895c6a9962fc8e43e"
+    },
+    {
+      "path": "examples/platform.yaml",
+      "bytes": 2185,
+      "sha256": "05d78c73bcf21822559fe08827a30d37fc7318cf0edfcfe51dd76f25f30a7e1a"
+    },
+    {
+      "path": "examples/resourcegraphdefinition.yaml",
+      "bytes": 15176,
+      "sha256": "bc9d44e5aa3d15f1266019f84db37f07d976abfc72e6b559c8800513cf1e0c0a"
+    },
+    {
+      "path": "gateway_baseline.py",
+      "bytes": 1871,
+      "sha256": "653d20d3f706ce7ddf09030cc2692ef040c204a5a3c8aa6305fcadad4f1dcc44"
+    },
+    {
+      "path": "preflight.py",
+      "bytes": 2940,
+      "sha256": "582f4d0bb233e253e2be27002472098b5554341e80b5262b22a25ac1987c936a"
+    },
+    {
+      "path": "query.py",
+      "bytes": 2691,
+      "sha256": "3089d983aef0764e8e47834aff319494042d85d0c00a4f8373b41a05c26b80ce"
+    },
+    {
+      "path": "runtime/Dockerfile",
+      "bytes": 165,
+      "sha256": "472aae721877f7c253bbe456d8c9c027b9b19c8acd1cb40b5f9e694df123ef50"
+    },
+    {
+      "path": "runtime/golden.py",
+      "bytes": 5165,
+      "sha256": "044d8cd10f97f68709c519a6e946fa800bbc8b120831fcfca8f00c721a8a884a"
+    },
+    {
+      "path": "tests/test_classic.py",
+      "bytes": 4259,
+      "sha256": "071425dcb559e06d4fada215e7b033961e04249ef736f805d0f496a99f7256ba"
+    },
+    {
+      "path": "versions.lock.json",
+      "bytes": 1096,
+      "sha256": "cdb620a5ac817f7f2524aad432ff77c6c0cb1059a2d7586980258d75e317f12e"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+apiVersion: demo.kagent.dev/v1alpha1
+kind: ClassicSecureAgent
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  modelConfig: approved-model
+  systemPrompt: Read only the approved Kubernetes demo namespace and report observed
+    pod readiness. Do not change resources.
+  skills:
+  - work-guidance
+  tools:
+  - kubernetes-readonly

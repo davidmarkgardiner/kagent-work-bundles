@@ -1,0 +1,15 @@
+# Workplace adapter example. Resolve the catalog and run a real backend query before claiming success.
+apiVersion: demo.kagent.dev/v1alpha1
+kind: ClassicSecureAgent
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  modelConfig: approved-model
+  systemPrompt: Use the configured GitLab project tools to report its default branch
+    and latest pipeline. Do not create or modify issues, branches, commits, merge
+    requests or pipelines.
+  skills:
+  - work-guidance
+  tools:
+  - gitlab-readonly

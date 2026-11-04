@@ -1,0 +1,15 @@
+# Workplace adapter example. Resolve the catalog and run a real backend query before claiming success.
+apiVersion: demo.kagent.dev/v1alpha1
+kind: ClassicSecureAgent
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  modelConfig: approved-model
+  systemPrompt: Use the approved typed Denodo inventory tools. Begin with product
+    details, then report the namespace count. Respect truncation and never execute
+    arbitrary SQL or reconstruct an export.
+  skills:
+  - work-guidance
+  tools:
+  - denodo-readonly
