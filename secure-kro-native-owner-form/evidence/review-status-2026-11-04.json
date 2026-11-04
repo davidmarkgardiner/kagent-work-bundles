@@ -1,0 +1,26 @@
+{
+  "scope": "Native owner-form delta",
+  "reviews": [
+    {
+      "requestedModel": "sonnet",
+      "status": "not-completed",
+      "runnerStatus": "child-failed",
+      "reason": "Claude CLI reported the 5-hour usage limit, resetting at 13:10 Europe/London on 4 November 2026; no model tokens or review output.",
+      "servedModel": null
+    },
+    {
+      "requestedModel": "opus",
+      "status": "not-completed",
+      "runnerStatus": "child-failed",
+      "reason": "Claude CLI reported the 5-hour usage limit, resetting at 13:10 Europe/London on 4 November 2026; no model tokens or review output.",
+      "servedModel": null
+    },
+    {
+      "requestedModel": "Kimi 3.1",
+      "status": "not-retried",
+      "reason": "Earlier requested review reported a weekly usage limit; no Kimi review is claimed for this native delta."
+    }
+  ],
+  "independentNativeImplementationTests": 17,
+  "portableBundleTests": 3
+}

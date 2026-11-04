@@ -1,0 +1,26 @@
+apiVersion: kro.run/v1alpha1
+kind: SecureAgent
+metadata:
+  name: demo
+  namespace: secure-byo-kro
+spec:
+  modelConfig:
+    name: approved-model
+  skills:
+  - name: aks-known-issues
+    source:
+      oci: '{{APPROVED_CONTENT_REGISTRY}}/reviewed-aks-known-issues@sha256:84b5a6a8f85db941e2ec588016e0b48d4906bcf4001f45f6ebcc33a2075a34fc'
+      path: skill
+  - name: kb-aks-bootstrap
+    source:
+      oci: '{{APPROVED_CONTENT_REGISTRY}}/reviewed-kb-aks-bootstrap@sha256:99872678014bef62bc8709ae30342246f7616d7f20d695b8a16500d3c54c1e2b'
+      path: skill
+  tools:
+  - mcp:
+      server:
+        kind: RemoteMCPServer
+        name: approved-mcp
+      tools:
+      - get_demo_status
+  systemPrompt: Use the approved skills and get_demo_status for synthetic evidence.
+    Report observed facts.

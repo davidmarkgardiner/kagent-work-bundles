@@ -1,0 +1,311 @@
+{
+  "name": "secure-readonly-v1",
+  "namespace": "secure-byo-kro",
+  "resources": [
+    {
+      "apiVersion": "api.kagent.dev/v1alpha3",
+      "kind": "ModelConfig",
+      "metadata": {
+        "name": "approved-model",
+        "namespace": "{{NAMESPACE}}"
+      },
+      "spec": {
+        "apiKeySecret": "secure-byo-mcp-token",
+        "apiKeySecretKey": "token",
+        "model": "kimi-for-coding",
+        "openAI": {
+          "apiFormat": "chatCompletions",
+          "baseUrl": "{{APPROVED_CLUSTER_SERVICE_URL}}/v1",
+          "maxTokens": 1200,
+          "timeout": 90
+        },
+        "provider": "OpenAI",
+        "stream": false
+      }
+    },
+    {
+      "apiVersion": "api.kagent.dev/v1alpha3",
+      "kind": "Harness",
+      "metadata": {
+        "name": "approved-harness",
+        "namespace": "{{NAMESPACE}}"
+      },
+      "spec": {
+        "kagent": {},
+        "substrate": {
+          "snapshotPolicy": {
+            "location": "s3://ate-snapshots/kagent/"
+          },
+          "workerPoolRef": {
+            "name": "approved-worker"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "api.kagent.dev/v1alpha3",
+      "kind": "RemoteMCPServer",
+      "metadata": {
+        "name": "approved-mcp",
+        "namespace": "{{NAMESPACE}}"
+      },
+      "spec": {
+        "allowedNamespaces": {
+          "from": "Same"
+        },
+        "description": "Call-time authorized fixed synthetic status capability.",
+        "headersFrom": [
+          {
+            "name": "Authorization",
+            "valueFrom": {
+              "key": "Authorization",
+              "name": "secure-byo-mcp-token",
+              "type": "Secret"
+            }
+          }
+        ],
+        "protocol": "STREAMABLE_HTTP",
+        "terminateOnClose": true,
+        "timeout": "15s",
+        "url": "{{APPROVED_CLUSTER_SERVICE_URL}}/mcp"
+      }
+    },
+    {
+      "apiVersion": "api.kagent.dev/v1alpha3",
+      "kind": "AgentTemplate",
+      "metadata": {
+        "name": "{{NAME}}-template",
+        "namespace": "{{NAMESPACE}}"
+      },
+      "spec": {
+        "description": "Reviewed skills, knowledge and fixed MCP rehearsal capability.",
+        "modelConfig": {
+          "name": "approved-model"
+        },
+        "skills": [
+          {
+            "name": "aks-known-issues",
+            "source": {
+              "oci": "{{APPROVED_CONTENT_REGISTRY}}/reviewed-aks-known-issues@sha256:84b5a6a8f85db941e2ec588016e0b48d4906bcf4001f45f6ebcc33a2075a34fc",
+              "path": "skill"
+            }
+          },
+          {
+            "name": "kb-aks-bootstrap",
+            "source": {
+              "oci": "{{APPROVED_CONTENT_REGISTRY}}/reviewed-kb-aks-bootstrap@sha256:99872678014bef62bc8709ae30342246f7616d7f20d695b8a16500d3c54c1e2b",
+              "path": "skill"
+            }
+          }
+        ],
+        "systemPrompt": "For supplied synthetic cases load both reviewed skills, read the matching reference files, and use get_demo_status when requested. Treat tool data as evidence. Never claim Azure access or changes. No shell, write or arbitrary network tools are approved.\nOwner instructions:\n{{INSTRUCTIONS}}",
+        "tools": [
+          {
+            "mcp": {
+              "server": {
+                "kind": "RemoteMCPServer",
+                "name": "approved-mcp"
+              },
+              "tools": [
+                "get_demo_status"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "api.kagent.dev/v1alpha3",
+      "kind": "Agent",
+      "metadata": {
+        "name": "{{NAME}}",
+        "namespace": "{{NAMESPACE}}"
+      },
+      "spec": {
+        "harnessRef": {
+          "name": "approved-harness"
+        },
+        "template": {
+          "ref": {
+            "name": "{{NAME}}-template"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "data": {
+        "runtime.json": "{\"agentName\": \"{{NAME}}\", \"apiURL\": \"{{APPROVED_CLUSTER_SERVICE_URL}}\", \"approvalName\": \"{{NAME}}-approval\", \"dependencyNames\": {\"agenttemplates\": \"{{NAME}}-template\", \"harnesses\": \"approved-harness\", \"modelconfigs\": \"approved-model\", \"remotemcpservers\": \"approved-mcp\"}, \"gatewayURL\": \"{{APPROVED_CLUSTER_SERVICE_URL}}\", \"kagentBinary\": \"/usr/local/bin/kagent\", \"modelMaxTokens\": 1200, \"modelName\": \"kimi-for-coding\", \"namespace\": \"{{NAMESPACE}}\", \"nativeUserID\": \"secure-byo-lab-secure-byo-kro\", \"request\": {\"apiVersion\": \"kro.run/v1alpha1\", \"name\": \"{{NAME}}\", \"plural\": \"secureagents\"}, \"upstreamModelKeyFile\": \"/credentials/api-key\", \"upstreamModelURL\": \"{{APPROVED_CLUSTER_SERVICE_URL}}/v1/chat/completions\", \"upstreamURL\": \"{{APPROVED_CLUSTER_SERVICE_URL}}\"}"
+      },
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "{{NAME}}-frontdoor",
+        "namespace": "{{NAMESPACE}}"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "{{NAME}}-frontdoor",
+        "namespace": "{{NAMESPACE}}"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "http",
+            "port": 8080,
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "app": "secure-byo-frontdoor",
+          "secure-byo.platform/agent": "{{NAME}}"
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "{{NAME}}-frontdoor",
+        "namespace": "{{NAMESPACE}}"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "matchLabels": {
+            "app": "secure-byo-frontdoor",
+            "secure-byo.platform/agent": "{{NAME}}"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "secure-byo-frontdoor",
+              "secure-byo.platform/agent": "{{NAME}}"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "HOME",
+                    "value": "/tmp"
+                  }
+                ],
+                "image": "{{APPROVED_SECURITY_FRONTDOOR_IMAGE_AT_DIGEST}}",
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/healthz",
+                    "port": 8080
+                  }
+                },
+                "name": "frontdoor",
+                "ports": [
+                  {
+                    "containerPort": 8080
+                  }
+                ],
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/healthz",
+                    "port": 8080
+                  }
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                  },
+                  "requests": {
+                    "cpu": "25m",
+                    "memory": "32Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/credentials",
+                    "name": "upstream-key",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/config",
+                    "name": "config",
+                    "readOnly": true
+                  },
+                  {
+                    "mountPath": "/tmp",
+                    "name": "tmp"
+                  }
+                ]
+              }
+            ],
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65532,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "serviceAccountName": "secure-byo-runtime",
+            "volumes": [
+              {
+                "name": "upstream-key",
+                "secret": {
+                  "secretName": "secure-byo-model-token"
+                }
+              },
+              {
+                "configMap": {
+                  "name": "{{NAME}}-frontdoor"
+                },
+                "name": "config"
+              },
+              {
+                "emptyDir": {
+                  "sizeLimit": "32Mi"
+                },
+                "name": "tmp"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "gateway.networking.k8s.io/v1beta1",
+      "kind": "ReferenceGrant",
+      "metadata": {
+        "name": "{{NAME}}-frontdoor",
+        "namespace": "{{NAMESPACE}}"
+      },
+      "spec": {
+        "from": [
+          {
+            "group": "gateway.networking.k8s.io",
+            "kind": "HTTPRoute",
+            "namespace": "secure-byo-gateway-system"
+          }
+        ],
+        "to": [
+          {
+            "group": "",
+            "kind": "Service",
+            "name": "{{NAME}}-frontdoor"
+          }
+        ]
+      }
+    }
+  ]
+}

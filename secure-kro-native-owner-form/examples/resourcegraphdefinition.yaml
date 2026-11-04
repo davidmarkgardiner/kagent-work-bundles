@@ -1,0 +1,264 @@
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: secure-byo-kro-secure-agent
+spec:
+  schema:
+    apiVersion: v1alpha1
+    group: kro.run
+    kind: SecureAgent
+    scope: Namespaced
+    types:
+      ApprovedModelConfig:
+        name: string | required=true enum=approved-model
+      ApprovedSkill:
+        name: string | required=true maxLength=63
+        source:
+          oci: string | maxLength=2048
+          git:
+            url: string | required=true minLength=1 maxLength=2048
+            commit: string | required=true maxLength=64
+          path: string | maxLength=1024
+      ApprovedMCPOperation: string | minLength=1 maxLength=128
+      ApprovedTool:
+        mcp:
+          server:
+            kind: string | required=true enum=RemoteMCPServer
+            name: string | required=true maxLength=63
+          tools: '[]ApprovedMCPOperation | required=true minItems=1 maxItems=1'
+          requireApproval: boolean
+    spec:
+      profileRef: string | default=secure-readonly-v1 enum=secure-readonly-v1 immutable=true
+      instructions: string | default="" maxLength=4096 immutable=true
+      modelConfig: ApprovedModelConfig | default={"name":"approved-model"} immutable=true
+      skills: '[]ApprovedSkill | default=[{"name":"aks-known-issues","source":{"oci":"{{APPROVED_CONTENT_REGISTRY}}/reviewed-aks-known-issues@sha256:84b5a6a8f85db941e2ec588016e0b48d4906bcf4001f45f6ebcc33a2075a34fc","path":"skill"}},{"name":"kb-aks-bootstrap","source":{"oci":"{{APPROVED_CONTENT_REGISTRY}}/reviewed-kb-aks-bootstrap@sha256:99872678014bef62bc8709ae30342246f7616d7f20d695b8a16500d3c54c1e2b","path":"skill"}}]
+        maxItems=2 validation="self.all(s, (has(s.source) && s.name == \"aks-known-issues\" && has(s.source.oci)
+        && !has(s.source.git) && s.source.oci == \"{{APPROVED_CONTENT_REGISTRY}}/reviewed-aks-known-issues@sha256:84b5a6a8f85db941e2ec588016e0b48d4906bcf4001f45f6ebcc33a2075a34fc\"
+        && has(s.source.path) && s.source.path == \"skill\") || (has(s.source) && s.name == \"kb-aks-bootstrap\"
+        && has(s.source.oci) && !has(s.source.git) && s.source.oci == \"{{APPROVED_CONTENT_REGISTRY}}/reviewed-kb-aks-bootstrap@sha256:99872678014bef62bc8709ae30342246f7616d7f20d695b8a16500d3c54c1e2b\"
+        && has(s.source.path) && s.source.path == \"skill\")) && self.all(s, self.filter(t, t.name ==
+        s.name).size() == 1)" immutable=true'
+      tools: '[]ApprovedTool | default=[{"mcp":{"server":{"kind":"RemoteMCPServer","name":"approved-mcp"},"tools":["get_demo_status"]}}]
+        maxItems=1 validation="self.all(t, has(t.mcp) && has(t.mcp.server) && has(t.mcp.tools) && t.mcp.tools.size()
+        > 0 && ((t.mcp.server.kind == \"RemoteMCPServer\" && t.mcp.server.name == \"approved-mcp\" &&
+        t.mcp.tools.all(op, op in [\"get_demo_status\"]) && true)) && t.mcp.tools.all(op, t.mcp.tools.filter(other,
+        other == op).size() == 1)) && self.all(t, self.filter(other, other.mcp.server.name == t.mcp.server.name).size()
+        == 1)" immutable=true'
+      systemPrompt: string | maxLength=4096 immutable=true
+    status:
+      profile: ${schema.spec.profileRef}
+  resources:
+  - id: resource0
+    template:
+      apiVersion: api.kagent.dev/v1alpha3
+      kind: ModelConfig
+      metadata:
+        name: approved-model
+        namespace: ${schema.metadata.namespace}
+      spec:
+        apiKeySecret: secure-byo-mcp-token
+        apiKeySecretKey: token
+        model: kimi-for-coding
+        openAI:
+          apiFormat: chatCompletions
+          baseUrl: '{{APPROVED_CLUSTER_SERVICE_URL}}/v1'
+          maxTokens: 1200
+          timeout: 90
+        provider: OpenAI
+        stream: false
+  - id: resource1
+    template:
+      apiVersion: api.kagent.dev/v1alpha3
+      kind: Harness
+      metadata:
+        name: approved-harness
+        namespace: ${schema.metadata.namespace}
+      spec:
+        kagent: {}
+        substrate:
+          snapshotPolicy:
+            location: s3://ate-snapshots/kagent/
+          workerPoolRef:
+            name: approved-worker
+  - id: resource2
+    template:
+      apiVersion: api.kagent.dev/v1alpha3
+      kind: RemoteMCPServer
+      metadata:
+        name: approved-mcp
+        namespace: ${schema.metadata.namespace}
+      spec:
+        allowedNamespaces:
+          from: Same
+        description: Call-time authorized fixed synthetic status capability.
+        headersFrom:
+        - name: Authorization
+          valueFrom:
+            key: Authorization
+            name: secure-byo-mcp-token
+            type: Secret
+        protocol: STREAMABLE_HTTP
+        terminateOnClose: true
+        timeout: 15s
+        url: '{{APPROVED_CLUSTER_SERVICE_URL}}/mcp'
+  - id: resource3
+    template:
+      apiVersion: api.kagent.dev/v1alpha3
+      kind: AgentTemplate
+      metadata:
+        name: ${schema.metadata.name}-template
+        namespace: ${schema.metadata.namespace}
+      spec:
+        description: Reviewed skills, knowledge and fixed MCP rehearsal capability.
+        modelConfig: ${schema.spec.modelConfig}
+        skills: ${schema.spec.skills}
+        systemPrompt: '${has(schema.spec.systemPrompt) ? schema.spec.systemPrompt : schema.spec.instructions}'
+        tools: ${schema.spec.tools}
+  - id: resource4
+    template:
+      apiVersion: api.kagent.dev/v1alpha3
+      kind: Agent
+      metadata:
+        name: ${schema.metadata.name}
+        namespace: ${schema.metadata.namespace}
+      spec:
+        harnessRef:
+          name: approved-harness
+        template:
+          ref:
+            name: ${schema.metadata.name}-template
+    readyWhen:
+    - ${resource4.status.conditions.exists(c, c.type == "Accepted" && c.status == "True" && c.observedGeneration
+      == resource4.metadata.generation)}
+    - ${resource4.status.conditions.exists(c, c.type == "ResolvedRefs" && c.status == "True" && c.observedGeneration
+      == resource4.metadata.generation)}
+    - ${resource4.status.conditions.exists(c, c.type == "Compatible" && c.status == "True" && c.observedGeneration
+      == resource4.metadata.generation)}
+    - ${resource4.status.conditions.exists(c, c.type == "EgressPoliciesApplied" && c.status == "True"
+      && c.observedGeneration == resource4.metadata.generation)}
+    - ${resource4.status.conditions.exists(c, c.type == "Ready" && c.status == "True" && c.observedGeneration
+      == resource4.metadata.generation)}
+    - ${resource4.status.desiredRevision != "" && resource4.status.desiredRevision == resource4.status.latestSuccessfulRevision}
+  - id: resource5
+    template:
+      apiVersion: v1
+      data:
+        runtime.json: '{"agentName": "${schema.metadata.name}", "apiURL": "{{APPROVED_CLUSTER_SERVICE_URL}}",
+          "approvalName": "${schema.metadata.name}-approval", "dependencyNames": {"agenttemplates": "${schema.metadata.name}-template",
+          "harnesses": "approved-harness", "modelconfigs": "approved-model", "remotemcpservers": "approved-mcp"},
+          "gatewayURL": "{{APPROVED_CLUSTER_SERVICE_URL}}", "kagentBinary": "/usr/local/bin/kagent", "modelMaxTokens":
+          1200, "modelName": "kimi-for-coding", "namespace": "${schema.metadata.namespace}", "nativeUserID":
+          "secure-byo-lab-secure-byo-kro", "request": {"apiVersion": "kro.run/v1alpha1", "name": "${schema.metadata.name}",
+          "plural": "secureagents"}, "upstreamModelKeyFile": "/credentials/api-key", "upstreamModelURL":
+          "{{APPROVED_CLUSTER_SERVICE_URL}}/v1/chat/completions", "upstreamURL": "{{APPROVED_CLUSTER_SERVICE_URL}}"}'
+      kind: ConfigMap
+      metadata:
+        name: ${schema.metadata.name}-frontdoor
+        namespace: ${schema.metadata.namespace}
+  - id: resource6
+    template:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: ${schema.metadata.name}-frontdoor
+        namespace: ${schema.metadata.namespace}
+      spec:
+        ports:
+        - name: http
+          port: 8080
+          targetPort: 8080
+        selector:
+          app: secure-byo-frontdoor
+          secure-byo.platform/agent: ${schema.metadata.name}
+  - id: resource7
+    template:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: ${schema.metadata.name}-frontdoor
+        namespace: ${schema.metadata.namespace}
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: secure-byo-frontdoor
+            secure-byo.platform/agent: ${schema.metadata.name}
+        template:
+          metadata:
+            labels:
+              app: secure-byo-frontdoor
+              secure-byo.platform/agent: ${schema.metadata.name}
+          spec:
+            containers:
+            - env:
+              - name: HOME
+                value: /tmp
+              image: '{{APPROVED_SECURITY_FRONTDOOR_IMAGE_AT_DIGEST}}'
+              livenessProbe:
+                httpGet:
+                  path: /healthz
+                  port: 8080
+              name: frontdoor
+              ports:
+              - containerPort: 8080
+              readinessProbe:
+                httpGet:
+                  path: /healthz
+                  port: 8080
+              resources:
+                limits:
+                  cpu: 250m
+                  memory: 256Mi
+                requests:
+                  cpu: 25m
+                  memory: 32Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                  - ALL
+                readOnlyRootFilesystem: true
+              volumeMounts:
+              - mountPath: /credentials
+                name: upstream-key
+                readOnly: true
+              - mountPath: /config
+                name: config
+                readOnly: true
+              - mountPath: /tmp
+                name: tmp
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 65532
+              seccompProfile:
+                type: RuntimeDefault
+            serviceAccountName: secure-byo-runtime
+            volumes:
+            - name: upstream-key
+              secret:
+                secretName: secure-byo-model-token
+            - configMap:
+                name: ${schema.metadata.name}-frontdoor
+              name: config
+            - emptyDir:
+                sizeLimit: 32Mi
+              name: tmp
+    readyWhen:
+    - ${resource7.status.availableReplicas > 0}
+    - ${resource7.status.observedGeneration == resource7.metadata.generation}
+  - id: resource8
+    template:
+      apiVersion: gateway.networking.k8s.io/v1beta1
+      kind: ReferenceGrant
+      metadata:
+        name: ${schema.metadata.name}-frontdoor
+        namespace: ${schema.metadata.namespace}
+      spec:
+        from:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          namespace: secure-byo-gateway-system
+        to:
+        - group: ''
+          kind: Service
+          name: ${schema.metadata.name}-frontdoor

@@ -1,0 +1,64 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 4841,
+      "sha256": "eb58819560009dbe2fa622093805eb4885e8a8eb0c566c9e73db8047e87a7810"
+    },
+    {
+      "path": "SHOWCASE.html",
+      "bytes": 89019,
+      "sha256": "e83195946c69bea892a6136b9be26b166c66a77c3a3c36f1c8286b9202a44398"
+    },
+    {
+      "path": "evidence/live-composition-2026-11-04.json",
+      "bytes": 1294,
+      "sha256": "2df756b7f6cac7abd0f91180467c4e2e48bde49344fdf4943b7d202fd818401d"
+    },
+    {
+      "path": "evidence/review-status-2026-11-04.json",
+      "bytes": 923,
+      "sha256": "a1fbfa841873f7805528aaa2a3842a7c5d4a228a390e2327de72ba793adb6089"
+    },
+    {
+      "path": "examples/owner-binding.yaml",
+      "bytes": 211,
+      "sha256": "dbef99bb1abd1889415e39f924fe9d8f4b696eed4ff7510ba60a13e7fe624b68"
+    },
+    {
+      "path": "examples/owner-policy.yaml",
+      "bytes": 2234,
+      "sha256": "8ef1380071938094efcf1598bba831fe618f5bb2909bf05405527078b8840cda"
+    },
+    {
+      "path": "examples/platform-profile.json",
+      "bytes": 9258,
+      "sha256": "a2dc718d85a17f82d7e88e048b4a1d950a481efa95952ff2fd01b5ecb6d9833a"
+    },
+    {
+      "path": "examples/resourcegraphdefinition.yaml",
+      "bytes": 10863,
+      "sha256": "fc17f8419f098423228a5cc281a72c3a83e25fc331ecaad13a722b47331d751f"
+    },
+    {
+      "path": "examples/secure-agent.yaml",
+      "bytes": 787,
+      "sha256": "074b2efd2c8fa28f4fe36a77a22c42587e6bcd03e29192df2973b004b4926765"
+    },
+    {
+      "path": "owner_schema.py",
+      "bytes": 23195,
+      "sha256": "4ba26b05dcbd7698f7dabfdac888487508c422b914d37e50e1b608c83b668d1c"
+    },
+    {
+      "path": "render.py",
+      "bytes": 1128,
+      "sha256": "0e7ee27e4b6432a943a78d5d747b5ec108bd3d96ccb201c8ad5e6c9e73d6c264"
+    },
+    {
+      "path": "tests/test_contract.py",
+      "bytes": 1949,
+      "sha256": "bbbab299d63d249f48f03030e056afd7e6abe20288593d6681dd672767e73e68"
+    }
+  ]
+}

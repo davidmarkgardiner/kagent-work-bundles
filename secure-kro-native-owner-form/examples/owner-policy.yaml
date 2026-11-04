@@ -1,0 +1,39 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: secure-byo-kro-owner-contract
+spec:
+  failurePolicy: Fail
+  matchConditions:
+  - name: protected-namespace
+    expression: request.namespace == "secure-byo-kro"
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - kro.run
+      apiVersions:
+      - v1alpha1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - secureagents
+  validations:
+  - expression: object.metadata.namespace == "secure-byo-kro" && object.metadata.name == "demo"
+    message: This graph supports only the protected secure-byo-kro/demo instance.
+  - expression: oldObject == null || object.spec == oldObject.spec
+    message: Owner intent is immutable; platform migration is required to change an existing instance.
+  - expression: object.spec.skills.all(s, (has(s.source) && s.name == "aks-known-issues" && has(s.source.oci)
+      && !has(s.source.git) && s.source.oci == "{{APPROVED_CONTENT_REGISTRY}}/reviewed-aks-known-issues@sha256:84b5a6a8f85db941e2ec588016e0b48d4906bcf4001f45f6ebcc33a2075a34fc"
+      && has(s.source.path) && s.source.path == "skill") || (has(s.source) && s.name == "kb-aks-bootstrap"
+      && has(s.source.oci) && !has(s.source.git) && s.source.oci == "{{APPROVED_CONTENT_REGISTRY}}/reviewed-kb-aks-bootstrap@sha256:99872678014bef62bc8709ae30342246f7616d7f20d695b8a16500d3c54c1e2b"
+      && has(s.source.path) && s.source.path == "skill")) && object.spec.skills.all(s, object.spec.skills.filter(t,
+      t.name == s.name).size() == 1)
+    message: Skills must exactly match approved immutable source entries.
+  - expression: object.spec.tools.all(t, has(t.mcp) && has(t.mcp.server) && has(t.mcp.tools) && t.mcp.tools.size()
+      > 0 && ((t.mcp.server.kind == "RemoteMCPServer" && t.mcp.server.name == "approved-mcp" && t.mcp.tools.all(op,
+      op in ["get_demo_status"]) && true)) && t.mcp.tools.all(op, t.mcp.tools.filter(other, other == op).size()
+      == 1)) && object.spec.tools.all(t, object.spec.tools.filter(other, other.mcp.server.name == t.mcp.server.name).size()
+      == 1)
+    message: MCP selections must name an approved server and explicit permitted operations without relaxing
+      approval.

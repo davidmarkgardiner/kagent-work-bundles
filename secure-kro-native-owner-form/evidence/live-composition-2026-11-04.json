@@ -1,0 +1,49 @@
+{
+  "observedAtUTC": "2026-11-04T10:59:31.515582+00:00",
+  "scope": "Live KRO compilation, native field materialization and server admission; no new inference or access-lease claim",
+  "existingMigrationRetainsLegacyFields": true,
+  "checks": [
+    {
+      "check": "approved-owner",
+      "expectedAllowed": true,
+      "allowed": true,
+      "passed": true
+    },
+    {
+      "check": "unapproved-model",
+      "expectedAllowed": false,
+      "allowed": false,
+      "passed": true
+    },
+    {
+      "check": "unapproved-tool",
+      "expectedAllowed": false,
+      "allowed": false,
+      "passed": true
+    },
+    {
+      "check": "all-tools-shortcut",
+      "expectedAllowed": false,
+      "allowed": false,
+      "passed": true
+    },
+    {
+      "check": "unknown-url-field",
+      "expectedAllowed": false,
+      "allowed": false,
+      "passed": true
+    }
+  ],
+  "kro": "0.9.4",
+  "kagent": "1.0.0-alpha17",
+  "rgdGeneration": 8,
+  "requestGeneration": 2,
+  "nativeTemplateGeneration": 3,
+  "nativeDesiredRevision": "fb59315926f8b1a8a70f83d56e436a44671daf0172d11098fcf0d1cb32d165c8",
+  "sourceUnitTests": 17,
+  "rgdCompiledReady": true,
+  "nativeAgentReady": true,
+  "nativeModelSkillToolPromptMaterialized": true,
+  "providerInferenceRetested": false,
+  "entraImplemented": false
+}
