@@ -1,10 +1,10 @@
 # Recover after an incorrect PeerAuthentication revision label
 
-**Revision confirmation is pending.** A later request mentioned reversing to `1-23`, which conflicts with the earlier recovery target below. Confirm the intended revision before running numeric patch commands. See [the README confirmation and Flux pause/resume procedure](README.md#confirm-the-revision-before-any-patch). This runbook's `1-23 -> 1-29` examples apply only if `1-29` is confirmed.
+**The requested direction is now confirmed as `1-29 -> 1-23`.** This supersedes the earlier opposite-direction examples. See [the README](README.md#confirm-the-revision-before-any-patch) for current commands and Flux pause/resume steps.
 
-Use this process for the reported `PeerAuthentication` label correction **1-23 -> 1-29**, after stopping the offending Kyverno mutation through GitOps.
+Use this process after stopping the offending Kyverno mutation. Confirm `1-23` is the correct configured control-plane revision for the affected policies. Installed Istio was previously reported as version 1.29; if the actual istiod revision is still `1-29`, a policy labelled `1-23` may be ignored by it. No healthy target revision has been verified here.
 
-The installed Istio is reported as 1.29. Confirm the actual configured control-plane revision is exactly `1-29`. This process corrects `metadata.labels["istio.io/rev"]` on identified policies. It does not downgrade Istio or change namespace injection labels.
+This process changes only `metadata.labels["istio.io/rev"]` on identified PeerAuthentications. It does not downgrade Istio or change namespace injection labels.
 
 **Do not restart every Deployment across the cluster as an automatic recovery step.** First patch the policy, verify propagation and test application traffic. Use the conditional restart procedure below only when evidence supports it.
 
@@ -38,7 +38,7 @@ kubectl --context "$WORK_CONTEXT" -n "$CONTROL_PLANE_NAMESPACE" \
 
 Inspect the saved policy and confirm the bad value is the metadata revision label. Preserve its complete spec, including mTLS mode, port overrides and workload selector. If the wrong field is inside `spec.selector`, stop and prepare a different patch.
 
-Inspect the installed istiod image, configured revision and affected proxies' control-plane connection. An image version of 1.29 alone does not prove the revision string is `1-29`. If your installation uses different istiod labels, use its actual Deployment name to collect that evidence.
+Inspect the installed istiod image, configured revision and affected proxies' control-plane connection. An image version of 1.29 alone does not prove the revision string is `1-23`. If your installation uses different istiod labels, use its actual Deployment name to collect that evidence.
 
 Identify every affected policy explicitly. A policy without a selector in the mesh root namespace can affect the whole mesh. A namespace-scoped policy can affect multiple Deployments. Do not infer the affected set from the policy name alone.
 
@@ -48,9 +48,9 @@ Identify every affected policy explicitly. A policy without a selector in the me
 2. Disable or correct that rule through the existing delivery process. Preserve unrelated security rules.
 3. Confirm reconciliation completed and the live rule is corrected or absent. If removing a policy, confirm pruning actually removed it.
 4. Include admission mutation and mutate-existing background processing. Review outstanding background work that could restore the bad label.
-5. Set the affected PeerAuthentication's desired GitOps metadata revision label to `1-29`.
+5. Set the affected PeerAuthentication's desired GitOps metadata revision label to `1-23`.
 
-Changing validation to Audit or setting `background: false` does not generally disable admission mutation. Do not proceed while an active reconciler keeps restoring `1-23`.
+Changing validation to Audit or setting `background: false` does not generally disable admission mutation. Do not proceed while an active reconciler keeps restoring `1-29`.
 
 If GitOps already corrected the stored policy, the script reports an already-correct label and performs no write. Continue with verification.
 
@@ -62,7 +62,7 @@ Run the preview from the bundle directory. Requires Bash, kubectl and jq.
 
 ```bash
 bash patch-peerauthentication-revision.sh \
-  "$WORK_CONTEXT" "$POLICY_NAMESPACE" "$POLICY_NAME" '1-23' '1-29'
+  "$WORK_CONTEXT" "$POLICY_NAMESPACE" "$POLICY_NAME" '1-29' '1-23'
 ```
 
 Inspect the printed plan and private evidence directory. The dry-run must preserve the complete policy spec and return the desired revision label.
@@ -71,14 +71,14 @@ Apply the correction with the same inputs:
 
 ```bash
 bash patch-peerauthentication-revision.sh \
-  "$WORK_CONTEXT" "$POLICY_NAMESPACE" "$POLICY_NAME" '1-23' '1-29' --apply
+  "$WORK_CONTEXT" "$POLICY_NAMESPACE" "$POLICY_NAME" '1-29' '1-23' --apply
 ```
 
 The script tests the UID, resourceVersion and current bad label, then replaces only that label. It reads the policy back and checks the desired label and unchanged spec. Record the printed evidence directory in the private incident record.
 
-Repeat only for the explicitly identified affected policies. If every policy labelled `1-23` should target `1-29`, use [the reviewed cluster-wide loop](README.md#loop-over-matching-policies-across-all-namespaces-1-23-to-1-29). Confirm every match, including mesh-root policies, before applying. The loop stops on the first failure and does not undo earlier successful patches. The script handles one named policy per invocation. It is a shell script, not a Kubernetes Job. If your organisation requires a Job, use the existing approved runner and reviewed identity; do not grant cluster-wide patch or restart access to run this script.
+Repeat only for the explicitly identified affected policies. If every policy labelled `1-29` should target `1-23`, use [the reviewed cluster-wide loop](README.md#loop-over-matching-policies-across-all-namespaces-1-29-to-1-23). Confirm every match, including mesh-root policies, before applying. The loop stops on the first failure and does not undo earlier successful patches. The script handles one named policy per invocation. It is a shell script, not a Kubernetes Job. If your organisation requires a Job, use the existing approved runner and reviewed identity; do not grant cluster-wide patch or restart access to run this script.
 
-If the script stops, inspect its evidence before another attempt. A post-write failure means a write may already have occurred. There is no automatic retry or undo into `1-23`.
+If the script stops, inspect its evidence before another attempt. A post-write failure means a write may already have occurred. There is no automatic retry or undo into `1-29`.
 
 ## 4. Verify stored state and effective policy
 
@@ -90,12 +90,12 @@ kubectl --context "$WORK_CONTEXT" -n "$POLICY_NAMESPACE" \
   > "$INCIDENT_EVIDENCE/policy-after.yaml"
 ```
 
-Confirm the revision remains `1-29` across the relevant GitOps and background reconciliation cycle. Confirm the mTLS mode, port overrides and selector match the before evidence.
+Confirm the revision remains `1-23` across the relevant GitOps and background reconciliation cycle. Confirm the mTLS mode, port overrides and selector match the before evidence.
 
 Use the matching Istio CLI to inspect control-plane sync and representative affected proxies:
 
 ```bash
-istioctl --context "$WORK_CONTEXT" --revision '1-29' proxy-status \
+istioctl --context "$WORK_CONTEXT" --revision '1-23' proxy-status \
   > "$INCIDENT_EVIDENCE/proxy-status-after.txt"
 
 istioctl --context "$WORK_CONTEXT" -n "$WORKLOAD_NAMESPACE" \

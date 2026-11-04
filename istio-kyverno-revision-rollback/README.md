@@ -6,9 +6,9 @@ Follow the complete operational sequence in [INCIDENT-RECOVERY-PROCESS.md](INCID
 
 ## Confirm the revision before any patch
 
-**The latest request mentioned changing back to `1-23`. That conflicts with the earlier report that `1-23` caused the incident and installed Istio is 1.29. The target revision is awaiting operator confirmation.** The numeric examples later in this bundle describe the earlier `1-23 -> 1-29` recovery, not confirmation that either direction is now approved to execute.
+**The operator has explicitly confirmed the requested direction as `1-29 -> 1-23`. All active patch examples below now use that direction.** This replaces the earlier `1-23 -> 1-29` instructions.
 
-Check the actual configured istiod revision and the intended policy scope. Set the observed wrong value and confirmed target explicitly. Do not infer a policy revision from the image version alone.
+Verify that `1-23` is the correct configured control-plane revision for the affected policies. Istio was previously reported as installed version 1.29. A version number and configured revision are different values. If istiod is configured only as `1-29`, changing the policy label to `1-23` may exclude the policy from that control plane. This patch does not install or downgrade Istio, and no healthy `1-23` control plane has been verified here.
 
 ## Follow this recovery order
 
@@ -70,25 +70,25 @@ bash patch-peerauthentication-revision.sh \
   'OBSERVED_WRONG_REV' 'CONFIRMED_TARGET_REV' --apply
 ```
 
-If the actual target remains `1-29`, substitute bad revision `1-23` and target `1-29`. If the operator intentionally chooses `1-23`, first establish that it is the correct configured policy revision for the affected control plane. Do not reverse the arguments merely to suppress an error.
+The current requested arguments are observed revision `1-29` and target revision `1-23`. Do not reverse them merely to suppress an error.
 
 The script only patches one named PeerAuthentication. It does not disable Flux, disable Kyverno, create a Job, restart workloads or reboot nodes.
 
-## Direct command with hardcoded revisions: 1-23 to 1-29
+## Direct command with hardcoded revisions: 1-29 to 1-23
 
-**Run this only if the confirmed recovery target is `1-29`.** A later request mentioned reversing to `1-23`; that direction remains unconfirmed. Do not run this example if `1-23` is the intended target.
+**The operator-requested recovery target is now `1-23`.** Confirm that revision is correct for the affected policies before applying.
 
 First stop the offending live Kyverno mutation and, if manual repair requires it, pause the specific Flux owners using the procedure above. Save the current policy as private incident evidence. Replace `WORK_CONTEXT`, `POLICY_NAMESPACE` and `POLICY_NAME` with the actual values.
 
-The command tests that the current metadata revision label is `1-23`, then replaces only that label with `1-29`:
+The command tests that the current metadata revision label is `1-29`, then replaces only that label with `1-23`:
 
 ```bash
 kubectl --context 'WORK_CONTEXT' -n 'POLICY_NAMESPACE' \
   patch peerauthentications.security.istio.io 'POLICY_NAME' \
   --type=json \
   -p='[
-    {"op":"test","path":"/metadata/labels/istio.io~1rev","value":"1-23"},
-    {"op":"replace","path":"/metadata/labels/istio.io~1rev","value":"1-29"}
+    {"op":"test","path":"/metadata/labels/istio.io~1rev","value":"1-29"},
+    {"op":"replace","path":"/metadata/labels/istio.io~1rev","value":"1-23"}
   ]'
 ```
 
@@ -100,13 +100,13 @@ kubectl --context 'WORK_CONTEXT' -n 'POLICY_NAMESPACE' \
   -o jsonpath='{.metadata.labels.istio\.io/rev}{"\n"}'
 ```
 
-Expected output is `1-29`. If the JSON Patch test fails, inspect the current object before another action. Do not remove the test or reverse the values merely to make the command succeed.
+Expected output is `1-23`. If the JSON Patch test fails, inspect the current object before another action. Do not remove the test or reverse the values merely to make the command succeed.
 
 This direct command does not save evidence, dry-run admission, check resourceVersion, or compare the spec after the write. Use the bundled script above when those additional checks are required. In both cases, verify the effective mTLS policy and application traffic before considering a targeted restart. Do not reboot nodes or restart every Deployment for this label correction.
 
-## Loop over matching policies across all namespaces: 1-23 to 1-29
+## Loop over matching policies across all namespaces: 1-29 to 1-23
 
-**Use this only after confirming that every matched policy should target `1-29`.** If the target is still uncertain, or some policies intentionally belong to `1-23`, use individual named-policy patches instead. A mesh-root policy may affect the whole mesh.
+**Use this only after confirming that every matched policy should target `1-23`.** If some policies intentionally belong to `1-29`, use individual named-policy patches instead. A mesh-root policy may affect the whole mesh.
 
 First stop the offending Kyverno admission and mutate-existing mutation. Pause the relevant Flux owners if manual repair requires it, and account for their parent reconcilers. The loop does not perform those containment steps.
 
@@ -116,7 +116,7 @@ From the bundle directory, replace `WORK_CONTEXT` and preview all policies that 
 CTX='WORK_CONTEXT'
 
 kubectl --context "$CTX" get peerauthentications.security.istio.io \
-  -A -l 'istio.io/rev=1-23'
+  -A -l 'istio.io/rev=1-29'
 ```
 
 Review every namespace and policy name. The apply command queries the matching set again, so include any changes since the preview in the incident review. Run in the same Bash session:
@@ -127,13 +127,13 @@ Review every namespace and policy name. The apply command queries the matching s
   : "${CTX:?Set CTX to the work context first}"
 
   kubectl --context "$CTX" get peerauthentications.security.istio.io \
-    -A -l 'istio.io/rev=1-23' -o json |
+    -A -l 'istio.io/rev=1-29' -o json |
   jq -r '.items[] | [.metadata.namespace, .metadata.name] | @tsv' |
   while IFS=$'\t' read -r ns name; do
-    echo "Patching PeerAuthentication $ns/$name: 1-23 -> 1-29"
+    echo "Patching PeerAuthentication $ns/$name: 1-29 -> 1-23"
 
     bash ./patch-peerauthentication-revision.sh \
-      "$CTX" "$ns" "$name" '1-23' '1-29' --apply
+      "$CTX" "$ns" "$name" '1-29' '1-23' --apply
   done
 )
 ```
@@ -142,30 +142,30 @@ Requires the local `patch-peerauthentication-revision.sh`, Bash, kubectl and jq.
 
 The loop stops on the first failure. Earlier successful patches remain applied. There is no batch rollback or automatic retry. Keep each printed evidence directory in the private incident record. A failed post-write check means the current policy may also have been changed.
 
-Read back any remaining `1-23` labels:
+Read back any remaining `1-29` labels:
 
 ```bash
 kubectl --context "$CTX" get peerauthentications.security.istio.io \
-  -A -l 'istio.io/rev=1-23'
+  -A -l 'istio.io/rev=1-29'
 ```
 
 No matching objects is only a label inventory result. Verify effective policy, authenticated mTLS and application traffic for the affected paths, then confirm the correction survives reconciliation. The loop does not restart Deployments, reboot nodes or resume Flux.
 
 ## Patch matching policies using the current kube context
 
-Use this kubectl-only command for the confirmed **1-23 -> 1-29** correction in the cluster you are already logged into. It needs no Flux CLI, jq or local patch script. Stop the offending Kyverno mutation first and pause the relevant Flux owners if required. Confirm every matched policy should target `1-29`, including mesh-root policies. If you actually intend `1-23`, do not run this command.
+Use this kubectl-only command for the confirmed **1-29 -> 1-23** correction in the cluster you are already logged into. It needs no Flux CLI, jq or local patch script. Stop the offending Kyverno mutation first and pause the relevant Flux owners if required. Confirm every matched policy should target `1-23`, including mesh-root policies.
 
 ```bash
 (
   set -euo pipefail
   kubectl get peerauthentications.security.istio.io -A \
-    -l 'istio.io/rev=1-23' \
+    -l 'istio.io/rev=1-29' \
     -o jsonpath='{range .items[*]}{.metadata.namespace}{"\t"}{.metadata.name}{"\n"}{end}' |
   while read -r ns name; do
     kubectl -n "$ns" patch peerauthentications.security.istio.io "$name" \
       --type=json -p='[
-        {"op":"test","path":"/metadata/labels/istio.io~1rev","value":"1-23"},
-        {"op":"replace","path":"/metadata/labels/istio.io~1rev","value":"1-29"}
+        {"op":"test","path":"/metadata/labels/istio.io~1rev","value":"1-29"},
+        {"op":"replace","path":"/metadata/labels/istio.io~1rev","value":"1-23"}
       ]'
   done
 )
@@ -191,11 +191,11 @@ Check reconciliation health, then repeat the policy-label and application mTLS c
 
 For conditional canary restart commands, follow [step 6 of the incident process](INCIDENT-RECOVERY-PROCESS.md#6-restart-one-deployment-only-if-evidence-requires-it). Do not reboot nodes or restart every Deployment as part of this label-only correction.
 
-## Earlier confirmed incident direction and evidence
+## Superseded directions
 
-**Corrected operator report:** the installed Istio is 1.29. A `PeerAuthentication` was incorrectly labelled `istio.io/rev: "1-23"`. The intended correction is **1-23 -> 1-29 on that policy's metadata label**. This supersedes the initial namespace/proxy downgrade hypothesis. The old `rollback-one-deployment.sh` now refuses execution. Do not run the earlier commit's namespace rollback for this incident.
+The current operator-requested policy correction is **1-29 -> 1-23**. Earlier messages and earlier Git commits used the opposite direction. Do not use those old commands for this request. The old namespace rollback entrypoint remains disabled; this change concerns PeerAuthentication metadata labels only.
 
-The label key is assumed to be `metadata.labels["istio.io/rev"]`; confirm that from the actual object. A different field, such as `spec.selector.matchLabels`, requires a different patch. Verify the actual istiod revision is literally `1-29`, rather than deriving it from the binary version. Policy metadata labels are filtered against the configured control-plane revision; a sidecar injection tag is not automatically interchangeable with that revision here.
+Confirm the actual label key is `metadata.labels["istio.io/rev"]`. A change inside `spec.selector.matchLabels` needs a different patch. Preserve existing mTLS mode, port overrides and workload selector.
 
 ## Script checks and private evidence
 
@@ -215,9 +215,9 @@ Use the approved application test through the affected client/server path. Check
 
 The reported encryption impact remains unverified here. A revision mismatch can exclude the intended policy, but does not by itself prove all traffic became plaintext. No work cluster was accessed or changed. Do not restart applications as an automatic first step for this configuration-only correction.
 
-## Reproduce the reported mutation offline
+## Historical offline evidence from the earlier direction
 
-Never apply these fixture policies to production.
+These retained fixtures and evidence demonstrate the earlier, opposite correction `1-23 -> 1-29`. They have not been rerun or relabelled as proof for the newly requested target `1-23`. The patch script accepts explicit bad and good revision arguments. Never apply these fixture policies to production.
 
 ```bash
 bash reproduce-offline.sh
