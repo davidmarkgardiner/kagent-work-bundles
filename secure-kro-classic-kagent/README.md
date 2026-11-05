@@ -20,6 +20,12 @@ inspection, presenter notes and complete landscape printing. It opens offline
 as one file. Use that deck for the architecture story and the existing detailed
 YAML explorer/terminal walkthrough for the actual configuration and live proof.
 
+The [three-chapter presentation guide](PRESENTATIONS.md) adds separate
+[secure-agent journey](journey.html), [SRE triage/application recovery](triage.html)
+and [SDLC delivery](sdlc.html) decks. Each has six slides and links to the other
+chapters. The kinetic decks now offer **Repeat after: Off / 3 / 5 / 10 seconds**
+for the current flow. All new examples are synthetic; no animation is live proof.
+
 [NEXT-STEPS.md](NEXT-STEPS.md) records the Entra ID/UAMI iteration, Gateway
 telemetry and token-usage evidence, tool and network acceptance tests, and the
 later UI or builder-agent path. The current runtime remains non-Substrate.

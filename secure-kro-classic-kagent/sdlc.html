@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="icon" href="data:,">
+<title>Bounded agent-assisted software delivery | Interactive architecture</title>
+<style>
+:root {
+  --surface:#ffffff;
+  --backdrop:#e7e6e2;
+  --text:#141414;
+  --body-text:#383838;
+  --muted:#666462;
+  --border:#e3e1dc;
+  --panel:#f6f5f2;
+  --accent:#e60000;
+  --link:#1f5fa6;
+  --link-tint:#e9f0f9;
+  --positive:#17804a;
+  --positive-tint:#e5f3eb;
+  --reference:#9a5c12;
+  --reference-tint:#fdf0dc;
+  --font:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --code-font:ui-monospace,Consolas,monospace;
+  --panel-radius:16px;
+  --node-radius:12px;
+  --layout-gap:24px;
+  --enter-duration:450ms;
+  --packet-duration:850ms;
+  --scale:1;
+}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:var(--font);color:var(--text);background:var(--backdrop)}body{height:100dvh;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:18px 24px 100px}button,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,pre:focus-visible{outline:3px solid var(--link);outline-offset:4px}button:disabled{cursor:default;opacity:.38}button:focus:not(:focus-visible){outline:none}[hidden]{display:none!important}#stage{position:relative;flex:none;background:var(--surface)}#canvas{position:relative;width:1600px;height:900px;transform:scale(var(--scale));transform-origin:top left;background:var(--surface)}.slide{position:absolute;inset:0;width:1600px;height:900px;padding:40px 56px;background:var(--surface)}.accent-rule{width:64px;height:5px;background:var(--accent);margin-bottom:25px}.eyebrow{font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}h1{font-size:48px;font-weight:720;line-height:1.12;letter-spacing:-.025em;margin:17px 0 13px;max-width:1480px}p.intro{font-size:22px;line-height:1.4;color:var(--body-text);margin:0;max-width:1440px}.slide-topline{position:absolute;right:56px;top:42px;font-size:13px;color:var(--muted);display:flex;gap:15px;align-items:center}.illustration-label{border:1px solid var(--border);padding:5px 10px;border-radius:4px;background:var(--panel);letter-spacing:.035em;font-size:12px}.content{position:absolute;top:240px;left:56px;width:1488px}.interaction-row{display:flex;align-items:center;justify-content:space-between;min-height:32px;gap:20px;margin-bottom:9px}.scenario-group{display:flex;gap:calc(var(--layout-gap) / 3);flex-wrap:wrap}.scenario{border:1px solid var(--border);background:var(--surface);color:var(--body-text);border-radius:6px;padding:8px 12px;font-size:15px}.scenario[aria-pressed=true]{color:var(--link);border-color:var(--link);background:var(--link-tint)}.diagram-hint{font-size:14px;color:var(--muted)}.mobile-hint{display:none}.diagram-scroll{overflow:visible}.diagram{position:relative;width:1488px;height:450px;border:1px solid var(--border);border-radius:var(--panel-radius);background:var(--surface)}.connections{position:absolute;inset:0;width:1488px;height:450px;overflow:visible;pointer-events:none}.route{fill:none;stroke:var(--link);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.route.reference{stroke:var(--reference);stroke-dasharray:8 7}.route.red{stroke:var(--accent)}.route.inactive{opacity:.14}.edge-label{font:16px var(--font);fill:var(--muted);text-anchor:middle;paint-order:stroke;stroke:var(--surface);stroke-width:6;stroke-linejoin:round}.edge-label.red{fill:var(--accent)}.edge-label.reference{fill:var(--reference)}.edge-label.inactive{opacity:.2}.packet{pointer-events:none}.stop-mark{stroke:var(--accent);stroke-width:3;stroke-linecap:round}.stop-mark.inactive{opacity:.12}.node{position:absolute;text-align:left;display:flex;flex-direction:column;justify-content:center;padding:22px;background:var(--panel);border:1px solid var(--border);border-radius:var(--node-radius);color:var(--text);transition:border-color 140ms,box-shadow 140ms}.node:hover{border-color:var(--link);box-shadow:0 0 0 2px var(--link-tint)}.node-top{display:flex;align-items:center;gap:11px;margin-bottom:12px}.node svg{width:30px;height:30px;flex:0 0 30px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.node h2{font-size:22px;line-height:1.2;letter-spacing:-.015em;margin:0;font-weight:680}.node p{font-size:16px;line-height:1.4;color:var(--body-text);margin:0}.node.dark{background:var(--text);border-color:var(--text);color:var(--surface)}.node.dark p{color:var(--surface)}.node.blue{background:var(--link-tint);border-color:var(--link);color:var(--link)}.node.reference{background:var(--reference-tint);border-color:var(--reference);color:var(--reference)}.node.compact{padding:11px 18px}.node.compact .node-top{margin-bottom:5px;gap:9px}.node.compact h2{font-size:18px}.node.compact svg{height:24px;width:24px;flex-basis:24px}.node.compact p{font-size:14px}.node.code-node{justify-content:flex-start;padding:23px;background:var(--panel)}.node.code-node .node-top{margin-bottom:8px}.inline-code{font:15px/1.7 var(--code-font);white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;margin:10px 0 0;color:var(--body-text)}.node .inspect-hint{font-size:12px;color:var(--muted);margin-top:auto;padding-top:12px}.legend-row{display:flex;justify-content:space-between;align-items:center;gap:25px;margin-top:12px;font-size:14px;color:var(--muted)}.legend{display:flex;gap:20px;align-items:center}.legend span{display:flex;align-items:center;gap:8px}.legend i{display:inline-block;width:35px;border-top:2px solid var(--link)}.legend i.dashed{border-top:2px dashed var(--reference)}.status{font-size:14px;line-height:1.4;max-width:980px;color:var(--body-text);min-height:20px}.strips{position:absolute;left:16px;right:16px;bottom:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.strip{background:var(--panel);border:1px solid var(--border);padding:12px 16px;border-radius:8px;min-width:0}.strip strong{display:block;font-size:17px;line-height:1.3;margin-bottom:3px}.strip p{font-size:14px;line-height:1.35;color:var(--body-text);margin:0}.takeaway{position:absolute;left:56px;right:56px;bottom:50px;min-height:57px;display:flex;align-items:center;gap:18px;padding:15px 19px;border-left:4px solid var(--link);background:var(--link-tint);font-size:20px;line-height:1.4;color:var(--text)}.takeaway strong{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--link);white-space:nowrap}.deck-link{color:var(--link);text-underline-offset:3px}.slide-footer{position:absolute;bottom:20px;left:56px;right:56px;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:13px}.toolbar{position:fixed;bottom:17px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:10px;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:9px 12px;max-width:calc(100vw - 24px)}.toolbar button{border:1px solid var(--border);background:var(--surface);border-radius:6px;padding:9px 13px;color:var(--body-text);font-size:14px;white-space:nowrap}.toolbar button:hover{background:var(--link-tint);color:var(--link);border-color:var(--link)}.repeat-control{display:flex;align-items:center;gap:7px;font-size:12px;white-space:nowrap;color:var(--muted)}.repeat-control select{border:1px solid var(--border);background:var(--surface);color:var(--body-text);border-radius:6px;padding:9px 5px;font-size:13px}.repeat-control select:disabled{opacity:.5}.toolbar .primary{background:var(--link);border-color:var(--link);color:var(--surface)}.toolbar .primary:hover{background:var(--link);color:var(--surface)}#slideCounter{min-width:72px;text-align:center;font-size:14px;color:var(--muted);white-space:nowrap}.keyboard-help{font-size:11px;color:var(--muted);text-align:center;position:fixed;bottom:1px;left:0;right:0;pointer-events:none}.print-note{display:none}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}dialog{border:1px solid var(--border);border-radius:var(--panel-radius);background:var(--surface);color:var(--text);padding:26px;width:min(900px,calc(100vw - 40px));max-height:calc(100dvh - 40px);overflow:auto}dialog::backdrop{background:rgba(20,20,20,.38)}dialog h2{font-size:27px;letter-spacing:-.02em;margin:0 0 18px}dialog label{display:block;font-size:14px;font-weight:650}dialog select{display:block;margin:8px 0 14px;width:100%;padding:11px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text)}.source-meta{font-size:13px;color:var(--reference);margin:0 0 12px}.source-code{max-height:53dvh;overflow:auto;border:1px solid var(--border);border-radius:8px;background:var(--panel);padding:18px;white-space:pre;font:14px/1.6 var(--code-font);color:var(--body-text);margin:0}.dialog-buttons{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}.dialog-buttons button{border:1px solid var(--border);background:var(--surface);border-radius:6px;padding:10px 15px}.dialog-buttons .primary{background:var(--link);border-color:var(--link);color:var(--surface)}#copyStatus{font-size:13px;min-height:20px;margin:10px 0 0;color:var(--body-text)}#notesText{white-space:pre-line;line-height:1.7;color:var(--body-text);font-size:17px}#notesTitle{margin-bottom:12px}.reference-note{font-size:14px;color:var(--muted);line-height:1.5}
+@media(max-width:899px){html,body{height:auto;min-height:100%;overflow:visible}body{display:block;padding:14px 12px 190px}#stage{width:100%!important;height:auto!important}#canvas{width:100%;height:auto;transform:none}.slide{position:relative;inset:auto;width:100%;height:auto;min-height:0;padding:28px 24px}.accent-rule{margin-bottom:20px;width:54px;height:4px}.eyebrow{font-size:11px;max-width:65%}.slide-topline{top:28px;right:24px;gap:0}.slide-topline .version{display:none}.illustration-label{font-size:10px;padding:4px 6px}h1{font-size:32px;line-height:1.12;margin:22px 0 14px}p.intro{font-size:18px;line-height:1.5}.content{position:static;width:auto;margin-top:24px}.interaction-row{display:block;margin-bottom:14px}.scenario-group{gap:7px}.scenario{padding:8px 9px;font-size:13px}.diagram-hint{margin-top:12px;font-size:12px}.mobile-hint{display:block;color:var(--link);font-size:12px;margin:12px 0 8px}.diagram-scroll{overflow-x:auto;overflow-y:hidden;border-radius:var(--panel-radius);border:1px solid var(--border);max-width:100%;overscroll-behavior-x:contain}.diagram{border:0;border-radius:0}.legend-row{display:block;margin-top:16px}.legend{gap:13px;flex-wrap:wrap;font-size:12px;margin-bottom:12px}.legend i{width:25px}.status{font-size:14px;min-height:0}.takeaway{position:static;margin-top:24px;display:block;min-height:0;padding:16px;font-size:17px}.takeaway strong{display:block;margin-bottom:7px}.slide-footer{position:static;display:block;font-size:11px;margin-top:24px}.slide-footer span{display:block;margin-top:6px}.toolbar{left:8px;right:8px;bottom:17px;transform:none;max-width:none;flex-wrap:wrap;padding:8px;gap:7px}.toolbar button{padding:8px 10px;font-size:12px}#slideCounter{min-width:55px;font-size:12px}.keyboard-help{font-size:9px;background:var(--backdrop);bottom:2px}.source-code{font-size:12px;max-height:50dvh}dialog{padding:20px}dialog h2{font-size:23px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@page{size:1600px 900px;margin:0}
+@media print{html,body{margin:0!important;padding:0!important;width:1600px!important;height:auto!important;min-height:0!important;overflow:visible!important;background:var(--surface)!important;display:block!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}#stage{position:static!important;display:block!important;width:1600px!important;height:auto!important;margin:0!important;border:0!important}#canvas{width:1600px!important;height:auto!important;transform:none!important;position:static!important;display:block!important}.slide,.slide[hidden]{display:block!important;position:relative!important;inset:auto!important;width:1600px!important;height:900px!important;min-height:900px!important;padding:40px 56px!important;break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid}.slide:last-child{break-after:auto;page-break-after:auto}.toolbar,.keyboard-help,dialog,dialog::backdrop,.scenario-group,.diagram-hint,.mobile-hint,.packet,.inspect-hint{display:none!important}.content{position:absolute!important;top:240px!important;left:56px!important;width:1488px!important;margin:0!important}.interaction-row{display:block!important;min-height:25px!important;margin-bottom:10px!important}.print-note{display:block;font-size:14px;color:var(--muted)}.diagram-scroll{overflow:visible!important;border:0!important}.diagram{width:1488px!important;height:450px!important;border:1px solid var(--border)!important;break-inside:avoid;page-break-inside:avoid}.node{opacity:1!important;transform:none!important;box-shadow:none!important;transition:none!important}.route.inactive,.edge-label.inactive,.stop-mark.inactive{opacity:1!important}.legend-row{display:flex!important;gap:20px!important}.legend{display:flex!important;font-size:14px!important;margin:0!important}.status{display:none!important}.takeaway{position:absolute!important;left:56px!important;right:56px!important;bottom:50px!important;display:flex!important;min-height:57px!important;margin:0!important;padding:15px 19px!important;font-size:20px!important}.takeaway strong{display:inline!important;margin:0!important}.slide-footer{position:absolute!important;bottom:20px!important;left:56px!important;right:56px!important;display:flex!important;font-size:13px!important;margin:0!important}.slide-footer span{display:inline!important;margin:0!important}.slide-topline{top:42px!important;right:56px!important}.slide-topline .version{display:inline!important}.illustration-label{font-size:12px!important;padding:5px 10px!important}.accent-rule{width:64px!important;height:5px!important;margin-bottom:25px!important}.eyebrow{font-size:14px!important;max-width:none!important}h1{font-size:48px!important;margin:17px 0 13px!important;line-height:1.12!important}p.intro{font-size:22px!important;line-height:1.4!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>
+<symbol id="icon-file" viewBox="0 0 32 32"><path d="M8 3h11l6 6v20H8zM19 3v7h6M12 15h9M12 20h9M12 25h6"/></symbol>
+<symbol id="icon-graph" viewBox="0 0 32 32"><rect x="2" y="12" width="8" height="8" rx="2"/><rect x="23" y="2" width="7" height="8" rx="2"/><rect x="23" y="22" width="7" height="8" rx="2"/><path d="M10 16h7V6h6M17 16v10h6"/></symbol>
+<symbol id="icon-agent" viewBox="0 0 32 32"><rect x="5" y="9" width="22" height="18" rx="5"/><path d="M16 9V4M13 4h6M11 16v2M21 16v2M11 23h10M2 15v6M30 15v6"/></symbol>
+<symbol id="icon-shield" viewBox="0 0 32 32"><path d="M16 3 27 8v9c0 6-6 10-11 13C11 27 5 23 5 17V8zM10 16l4 4 8-9"/></symbol>
+<symbol id="icon-key" viewBox="0 0 32 32"><circle cx="11" cy="12" r="7"/><path d="m16 17 12 12M22 23l4-4M25 26l4-4"/></symbol>
+<symbol id="icon-model" viewBox="0 0 32 32"><path d="m16 3 12 7-12 7L4 10zM4 16l12 7 12-7M4 22l12 7 12-7"/></symbol>
+<symbol id="icon-tools" viewBox="0 0 32 32"><path d="M5 5h22v22H5zM5 12h22M12 12v15M16 17h7M16 22h5M9 8h1M14 8h1"/></symbol>
+<symbol id="icon-eye" viewBox="0 0 32 32"><path d="M2 16s5-9 14-9 14 9 14 9-5 9-14 9S2 16 2 16z"/><circle cx="16" cy="16" r="4"/></symbol>
+<symbol id="icon-check" viewBox="0 0 32 32"><rect x="5" y="3" width="22" height="27" rx="3"/><path d="m10 17 4 4 9-11M11 7h10"/></symbol>
+<symbol id="icon-network" viewBox="0 0 32 32"><rect x="11" y="2" width="10" height="8" rx="2"/><rect x="2" y="23" width="10" height="7" rx="2"/><rect x="20" y="23" width="10" height="7" rx="2"/><path d="M16 10v7M7 23v-6h18v6"/></symbol>
+<symbol id="icon-identity" viewBox="0 0 32 32"><circle cx="12" cy="9" r="5"/><path d="M3 28v-4a9 9 0 0 1 15-7M23 15l7 4v5c0 3-4 5-7 7-3-2-7-4-7-7v-5z"/></symbol>
+<symbol id="icon-box" viewBox="0 0 32 32"><rect x="4" y="4" width="24" height="24" rx="4"/><path d="M10 11h12M10 17h12M10 23h6"/></symbol>
+</defs></svg>
+<main id="stage" aria-label="Interactive secure-agent architecture presentation"><div id="canvas"></div></main>
+<nav class="toolbar" aria-label="Slide controls">
+<button id="previous" aria-label="Previous slide">← Previous</button><span id="slideCounter" aria-live="polite" aria-atomic="true"></span><button id="next" class="primary" aria-label="Next slide">Next →</button>
+<button id="replay" aria-label="Replay illustrated flow, shortcut R">Replay · R</button><label class="repeat-control" for="repeat">Repeat after <select id="repeat" aria-label="Pause between automatic replays"><option value="0">Off</option><option value="3000">3 seconds</option><option value="5000">5 seconds</option><option value="10000">10 seconds</option></select></label><button id="notes" aria-label="Presenter notes, shortcut N">Notes · N</button><button id="details">Sources / details</button><button id="print">Print all slides</button>
+</nav>
+<div class="keyboard-help">← → / PgUp PgDn · Home End · R replay · N notes · Click a component to inspect</div>
+<div class="sr-only" id="slideAnnouncement" role="status" aria-live="polite"></div>
+<dialog id="sourceDialog" aria-labelledby="sourceHeading"><h2 id="sourceHeading">Component source and details</h2><label for="sourceSelect">Choose a component</label><select id="sourceSelect"></select><p class="source-meta" id="sourceMeta"></p><pre class="source-code" id="sourceCode" tabindex="0"></pre><p id="copyStatus" role="status" aria-live="polite"></p><div class="dialog-buttons"><button id="copySource" class="primary">Copy source text</button><button id="closeSource">Close</button></div></dialog>
+<dialog id="notesDialog" aria-labelledby="notesTitle"><h2 id="notesTitle">Presenter notes</h2><p id="notesText"></p><p class="reference-note">All sample values and states in this deck are illustrative. No workplace data, credentials or real execution receipts are embedded.</p><div class="dialog-buttons"><button id="closeNotes">Close notes</button></div></dialog>
+<script type="application/json" id="deckData">{
+  "slides": [
+    {
+      "id": "contract",
+      "label": "01 / Assisted software delivery",
+      "title": "Start with an approved task, not an open mandate.",
+      "intro": "A bounded board workflow turns explicit acceptance criteria into a reviewable change.",
+      "takeaway": "Agents prepare delivery evidence. Humans retain the merge decision.",
+      "nodes": [
+        {
+          "id": "request",
+          "title": "Approved issue",
+          "detail": "Owner, scope and acceptance criterion",
+          "source": "sdlc-contract",
+          "x": 10,
+          "y": 140,
+          "w": 280,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "poll",
+          "title": "Board checkpoint",
+          "detail": "Durable labels + shared writer Lease",
+          "source": "sdlc-contract",
+          "x": 390,
+          "y": 140,
+          "w": 280,
+          "h": 180,
+          "tone": "blue",
+          "icon": "graph"
+        },
+        {
+          "id": "pm",
+          "title": "PM agent",
+          "detail": "Plan a bounded child and delegate",
+          "source": "sdlc-plan",
+          "x": 770,
+          "y": 140,
+          "w": 280,
+          "h": 180,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "mr",
+          "title": "Reviewable outcome",
+          "detail": "Draft MR, CI and reviewer evidence",
+          "source": "sdlc-evidence",
+          "x": 1150,
+          "y": 140,
+          "w": 320,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "check"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M290 230H390",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "b",
+          "d": "M670 230H770",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "c",
+          "d": "M1050 230H1150",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "Describe the existing bounded GitLab board rig. It advances one checkpoint per poll and uses artifact checks rather than trusting a status sentence from the PM. Human merge is outside the exposed tool set."
+    },
+    {
+      "id": "roles",
+      "label": "02 / Specialist roles",
+      "title": "Delegate work with explicit role boundaries.",
+      "intro": "The PM coordinates planning, building, testing and review through native agent tasks.",
+      "takeaway": "Different roles need different instructions, tools and evidence.",
+      "nodes": [
+        {
+          "id": "pm",
+          "title": "PM / planner",
+          "detail": "Acceptance, child issue and delegation",
+          "source": "sdlc-plan",
+          "x": 10,
+          "y": 140,
+          "w": 250,
+          "h": 180,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "builder",
+          "title": "Builder",
+          "detail": "Narrow branch and reviewed files",
+          "source": "sdlc-plan",
+          "x": 310,
+          "y": 140,
+          "w": 250,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "tester",
+          "title": "Tester",
+          "detail": "Approved tests and actual CI results",
+          "source": "sdlc-plan",
+          "x": 610,
+          "y": 140,
+          "w": 250,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "check"
+        },
+        {
+          "id": "reviewer",
+          "title": "Reviewer",
+          "detail": "Independent assessment of current head",
+          "source": "sdlc-plan",
+          "x": 910,
+          "y": 140,
+          "w": 250,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "eye"
+        },
+        {
+          "id": "human",
+          "title": "Human reviewer",
+          "detail": "Review the change and choose merge",
+          "source": "sdlc-contract",
+          "x": 1210,
+          "y": 140,
+          "w": 260,
+          "h": 180,
+          "tone": "blue",
+          "icon": "identity"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M260 230H310",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "b",
+          "d": "M560 230H610",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "c",
+          "d": "M860 230H910",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d",
+          "d": "M1160 230H1210",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "The inspected rig includes an echo diagnostic agent as well. It is omitted from the main flow because it is not a delivery checkpoint. The model roles in the historical lab used one provider; model catalog options are not proof of multiple providers."
+    },
+    {
+      "id": "capabilities",
+      "label": "03 / Reusable agent building blocks",
+      "title": "Every role uses a bounded capability profile.",
+      "intro": "Reuse the model garden, native skill mechanism and MCP adapters while keeping permissions specific to the role.",
+      "takeaway": "A shared platform does not mean shared credentials or unrestricted tools.",
+      "nodes": [
+        {
+          "id": "role",
+          "title": "Role profile",
+          "detail": "Task, constraints and output contract",
+          "source": "sdlc-tools",
+          "x": 10,
+          "y": 140,
+          "w": 280,
+          "h": 180,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "model",
+          "title": "Approved ModelConfig",
+          "detail": "Model route via Agent Gateway",
+          "source": "sdlc-tools",
+          "x": 490,
+          "y": 25,
+          "w": 420,
+          "h": 175,
+          "tone": "blue",
+          "icon": "model"
+        },
+        {
+          "id": "skills",
+          "title": "Reviewed skills",
+          "detail": "Selected native runbooks where configured",
+          "source": "skill-native",
+          "x": 1040,
+          "y": 25,
+          "w": 420,
+          "h": 175,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "mcp",
+          "title": "GitLab MCP adapter",
+          "detail": "Named project/file operations; no merge",
+          "source": "sdlc-contract",
+          "x": 490,
+          "y": 250,
+          "w": 420,
+          "h": 175,
+          "tone": "neutral",
+          "icon": "tools"
+        },
+        {
+          "id": "telemetry",
+          "title": "Usage + task evidence",
+          "detail": "Real model counters and tool records",
+          "source": "usage",
+          "x": 1040,
+          "y": 250,
+          "w": 420,
+          "h": 175,
+          "tone": "neutral",
+          "icon": "eye"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M290 185H370V112H490",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "b",
+          "d": "M150 140V12H1250V25",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "c",
+          "d": "M290 270H370V337H490",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d",
+          "d": "M910 337H1040",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "Keep current and possible configuration distinct. The inspected rig sent model traffic through agentgateway and GitLab MCP directly. Routing the MCP through Gateway policies is an extension, not an accomplished fact. Show actual skill mount evidence before claiming a specific role uses it."
+    },
+    {
+      "id": "checkpoints",
+      "label": "04 / Evidence over assertions",
+      "title": "Advance only when artifacts agree.",
+      "intro": "A delivery checkpoint reads the current commit, CI and review evidence before moving the board.",
+      "takeaway": "The same exact head must be built, tested and reviewed.",
+      "nodes": [
+        {
+          "id": "commit",
+          "title": "Current commit",
+          "detail": "Read actual branch and head",
+          "source": "sdlc-evidence",
+          "x": 10,
+          "y": 140,
+          "w": 250,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "ci",
+          "title": "CI pipeline",
+          "detail": "Successful named tests for that head",
+          "source": "sdlc-evidence",
+          "x": 310,
+          "y": 140,
+          "w": 250,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "check"
+        },
+        {
+          "id": "review",
+          "title": "Independent review",
+          "detail": "Tagged verdict for the current diff",
+          "source": "sdlc-evidence",
+          "x": 610,
+          "y": 140,
+          "w": 250,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "eye"
+        },
+        {
+          "id": "mr",
+          "title": "Draft MR",
+          "detail": "Read back artifacts and target",
+          "source": "sdlc-evidence",
+          "x": 910,
+          "y": 140,
+          "w": 250,
+          "h": 180,
+          "tone": "dark",
+          "icon": "file"
+        },
+        {
+          "id": "ready",
+          "title": "Human handoff",
+          "detail": "Ready for review, never auto-merged",
+          "source": "sdlc-contract",
+          "x": 1210,
+          "y": 140,
+          "w": 260,
+          "h": 180,
+          "tone": "blue",
+          "icon": "identity"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M260 230H310",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "b",
+          "d": "M560 230H610",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "c",
+          "d": "M860 230H910",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d",
+          "d": "M1160 230H1210",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "Model output is an instruction or assessment. GitLab and CI read-back provide the evidence for transitions. A green pipeline for an old commit is insufficient after head drift. Unknown write outcomes are reconciled before retry."
+    },
+    {
+      "id": "rework",
+      "label": "05 / Controlled rework",
+      "title": "Failed checks return to bounded changes.",
+      "intro": "Keep rework visible and finite. A failed or unknown checkpoint must not become a passing state.",
+      "takeaway": "A useful automation knows when to stop and ask for a human.",
+      "nodes": [
+        {
+          "id": "check",
+          "title": "Checkpoint result",
+          "detail": "Actual test and artifact assessment",
+          "source": "sdlc-evidence",
+          "x": 10,
+          "y": 140,
+          "w": 300,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "check"
+        },
+        {
+          "id": "changes",
+          "title": "Changes requested",
+          "detail": "Return a scoped defect to the builder",
+          "source": "sdlc-evidence",
+          "x": 500,
+          "y": 25,
+          "w": 360,
+          "h": 175,
+          "tone": "dark",
+          "icon": "file"
+        },
+        {
+          "id": "blocked",
+          "title": "Blocked / human help",
+          "detail": "Stop at the configured attempt ceiling",
+          "source": "sdlc-evidence",
+          "x": 1040,
+          "y": 25,
+          "w": 420,
+          "h": 175,
+          "tone": "reference",
+          "icon": "identity"
+        },
+        {
+          "id": "review",
+          "title": "Ready for human review",
+          "detail": "Passing current-head evidence and draft MR",
+          "source": "sdlc-contract",
+          "x": 500,
+          "y": 250,
+          "w": 360,
+          "h": 175,
+          "tone": "blue",
+          "icon": "eye"
+        },
+        {
+          "id": "merge",
+          "title": "Human merge decision",
+          "detail": "No agent merge tool in this rig",
+          "source": "sdlc-contract",
+          "x": 1040,
+          "y": 250,
+          "w": 420,
+          "h": 175,
+          "tone": "neutral",
+          "icon": "key"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M310 190H400V112H500",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "fail"
+          ]
+        },
+        {
+          "id": "b",
+          "d": "M860 112H1040",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": true,
+          "scenarios": [
+            "fail"
+          ]
+        },
+        {
+          "id": "c",
+          "d": "M310 265H400V337H500",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "pass"
+          ]
+        },
+        {
+          "id": "d",
+          "d": "M860 337H1040",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "pass"
+          ]
+        }
+      ],
+      "notes": "Switch between failed CI and passing evidence. In the inspected rig, failed CI returns to agent:changes and three unsuccessful stage attempts become agent:blocked. These are configured workflow rules, not an autonomous permission to keep spending or to merge.",
+      "scenarios": [
+        {
+          "id": "fail",
+          "label": "Failed CI",
+          "status": "Illustration: failure returns to scoped rework; repeated failures stop at the configured ceiling."
+        },
+        {
+          "id": "pass",
+          "label": "Passing evidence",
+          "status": "Illustration: passing artifacts enable a human review handoff, not automatic merge."
+        }
+      ]
+    },
+    {
+      "id": "demonstrate",
+      "label": "06 / One platform, three stories",
+      "title": "Show the workflow and its evidence together.",
+      "intro": "Connect secure agent creation, evidence-driven triage and reviewable delivery without blurring their permissions.",
+      "takeaway": "The platform makes assistance repeatable. Live proof still comes from real tasks and artifacts.",
+      "nodes": [
+        {
+          "id": "secure",
+          "title": "Secure service",
+          "detail": "Native kagent + KRO security envelope",
+          "source": "lifecycle",
+          "x": 10,
+          "y": 140,
+          "w": 280,
+          "h": 180,
+          "tone": "blue",
+          "icon": "shield"
+        },
+        {
+          "id": "triage",
+          "title": "SRE assistance",
+          "detail": "Bounded evidence and scoped investigation",
+          "source": "triage-agent",
+          "x": 390,
+          "y": 140,
+          "w": 280,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "eye"
+        },
+        {
+          "id": "sdlc",
+          "title": "Delivery assistance",
+          "detail": "Build, test and independent review",
+          "source": "sdlc-proof",
+          "x": 770,
+          "y": 140,
+          "w": 280,
+          "h": 180,
+          "tone": "dark",
+          "icon": "graph"
+        },
+        {
+          "id": "human",
+          "title": "Human decision",
+          "detail": "Approve change, observe actual outcome",
+          "source": "sdlc-proof",
+          "x": 1150,
+          "y": 140,
+          "w": 320,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "identity"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M290 230H390",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "b",
+          "d": "M670 230H770",
+          "label": "approved",
+          "lx": 720,
+          "ly": 205,
+          "tone": "reference",
+          "reference": true,
+          "scenarios": null
+        },
+        {
+          "id": "c",
+          "d": "M1050 230H1150",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "Use the linked Journey, Triage and SDLC decks as separate chapters. Run terminal evidence separately. No animation opens an issue, spends model tokens or changes a cluster. Do not claim all the historical paths are connected in a workplace environment without receiving-cluster proof."
+    }
+  ],
+  "sources": {
+    "lifecycle": {
+      "title": "Agent lifecycle and change controls",
+      "text": "1 Author intent using approved prompt, model, skills and tools.\n2 Admit schema/catalog and create native Agent plus security dependencies.\n3 Run Golden and record an actual model-backed response before caller route creation.\n4 Serve through the authenticated route and enforce backend permissions.\n5 Observe real usage, traces, failures and policy decisions.\n6 On material changes, retire caller access and verify again. A completed Job is not continuous revocation.\n7 Retire agent, routes, credentials and generated resources using controlled lifecycle ownership.\nFuture identity extension: approved Entra caller claims and separately scoped workload identity/UAMI for tools.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "sdlc-contract": {
+      "title": "Bounded SDLC contract",
+      "text": "Existing rig: PM plus builder, tester, reviewer and echo agents.\nGitLab MCP exposes named issue, branch, file, pipeline, draft-MR and review-note operations.\nNo merge, delete, arbitrary GitLab API or project-settings tool is exposed to these agents.\nThe board poller advances one parent issue by one checkpoint per run, with durable labels and artifact checks.\nUse a shared Lease for manual/scheduled writer exclusion. A concurrencyPolicy alone does not serialize all writers.\nA task requires owner-approved scope and acceptance criteria. A health hypothesis is not an approved implementation task.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "sdlc-evidence": {
+      "title": "Artifact-backed state transitions",
+      "text": "Do not advance from a model saying done.\nRead back the actual child issue, commit, pipeline, draft MR and tagged review note.\nBind tests and review to the same current head.\nFailed CI routes to agent:changes. Three unsuccessful stage attempts route to agent:blocked in the inspected rig.\nUnknown writes require read-back and reconciliation before retry.\nLease ownership and durable board labels provide recovery checkpoints, not a claim of universal exactly-once delivery.\nDraft MR remains a human merge action.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "sdlc-plan": {
+      "title": "PM and specialist roles",
+      "text": "PM reads the approved parent issue, defines a bounded child and delegates through native Agent/A2A bindings.\nBuilder changes only reviewed files on the task branch.\nTester runs the approved tests and records actual results.\nReviewer evaluates the exact current diff and independent CI evidence.\nEcho is a diagnostic role, not a required delivery stage.\nApproved ModelConfig routes model traffic through Agent Gateway. Role-specific skills and MCP allowlists constrain the task.\nThe inspected rig model path used Agent Gateway; its GitLab MCP path was direct. MCP Gateway policy/telemetry was a separate next step.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "sdlc-proof": {
+      "title": "Delivery demonstration proof",
+      "text": "Show one approved parent and its acceptance criterion.\nInvoke one bounded poller/checkpoint and observe the actual native task.\nRead back child, branch, commit, successful named CI tests, draft MR and exact-head reviewer note.\nDemonstrate a failing test returning to changes and preserving the human merge gate.\nTrace actual model usage and tool operations where instrumentation exists; missing spans remain missing.\nThe existing narrow lab receipts establish their recorded workflow only. This synthetic deck performs no model, GitLab, CI or cluster operations.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "sdlc-tools": {
+      "title": "Tools, skills and model garden",
+      "text": "Each role gets an approved ModelConfig and selected instruction/runbook content.\nCatalog choices can distinguish a general planning model, code model and review model; these are illustrative options, not observed multi-provider routing.\nUse native skill sources only when configured and verified; a diagram does not prove all existing roles mount a skill.\nGitLab adapter limits project, files and operations. Agents do not receive an arbitrary shell or arbitrary GitLab API.\nGateway model routing and usage telemetry are platform controls; direct MCP traffic needs its own verified policy path.\nNever substitute providers automatically when a route or budget fails.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "skill-native": {
+      "title": "Native skill loading example",
+      "text": "# Synthetic native kagent 0.x excerpt. Not a complete deployment.\napiVersion: kagent.dev/v1alpha2\nkind: Agent\nmetadata:\n  name: sample-specialist\nspec:\n  type: Declarative\n  skills:\n    gitRefs:\n      - url: https://gitlab.example.invalid/demo/approved-skills.git\n        ref: \"{{IMMUTABLE_COMMIT_SHA}}\"\n        path: skills/platform-triage\n        name: platform-triage\n    gitAuthSecretRef:\n      name: approved-skills-reader\n  declarative:\n    modelConfig: approved-general\n    systemMessage: Use the selected runbook and approved tools.\n# The customer composition selects catalog IDs; the platform resolves this shape.\n# Native skills initialization loads the shared /skills volume.\n# Use the matching full runtime image for skills, not a slim image lacking support.\n# Fetch credentials and narrowly allowed source egress are separate prerequisites.",
+      "type": "Synthetic native Agent YAML excerpt"
+    },
+    "triage-agent": {
+      "title": "Read-only SRE investigation",
+      "text": "Agent consumes bounded, untrusted evidence and approved runbook/KB context.\nSelected Kubernetes MCP calls can corroborate namespace/workload status.\nNo arbitrary kubectl, apply, delete or broad write tool is required for diagnosis.\nReturn observations, hypotheses, confidence limits and evidence references.\nAn idempotent GitLab issue records investigation. Only explicitly approved repository work enters SDLC.\nThe historical Kafka issue path and the application specialist's MR path are different implementations.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "usage": {
+      "title": "Token usage, attribution and budgets",
+      "text": "Capture actual provider input/output token counters when available.\nCorrelate identity, task, selected model, route, policy decision, latency and tool spans.\nShow unknown for absent usage. Never infer tokens from a coloured diagram or a guessed character ratio.\nRequest limits and LLM-token limits are separate controls.\nLocal counters apply per proxy replica; global budgets require a coordinating service.\nPost-response token accounting can overshoot during in-flight responses. It is not a hard mid-generation spend cutoff.\nCost estimates need an approved pricing catalog and model mapping.\nRedact secrets and sensitive prompt/tool contents before telemetry export.\nPrimary reference: https://agentgateway.dev/docs/kubernetes/latest/documentation/llm/rate-limit/",
+      "type": "Illustrative design and configuration notes"
+    }
+  },
+  "deckLinks": [
+    {
+      "label": "Journey",
+      "href": "journey.html"
+    },
+    {
+      "label": "Triage",
+      "href": "triage.html"
+    },
+    {
+      "label": "SDLC",
+      "href": "sdlc.html"
+    }
+  ]
+}</script>
+<script>
+'use strict';
+const data=JSON.parse(document.getElementById('deckData').textContent);
+const $=id=>document.getElementById(id);
+const svgNS='http://www.w3.org/2000/svg';
+const mobile=matchMedia('(max-width:899px)');
+const reduced=matchMedia('(prefers-reduced-motion:reduce)');
+const state={index:0,scenario:new Map(),raf:null,generation:0,effects:[],markers:[],sourceOpener:null,notesOpener:null,printing:false,printScroll:[],repeatMs:0,repeatTimer:null};
+const elements=new Map();
+function element(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
+function svg(tag,attrs){const e=document.createElementNS(svgNS,tag);for(const [k,v]of Object.entries(attrs))e.setAttribute(k,v);return e}
+function color(path){return path.tone==='red'?'var(--accent)':path.reference?'var(--reference)':'var(--link)'}
+function buildSlide(slide,index){
+ const article=element('article','slide');article.id=slide.id;article.hidden=true;article.inert=true;article.setAttribute('aria-labelledby',slide.id+'-title');article.setAttribute('aria-hidden','true');
+ article.append(element('div','accent-rule'),element('div','eyebrow',slide.label));
+ const topline=element('div','slide-topline');topline.append(element('span','version','Native kagent · KRO · agentgateway'),element('span','illustration-label','Illustration / synthetic examples'));article.append(topline);
+ const heading=element('h1','',slide.title);heading.id=slide.id+'-title';heading.tabIndex=-1;article.append(heading,element('p','intro',slide.intro));
+ const content=element('div','content');const interaction=element('div','interaction-row');const scenarioGroup=element('div','scenario-group');scenarioGroup.setAttribute('role','group');scenarioGroup.setAttribute('aria-label','Illustrated scenarios');
+ for(const option of slide.scenarios||[]){const button=element('button','scenario','Illustration: '+option.label);button.dataset.scenario=option.id;button.addEventListener('click',()=>{state.scenario.set(slide.id,option.id);applyScenario(slide);play()});scenarioGroup.append(button)}
+ interaction.append(scenarioGroup,element('div','diagram-hint','Click a component for source / details'),element('div','print-note','Illustrative architecture. Solid = main flow; dashed = reference or optional path.'));
+ content.append(interaction,element('p','mobile-hint','Scroll diagram sideways to explore all components.'));
+ const scroller=element('div','diagram-scroll');scroller.tabIndex=0;scroller.setAttribute('role','region');scroller.setAttribute('aria-label',slide.title+' diagram; scroll horizontally on narrow screens');
+ const diagram=element('div','diagram');diagram.setAttribute('role','group');diagram.setAttribute('aria-label','Interactive components and labelled connection paths');
+ const lines=svg('svg',{class:'connections',viewBox:'0 0 1488 450','aria-hidden':'true'});const defs=svg('defs',{});for(const [tone,fill]of [['blue','var(--link)'],['reference','var(--reference)'],['red','var(--accent)']]){const arrow=svg('marker',{id:slide.id+'-arrow-'+tone,viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:6,markerHeight:6,orient:'auto'});arrow.append(svg('path',{d:'M1 1L7 4L1 7Z',fill}));defs.append(arrow)}lines.append(defs);const pathMap=new Map();
+ for(const p of slide.paths){const line=svg('path',{d:p.d,class:'route'+(p.reference?' reference':'')+(p.tone==='red'?' red':''),'data-path':p.id,'marker-end':'url(#'+slide.id+'-arrow-'+(p.tone==='red'?'red':p.reference?'reference':'blue')+')'});lines.append(line);pathMap.set(p.id,line);if(p.label){const label=svg('text',{x:p.lx,y:p.ly,class:'edge-label'+(p.reference?' reference':'')+(p.tone==='red'?' red':''),'data-label-path':p.id});label.textContent=p.label;lines.append(label)}}
+ for(const stop of slide.stops||[]){const g=svg('g',{class:'stop-mark','data-stop-scenario':stop.scenario});g.append(svg('path',{d:`M${stop.x-6} ${stop.y-6}L${stop.x+6} ${stop.y+6}M${stop.x+6} ${stop.y-6}L${stop.x-6} ${stop.y+6}`}));lines.append(g)}
+ diagram.append(lines);
+ for(const n of slide.nodes){const button=element('button','node '+n.tone+(n.code?' code-node':'')+(n.h<=100?' compact':''));button.dataset.node=n.id;Object.assign(button.style,{left:n.x+'px',top:n.y+'px',width:n.w+'px',height:n.h+'px'});button.setAttribute('aria-label','Inspect '+n.title);const top=element('div','node-top');const icon=svg('svg',{'aria-hidden':'true',viewBox:'0 0 32 32'});icon.append(svg('use',{href:'#icon-'+n.icon}));top.append(icon,element('h2','',n.title));button.append(top,element('p','',n.detail));if(n.code){button.append(element('pre','inline-code',n.code),element('span','inspect-hint','Click to inspect the full synthetic example'))}button.addEventListener('click',()=>openSource(n.source,button));diagram.append(button)}
+ if(slide.strips){const strips=element('div','strips');for(const item of slide.strips){const strip=element('div','strip');strip.append(element('strong','',item.title),element('p','',item.text));strips.append(strip)}diagram.append(strips)}
+ scroller.append(diagram);content.append(scroller);const legendRow=element('div','legend-row');const legend=element('div','legend');for(const [name,style]of [['Main illustrated flow',''],['Reference / optional','dashed']]){const span=element('span','');span.append(element('i',style),document.createTextNode(name));legend.append(span)}const status=element('div','status','Illustration only. No backend calls or tests run in this deck.');status.setAttribute('aria-live','polite');legendRow.append(legend,status);content.append(legendRow);article.append(content);
+ const takeaway=element('div','takeaway');takeaway.append(element('strong','','Takeaway'),element('span','',slide.takeaway));article.append(takeaway);const footer=element('footer','slide-footer');const chapters=element('span','');chapters.append(document.createTextNode('Synthetic architecture · '));for(const chapter of data.deckLinks||[]){const a=element('a','deck-link',chapter.label);a.href=chapter.href;chapters.append(a,document.createTextNode(' · '))}if(!data.deckLinks)chapters.append(document.createTextNode('Native runtime, no Substrate'));footer.append(chapters,element('span','',String(index+1).padStart(2,'0')+' / '+String(data.slides.length).padStart(2,'0')));article.append(footer);$('canvas').append(article);elements.set(slide.id,{article,heading,diagram,lines,pathMap,scenarioGroup,status,scroller});
+ if(slide.scenarios)state.scenario.set(slide.id,slide.scenarios[0].id);
+}
+data.slides.forEach(buildSlide);
+for(const [id,source]of Object.entries(data.sources)){const option=element('option','',source.title);option.value=id;$('sourceSelect').append(option)}
+function current(){return data.slides[state.index]}
+function isActivePath(slide,path){return !path.scenarios||path.scenarios.includes(state.scenario.get(slide.id))}
+function applyScenario(slide){const e=elements.get(slide.id);const id=state.scenario.get(slide.id);for(const b of e.scenarioGroup.children)b.setAttribute('aria-pressed',String(b.dataset.scenario===id));for(const path of slide.paths){const active=isActivePath(slide,path);e.pathMap.get(path.id).classList.toggle('inactive',!active);const label=e.lines.querySelector('[data-label-path="'+path.id+'"]');if(label)label.classList.toggle('inactive',!active)}for(const g of e.lines.querySelectorAll('[data-stop-scenario]'))g.classList.toggle('inactive',g.dataset.stopScenario!==id);const scenario=slide.scenarios?.find(s=>s.id===id);e.status.textContent=scenario?scenario.status:'Illustration only. No backend calls or tests run in this deck.'}
+function cancelMotion(){clearTimeout(state.repeatTimer);state.repeatTimer=null;state.generation++;if(state.raf!==null)cancelAnimationFrame(state.raf);state.raf=null;for(const effect of state.effects)effect.cancel();state.effects=[];for(const marker of state.markers)marker.remove();state.markers=[];for(const path of document.querySelectorAll('.route')){path.style.strokeDasharray='';path.style.strokeDashoffset=''}}
+function canAnimate(){return !reduced.matches&&!document.hidden&&!state.printing&&!$('sourceDialog').open&&!$('notesDialog').open}
+function scheduleRepeat(){clearTimeout(state.repeatTimer);state.repeatTimer=null;if(state.repeatMs&&canAnimate())state.repeatTimer=setTimeout(play,state.repeatMs)}
+function updateRepeatControl(){$('repeat').disabled=reduced.matches;$('repeat').title=reduced.matches?'Automatic motion is paused by your reduced-motion preference.':'Pause after each flow completes. Repeats the current slide.'}
+function duration(token,fallback){const raw=getComputedStyle(document.documentElement).getPropertyValue(token).trim();return raw.endsWith('ms')?Number.parseFloat(raw):raw.endsWith('s')?Number.parseFloat(raw)*1000:fallback}
+function play(){cancelMotion();const slide=current();const e=elements.get(slide.id);applyScenario(slide);if(!canAnimate())return;const generation=state.generation;const enter=duration('--enter-duration',450);const packet=duration('--packet-duration',850);const paths=slide.paths.filter(p=>isActivePath(slide,p));for(const [i,node]of Array.from(e.diagram.querySelectorAll('.node')).entries()){state.effects.push(node.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'translateY(0)'}],{duration:enter,delay:i*90,easing:'cubic-bezier(.2,.65,.3,1)',fill:'backwards'}))}
+ const travels=paths.map((path,i)=>{const line=e.pathMap.get(path.id);const length=line.getTotalLength();const marker=svg('circle',{r:6,fill:color(path),class:'packet',opacity:0,'data-reference':String(path.reference)});e.lines.append(marker);state.markers.push(marker);return {path,line,length,marker,start:330+i*170}});const start=performance.now();const end=Math.max(enter+slide.nodes.length*90,...travels.map(t=>t.start+packet))+80;
+ function tick(now){if(generation!==state.generation)return;const elapsed=now-start;for(const t of travels){const p=Math.max(0,Math.min(1,(elapsed-t.start)/packet));if(!t.path.reference){t.line.style.strokeDasharray=t.length+' '+t.length;t.line.style.strokeDashoffset=String(t.length*(1-p))}t.marker.setAttribute('opacity',elapsed>=t.start&&p<1?'1':'0');const point=t.line.getPointAtLength(t.length*p);t.marker.setAttribute('cx',point.x);t.marker.setAttribute('cy',point.y)}if(elapsed<end)state.raf=requestAnimationFrame(tick);else{cancelMotion();e.status.textContent=(slide.scenarios?.find(s=>s.id===state.scenario.get(slide.id))?.status||'Illustration complete. Inspect a component or replay the flow.')+' No live result is represented.';scheduleRepeat()}}
+ state.raf=requestAnimationFrame(tick);
+}
+function fit(){if(mobile.matches){$('stage').style.width='';$('stage').style.height='';document.documentElement.style.setProperty('--scale','1');return}const scale=Math.min((innerWidth-48)/1600,(innerHeight-118)/900);document.documentElement.style.setProperty('--scale',String(scale));$('stage').style.width=1600*scale+'px';$('stage').style.height=900*scale+'px'}
+function showSlide(index,{animate=true,hash=true,focus=false}={}){cancelMotion();state.index=Math.max(0,Math.min(data.slides.length-1,index));const slide=current();for(const entry of data.slides){const active=entry.id===slide.id;const article=elements.get(entry.id).article;article.hidden=!active;article.inert=!active;article.setAttribute('aria-hidden',String(!active))}applyScenario(slide);$('previous').disabled=state.index===0;$('next').disabled=state.index===data.slides.length-1;$('slideCounter').textContent=(state.index+1)+' / '+data.slides.length;$('slideAnnouncement').textContent='Slide '+(state.index+1)+' of '+data.slides.length+'. '+slide.title;if(hash&&location.hash!=='#'+slide.id)location.hash=slide.id;if(focus)elements.get(slide.id).heading.focus({preventScroll:true});if(mobile.matches)window.scrollTo({top:0,behavior:'instant'});fit();if(animate)play();else scheduleRepeat()}
+function sourceText(){const source=data.sources[$('sourceSelect').value];$('sourceCode').textContent=source.text;$('sourceMeta').textContent=source.type+' · Illustration only';$('sourceCode').scrollTop=0;$('sourceCode').scrollLeft=0;$('copyStatus').textContent=''}
+function openSource(id,opener){cancelMotion();state.sourceOpener=opener||document.activeElement;$('sourceSelect').value=id;sourceText();$('sourceDialog').showModal();$('sourceSelect').focus()}
+function openNotes(opener){cancelMotion();state.notesOpener=opener||document.activeElement;$('notesTitle').textContent='Slide '+(state.index+1)+' / Presenter notes';$('notesText').textContent=current().notes;$('notesDialog').showModal();$('closeNotes').focus()}
+$('sourceSelect').addEventListener('change',sourceText);$('sourceDialog').addEventListener('close',()=>{if(state.sourceOpener?.isConnected)state.sourceOpener.focus({preventScroll:true});scheduleRepeat()});$('notesDialog').addEventListener('close',()=>{if(state.notesOpener?.isConnected)state.notesOpener.focus({preventScroll:true});scheduleRepeat()});$('closeSource').addEventListener('click',()=>$('sourceDialog').close());$('closeNotes').addEventListener('click',()=>$('notesDialog').close());
+$('copySource').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('sourceCode').textContent);$('copyStatus').textContent='Copied source text.'}catch{const range=document.createRange();range.selectNodeContents($('sourceCode'));const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);$('sourceCode').focus();$('copyStatus').textContent='Clipboard unavailable. Text selected; press Cmd+C or Ctrl+C to copy manually.'}});
+$('repeat').addEventListener('change',()=>{state.repeatMs=Number($('repeat').value);cancelMotion();if(state.repeatMs)play()});
+$('previous').addEventListener('click',()=>showSlide(state.index-1));$('next').addEventListener('click',()=>showSlide(state.index+1));$('replay').addEventListener('click',play);$('notes').addEventListener('click',event=>openNotes(event.currentTarget));$('details').addEventListener('click',event=>openSource(current().nodes[0].source,event.currentTarget));$('print').addEventListener('click',()=>{cancelMotion();window.print()});
+document.addEventListener('keydown',event=>{if(event.ctrlKey||event.metaKey||event.altKey||event.target.closest('input,textarea,select,[contenteditable],dialog')||$('sourceDialog').open||$('notesDialog').open||window.getSelection()?.toString())return;const key=event.key.toLowerCase();if(event.shiftKey&&key.startsWith('arrow'))return;let target=null;if(['arrowright','pagedown'].includes(key))target=state.index+1;if(['arrowleft','pageup'].includes(key))target=state.index-1;if(key==='home')target=0;if(key==='end')target=data.slides.length-1;if(target!==null){event.preventDefault();showSlide(target,{focus:true})}else if(key==='r'){event.preventDefault();play()}else if(key==='n'){event.preventDefault();openNotes(event.target)}});
+window.addEventListener('hashchange',()=>{const index=data.slides.findIndex(s=>'#'+s.id===location.hash);if(index>=0&&index!==state.index)showSlide(index,{hash:false})});window.addEventListener('resize',()=>{cancelMotion();fit();scheduleRepeat()});document.addEventListener('visibilitychange',()=>{cancelMotion();scheduleRepeat()});reduced.addEventListener('change',()=>{cancelMotion();updateRepeatControl();scheduleRepeat()});
+window.addEventListener('beforeprint',()=>{cancelMotion();state.printing=true;state.printScroll=Array.from(document.querySelectorAll('.diagram-scroll,.source-code'),e=>({e,left:e.scrollLeft,top:e.scrollTop}));for(const item of state.printScroll){item.e.scrollLeft=0;item.e.scrollTop=0}for(const entry of elements.values()){entry.article.hidden=false;entry.article.inert=true}});
+window.addEventListener('afterprint',()=>{state.printing=false;showSlide(state.index,{animate:false,hash:false});for(const item of state.printScroll){item.e.scrollLeft=item.left;item.e.scrollTop=item.top}state.printScroll=[]});
+updateRepeatControl();
+const initial=data.slides.findIndex(s=>'#'+s.id===location.hash);showSlide(initial>=0?initial:0,{animate:false});
+</script>
+</body>
+</html>

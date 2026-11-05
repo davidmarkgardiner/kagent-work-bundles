@@ -1,0 +1,1004 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="icon" href="data:,">
+<title>The secure agent journey | Interactive architecture</title>
+<style>
+:root {
+  --surface:#ffffff;
+  --backdrop:#e7e6e2;
+  --text:#141414;
+  --body-text:#383838;
+  --muted:#666462;
+  --border:#e3e1dc;
+  --panel:#f6f5f2;
+  --accent:#e60000;
+  --link:#1f5fa6;
+  --link-tint:#e9f0f9;
+  --positive:#17804a;
+  --positive-tint:#e5f3eb;
+  --reference:#9a5c12;
+  --reference-tint:#fdf0dc;
+  --font:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --code-font:ui-monospace,Consolas,monospace;
+  --panel-radius:16px;
+  --node-radius:12px;
+  --layout-gap:24px;
+  --enter-duration:450ms;
+  --packet-duration:850ms;
+  --scale:1;
+}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:var(--font);color:var(--text);background:var(--backdrop)}body{height:100dvh;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:18px 24px 100px}button,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,pre:focus-visible{outline:3px solid var(--link);outline-offset:4px}button:disabled{cursor:default;opacity:.38}button:focus:not(:focus-visible){outline:none}[hidden]{display:none!important}#stage{position:relative;flex:none;background:var(--surface)}#canvas{position:relative;width:1600px;height:900px;transform:scale(var(--scale));transform-origin:top left;background:var(--surface)}.slide{position:absolute;inset:0;width:1600px;height:900px;padding:40px 56px;background:var(--surface)}.accent-rule{width:64px;height:5px;background:var(--accent);margin-bottom:25px}.eyebrow{font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}h1{font-size:48px;font-weight:720;line-height:1.12;letter-spacing:-.025em;margin:17px 0 13px;max-width:1480px}p.intro{font-size:22px;line-height:1.4;color:var(--body-text);margin:0;max-width:1440px}.slide-topline{position:absolute;right:56px;top:42px;font-size:13px;color:var(--muted);display:flex;gap:15px;align-items:center}.illustration-label{border:1px solid var(--border);padding:5px 10px;border-radius:4px;background:var(--panel);letter-spacing:.035em;font-size:12px}.content{position:absolute;top:240px;left:56px;width:1488px}.interaction-row{display:flex;align-items:center;justify-content:space-between;min-height:32px;gap:20px;margin-bottom:9px}.scenario-group{display:flex;gap:calc(var(--layout-gap) / 3);flex-wrap:wrap}.scenario{border:1px solid var(--border);background:var(--surface);color:var(--body-text);border-radius:6px;padding:8px 12px;font-size:15px}.scenario[aria-pressed=true]{color:var(--link);border-color:var(--link);background:var(--link-tint)}.diagram-hint{font-size:14px;color:var(--muted)}.mobile-hint{display:none}.diagram-scroll{overflow:visible}.diagram{position:relative;width:1488px;height:450px;border:1px solid var(--border);border-radius:var(--panel-radius);background:var(--surface)}.connections{position:absolute;inset:0;width:1488px;height:450px;overflow:visible;pointer-events:none}.route{fill:none;stroke:var(--link);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.route.reference{stroke:var(--reference);stroke-dasharray:8 7}.route.red{stroke:var(--accent)}.route.inactive{opacity:.14}.edge-label{font:16px var(--font);fill:var(--muted);text-anchor:middle;paint-order:stroke;stroke:var(--surface);stroke-width:6;stroke-linejoin:round}.edge-label.red{fill:var(--accent)}.edge-label.reference{fill:var(--reference)}.edge-label.inactive{opacity:.2}.packet{pointer-events:none}.stop-mark{stroke:var(--accent);stroke-width:3;stroke-linecap:round}.stop-mark.inactive{opacity:.12}.node{position:absolute;text-align:left;display:flex;flex-direction:column;justify-content:center;padding:22px;background:var(--panel);border:1px solid var(--border);border-radius:var(--node-radius);color:var(--text);transition:border-color 140ms,box-shadow 140ms}.node:hover{border-color:var(--link);box-shadow:0 0 0 2px var(--link-tint)}.node-top{display:flex;align-items:center;gap:11px;margin-bottom:12px}.node svg{width:30px;height:30px;flex:0 0 30px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.node h2{font-size:22px;line-height:1.2;letter-spacing:-.015em;margin:0;font-weight:680}.node p{font-size:16px;line-height:1.4;color:var(--body-text);margin:0}.node.dark{background:var(--text);border-color:var(--text);color:var(--surface)}.node.dark p{color:var(--surface)}.node.blue{background:var(--link-tint);border-color:var(--link);color:var(--link)}.node.reference{background:var(--reference-tint);border-color:var(--reference);color:var(--reference)}.node.compact{padding:11px 18px}.node.compact .node-top{margin-bottom:5px;gap:9px}.node.compact h2{font-size:18px}.node.compact svg{height:24px;width:24px;flex-basis:24px}.node.compact p{font-size:14px}.node.code-node{justify-content:flex-start;padding:23px;background:var(--panel)}.node.code-node .node-top{margin-bottom:8px}.inline-code{font:15px/1.7 var(--code-font);white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;margin:10px 0 0;color:var(--body-text)}.node .inspect-hint{font-size:12px;color:var(--muted);margin-top:auto;padding-top:12px}.legend-row{display:flex;justify-content:space-between;align-items:center;gap:25px;margin-top:12px;font-size:14px;color:var(--muted)}.legend{display:flex;gap:20px;align-items:center}.legend span{display:flex;align-items:center;gap:8px}.legend i{display:inline-block;width:35px;border-top:2px solid var(--link)}.legend i.dashed{border-top:2px dashed var(--reference)}.status{font-size:14px;line-height:1.4;max-width:980px;color:var(--body-text);min-height:20px}.strips{position:absolute;left:16px;right:16px;bottom:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.strip{background:var(--panel);border:1px solid var(--border);padding:12px 16px;border-radius:8px;min-width:0}.strip strong{display:block;font-size:17px;line-height:1.3;margin-bottom:3px}.strip p{font-size:14px;line-height:1.35;color:var(--body-text);margin:0}.takeaway{position:absolute;left:56px;right:56px;bottom:50px;min-height:57px;display:flex;align-items:center;gap:18px;padding:15px 19px;border-left:4px solid var(--link);background:var(--link-tint);font-size:20px;line-height:1.4;color:var(--text)}.takeaway strong{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--link);white-space:nowrap}.deck-link{color:var(--link);text-underline-offset:3px}.slide-footer{position:absolute;bottom:20px;left:56px;right:56px;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:13px}.toolbar{position:fixed;bottom:17px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:10px;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:9px 12px;max-width:calc(100vw - 24px)}.toolbar button{border:1px solid var(--border);background:var(--surface);border-radius:6px;padding:9px 13px;color:var(--body-text);font-size:14px;white-space:nowrap}.toolbar button:hover{background:var(--link-tint);color:var(--link);border-color:var(--link)}.repeat-control{display:flex;align-items:center;gap:7px;font-size:12px;white-space:nowrap;color:var(--muted)}.repeat-control select{border:1px solid var(--border);background:var(--surface);color:var(--body-text);border-radius:6px;padding:9px 5px;font-size:13px}.repeat-control select:disabled{opacity:.5}.toolbar .primary{background:var(--link);border-color:var(--link);color:var(--surface)}.toolbar .primary:hover{background:var(--link);color:var(--surface)}#slideCounter{min-width:72px;text-align:center;font-size:14px;color:var(--muted);white-space:nowrap}.keyboard-help{font-size:11px;color:var(--muted);text-align:center;position:fixed;bottom:1px;left:0;right:0;pointer-events:none}.print-note{display:none}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}dialog{border:1px solid var(--border);border-radius:var(--panel-radius);background:var(--surface);color:var(--text);padding:26px;width:min(900px,calc(100vw - 40px));max-height:calc(100dvh - 40px);overflow:auto}dialog::backdrop{background:rgba(20,20,20,.38)}dialog h2{font-size:27px;letter-spacing:-.02em;margin:0 0 18px}dialog label{display:block;font-size:14px;font-weight:650}dialog select{display:block;margin:8px 0 14px;width:100%;padding:11px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text)}.source-meta{font-size:13px;color:var(--reference);margin:0 0 12px}.source-code{max-height:53dvh;overflow:auto;border:1px solid var(--border);border-radius:8px;background:var(--panel);padding:18px;white-space:pre;font:14px/1.6 var(--code-font);color:var(--body-text);margin:0}.dialog-buttons{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}.dialog-buttons button{border:1px solid var(--border);background:var(--surface);border-radius:6px;padding:10px 15px}.dialog-buttons .primary{background:var(--link);border-color:var(--link);color:var(--surface)}#copyStatus{font-size:13px;min-height:20px;margin:10px 0 0;color:var(--body-text)}#notesText{white-space:pre-line;line-height:1.7;color:var(--body-text);font-size:17px}#notesTitle{margin-bottom:12px}.reference-note{font-size:14px;color:var(--muted);line-height:1.5}
+@media(max-width:899px){html,body{height:auto;min-height:100%;overflow:visible}body{display:block;padding:14px 12px 190px}#stage{width:100%!important;height:auto!important}#canvas{width:100%;height:auto;transform:none}.slide{position:relative;inset:auto;width:100%;height:auto;min-height:0;padding:28px 24px}.accent-rule{margin-bottom:20px;width:54px;height:4px}.eyebrow{font-size:11px;max-width:65%}.slide-topline{top:28px;right:24px;gap:0}.slide-topline .version{display:none}.illustration-label{font-size:10px;padding:4px 6px}h1{font-size:32px;line-height:1.12;margin:22px 0 14px}p.intro{font-size:18px;line-height:1.5}.content{position:static;width:auto;margin-top:24px}.interaction-row{display:block;margin-bottom:14px}.scenario-group{gap:7px}.scenario{padding:8px 9px;font-size:13px}.diagram-hint{margin-top:12px;font-size:12px}.mobile-hint{display:block;color:var(--link);font-size:12px;margin:12px 0 8px}.diagram-scroll{overflow-x:auto;overflow-y:hidden;border-radius:var(--panel-radius);border:1px solid var(--border);max-width:100%;overscroll-behavior-x:contain}.diagram{border:0;border-radius:0}.legend-row{display:block;margin-top:16px}.legend{gap:13px;flex-wrap:wrap;font-size:12px;margin-bottom:12px}.legend i{width:25px}.status{font-size:14px;min-height:0}.takeaway{position:static;margin-top:24px;display:block;min-height:0;padding:16px;font-size:17px}.takeaway strong{display:block;margin-bottom:7px}.slide-footer{position:static;display:block;font-size:11px;margin-top:24px}.slide-footer span{display:block;margin-top:6px}.toolbar{left:8px;right:8px;bottom:17px;transform:none;max-width:none;flex-wrap:wrap;padding:8px;gap:7px}.toolbar button{padding:8px 10px;font-size:12px}#slideCounter{min-width:55px;font-size:12px}.keyboard-help{font-size:9px;background:var(--backdrop);bottom:2px}.source-code{font-size:12px;max-height:50dvh}dialog{padding:20px}dialog h2{font-size:23px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@page{size:1600px 900px;margin:0}
+@media print{html,body{margin:0!important;padding:0!important;width:1600px!important;height:auto!important;min-height:0!important;overflow:visible!important;background:var(--surface)!important;display:block!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}#stage{position:static!important;display:block!important;width:1600px!important;height:auto!important;margin:0!important;border:0!important}#canvas{width:1600px!important;height:auto!important;transform:none!important;position:static!important;display:block!important}.slide,.slide[hidden]{display:block!important;position:relative!important;inset:auto!important;width:1600px!important;height:900px!important;min-height:900px!important;padding:40px 56px!important;break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid}.slide:last-child{break-after:auto;page-break-after:auto}.toolbar,.keyboard-help,dialog,dialog::backdrop,.scenario-group,.diagram-hint,.mobile-hint,.packet,.inspect-hint{display:none!important}.content{position:absolute!important;top:240px!important;left:56px!important;width:1488px!important;margin:0!important}.interaction-row{display:block!important;min-height:25px!important;margin-bottom:10px!important}.print-note{display:block;font-size:14px;color:var(--muted)}.diagram-scroll{overflow:visible!important;border:0!important}.diagram{width:1488px!important;height:450px!important;border:1px solid var(--border)!important;break-inside:avoid;page-break-inside:avoid}.node{opacity:1!important;transform:none!important;box-shadow:none!important;transition:none!important}.route.inactive,.edge-label.inactive,.stop-mark.inactive{opacity:1!important}.legend-row{display:flex!important;gap:20px!important}.legend{display:flex!important;font-size:14px!important;margin:0!important}.status{display:none!important}.takeaway{position:absolute!important;left:56px!important;right:56px!important;bottom:50px!important;display:flex!important;min-height:57px!important;margin:0!important;padding:15px 19px!important;font-size:20px!important}.takeaway strong{display:inline!important;margin:0!important}.slide-footer{position:absolute!important;bottom:20px!important;left:56px!important;right:56px!important;display:flex!important;font-size:13px!important;margin:0!important}.slide-footer span{display:inline!important;margin:0!important}.slide-topline{top:42px!important;right:56px!important}.slide-topline .version{display:inline!important}.illustration-label{font-size:12px!important;padding:5px 10px!important}.accent-rule{width:64px!important;height:5px!important;margin-bottom:25px!important}.eyebrow{font-size:14px!important;max-width:none!important}h1{font-size:48px!important;margin:17px 0 13px!important;line-height:1.12!important}p.intro{font-size:22px!important;line-height:1.4!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>
+<symbol id="icon-file" viewBox="0 0 32 32"><path d="M8 3h11l6 6v20H8zM19 3v7h6M12 15h9M12 20h9M12 25h6"/></symbol>
+<symbol id="icon-graph" viewBox="0 0 32 32"><rect x="2" y="12" width="8" height="8" rx="2"/><rect x="23" y="2" width="7" height="8" rx="2"/><rect x="23" y="22" width="7" height="8" rx="2"/><path d="M10 16h7V6h6M17 16v10h6"/></symbol>
+<symbol id="icon-agent" viewBox="0 0 32 32"><rect x="5" y="9" width="22" height="18" rx="5"/><path d="M16 9V4M13 4h6M11 16v2M21 16v2M11 23h10M2 15v6M30 15v6"/></symbol>
+<symbol id="icon-shield" viewBox="0 0 32 32"><path d="M16 3 27 8v9c0 6-6 10-11 13C11 27 5 23 5 17V8zM10 16l4 4 8-9"/></symbol>
+<symbol id="icon-key" viewBox="0 0 32 32"><circle cx="11" cy="12" r="7"/><path d="m16 17 12 12M22 23l4-4M25 26l4-4"/></symbol>
+<symbol id="icon-model" viewBox="0 0 32 32"><path d="m16 3 12 7-12 7L4 10zM4 16l12 7 12-7M4 22l12 7 12-7"/></symbol>
+<symbol id="icon-tools" viewBox="0 0 32 32"><path d="M5 5h22v22H5zM5 12h22M12 12v15M16 17h7M16 22h5M9 8h1M14 8h1"/></symbol>
+<symbol id="icon-eye" viewBox="0 0 32 32"><path d="M2 16s5-9 14-9 14 9 14 9-5 9-14 9S2 16 2 16z"/><circle cx="16" cy="16" r="4"/></symbol>
+<symbol id="icon-check" viewBox="0 0 32 32"><rect x="5" y="3" width="22" height="27" rx="3"/><path d="m10 17 4 4 9-11M11 7h10"/></symbol>
+<symbol id="icon-network" viewBox="0 0 32 32"><rect x="11" y="2" width="10" height="8" rx="2"/><rect x="2" y="23" width="10" height="7" rx="2"/><rect x="20" y="23" width="10" height="7" rx="2"/><path d="M16 10v7M7 23v-6h18v6"/></symbol>
+<symbol id="icon-identity" viewBox="0 0 32 32"><circle cx="12" cy="9" r="5"/><path d="M3 28v-4a9 9 0 0 1 15-7M23 15l7 4v5c0 3-4 5-7 7-3-2-7-4-7-7v-5z"/></symbol>
+<symbol id="icon-box" viewBox="0 0 32 32"><rect x="4" y="4" width="24" height="24" rx="4"/><path d="M10 11h12M10 17h12M10 23h6"/></symbol>
+</defs></svg>
+<main id="stage" aria-label="Interactive secure-agent architecture presentation"><div id="canvas"></div></main>
+<nav class="toolbar" aria-label="Slide controls">
+<button id="previous" aria-label="Previous slide">← Previous</button><span id="slideCounter" aria-live="polite" aria-atomic="true"></span><button id="next" class="primary" aria-label="Next slide">Next →</button>
+<button id="replay" aria-label="Replay illustrated flow, shortcut R">Replay · R</button><label class="repeat-control" for="repeat">Repeat after <select id="repeat" aria-label="Pause between automatic replays"><option value="0">Off</option><option value="3000">3 seconds</option><option value="5000">5 seconds</option><option value="10000">10 seconds</option></select></label><button id="notes" aria-label="Presenter notes, shortcut N">Notes · N</button><button id="details">Sources / details</button><button id="print">Print all slides</button>
+</nav>
+<div class="keyboard-help">← → / PgUp PgDn · Home End · R replay · N notes · Click a component to inspect</div>
+<div class="sr-only" id="slideAnnouncement" role="status" aria-live="polite"></div>
+<dialog id="sourceDialog" aria-labelledby="sourceHeading"><h2 id="sourceHeading">Component source and details</h2><label for="sourceSelect">Choose a component</label><select id="sourceSelect"></select><p class="source-meta" id="sourceMeta"></p><pre class="source-code" id="sourceCode" tabindex="0"></pre><p id="copyStatus" role="status" aria-live="polite"></p><div class="dialog-buttons"><button id="copySource" class="primary">Copy source text</button><button id="closeSource">Close</button></div></dialog>
+<dialog id="notesDialog" aria-labelledby="notesTitle"><h2 id="notesTitle">Presenter notes</h2><p id="notesText"></p><p class="reference-note">All sample values and states in this deck are illustrative. No workplace data, credentials or real execution receipts are embedded.</p><div class="dialog-buttons"><button id="closeNotes">Close notes</button></div></dialog>
+<script type="application/json" id="deckData">{
+  "slides": [
+    {
+      "id": "compare",
+      "label": "01 / Same agent, repeatable protection",
+      "title": "Same useful agent. Different protection.",
+      "intro": "Native kagent runs both versions. KRO assembles the surrounding controls for the secure service.",
+      "takeaway": "Keep permissions equal. Demonstrate the security assembly and its denied paths.",
+      "nodes": [
+        {
+          "id": "intent",
+          "title": "Same customer intent",
+          "detail": "Prompt, model, selected skills and tools",
+          "source": "customer",
+          "x": 10,
+          "y": 140,
+          "w": 280,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "normal",
+          "title": "Native Agent alone",
+          "detail": "Runtime + Service; platform setup is separate",
+          "source": "comparison",
+          "x": 450,
+          "y": 25,
+          "w": 330,
+          "h": 175,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "normal-boundary",
+          "title": "Separate platform work",
+          "detail": "Gateway auth, isolation, verification and telemetry",
+          "source": "comparison",
+          "x": 1000,
+          "y": 25,
+          "w": 460,
+          "h": 175,
+          "tone": "neutral",
+          "icon": "network"
+        },
+        {
+          "id": "secure",
+          "title": "KRO secure instance",
+          "detail": "Creates the same native Agent",
+          "source": "graph",
+          "x": 450,
+          "y": 250,
+          "w": 330,
+          "h": 175,
+          "tone": "dark",
+          "icon": "graph"
+        },
+        {
+          "id": "envelope",
+          "title": "Composed security envelope",
+          "detail": "JWT routes, identities, network intent and Golden",
+          "source": "security",
+          "x": 1000,
+          "y": 250,
+          "w": 460,
+          "h": 175,
+          "tone": "blue",
+          "icon": "shield"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M290 190H370V112H450",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "b",
+          "d": "M290 260H370V337H450",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "c",
+          "d": "M780 112H1000",
+          "label": "configure separately",
+          "lx": 890,
+          "ly": 88,
+          "tone": "reference",
+          "reference": true,
+          "scenarios": null
+        },
+        {
+          "id": "d",
+          "d": "M780 337H1000",
+          "label": "compose automatically",
+          "lx": 890,
+          "ly": 312,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "Open the comparison source. A native agent is not inherently insecure. The baseline here omits the extra composed envelope. Test the same authorized task and the same unauthorized identities on each configured front door. Do not grant broad permissions to manufacture the contrast."
+    },
+    {
+      "id": "tools",
+      "label": "02 / Approved capability catalog",
+      "title": "Pick the tools the task actually needs.",
+      "intro": "Select reviewed bindings at startup. Each MCP server retains its own authentication, scope and data controls.",
+      "takeaway": "Selecting a tool exposes an operation. Backend permissions decide what it can do.",
+      "nodes": [
+        {
+          "id": "agent",
+          "title": "Native kagent Agent",
+          "detail": "Approved model + explicit tool names",
+          "source": "catalog",
+          "x": 10,
+          "y": 140,
+          "w": 280,
+          "h": 170,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "denodo",
+          "title": "Denodo MCP",
+          "detail": "Approved metadata + bounded read-only data",
+          "source": "denodo",
+          "x": 490,
+          "y": 30,
+          "w": 420,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "tools"
+        },
+        {
+          "id": "gitlab",
+          "title": "GitLab MCP",
+          "detail": "Issues, source and CI; writes use a separate role",
+          "source": "gitlab",
+          "x": 1040,
+          "y": 30,
+          "w": 420,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "kube",
+          "title": "Kubernetes MCP",
+          "detail": "Namespace-scoped workload status and events",
+          "source": "kubernetes",
+          "x": 490,
+          "y": 250,
+          "w": 420,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "network"
+        },
+        {
+          "id": "kagent",
+          "title": "kagent tools",
+          "detail": "Selected MCP operations or approved Agent delegation",
+          "source": "kagent-tools",
+          "x": 1040,
+          "y": 250,
+          "w": 420,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "agent"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M290 185H370V115H490",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "b",
+          "d": "M150 140V12H1250V30",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "c",
+          "d": "M290 265H370V335H490",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d",
+          "d": "M150 310V437H1250V420",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "These four tool families are a generic catalog, not an installed inventory. Open each node for a prompt and permission notes. Use real discovery before binding names. The GitLab write-capable SDLC profile is deliberately separate from the read-only comparison."
+    },
+    {
+      "id": "skills",
+      "label": "03 / Skills at startup",
+      "title": "Select skills. Let kagent load them.",
+      "intro": "The customer selects approved skill IDs; the platform resolves native sources and the runtime mounts their contents.",
+      "takeaway": "Skills provide reviewed instructions and content. They do not grant access.",
+      "nodes": [
+        {
+          "id": "catalog",
+          "title": "Approved skills",
+          "detail": "Triage, code review, data dictionary",
+          "source": "catalog",
+          "x": 10,
+          "y": 140,
+          "w": 250,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "select",
+          "title": "Customer selection",
+          "detail": "Catalog IDs in the one customer YAML",
+          "source": "customer",
+          "x": 310,
+          "y": 140,
+          "w": 250,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "check"
+        },
+        {
+          "id": "native",
+          "title": "Native skill refs",
+          "detail": "Pinned GitLab commit or OCI digest",
+          "source": "skill-native",
+          "x": 610,
+          "y": 140,
+          "w": 250,
+          "h": 180,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "init",
+          "title": "skills-init",
+          "detail": "Fetch using scoped credentials and egress",
+          "source": "skill-mount",
+          "x": 910,
+          "y": 140,
+          "w": 250,
+          "h": 180,
+          "tone": "neutral",
+          "icon": "box"
+        },
+        {
+          "id": "mount",
+          "title": "Runtime /skills",
+          "detail": "Selected runbooks + supporting files",
+          "source": "skill-mount",
+          "x": 1210,
+          "y": 140,
+          "w": 260,
+          "h": 180,
+          "tone": "blue",
+          "icon": "file"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M260 230H310",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "b",
+          "d": "M560 230H610",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "c",
+          "d": "M860 230H910",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d",
+          "d": "M1160 230H1210",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "Click Native skill refs for a synthetic kagent.dev/v1alpha2 Agent excerpt. GitLab supplies native gitRefs; a front-door ConfigMap is not needed to turn a prompt into a native Agent. Full runtime compatibility, source auth and narrow fetch egress must be verified in the target. Skill-loading is not claimed by the Golden model ping."
+    },
+    {
+      "id": "gateway",
+      "label": "04 / Routing, policy and consumption",
+      "title": "The Gateway governs each connection.",
+      "intro": "Use explicit caller, model and tool paths. Apply the supported policy at the boundary that owns the decision.",
+      "takeaway": "JWT proves a caller identity. Tool grants, route selection and budgets remain distinct.",
+      "nodes": [
+        {
+          "id": "front",
+          "title": "Frontend boundary",
+          "detail": "Listener TLS, connection settings and telemetry",
+          "source": "gateway-policy",
+          "x": 10,
+          "y": 25,
+          "w": 390,
+          "h": 170,
+          "tone": "blue",
+          "icon": "shield"
+        },
+        {
+          "id": "traffic",
+          "title": "Traffic policies",
+          "detail": "JWT + CEL authorization; request limits",
+          "source": "gateway-policy",
+          "x": 550,
+          "y": 25,
+          "w": 390,
+          "h": 170,
+          "tone": "dark",
+          "icon": "key"
+        },
+        {
+          "id": "back",
+          "title": "Backend policies",
+          "detail": "Verified TLS, provider auth, model and MCP controls",
+          "source": "gateway-policy",
+          "x": 1080,
+          "y": 25,
+          "w": 390,
+          "h": 170,
+          "tone": "blue",
+          "icon": "tools"
+        },
+        {
+          "id": "usage",
+          "title": "Observed usage",
+          "detail": "Real input/output tokens, latency and attribution",
+          "source": "usage",
+          "x": 10,
+          "y": 255,
+          "w": 390,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "eye"
+        },
+        {
+          "id": "budget",
+          "title": "Consumption controls",
+          "detail": "Local/global limits and reviewed generation caps",
+          "source": "usage",
+          "x": 550,
+          "y": 255,
+          "w": 390,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "check"
+        },
+        {
+          "id": "grant",
+          "title": "Reference consent",
+          "detail": "ReferenceGrant only for supported cross-namespace refs",
+          "source": "gateway-policy",
+          "x": 1080,
+          "y": 255,
+          "w": 390,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "network"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M400 110H550",
+          "label": "authenticate",
+          "lx": 475,
+          "ly": 86,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "b",
+          "d": "M940 110H1080",
+          "label": "route + authorize",
+          "lx": 1010,
+          "ly": 86,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "c",
+          "d": "M205 195V255",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d",
+          "d": "M745 195V255",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "e",
+          "d": "M1275 255V195",
+          "label": "conditional",
+          "lx": 1333,
+          "ly": 230,
+          "tone": "reference",
+          "reference": true,
+          "scenarios": null
+        }
+      ],
+      "notes": "Current composition supplies JWT route controls and identity separation. TLS variants, token budgets, MCP policies and dashboards are available configuration choices, not all automatically deployed by this bundle. Expand the policy and usage nodes for the capability map, its caveats and official source URLs."
+    },
+    {
+      "id": "telemetry",
+      "label": "05 / OTel and LGTM",
+      "title": "Follow one request through the system.",
+      "intro": "Export real request, model and tool telemetry. Use LGTM to explain behaviour and diagnose application impact.",
+      "takeaway": "A dashboard is useful when a real request can be traced to its observed usage and outcome.",
+      "nodes": [
+        {
+          "id": "emit",
+          "title": "Agent + Gateway + MCP",
+          "detail": "Actual spans, sanitized logs and usage",
+          "source": "otel",
+          "x": 10,
+          "y": 140,
+          "w": 260,
+          "h": 175,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "collect",
+          "title": "OTel Collector",
+          "detail": "Receive, redact, correlate and export",
+          "source": "otel",
+          "x": 370,
+          "y": 140,
+          "w": 260,
+          "h": 175,
+          "tone": "blue",
+          "icon": "network"
+        },
+        {
+          "id": "loki",
+          "title": "Loki",
+          "detail": "Logs and audit metadata",
+          "source": "dashboards",
+          "x": 770,
+          "y": 5,
+          "w": 260,
+          "h": 140,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "tempo",
+          "title": "Tempo",
+          "detail": "Request, model and tool traces",
+          "source": "dashboards",
+          "x": 770,
+          "y": 155,
+          "w": 260,
+          "h": 140,
+          "tone": "neutral",
+          "icon": "network"
+        },
+        {
+          "id": "mimir",
+          "title": "Mimir",
+          "detail": "Latency, errors and token metrics",
+          "source": "dashboards",
+          "x": 770,
+          "y": 305,
+          "w": 260,
+          "h": 140,
+          "tone": "neutral",
+          "icon": "eye"
+        },
+        {
+          "id": "grafana",
+          "title": "Grafana dashboards",
+          "detail": "Trace drill-down, policies, usage and uptime",
+          "source": "dashboards",
+          "x": 1190,
+          "y": 140,
+          "w": 280,
+          "h": 175,
+          "tone": "blue",
+          "icon": "eye"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M270 227H370",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "b",
+          "d": "M630 200H700V78H770",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "c",
+          "d": "M630 227H770",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d",
+          "d": "M630 255H700V372H770",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "e",
+          "d": "M1030 78H1110V195H1190",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "f",
+          "d": "M1030 225H1190",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "g",
+          "d": "M1030 372H1110V260H1190",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "This is reference observability wiring. No live values are shown. Existing platform exporters may take direct paths; the installed collector and exporters decide the real route. Correlate real task and tool-call IDs, suppress sensitive bodies and show missing telemetry as missing."
+    },
+    {
+      "id": "lifecycle",
+      "label": "06 / Operate and evolve",
+      "title": "Creation is the first lifecycle step.",
+      "intro": "The same controlled contract covers deployment, verification, useful work, changes and retirement.",
+      "takeaway": "Reverify changed dependencies and revoke access deliberately; a past Golden pass is not a live lease.",
+      "nodes": [
+        {
+          "id": "intent",
+          "title": "Author + select",
+          "detail": "Prompt, model, skills and tools",
+          "source": "customer",
+          "x": 10,
+          "y": 35,
+          "w": 300,
+          "h": 165,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "compose",
+          "title": "Admit + compose",
+          "detail": "Native Agent and security envelope",
+          "source": "graph",
+          "x": 580,
+          "y": 35,
+          "w": 300,
+          "h": 165,
+          "tone": "dark",
+          "icon": "graph"
+        },
+        {
+          "id": "verify",
+          "title": "Golden verification",
+          "detail": "Record actual model-path proof",
+          "source": "golden",
+          "x": 1160,
+          "y": 35,
+          "w": 310,
+          "h": 165,
+          "tone": "neutral",
+          "icon": "check"
+        },
+        {
+          "id": "retire",
+          "title": "Retire + revoke",
+          "detail": "Remove access and owned resources",
+          "source": "lifecycle",
+          "x": 10,
+          "y": 255,
+          "w": 300,
+          "h": 165,
+          "tone": "neutral",
+          "icon": "key"
+        },
+        {
+          "id": "change",
+          "title": "Change + reverify",
+          "detail": "Control revisions and caller exposure",
+          "source": "lifecycle",
+          "x": 580,
+          "y": 255,
+          "w": 300,
+          "h": 165,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "serve",
+          "title": "Serve + observe",
+          "detail": "Authenticated tasks, real usage and traces",
+          "source": "otel",
+          "x": 1160,
+          "y": 255,
+          "w": 310,
+          "h": 165,
+          "tone": "blue",
+          "icon": "eye"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M310 117H580",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "b",
+          "d": "M880 117H1160",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "c",
+          "d": "M1315 200V255",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d",
+          "d": "M1160 337H880",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "e",
+          "d": "M580 337H310",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "f",
+          "d": "M730 255V200",
+          "label": "reverify",
+          "lx": 795,
+          "ly": 230,
+          "tone": "reference",
+          "reference": true,
+          "scenarios": null
+        }
+      ],
+      "notes": "Explain that the actual Golden result is separate from this illustration. A completed verifier Job is not continuous revocation. Future Entra caller identity and UAMI-to-tool authorization build on this lifecycle. The customer-facing UI or builder agent can produce the same reviewed input YAML."
+    }
+  ],
+  "sources": {
+    "catalog": {
+      "title": "Approved startup catalog",
+      "text": "Illustrative catalog, not an inventory of installed services.\nModels: approved-general, approved-code, approved-data.\nSkills: platform-triage, gitlab-review, data-dictionary.\nTools: kubernetes-readonly, gitlab-readonly, denodo-readonly, kagent-tools-readonly.\nCustomer picks identifiers; the platform resolves immutable reviewed definitions.\nOnly selected tool names are exposed. The server and its credentials enforce real permissions.\nDiscovery is required before using actual MCP names. No generic write/delete tools in the read-only demonstration.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "comparison": {
+      "title": "Fair native versus composed comparison",
+      "text": "Same inputs on both sides: system prompt, approved ModelConfig, selected skills and read-only MCP bindings.\nNative Agent alone: kagent reconciles its runtime and Service. Surrounding Gateway authentication, network isolation, verification and audit configuration need separate platform work.\nClassicSecureAgent composition: KRO creates the native Agent plus the prescribed identities, routes, JWT policies, network intent and Golden verifier.\nDemonstrate the value with paired allowed and denied requests, not with a deliberately privileged baseline.\nNormal kagent can also be secured manually. This comparison is about repeatable assembly.\nA successful model PONG does not prove MCP authorization or CNI enforcement.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "customer": {
+      "title": "Customer intent",
+      "type": "Synthetic customer YAML",
+      "text": "# Illustration only. Generic values, not a deployment instruction.\napiVersion: demo.kagent.dev/v1alpha1\nkind: ClassicSecureAgent\nmetadata:\n  name: sample-agent\n  namespace: demo-agents\nspec:\n  modelConfig: approved-example\n  systemPrompt: Answer using approved information.\n  skills: [reviewed-guidance]\n  tools: [inventory-readonly]\n"
+    },
+    "dashboards": {
+      "title": "LGTM views",
+      "text": "Loki: sanitized errors, auth failures and tool-call audit metadata.\nTempo: actual spans across request, model and MCP operations, linked by real trace context.\nMimir: request count, latency, error rate and actual token usage where emitted.\nGrafana: task/trace drill-down, model/route usage, policy denials and application rollout/health.\nIllustrative panel names, no invented dashboard values or live green badges.\nAuthentication failures, tool permission failures and model/provider failures need separate views.\nSampling, missing instrumentation and retention can leave gaps. Check coverage explicitly.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "denodo": {
+      "title": "Denodo MCP",
+      "text": "Illustrative data assistant binding.\nRemoteMCPServer points to the approved Denodo MCP endpoint.\nExpose reviewed metadata and bounded read-only data operations only.\nThe data platform enforces views, grants and result limits; a prompt cannot confer permission.\nExample audience question: Which approved dataset contains the service-level measure?\nProof needed: actual MCP call record, authorized bounded result and a denied unapproved operation.\nNo Denodo endpoint, credentials or live results are embedded.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "gateway-policy": {
+      "title": "Gateway policy layers",
+      "text": "Policy capability map. Validate fields against the installed AgentgatewayPolicy CRD.\nComposed demo: protected HTTPRoutes, strict JWT checks and caller/verifier identity separation.\nFrontend options: listener TLS/mTLS setup, connection controls, access logs, tracing and metrics.\nTraffic options: JWT issuer/audience checks, CEL authorization, external auth, request and token rate limits.\nBackend options: approved provider auth, verified TLS, model aliases/routes and selected MCP tool authorization.\nReferenceGrant is required only for a supported cross-namespace backend reference. It is consent to reference, not runtime authentication.\nExact model/MCP routing, credentials and backend grants must be configured independently.\nPrimary reference: https://agentgateway.dev/docs/kubernetes/latest/documentation/security/",
+      "type": "Illustrative design and configuration notes"
+    },
+    "gitlab": {
+      "title": "GitLab MCP",
+      "text": "Read-only demo: inspect issues, repository files and pipeline status in an approved project.\nDelivery demonstration: a separate write-capable identity exposes only reviewed branch/file/draft-MR operations.\nDo not reuse delivery credentials for the read-only agent.\nCreating an MR is not approval to merge. Require human review and exact-head checks.\nExample question: Summarize the failing pipeline and its associated change.\nTool names must come from the deployed MCP server's discovery response.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "golden": {
+      "title": "Golden verification",
+      "type": "Synthetic Job / token contract excerpt",
+      "text": "apiVersion: batch/v1\nkind: Job\nmetadata:\n  name: sample-golden\nspec:\n  backoffLimit: 0\n  # Container, ConfigMap and network settings omitted.\n  template:\n    spec:\n      serviceAccountName: sample-verifier\n      automountServiceAccountToken: false\n      restartPolicy: Never\n      volumes:\n        - name: verifier-token\n          projected:\n            sources:\n              - serviceAccountToken:\n                  audience: illustrative-agent\n                  expirationSeconds: 600\n                  path: token\n# One actual model request is required by a real run.\n"
+    },
+    "graph": {
+      "title": "KRO resource graph",
+      "type": "Synthetic, abbreviated RGD excerpt",
+      "text": "apiVersion: kro.run/v1alpha1\nkind: ResourceGraphDefinition\nmetadata:\n  name: illustrative-secure-agent\nspec:\n  # Schema, catalogs and other resources omitted.\n  resources:\n    - id: golden\n      readyWhen:\n        - ${golden.status.succeeded == 1}\n      template:\n        apiVersion: batch/v1\n        kind: Job\n        # Full verifier template omitted.\n    - id: callerRoute\n      template:\n        apiVersion: gateway.networking.k8s.io/v1\n        kind: HTTPRoute\n        metadata:\n          annotations:\n            demo.example/verified-job: ${golden.metadata.name}\n# Dependency: callerRoute waits for golden readiness.\n"
+    },
+    "kagent-tools": {
+      "title": "kagent tools and delegation",
+      "text": "kagent-tools can expose Kubernetes and other integration tools through MCP.\nSelect an explicit allowlist of discovered tool names and keep credentials scoped.\nA native Agent may also reference another approved Agent as a tool when supported and configured.\nAn Agent reference is distinct from a RemoteMCPServer reference.\nDelegation does not expand the caller's authorized task or turn every tool into a safe operation.\nThis catalog illustration does not assert those services are installed.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "kubernetes": {
+      "title": "Kubernetes MCP",
+      "text": "Approved namespace-scoped read operations for pods, workload status and events.\nNo apply, delete, exec or resource-changing tools in the comparison baseline.\nUse workload identity and Kubernetes RBAC to enforce actual scope.\nExample question: Which workload has unavailable replicas, and what observed event explains it?\nAn Agent's tool list guides available operations; backend authorization enforces access.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "lifecycle": {
+      "title": "Agent lifecycle and change controls",
+      "text": "1 Author intent using approved prompt, model, skills and tools.\n2 Admit schema/catalog and create native Agent plus security dependencies.\n3 Run Golden and record an actual model-backed response before caller route creation.\n4 Serve through the authenticated route and enforce backend permissions.\n5 Observe real usage, traces, failures and policy decisions.\n6 On material changes, retire caller access and verify again. A completed Job is not continuous revocation.\n7 Retire agent, routes, credentials and generated resources using controlled lifecycle ownership.\nFuture identity extension: approved Entra caller claims and separately scoped workload identity/UAMI for tools.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "otel": {
+      "title": "OTel pipeline",
+      "text": "Reference observability wiring, not proof that dashboards received telemetry.\nInstrument native agent, Gateway and MCP services where supported.\nPropagate trace context and task/tool-call metadata; never manufacture missing parents or spans.\nOTel Collector receives configured telemetry, sanitizes attributes and exports to selected backends.\nUse Loki for logs, Tempo for traces and Mimir for metrics. Grafana queries those backends.\nSome existing platform components may emit directly to their backend; configure receivers/exporters to match.\nNo raw credentials, prompt bodies or tool results should be exported by default.\nVerify one real request end to end, including collector receipt and retained trace/usage counters.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "security": {
+      "title": "What KRO adds",
+      "type": "Illustrative ownership inventory",
+      "text": "KRO-managed envelope\n  Native Agent\n  Runtime / verifier / caller ServiceAccounts\n  Agent and verifier NetworkPolicies\n  Verifier and caller JWT / authorization policies\n  AgentCard and verification HTTPRoutes\n  Golden ConfigMap and Job\n  Caller HTTPRoute, after Golden succeeds\n\nPlatform-owned prerequisites\n  Approved ModelConfig and MCP backends\n  Gateway and strict listener policies\n  Controller permissions, identity and observability\n\nkagent-owned output\n  Normal Deployment, Service and configuration Secret\n"
+    },
+    "skill-mount": {
+      "title": "Skills initialization and mount",
+      "text": "Native kagent's skills-init loads reviewed sources into a shared volume at /skills.\nGitLab is a Git source, not a bespoke front-door ConfigMap mount.\nPin immutable Git commits or OCI digests; use the installed schema for other source types.\nUse a compatible full runtime image, source-auth Secret and approved fetch egress.\nA skill contains SKILL.md instructions and may include supporting files or executable material.\nA knowledge-base document is content. It does not become a skill or access permission just because it is Markdown.\nReview source provenance and scripts. Mounting instructions never grants RBAC or data access.\nVerify the selected revision and a task actually using the skill.",
+      "type": "Illustrative design and configuration notes"
+    },
+    "skill-native": {
+      "title": "Native skill loading example",
+      "text": "# Synthetic native kagent 0.x excerpt. Not a complete deployment.\napiVersion: kagent.dev/v1alpha2\nkind: Agent\nmetadata:\n  name: sample-specialist\nspec:\n  type: Declarative\n  skills:\n    gitRefs:\n      - url: https://gitlab.example.invalid/demo/approved-skills.git\n        ref: \"{{IMMUTABLE_COMMIT_SHA}}\"\n        path: skills/platform-triage\n        name: platform-triage\n    gitAuthSecretRef:\n      name: approved-skills-reader\n  declarative:\n    modelConfig: approved-general\n    systemMessage: Use the selected runbook and approved tools.\n# The customer composition selects catalog IDs; the platform resolves this shape.\n# Native skills initialization loads the shared /skills volume.\n# Use the matching full runtime image for skills, not a slim image lacking support.\n# Fetch credentials and narrowly allowed source egress are separate prerequisites.",
+      "type": "Synthetic native Agent YAML excerpt"
+    },
+    "usage": {
+      "title": "Token usage, attribution and budgets",
+      "text": "Capture actual provider input/output token counters when available.\nCorrelate identity, task, selected model, route, policy decision, latency and tool spans.\nShow unknown for absent usage. Never infer tokens from a coloured diagram or a guessed character ratio.\nRequest limits and LLM-token limits are separate controls.\nLocal counters apply per proxy replica; global budgets require a coordinating service.\nPost-response token accounting can overshoot during in-flight responses. It is not a hard mid-generation spend cutoff.\nCost estimates need an approved pricing catalog and model mapping.\nRedact secrets and sensitive prompt/tool contents before telemetry export.\nPrimary reference: https://agentgateway.dev/docs/kubernetes/latest/documentation/llm/rate-limit/",
+      "type": "Illustrative design and configuration notes"
+    }
+  },
+  "deckLinks": [
+    {
+      "label": "Journey",
+      "href": "journey.html"
+    },
+    {
+      "label": "Triage",
+      "href": "triage.html"
+    },
+    {
+      "label": "SDLC",
+      "href": "sdlc.html"
+    }
+  ]
+}</script>
+<script>
+'use strict';
+const data=JSON.parse(document.getElementById('deckData').textContent);
+const $=id=>document.getElementById(id);
+const svgNS='http://www.w3.org/2000/svg';
+const mobile=matchMedia('(max-width:899px)');
+const reduced=matchMedia('(prefers-reduced-motion:reduce)');
+const state={index:0,scenario:new Map(),raf:null,generation:0,effects:[],markers:[],sourceOpener:null,notesOpener:null,printing:false,printScroll:[],repeatMs:0,repeatTimer:null};
+const elements=new Map();
+function element(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
+function svg(tag,attrs){const e=document.createElementNS(svgNS,tag);for(const [k,v]of Object.entries(attrs))e.setAttribute(k,v);return e}
+function color(path){return path.tone==='red'?'var(--accent)':path.reference?'var(--reference)':'var(--link)'}
+function buildSlide(slide,index){
+ const article=element('article','slide');article.id=slide.id;article.hidden=true;article.inert=true;article.setAttribute('aria-labelledby',slide.id+'-title');article.setAttribute('aria-hidden','true');
+ article.append(element('div','accent-rule'),element('div','eyebrow',slide.label));
+ const topline=element('div','slide-topline');topline.append(element('span','version','Native kagent · KRO · agentgateway'),element('span','illustration-label','Illustration / synthetic examples'));article.append(topline);
+ const heading=element('h1','',slide.title);heading.id=slide.id+'-title';heading.tabIndex=-1;article.append(heading,element('p','intro',slide.intro));
+ const content=element('div','content');const interaction=element('div','interaction-row');const scenarioGroup=element('div','scenario-group');scenarioGroup.setAttribute('role','group');scenarioGroup.setAttribute('aria-label','Illustrated scenarios');
+ for(const option of slide.scenarios||[]){const button=element('button','scenario','Illustration: '+option.label);button.dataset.scenario=option.id;button.addEventListener('click',()=>{state.scenario.set(slide.id,option.id);applyScenario(slide);play()});scenarioGroup.append(button)}
+ interaction.append(scenarioGroup,element('div','diagram-hint','Click a component for source / details'),element('div','print-note','Illustrative architecture. Solid = main flow; dashed = reference or optional path.'));
+ content.append(interaction,element('p','mobile-hint','Scroll diagram sideways to explore all components.'));
+ const scroller=element('div','diagram-scroll');scroller.tabIndex=0;scroller.setAttribute('role','region');scroller.setAttribute('aria-label',slide.title+' diagram; scroll horizontally on narrow screens');
+ const diagram=element('div','diagram');diagram.setAttribute('role','group');diagram.setAttribute('aria-label','Interactive components and labelled connection paths');
+ const lines=svg('svg',{class:'connections',viewBox:'0 0 1488 450','aria-hidden':'true'});const defs=svg('defs',{});for(const [tone,fill]of [['blue','var(--link)'],['reference','var(--reference)'],['red','var(--accent)']]){const arrow=svg('marker',{id:slide.id+'-arrow-'+tone,viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:6,markerHeight:6,orient:'auto'});arrow.append(svg('path',{d:'M1 1L7 4L1 7Z',fill}));defs.append(arrow)}lines.append(defs);const pathMap=new Map();
+ for(const p of slide.paths){const line=svg('path',{d:p.d,class:'route'+(p.reference?' reference':'')+(p.tone==='red'?' red':''),'data-path':p.id,'marker-end':'url(#'+slide.id+'-arrow-'+(p.tone==='red'?'red':p.reference?'reference':'blue')+')'});lines.append(line);pathMap.set(p.id,line);if(p.label){const label=svg('text',{x:p.lx,y:p.ly,class:'edge-label'+(p.reference?' reference':'')+(p.tone==='red'?' red':''),'data-label-path':p.id});label.textContent=p.label;lines.append(label)}}
+ for(const stop of slide.stops||[]){const g=svg('g',{class:'stop-mark','data-stop-scenario':stop.scenario});g.append(svg('path',{d:`M${stop.x-6} ${stop.y-6}L${stop.x+6} ${stop.y+6}M${stop.x+6} ${stop.y-6}L${stop.x-6} ${stop.y+6}`}));lines.append(g)}
+ diagram.append(lines);
+ for(const n of slide.nodes){const button=element('button','node '+n.tone+(n.code?' code-node':'')+(n.h<=100?' compact':''));button.dataset.node=n.id;Object.assign(button.style,{left:n.x+'px',top:n.y+'px',width:n.w+'px',height:n.h+'px'});button.setAttribute('aria-label','Inspect '+n.title);const top=element('div','node-top');const icon=svg('svg',{'aria-hidden':'true',viewBox:'0 0 32 32'});icon.append(svg('use',{href:'#icon-'+n.icon}));top.append(icon,element('h2','',n.title));button.append(top,element('p','',n.detail));if(n.code){button.append(element('pre','inline-code',n.code),element('span','inspect-hint','Click to inspect the full synthetic example'))}button.addEventListener('click',()=>openSource(n.source,button));diagram.append(button)}
+ if(slide.strips){const strips=element('div','strips');for(const item of slide.strips){const strip=element('div','strip');strip.append(element('strong','',item.title),element('p','',item.text));strips.append(strip)}diagram.append(strips)}
+ scroller.append(diagram);content.append(scroller);const legendRow=element('div','legend-row');const legend=element('div','legend');for(const [name,style]of [['Main illustrated flow',''],['Reference / optional','dashed']]){const span=element('span','');span.append(element('i',style),document.createTextNode(name));legend.append(span)}const status=element('div','status','Illustration only. No backend calls or tests run in this deck.');status.setAttribute('aria-live','polite');legendRow.append(legend,status);content.append(legendRow);article.append(content);
+ const takeaway=element('div','takeaway');takeaway.append(element('strong','','Takeaway'),element('span','',slide.takeaway));article.append(takeaway);const footer=element('footer','slide-footer');const chapters=element('span','');chapters.append(document.createTextNode('Synthetic architecture · '));for(const chapter of data.deckLinks||[]){const a=element('a','deck-link',chapter.label);a.href=chapter.href;chapters.append(a,document.createTextNode(' · '))}if(!data.deckLinks)chapters.append(document.createTextNode('Native runtime, no Substrate'));footer.append(chapters,element('span','',String(index+1).padStart(2,'0')+' / '+String(data.slides.length).padStart(2,'0')));article.append(footer);$('canvas').append(article);elements.set(slide.id,{article,heading,diagram,lines,pathMap,scenarioGroup,status,scroller});
+ if(slide.scenarios)state.scenario.set(slide.id,slide.scenarios[0].id);
+}
+data.slides.forEach(buildSlide);
+for(const [id,source]of Object.entries(data.sources)){const option=element('option','',source.title);option.value=id;$('sourceSelect').append(option)}
+function current(){return data.slides[state.index]}
+function isActivePath(slide,path){return !path.scenarios||path.scenarios.includes(state.scenario.get(slide.id))}
+function applyScenario(slide){const e=elements.get(slide.id);const id=state.scenario.get(slide.id);for(const b of e.scenarioGroup.children)b.setAttribute('aria-pressed',String(b.dataset.scenario===id));for(const path of slide.paths){const active=isActivePath(slide,path);e.pathMap.get(path.id).classList.toggle('inactive',!active);const label=e.lines.querySelector('[data-label-path="'+path.id+'"]');if(label)label.classList.toggle('inactive',!active)}for(const g of e.lines.querySelectorAll('[data-stop-scenario]'))g.classList.toggle('inactive',g.dataset.stopScenario!==id);const scenario=slide.scenarios?.find(s=>s.id===id);e.status.textContent=scenario?scenario.status:'Illustration only. No backend calls or tests run in this deck.'}
+function cancelMotion(){clearTimeout(state.repeatTimer);state.repeatTimer=null;state.generation++;if(state.raf!==null)cancelAnimationFrame(state.raf);state.raf=null;for(const effect of state.effects)effect.cancel();state.effects=[];for(const marker of state.markers)marker.remove();state.markers=[];for(const path of document.querySelectorAll('.route')){path.style.strokeDasharray='';path.style.strokeDashoffset=''}}
+function canAnimate(){return !reduced.matches&&!document.hidden&&!state.printing&&!$('sourceDialog').open&&!$('notesDialog').open}
+function scheduleRepeat(){clearTimeout(state.repeatTimer);state.repeatTimer=null;if(state.repeatMs&&canAnimate())state.repeatTimer=setTimeout(play,state.repeatMs)}
+function updateRepeatControl(){$('repeat').disabled=reduced.matches;$('repeat').title=reduced.matches?'Automatic motion is paused by your reduced-motion preference.':'Pause after each flow completes. Repeats the current slide.'}
+function duration(token,fallback){const raw=getComputedStyle(document.documentElement).getPropertyValue(token).trim();return raw.endsWith('ms')?Number.parseFloat(raw):raw.endsWith('s')?Number.parseFloat(raw)*1000:fallback}
+function play(){cancelMotion();const slide=current();const e=elements.get(slide.id);applyScenario(slide);if(!canAnimate())return;const generation=state.generation;const enter=duration('--enter-duration',450);const packet=duration('--packet-duration',850);const paths=slide.paths.filter(p=>isActivePath(slide,p));for(const [i,node]of Array.from(e.diagram.querySelectorAll('.node')).entries()){state.effects.push(node.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'translateY(0)'}],{duration:enter,delay:i*90,easing:'cubic-bezier(.2,.65,.3,1)',fill:'backwards'}))}
+ const travels=paths.map((path,i)=>{const line=e.pathMap.get(path.id);const length=line.getTotalLength();const marker=svg('circle',{r:6,fill:color(path),class:'packet',opacity:0,'data-reference':String(path.reference)});e.lines.append(marker);state.markers.push(marker);return {path,line,length,marker,start:330+i*170}});const start=performance.now();const end=Math.max(enter+slide.nodes.length*90,...travels.map(t=>t.start+packet))+80;
+ function tick(now){if(generation!==state.generation)return;const elapsed=now-start;for(const t of travels){const p=Math.max(0,Math.min(1,(elapsed-t.start)/packet));if(!t.path.reference){t.line.style.strokeDasharray=t.length+' '+t.length;t.line.style.strokeDashoffset=String(t.length*(1-p))}t.marker.setAttribute('opacity',elapsed>=t.start&&p<1?'1':'0');const point=t.line.getPointAtLength(t.length*p);t.marker.setAttribute('cx',point.x);t.marker.setAttribute('cy',point.y)}if(elapsed<end)state.raf=requestAnimationFrame(tick);else{cancelMotion();e.status.textContent=(slide.scenarios?.find(s=>s.id===state.scenario.get(slide.id))?.status||'Illustration complete. Inspect a component or replay the flow.')+' No live result is represented.';scheduleRepeat()}}
+ state.raf=requestAnimationFrame(tick);
+}
+function fit(){if(mobile.matches){$('stage').style.width='';$('stage').style.height='';document.documentElement.style.setProperty('--scale','1');return}const scale=Math.min((innerWidth-48)/1600,(innerHeight-118)/900);document.documentElement.style.setProperty('--scale',String(scale));$('stage').style.width=1600*scale+'px';$('stage').style.height=900*scale+'px'}
+function showSlide(index,{animate=true,hash=true,focus=false}={}){cancelMotion();state.index=Math.max(0,Math.min(data.slides.length-1,index));const slide=current();for(const entry of data.slides){const active=entry.id===slide.id;const article=elements.get(entry.id).article;article.hidden=!active;article.inert=!active;article.setAttribute('aria-hidden',String(!active))}applyScenario(slide);$('previous').disabled=state.index===0;$('next').disabled=state.index===data.slides.length-1;$('slideCounter').textContent=(state.index+1)+' / '+data.slides.length;$('slideAnnouncement').textContent='Slide '+(state.index+1)+' of '+data.slides.length+'. '+slide.title;if(hash&&location.hash!=='#'+slide.id)location.hash=slide.id;if(focus)elements.get(slide.id).heading.focus({preventScroll:true});if(mobile.matches)window.scrollTo({top:0,behavior:'instant'});fit();if(animate)play();else scheduleRepeat()}
+function sourceText(){const source=data.sources[$('sourceSelect').value];$('sourceCode').textContent=source.text;$('sourceMeta').textContent=source.type+' · Illustration only';$('sourceCode').scrollTop=0;$('sourceCode').scrollLeft=0;$('copyStatus').textContent=''}
+function openSource(id,opener){cancelMotion();state.sourceOpener=opener||document.activeElement;$('sourceSelect').value=id;sourceText();$('sourceDialog').showModal();$('sourceSelect').focus()}
+function openNotes(opener){cancelMotion();state.notesOpener=opener||document.activeElement;$('notesTitle').textContent='Slide '+(state.index+1)+' / Presenter notes';$('notesText').textContent=current().notes;$('notesDialog').showModal();$('closeNotes').focus()}
+$('sourceSelect').addEventListener('change',sourceText);$('sourceDialog').addEventListener('close',()=>{if(state.sourceOpener?.isConnected)state.sourceOpener.focus({preventScroll:true});scheduleRepeat()});$('notesDialog').addEventListener('close',()=>{if(state.notesOpener?.isConnected)state.notesOpener.focus({preventScroll:true});scheduleRepeat()});$('closeSource').addEventListener('click',()=>$('sourceDialog').close());$('closeNotes').addEventListener('click',()=>$('notesDialog').close());
+$('copySource').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('sourceCode').textContent);$('copyStatus').textContent='Copied source text.'}catch{const range=document.createRange();range.selectNodeContents($('sourceCode'));const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);$('sourceCode').focus();$('copyStatus').textContent='Clipboard unavailable. Text selected; press Cmd+C or Ctrl+C to copy manually.'}});
+$('repeat').addEventListener('change',()=>{state.repeatMs=Number($('repeat').value);cancelMotion();if(state.repeatMs)play()});
+$('previous').addEventListener('click',()=>showSlide(state.index-1));$('next').addEventListener('click',()=>showSlide(state.index+1));$('replay').addEventListener('click',play);$('notes').addEventListener('click',event=>openNotes(event.currentTarget));$('details').addEventListener('click',event=>openSource(current().nodes[0].source,event.currentTarget));$('print').addEventListener('click',()=>{cancelMotion();window.print()});
+document.addEventListener('keydown',event=>{if(event.ctrlKey||event.metaKey||event.altKey||event.target.closest('input,textarea,select,[contenteditable],dialog')||$('sourceDialog').open||$('notesDialog').open||window.getSelection()?.toString())return;const key=event.key.toLowerCase();if(event.shiftKey&&key.startsWith('arrow'))return;let target=null;if(['arrowright','pagedown'].includes(key))target=state.index+1;if(['arrowleft','pageup'].includes(key))target=state.index-1;if(key==='home')target=0;if(key==='end')target=data.slides.length-1;if(target!==null){event.preventDefault();showSlide(target,{focus:true})}else if(key==='r'){event.preventDefault();play()}else if(key==='n'){event.preventDefault();openNotes(event.target)}});
+window.addEventListener('hashchange',()=>{const index=data.slides.findIndex(s=>'#'+s.id===location.hash);if(index>=0&&index!==state.index)showSlide(index,{hash:false})});window.addEventListener('resize',()=>{cancelMotion();fit();scheduleRepeat()});document.addEventListener('visibilitychange',()=>{cancelMotion();scheduleRepeat()});reduced.addEventListener('change',()=>{cancelMotion();updateRepeatControl();scheduleRepeat()});
+window.addEventListener('beforeprint',()=>{cancelMotion();state.printing=true;state.printScroll=Array.from(document.querySelectorAll('.diagram-scroll,.source-code'),e=>({e,left:e.scrollLeft,top:e.scrollTop}));for(const item of state.printScroll){item.e.scrollLeft=0;item.e.scrollTop=0}for(const entry of elements.values()){entry.article.hidden=false;entry.article.inert=true}});
+window.addEventListener('afterprint',()=>{state.printing=false;showSlide(state.index,{animate:false,hash:false});for(const item of state.printScroll){item.e.scrollLeft=item.left;item.e.scrollTop=item.top}state.printScroll=[]});
+updateRepeatControl();
+const initial=data.slides.findIndex(s=>'#'+s.id===location.hash);showSlide(initial>=0?initial:0,{animate:false});
+</script>
+</body>
+</html>

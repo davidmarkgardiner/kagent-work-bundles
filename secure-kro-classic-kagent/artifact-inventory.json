@@ -26,9 +26,14 @@
       "sha256": "07789516d45e51d6e3914ee49a2ad6761a2275cef6c4100c3270ff17f03a79e7"
     },
     {
+      "path": "PRESENTATIONS.md",
+      "bytes": 5839,
+      "sha256": "13ee2bf06af483800c6b651e64a30c028e5aec275e0403e184d2001a7cb4962c"
+    },
+    {
       "path": "README.md",
-      "bytes": 17695,
-      "sha256": "a75501e2850900b486fbe0e395907c1b421df8ef411854374d114c3d2744a047"
+      "bytes": 18096,
+      "sha256": "2eaf9cc94c1c38b411c86c37a310473fb79d8b3b6e282cc87b363e77cf3ca217"
     },
     {
       "path": "WORK-AGENT-HANDOFF.md",
@@ -281,6 +286,11 @@
       "sha256": "c0b2e3b4ffd27d8018ac5d69700c59be96afa36cb380a6f758defda8709e83b3"
     },
     {
+      "path": "evidence/presentation-series-validation-2026-11-05.json",
+      "bytes": 5181,
+      "sha256": "e4edf287cb1e3bd314059bca3d3516636a73adf8fc681b8bf12f3069bbb06206"
+    },
+    {
       "path": "evidence/validation-0.10.4-2026-11-04.json",
       "bytes": 700,
       "sha256": "065ff27973355f84e76ac31e65c14399263c4f5183fba3382ff08417ea799f1e"
@@ -357,8 +367,13 @@
     },
     {
       "path": "index.html",
-      "bytes": 66367,
-      "sha256": "d4a6008f3184ce0661b2b88ad1078e7b18c91159c9edd71e3c91e51ae7fa6d6e"
+      "bytes": 68106,
+      "sha256": "f07f5c5db1d216c6fbde1db1b80738eedf55c8f789d9117244dd8d9cc6fbebec"
+    },
+    {
+      "path": "journey.html",
+      "bytes": 69333,
+      "sha256": "832342b2176641fac9e9599e44edabef81b129b8f049f2e9a1b03f5e31588df8"
     },
     {
       "path": "preflight.py",
@@ -386,6 +401,11 @@
       "sha256": "044d8cd10f97f68709c519a6e946fa800bbc8b120831fcfca8f00c721a8a884a"
     },
     {
+      "path": "sdlc.html",
+      "bytes": 60255,
+      "sha256": "220387e649e1f8025ef9b5dfa47f24f676db7eff7c962eb5e6d2ad439171820a"
+    },
+    {
       "path": "skills/secure-agent-request-builder/SKILL.md",
       "bytes": 1751,
       "sha256": "7d2438acbea3f819294c3299a7c691515925e9825a4b1a10c60e82c4132f1093"
@@ -399,6 +419,11 @@
       "path": "tests/test_demo.py",
       "bytes": 3538,
       "sha256": "da0ba89f1f706df0257c8c9dffbe8ed4a7bac3f16bcff9b06b76d9b5e0515779"
+    },
+    {
+      "path": "triage.html",
+      "bytes": 59547,
+      "sha256": "528306a531a64ed7aeb193a998df6024e0fd3a5a9de199e17093e617817bf408"
     },
     {
       "path": "versions.lock.json",

@@ -1,0 +1,167 @@
+{
+  "checkedAt": "2026-11-05T18:08:28.886984+00:00",
+  "result": "INTERACTIVE_PRESENTATION_SERIES_CHECKED",
+  "artifacts": [
+    {
+      "file": "index.html",
+      "sha256": "f07f5c5db1d216c6fbde1db1b80738eedf55c8f789d9117244dd8d9cc6fbebec"
+    },
+    {
+      "file": "journey.html",
+      "sha256": "832342b2176641fac9e9599e44edabef81b129b8f049f2e9a1b03f5e31588df8"
+    },
+    {
+      "file": "triage.html",
+      "sha256": "528306a531a64ed7aeb193a998df6024e0fd3a5a9de199e17093e617817bf408"
+    },
+    {
+      "file": "sdlc.html",
+      "sha256": "220387e649e1f8025ef9b5dfa47f24f676db7eff7c962eb5e6d2ad439171820a"
+    }
+  ],
+  "content": "Three new six-slide chapters plus repeat controls on the original six-slide architecture deck. All examples and states are synthetic.",
+  "browser": {
+    "decks": [
+      {
+        "file": "index.html",
+        "slides": 6,
+        "sources": 16,
+        "viewports": [
+          {
+            "width": 1660,
+            "height": 1030
+          },
+          {
+            "width": 1200,
+            "height": 800
+          },
+          {
+            "width": 820,
+            "height": 1180
+          },
+          {
+            "width": 360,
+            "height": 800
+          }
+        ]
+      },
+      {
+        "file": "journey.html",
+        "slides": 6,
+        "sources": 17,
+        "viewports": [
+          {
+            "width": 1660,
+            "height": 1030
+          },
+          {
+            "width": 1200,
+            "height": 800
+          },
+          {
+            "width": 820,
+            "height": 1180
+          },
+          {
+            "width": 360,
+            "height": 800
+          }
+        ]
+      },
+      {
+        "file": "triage.html",
+        "slides": 6,
+        "sources": 8,
+        "viewports": [
+          {
+            "width": 1660,
+            "height": 1030
+          },
+          {
+            "width": 1200,
+            "height": 800
+          },
+          {
+            "width": 820,
+            "height": 1180
+          },
+          {
+            "width": 360,
+            "height": 800
+          }
+        ]
+      },
+      {
+        "file": "sdlc.html",
+        "slides": 6,
+        "sources": 9,
+        "viewports": [
+          {
+            "width": 1660,
+            "height": 1030
+          },
+          {
+            "width": 1200,
+            "height": 800
+          },
+          {
+            "width": 820,
+            "height": 1180
+          },
+          {
+            "width": 360,
+            "height": 800
+          }
+        ]
+      }
+    ],
+    "checks": [
+      "All 24 slides checked at four viewport sizes; all sources and scenario buttons exercised; keyboard, notes, focus return, hidden/inert and offline zero-request checks",
+      "Automatic second cycle observed on each deck after 3-second pause; Off remains stopped",
+      "Copy success/failure; dialog pause/resume, simulated visibility pause/resume, reduced-motion cancellation, repeated replay cleanup, dashed lines, chapter links"
+    ],
+    "browserErrors": []
+  },
+  "print": {
+    "decks": [
+      {
+        "file": "index.html",
+        "pages": 6,
+        "allTitlesIntrosTakeawaysNodeTextAndInlineCodePresent": true,
+        "pdfSHA256": "7ea6c0fc87778ee15199597b5e56c79d6b9722fdf4b5994d3ef8f3c89587621f"
+      },
+      {
+        "file": "journey.html",
+        "pages": 6,
+        "allTitlesIntrosTakeawaysNodeTextAndInlineCodePresent": true,
+        "pdfSHA256": "17d92e10e7f2213f269f6e8a354c330d645111ac2944791d3fd53d8377be6523"
+      },
+      {
+        "file": "triage.html",
+        "pages": 6,
+        "allTitlesIntrosTakeawaysNodeTextAndInlineCodePresent": true,
+        "pdfSHA256": "7b5ed914697bd4eb2848cc017f4eec1e4d85613ff1c472fde80cdb4162dc6c57"
+      },
+      {
+        "file": "sdlc.html",
+        "pages": 6,
+        "allTitlesIntrosTakeawaysNodeTextAndInlineCodePresent": true,
+        "pdfSHA256": "90f544c68d0c1798cb8b3f4a2d6bb18d4477c50c0e2d67f84b374238ecf2154d"
+      }
+    ],
+    "journeyDesktopMobileIdentical": false,
+    "journeyDesktopMobileAllSixRastersIdentical": true
+  },
+  "printInteraction": [
+    "All four kinetic decks exported during automatic replay; printing cleans markers and restores one active slide",
+    "Mobile print restores internal scroll and full landscape geometry"
+  ],
+  "visualReview": "First, last and representative intermediate slides reviewed; all 24 PDF pages rasterized and reviewed as contact sheets. Narrow-phone viewport inspected.",
+  "safety": "Shared public-safe scan passed after normalizing only literal version 0.10.4 in a temporary text copy; gitleaks scanned original changed presentation/docs content and found no leaks.",
+  "boundaries": [
+    "Visibility cancellation was exercised using the visibilitychange handler with simulated document.hidden.",
+    "No new cluster, model, Kafka, GitLab, MCP, network enforcement or dashboard execution was performed.",
+    "Token usage and telemetry topology are reference capabilities; no synthetic usage is presented as observed data.",
+    "Three-second automatic repeat cycles and stopping were observed on all four decks. Five/ten-second intervals share the same scheduler."
+  ]
+}
