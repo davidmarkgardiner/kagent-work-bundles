@@ -2,12 +2,12 @@
 
 **Status:** Draft for incident review. This records a responder's account and proposed improvements; attach the internal evidence before treating the findings as final.
 
-**Incident:** {{INCIDENT_ID}}  
-**Change request:** {{CHANGE_REQUEST_ID}}  
-**Related merge requests:** {{MERGE_REQUEST_REFERENCES}}  
-**Incident review owner:** {{INCIDENT_REVIEW_OWNER}}  
-**Severity:** {{CONFIRMED_SEVERITY}}  
-**Reported window:** Approximately 19:00 on 4 November to 00:00 on 5 November 2026, Europe/London. Dates and times require confirmation.
+- **Incident:** {{INCIDENT_ID}}
+- **Change request:** {{CHANGE_REQUEST_ID}}
+- **Related merge requests:** {{MERGE_REQUEST_REFERENCES}}
+- **Incident review owner:** {{INCIDENT_REVIEW_OWNER}}
+- **Severity:** {{CONFIRMED_SEVERITY}}
+- **Reported window:** Approximately 19:00 on 4 November to 00:00 on 5 November 2026, Europe/London. Dates and times require confirmation.
 
 ## Summary
 
