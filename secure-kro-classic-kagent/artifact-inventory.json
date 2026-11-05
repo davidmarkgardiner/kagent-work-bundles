@@ -27,8 +27,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 17304,
-      "sha256": "8b34caf3e6d2770f89fc89a78c5b732d9aa1bc64ae9f2a26c2979af5e88f3e6f"
+      "bytes": 17695,
+      "sha256": "a75501e2850900b486fbe0e395907c1b421df8ef411854374d114c3d2744a047"
     },
     {
       "path": "WORK-AGENT-HANDOFF.md",
@@ -266,6 +266,11 @@
       "sha256": "2a6292693550b3c5e85e0fcc76b8bb7477a8905001694eb4ac25219e62467d35"
     },
     {
+      "path": "evidence/kinetic-deck-validation-2026-11-05.json",
+      "bytes": 2282,
+      "sha256": "5afd24dc86138dbce0ae083182b9c1770b1e9d04218b3bdd6bca6e865ef8c985"
+    },
+    {
       "path": "evidence/live-classic-0.10.4-2026-11-04.json",
       "bytes": 4330,
       "sha256": "7e03f577e66af418440e3b990ff0ef678fde085bacece8815339c32b6e0fda64"
@@ -349,6 +354,11 @@
       "path": "helm-values-no-substrate.yaml",
       "bytes": 1423,
       "sha256": "f5e818d6ed6f39aa40f389e92424f40a96628170fbb64b3f0ea42a541b2c0efa"
+    },
+    {
+      "path": "index.html",
+      "bytes": 66367,
+      "sha256": "d4a6008f3184ce0661b2b88ad1078e7b18c91159c9edd71e3c91e51ae7fa6d6e"
     },
     {
       "path": "preflight.py",

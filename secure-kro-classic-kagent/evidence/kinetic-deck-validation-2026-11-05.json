@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-11-05T17:45:40.518504+00:00",
+  "artifact": "index.html",
+  "sha256": "d4a6008f3184ce0661b2b88ad1078e7b18c91159c9edd71e3c91e51ae7fa6d6e",
+  "result": "INTERACTIVE_HTML_CHECKED",
+  "content": "Six synthetic architecture slides, no real execution evidence, credentials or workplace configuration.",
+  "browser": {
+    "slides": 6,
+    "sources": 16,
+    "viewports": [
+      {
+        "width": 1660,
+        "height": 1030
+      },
+      {
+        "width": 1200,
+        "height": 800
+      },
+      {
+        "width": 820,
+        "height": 1180
+      },
+      {
+        "width": 360,
+        "height": 800
+      }
+    ],
+    "checks": [
+      "All slides at full desktop, smaller desktop, tablet and phone; no node/body overflow or overlaps",
+      "Keyboard navigation, descriptive hashes, hidden/inert inactive slides",
+      "All 16 sources, copy success and failure, native selector keys, dialog Escape/focus return, notes shortcut",
+      "Four labelled boundary scenarios; reduced motion has no travelling markers or animations",
+      "Repeated replay cleanup and cancellation on dialogs/navigation/visibility handler",
+      "Reference line styles preserved while animated",
+      "Full local HTML rendered with networking disabled; navigation and embedded sources work; zero requests"
+    ],
+    "browserErrors": []
+  },
+  "print": {
+    "landscapePages": 6,
+    "desktopAndMobilePDFIdentical": true,
+    "allSixPagesRenderedAndVisuallyInspected": true,
+    "allHeadlinesIntrosTakeawaysAndNodeTextPresent": true,
+    "completeInlineCustomerCode": true,
+    "motionCancelledBeforePrint": true,
+    "activeSlideAndDiagramScrollRestored": true
+  },
+  "sourceSafety": {
+    "publicSafeScan": {
+      "clean": true,
+      "hits": 0
+    },
+    "gitleaks": "No leaks found",
+    "externalDependencies": false,
+    "eval": false
+  },
+  "limits": [
+    "No live model, MCP, authentication, network-policy or Entra/UAMI verification is performed by this deck.",
+    "Offline operation tested by rendering the complete local HTML with the browser network disabled.",
+    "Page-visibility cancellation handler exercised using a simulated hidden-document event.",
+    "Printing verified through Chromium PDF export; physical printer output was not tested."
+  ]
+}

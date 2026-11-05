@@ -14,6 +14,12 @@ template, catalog, prompt-building skill, terminal driver, split graph YAML and
 [YAML speaker notes](YAML-GUIDE.md). The HTML is an offline illustration with
 dated receipts; the terminal driver reads real receiving-cluster state.
 
+The new [six-slide kinetic presentation](index.html) uses synthetic examples
+only, with animated paths, allowed/blocked illustrations, component source
+inspection, presenter notes and complete landscape printing. It opens offline
+as one file. Use that deck for the architecture story and the existing detailed
+YAML explorer/terminal walkthrough for the actual configuration and live proof.
+
 [NEXT-STEPS.md](NEXT-STEPS.md) records the Entra ID/UAMI iteration, Gateway
 telemetry and token-usage evidence, tool and network acceptance tests, and the
 later UI or builder-agent path. The current runtime remains non-Substrate.
