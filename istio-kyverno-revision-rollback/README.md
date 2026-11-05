@@ -2,6 +2,8 @@
 
 Incident issue: https://github.com/davidmarkgardiner/kagent-work-bundles/issues/3
 
+Copy [GITLAB-POSTMORTEM-ISSUE.md](GITLAB-POSTMORTEM-ISSUE.md) into an internal GitLab issue for the responder account, provisional timeline, reported recovery and proposed corrective actions. It is a draft for evidence review, not an independently verified incident report.
+
 Follow the complete operational sequence in [INCIDENT-RECOVERY-PROCESS.md](INCIDENT-RECOVERY-PROCESS.md), including verification and the conditional canary restart.
 
 ## Confirm the revision before any patch
