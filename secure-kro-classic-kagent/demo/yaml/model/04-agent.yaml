@@ -1,0 +1,46 @@
+# KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: ${schema.metadata.name}
+  namespace: ${schema.metadata.namespace}
+spec:
+  type: Declarative
+  description: KRO-composed native agent without Substrate
+  declarative:
+    runtime: go
+    modelConfig: ${schema.spec.modelConfig}
+    systemMessage: ${schema.spec.systemPrompt}
+    stream: false
+    tools: []
+    deployment:
+      serviceAccountName: ${runtimeAccount.metadata.name}
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 1000m
+          memory: 256Mi
+      env:
+      - name: HOME
+        value: /tmp
+      podSecurityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+          - ALL
+      volumes:
+      - name: writable-tmp
+        emptyDir:
+          sizeLimit: 64Mi
+      volumeMounts:
+      - name: writable-tmp
+        mountPath: /tmp

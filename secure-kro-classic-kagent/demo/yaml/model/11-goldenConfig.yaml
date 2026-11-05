@@ -1,0 +1,12 @@
+# KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${schema.metadata.name}-golden
+  namespace: ${schema.metadata.namespace}
+data:
+  config.json: '{"invokeURL": "http://classic-demo.classic-agents.svc.cluster.local:8081/classic/classic-agents/${schema.metadata.name}/verify",
+    "cardURL": "http://classic-demo.classic-agents.svc.cluster.local:8081/classic/classic-agents/${schema.metadata.name}/card",
+    "callerURL": "http://classic-demo.classic-agents.svc.cluster.local:8080/classic/classic-agents/${schema.metadata.name}/invoke",
+    "expectedAgent": "${schema.metadata.name}", "requestUID": "${schema.metadata.uid}", "tokenFile": "/var/run/golden/token",
+    "timeoutSeconds": 480}'

@@ -1,0 +1,15 @@
+# Reference example only. Read its explanation before using it.
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-reviewed-route-to-demo
+  namespace: classic-agents
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: '{{APPROVED_ROUTE_NAMESPACE}}'
+  to:
+  - group: ''
+    kind: Service
+    name: demo

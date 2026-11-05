@@ -42,3 +42,12 @@ agent path requires Substrate. 0.10.4 is the parity target for this non-Substrat
 bundle. Do not swap only the controller image or change YAML API strings to
 imitate the other release. The earlier 0.8.0-beta4 receipt is historical evidence;
 use evidence/live-classic-0.10.4-2026-11-04.json for the current reference.
+
+For the showcase, follow DEMO-WALKTHROUGH.md. Open presentation.html and
+examples/agent-demo.yaml in VS Code. Use demo.py apply/watch/verify/show/query
+to display the exact file, observe actual resources, match Golden to this owner
+UID and invoke through the protected Gateway. YAML-GUIDE.md explains every
+resource. The customer template and portable request-builder skill are included.
+The HTML illustrates reconciliation and displays dated receipts; it does not
+perform deployments or claim fresh tool evidence. GitLab writes are not included
+in these read-only adapters.

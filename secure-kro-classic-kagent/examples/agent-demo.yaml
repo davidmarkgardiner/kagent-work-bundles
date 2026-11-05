@@ -1,0 +1,15 @@
+# This is the exact customer file used by the model-only terminal walkthrough.
+apiVersion: demo.kagent.dev/v1alpha1
+kind: ClassicSecureAgent
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  modelConfig: approved-model
+  systemPrompt: |
+    You are the organisation's concise platform assistant.
+    When asked for PONG, reply with exactly PONG and do not use tools.
+    Use only explicitly approved tools for other requests.
+    If you cannot verify a fact, say so. Never invent tool results.
+  skills: []
+  tools: []

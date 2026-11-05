@@ -1,0 +1,19 @@
+{
+  "apiVersion": "demo.kagent.dev/v1alpha1",
+  "kind": "ClassicSecureAgent",
+  "name": "demo",
+  "namespace": "classic-agents",
+  "models": [{"id": "approved-model", "label": "Approved platform model", "status": "Reference model route verified on 2026-11-04; configure the receiving ModelConfig"}],
+  "skills": [{"id": "work-guidance", "label": "Reviewed platform guidance from GitLab", "status": "Adapter example; set the immutable commit, repository, credentials and egress before use"}],
+  "tools": [
+    {"id": "kubernetes-readonly", "label": "Kubernetes read-only", "server": "approved-kubernetes-mcp", "operations": ["k8s_get_resources", "k8s_get_events"], "prompt": "Use the approved Kubernetes tools to inspect the approved demo namespace. Return at most five pods and five warning events. Cite the tool used. Do not change resources.", "status": "Workplace adapter example; operation names must match discovery and a backend query must pass"},
+    {"id": "gitlab-readonly", "label": "GitLab read-only", "server": "approved-gitlab-mcp", "operations": ["gitlab_get_project", "gitlab_get_latest_pipeline"], "prompt": "Use the approved GitLab tools to report the latest pipeline status for the approved demo project. Do not post, push or create anything.", "status": "Workplace adapter example; no GitLab write operation is included"},
+    {"id": "denodo-readonly", "label": "Denodo read-only", "server": "approved-denodo-mcp", "operations": ["get_inventory_data_product_details", "get_namespace_count", "get_namespace_summary"], "prompt": "Use the approved Denodo tools to return one bounded namespace summary. State the tool used and any result limits. Do not export or page through a dataset.", "status": "Workplace adapter example; verify against the approved data contract"}
+  ],
+  "scenarios": [
+    {"id": "pong", "label": "Model PONG", "file": "examples/agent-demo.yaml", "profile": "examples/platform-profile.json", "skills": [], "tools": [], "prompt": "Reply with exactly PONG. Do not call any tool.", "proof": "Model route verified live on 2026-11-04. A new apply requires a fresh Golden receipt."},
+    {"id": "kubernetes", "label": "Kubernetes assistant", "file": "examples/agent-kubernetes.yaml", "profile": "examples/platform-profile-with-catalog.json", "skills": ["work-guidance"], "tools": ["kubernetes-readonly"], "proof": "Adapter example. Skill loading and the MCP read require a receiving-cluster test."},
+    {"id": "gitlab", "label": "GitLab assistant", "file": "examples/agent-gitlab.yaml", "profile": "examples/platform-profile-with-catalog.json", "skills": ["work-guidance"], "tools": ["gitlab-readonly"], "proof": "Adapter example. A GitLab post is a separate write-capable scenario, not this demo."},
+    {"id": "denodo", "label": "Denodo assistant", "file": "examples/agent-denodo.yaml", "profile": "examples/platform-profile-with-catalog.json", "skills": ["work-guidance"], "tools": ["denodo-readonly"], "proof": "Adapter example. An actual Denodo query must be verified separately from PONG."}
+  ]
+}

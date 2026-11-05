@@ -1,0 +1,27 @@
+# Platform baseline, installed before any customer instance.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: classic-demo
+  namespace: classic-agents
+spec:
+  gatewayClassName: agentgateway
+  listeners:
+  - name: caller
+    port: 8080
+    protocol: HTTP
+    allowedRoutes:
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            kubernetes.io/metadata.name: classic-agents
+  - name: verify
+    port: 8081
+    protocol: HTTP
+    allowedRoutes:
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            kubernetes.io/metadata.name: classic-agents

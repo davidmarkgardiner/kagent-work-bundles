@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-11-05T11:31:17.188057+00:00",
+  "result": "DEMO_ASSETS_CHECKED_OFFLINE",
+  "behaviorTestsPassed": 15,
+  "portableRequestBuilderSkill": "Frontmatter and references checked",
+  "terminalDriver": "Offline fixture execution passed using recorded 2026-11-04 objects; not a live cluster test",
+  "browser": {
+    "resourceYamlViewsChecked": 23,
+    "catalogAgentMappingChecked": true,
+    "downloadedCustomerYamlParsed": true,
+    "illustrationPlaybackChecked": true,
+    "desktopViewport": 1200,
+    "mobileViewport": 360,
+    "horizontalOverflowAtCheckedWidths": false
+  },
+  "sourceSafety": {
+    "gitleaks": "No leaks found",
+    "sharedScanner": "Zero hits after masking only the public version literal 0.10.4, whose text matches the scanner IPv4 fragment rule"
+  },
+  "liveRunOn20261105": false,
+  "liveRunBlocker": "Lab SSH host was unreachable",
+  "priorModelEvidence": "live-classic-0.10.4-2026-11-04.json",
+  "notVerified": [
+    "Skill fetching",
+    "Kubernetes, GitLab or Denodo MCP backend reads",
+    "NetworkPolicy traffic enforcement",
+    "GitLab write actions",
+    "Entra/UAMI integration"
+  ]
+}

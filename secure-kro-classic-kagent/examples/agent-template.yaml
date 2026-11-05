@@ -1,0 +1,19 @@
+# Customer-owned file. The platform installs the RGD and security baseline once.
+# Give skills/secure-agent-request-builder/SKILL.md and demo/catalog.json to an
+# assistant, describe the agent you want, and ask it to fill this one file.
+apiVersion: demo.kagent.dev/v1alpha1
+kind: ClassicSecureAgent
+metadata:
+  # This bounded demonstration has one approved slot. Keep these two values.
+  name: demo
+  namespace: classic-agents
+spec:
+  # Approved ModelConfig names appear in demo/catalog.json.
+  modelConfig: approved-model
+  systemPrompt: |
+    {{PUT_YOUR_SYSTEM_PROMPT_HERE}}
+  # Catalog IDs, not repository URLs, credentials or arbitrary tool names.
+  # The model-only RGD accepts empty lists. A skills-enabled RGD requires at
+  # least one approved skill. The platform must install the matching catalog.
+  skills: []
+  tools: []

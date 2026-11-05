@@ -1,0 +1,28 @@
+# KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ${schema.metadata.name}-verify
+  namespace: ${schema.metadata.namespace}
+  annotations:
+    classic.kagent.dev/policy: ${verifierPolicy.metadata.name}
+spec:
+  parentRefs:
+  - name: classic-demo
+    namespace: classic-agents
+    sectionName: verify
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /classic/classic-agents/${schema.metadata.name}/verify
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplaceFullPath
+          replaceFullPath: /
+    backendRefs:
+    - name: ${agent.metadata.name}
+      namespace: ${agent.metadata.namespace}
+      port: 8080

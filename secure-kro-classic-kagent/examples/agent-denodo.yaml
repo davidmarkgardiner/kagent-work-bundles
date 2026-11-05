@@ -1,4 +1,4 @@
-# Workplace adapter example. Resolve the catalog and run a real backend query before claiming success.
+# Workplace adapter example. Resolve the catalog and verify actual skill/tool execution.
 apiVersion: demo.kagent.dev/v1alpha1
 kind: ClassicSecureAgent
 metadata:
@@ -6,9 +6,9 @@ metadata:
   namespace: classic-agents
 spec:
   modelConfig: approved-model
-  systemPrompt: Use the approved typed Denodo inventory tools. Begin with product
-    details, then report the namespace count. Respect truncation and never execute
-    arbitrary SQL or reconstruct an export.
+  systemPrompt: Use the approved typed Denodo inventory tools. Begin with product details,
+    then report the namespace count. Respect truncation and never execute arbitrary SQL or
+    reconstruct an export. When asked for PONG, reply with exactly PONG without calling tools.
   skills:
   - work-guidance
   tools:

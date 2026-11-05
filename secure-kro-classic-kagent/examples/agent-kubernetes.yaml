@@ -1,4 +1,4 @@
-# Workplace adapter example. Resolve the catalog and run a real backend query before claiming success.
+# Workplace adapter example. Resolve the catalog and verify actual skill/tool execution.
 apiVersion: demo.kagent.dev/v1alpha1
 kind: ClassicSecureAgent
 metadata:
@@ -6,9 +6,9 @@ metadata:
   namespace: classic-agents
 spec:
   modelConfig: approved-model
-  systemPrompt: Read the approved Kubernetes demo namespace. Report up to five pod
-    readiness results and five warning events. Do not write resources or run shell
-    commands.
+  systemPrompt: Read the approved Kubernetes demo namespace. Report up to five pod readiness
+    results and five warning events. Do not write resources or run shell commands. When asked
+    for PONG, reply with exactly PONG without calling tools.
   skills:
   - work-guidance
   tools:

@@ -1,0 +1,58 @@
+{
+  "runtimeAccount": {
+    "title": "Runtime identity",
+    "explanation": "No Kubernetes API token is automounted into the native agent. Backend permissions remain separate from chat access. The native controller separately projects a one-hour JWT with audience kagent for its own API, visible in the recorded Deployment."
+  },
+  "verifierAccount": {
+    "title": "Golden identity",
+    "explanation": "The verifier gets only an audience-specific, short-lived projected JWT. It has no Role or RoleBinding to the Kubernetes API."
+  },
+  "callerAccount": {
+    "title": "Caller identity",
+    "explanation": "Only the exact demo-caller subject is accepted on the caller listener. Minting its JWT requires the operator token-request permission."
+  },
+  "agent": {
+    "title": "Native kagent Agent",
+    "explanation": "KRO passes the system prompt, existing ModelConfig name and selected MCP operations to the normal declarative Agent. kagent creates the Deployment, Service and generated configuration Secret."
+  },
+  "network": {
+    "title": "Agent network boundary",
+    "explanation": "Ingress is limited to the approved Gateway pods. Egress permits only the resolved DNS, model, controller and reviewed tool paths. DNS and backend permissions are still separate controls. This is policy intent; enforcement requires a supporting CNI and actual denied-traffic tests, which are not part of the recorded PONG proof."
+  },
+  "verifierPolicy": {
+    "title": "Verifier route policy",
+    "explanation": "Strict JWT validation checks issuer and audience. Authorization requires the verifier service-account subject."
+  },
+  "cardPolicy": {
+    "title": "AgentCard policy",
+    "explanation": "The Golden identity can inspect the native AgentCard. Anonymous callers and malformed tokens are denied."
+  },
+  "callerPolicy": {
+    "title": "Caller route policy",
+    "explanation": "Strict JWT validation and exact caller subject protect invocation. This policy does not give the caller Kubernetes or MCP execution permissions."
+  },
+  "verifyRoute": {
+    "title": "Golden invocation route",
+    "explanation": "The verifier-only listener rewrites the exact verification path to the native A2A endpoint. It is distinct from the customer invocation route."
+  },
+  "cardRoute": {
+    "title": "AgentCard route",
+    "explanation": "Only the verification listener exposes the exact AgentCard path. Route status must report Accepted and ResolvedRefs."
+  },
+  "goldenConfig": {
+    "title": "Golden ConfigMap",
+    "explanation": "Fixed URLs, expected agent name, owner UID and token file path bind the Job to this instance. It contains no provider key or JWT value. The token is projected at runtime."
+  },
+  "verifierNetwork": {
+    "title": "Verifier network boundary",
+    "explanation": "All verifier ingress is denied. Its only egress paths are DNS and the two Gateway listeners, including the caller lane used for a negative control."
+  },
+  "golden": {
+    "title": "Golden verification Job",
+    "explanation": "After the Agent and verifier routes are ready, the Job checks the card and denied requests, then makes one real model request for PONG. It requires completed native assistant output. backoffLimit is zero."
+  },
+  "callerRoute": {
+    "title": "Customer invocation route",
+    "explanation": "The annotation references the Golden Job. KRO waits for that Job to succeed before creating the caller route. A successful Job is a recorded gate, not continuous reapproval or revocation."
+  }
+}

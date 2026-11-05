@@ -1,0 +1,7 @@
+# KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ${schema.metadata.name}-runtime
+  namespace: ${schema.metadata.namespace}
+automountServiceAccountToken: false

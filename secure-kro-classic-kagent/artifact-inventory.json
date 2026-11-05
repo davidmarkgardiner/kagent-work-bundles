@@ -1,24 +1,254 @@
 {
   "files": [
     {
+      "path": "DEMO-WALKTHROUGH.md",
+      "bytes": 10568,
+      "sha256": "f73729f42d54b8a1e3ca0162c04e4321bcd61a21add1a99c10ae437a22ab45df"
+    },
+    {
       "path": "IMAGES.md",
       "bytes": 4619,
       "sha256": "63864714511a1c479e19f7843f9a23a95a48dabe224c016325d7e023a72f2161"
     },
     {
       "path": "README.md",
-      "bytes": 16341,
-      "sha256": "64a1d7753ea03529256cff0aa9d3f3b4edbcaa50851f86aa583568c814b9f017"
+      "bytes": 17073,
+      "sha256": "7eb00870c59328177248300d9e9974763517d4e21aac4500c233d5f5b79ccf7f"
     },
     {
       "path": "WORK-AGENT-HANDOFF.md",
-      "bytes": 2973,
-      "sha256": "53c98f1d75a55ab5d67f5f5b6287415df45297e3ee721f5ac5188d7b74e7b5b2"
+      "bytes": 3549,
+      "sha256": "5a0f987b74728fb3662b96f1be23fb8f4d8e67fe06d842fdac4c27ad0d14c9d3"
+    },
+    {
+      "path": "YAML-GUIDE.md",
+      "bytes": 8224,
+      "sha256": "bc8424842840b7ae4145a9621a6662798ef412d88db54c57abbcfeac7dceecf1"
+    },
+    {
+      "path": "build_presentation.py",
+      "bytes": 8758,
+      "sha256": "b2319d7bb1065fceef91a5a25520b57ab2d423083e073e33fb107d5a2a60101c"
     },
     {
       "path": "compose.py",
       "bytes": 12899,
       "sha256": "b87e7af47d7d80bee2af36a5005be6e94c992b9d62c8e06bf73bfd9723c67420"
+    },
+    {
+      "path": "demo/catalog.json",
+      "bytes": 3037,
+      "sha256": "19a60a76ce533a04eac785c89e77630d30ea45ab8c5881ed092efe01813f144f"
+    },
+    {
+      "path": "demo/presentation.template.html",
+      "bytes": 22960,
+      "sha256": "273730541c2d8ddd5df8e235e90b62a3e61458e6a461b08a2023419a749765cd"
+    },
+    {
+      "path": "demo/recorded-native-deployment.yaml",
+      "bytes": 3321,
+      "sha256": "99f4b944112e49703714f88cc066e8a6bd9d3adadc64cfb0e2a14f3754b73dfe"
+    },
+    {
+      "path": "demo/resource-notes.json",
+      "bytes": 3501,
+      "sha256": "987860a63f075659bfd200ff4b5fea7da56a674d6e5d550f4cdac2e269e59abb"
+    },
+    {
+      "path": "demo/yaml/catalog/01-runtimeAccount.yaml",
+      "bytes": 224,
+      "sha256": "c30c250c4ed79eeef3a4d04a8646c6a4a2fde5b7007546f8791ae965d7c1270e"
+    },
+    {
+      "path": "demo/yaml/catalog/02-verifierAccount.yaml",
+      "bytes": 225,
+      "sha256": "bb3c5df675bbf91ab417d76c01f474a5b1c5903a5f03d719dc52bfe92adaabc9"
+    },
+    {
+      "path": "demo/yaml/catalog/03-callerAccount.yaml",
+      "bytes": 223,
+      "sha256": "7417ef481304ee3d46fbf58bb0cb8dc43ca25487825c5ebd975857d2e7804c75"
+    },
+    {
+      "path": "demo/yaml/catalog/04-agent.yaml",
+      "bytes": 2241,
+      "sha256": "19812132be9815e128e3909c07b51f2ab893f9461937c762f85c2eeced4df458"
+    },
+    {
+      "path": "demo/yaml/catalog/05-network.yaml",
+      "bytes": 1341,
+      "sha256": "59b166556b5df9ad547a167fb195fe5bbc4e7723010d0021518778351c95b37c"
+    },
+    {
+      "path": "demo/yaml/catalog/06-verifierPolicy.yaml",
+      "bytes": 768,
+      "sha256": "d93940cb7997e18b990d9b4893bee0cb069fb6121b71904696ccfae85f5ebafe"
+    },
+    {
+      "path": "demo/yaml/catalog/07-cardPolicy.yaml",
+      "bytes": 764,
+      "sha256": "7682cb39fe122aff2cacc12a907827cd347068e3482b9c7aaeb5da9e3a599a3d"
+    },
+    {
+      "path": "demo/yaml/catalog/08-callerPolicy.yaml",
+      "bytes": 766,
+      "sha256": "e73e4636419331fe8a45bf736f594723806944466255406085b1601f4033b448"
+    },
+    {
+      "path": "demo/yaml/catalog/09-verifyRoute.yaml",
+      "bytes": 750,
+      "sha256": "354752f51a0b0ba8ced51d6364031ccdf587672a2caf227bf22b0e69ce593301"
+    },
+    {
+      "path": "demo/yaml/catalog/10-cardRoute.yaml",
+      "bytes": 769,
+      "sha256": "1272ab112c7f5ad10ab69c45a831f783e2357835424a43391c2496f1574a5306"
+    },
+    {
+      "path": "demo/yaml/catalog/11-goldenConfig.yaml",
+      "bytes": 747,
+      "sha256": "e54fc78319248280ccc5c6cca58aa866ff56574804ff3e57629492cbfa3190fc"
+    },
+    {
+      "path": "demo/yaml/catalog/12-verifierNetwork.yaml",
+      "bytes": 833,
+      "sha256": "8744984d130ddc5ac514181833e2aa0fef1faf4e121ac866e3b82047aaeb6a38"
+    },
+    {
+      "path": "demo/yaml/catalog/13-golden.yaml",
+      "bytes": 1866,
+      "sha256": "e55dac2b30fde8087442070f864d40346d6d8f52de4f12517b455cea2481eb52"
+    },
+    {
+      "path": "demo/yaml/catalog/14-callerRoute.yaml",
+      "bytes": 809,
+      "sha256": "3ee9c8bab2c5a28c84cb93665d31ae992c0e018753a051137b9ef827948a280d"
+    },
+    {
+      "path": "demo/yaml/catalog/resourcegraphdefinition.yaml",
+      "bytes": 16438,
+      "sha256": "4af650329a588d1149820ebcf1e87b4ccd61f901bd09662d71700552a1323445"
+    },
+    {
+      "path": "demo/yaml/model/01-runtimeAccount.yaml",
+      "bytes": 224,
+      "sha256": "c30c250c4ed79eeef3a4d04a8646c6a4a2fde5b7007546f8791ae965d7c1270e"
+    },
+    {
+      "path": "demo/yaml/model/02-verifierAccount.yaml",
+      "bytes": 225,
+      "sha256": "bb3c5df675bbf91ab417d76c01f474a5b1c5903a5f03d719dc52bfe92adaabc9"
+    },
+    {
+      "path": "demo/yaml/model/03-callerAccount.yaml",
+      "bytes": 223,
+      "sha256": "7417ef481304ee3d46fbf58bb0cb8dc43ca25487825c5ebd975857d2e7804c75"
+    },
+    {
+      "path": "demo/yaml/model/04-agent.yaml",
+      "bytes": 1154,
+      "sha256": "50a0b289148c4ce33acd4dc0206277bc77a332568fd6261e1b0b32e3eeaded62"
+    },
+    {
+      "path": "demo/yaml/model/05-network.yaml",
+      "bytes": 1341,
+      "sha256": "59b166556b5df9ad547a167fb195fe5bbc4e7723010d0021518778351c95b37c"
+    },
+    {
+      "path": "demo/yaml/model/06-verifierPolicy.yaml",
+      "bytes": 768,
+      "sha256": "d93940cb7997e18b990d9b4893bee0cb069fb6121b71904696ccfae85f5ebafe"
+    },
+    {
+      "path": "demo/yaml/model/07-cardPolicy.yaml",
+      "bytes": 764,
+      "sha256": "7682cb39fe122aff2cacc12a907827cd347068e3482b9c7aaeb5da9e3a599a3d"
+    },
+    {
+      "path": "demo/yaml/model/08-callerPolicy.yaml",
+      "bytes": 766,
+      "sha256": "e73e4636419331fe8a45bf736f594723806944466255406085b1601f4033b448"
+    },
+    {
+      "path": "demo/yaml/model/09-verifyRoute.yaml",
+      "bytes": 750,
+      "sha256": "354752f51a0b0ba8ced51d6364031ccdf587672a2caf227bf22b0e69ce593301"
+    },
+    {
+      "path": "demo/yaml/model/10-cardRoute.yaml",
+      "bytes": 769,
+      "sha256": "1272ab112c7f5ad10ab69c45a831f783e2357835424a43391c2496f1574a5306"
+    },
+    {
+      "path": "demo/yaml/model/11-goldenConfig.yaml",
+      "bytes": 747,
+      "sha256": "e54fc78319248280ccc5c6cca58aa866ff56574804ff3e57629492cbfa3190fc"
+    },
+    {
+      "path": "demo/yaml/model/12-verifierNetwork.yaml",
+      "bytes": 833,
+      "sha256": "8744984d130ddc5ac514181833e2aa0fef1faf4e121ac866e3b82047aaeb6a38"
+    },
+    {
+      "path": "demo/yaml/model/13-golden.yaml",
+      "bytes": 1866,
+      "sha256": "e55dac2b30fde8087442070f864d40346d6d8f52de4f12517b455cea2481eb52"
+    },
+    {
+      "path": "demo/yaml/model/14-callerRoute.yaml",
+      "bytes": 809,
+      "sha256": "3ee9c8bab2c5a28c84cb93665d31ae992c0e018753a051137b9ef827948a280d"
+    },
+    {
+      "path": "demo/yaml/model/resourcegraphdefinition.yaml",
+      "bytes": 15158,
+      "sha256": "58f4124688a0e598f1d294d278b10debb1fcec82961ede328003642e4162bc86"
+    },
+    {
+      "path": "demo/yaml/model.yaml",
+      "bytes": 402,
+      "sha256": "bfb7ce8d7e0f18ec01a5800ed51e9ebd3588404e393d70c85034521a3d5619c9"
+    },
+    {
+      "path": "demo/yaml/nativeService.yaml",
+      "bytes": 273,
+      "sha256": "159fe99ffccb65c36c98def1a077e2839e813e71c764707f70e95aa8f3008d59"
+    },
+    {
+      "path": "demo/yaml/platform-classic-demo.yaml",
+      "bytes": 643,
+      "sha256": "30da28c5ce07c11702ef32e07d29e5ffbed46af16849aa4f6c9096c92fcdda51"
+    },
+    {
+      "path": "demo/yaml/platform-classic-listener-caller.yaml",
+      "bytes": 731,
+      "sha256": "bb83d289a98041453f9d775d5cc77dff27362f5a4b2e9c3a6ee2575299dcf3fa"
+    },
+    {
+      "path": "demo/yaml/platform-classic-listener-verify.yaml",
+      "bytes": 733,
+      "sha256": "62921b6b1e7e89eeebb51270321866076838717cb9707c06ebe8ffac616517ad"
+    },
+    {
+      "path": "demo/yaml/referenceGrant.yaml",
+      "bytes": 376,
+      "sha256": "84ca35ddbc50e35a83d95250f458004750ee00f874a3a152f95a7605c03dfff3"
+    },
+    {
+      "path": "demo/yaml/remoteMCP.yaml",
+      "bytes": 319,
+      "sha256": "bb4f9b3f8a123f23e0bee14a848ba686e4ba208400bdbef3710846d763ce061f"
+    },
+    {
+      "path": "demo.py",
+      "bytes": 11177,
+      "sha256": "df9430ccb4756622cc405bfd161e9d981a87b522347a25646daa4d8c05e86c3d"
+    },
+    {
+      "path": "evidence/demo-assets-2026-11-05.json",
+      "bytes": 1133,
+      "sha256": "2a6292693550b3c5e85e0fcc76b8bb7477a8905001694eb4ac25219e62467d35"
     },
     {
       "path": "evidence/live-classic-0.10.4-2026-11-04.json",
@@ -36,19 +266,29 @@
       "sha256": "065ff27973355f84e76ac31e65c14399263c4f5183fba3382ff08417ea799f1e"
     },
     {
+      "path": "examples/agent-demo.yaml",
+      "bytes": 528,
+      "sha256": "e2879852d878c17fcad7e21efc5c719cf4dcc8f502dab6ffa3b59d647c0951d0"
+    },
+    {
       "path": "examples/agent-denodo.yaml",
-      "bytes": 518,
-      "sha256": "69af5fe7ee41565b6d440ee3e3e1cd44dca3feca48766d6c055386ca96efa027"
+      "bytes": 572,
+      "sha256": "e2e6a384453ddddc9cf98f5abd904e1128ae89df8adaf019b10b0f18db9f8710"
     },
     {
       "path": "examples/agent-gitlab.yaml",
-      "bytes": 503,
-      "sha256": "59985a483c5b761b73740622798e08f8b5aa5759e5b468f80a972b9b542ccc8b"
+      "bytes": 557,
+      "sha256": "bf291329d1a9b20beff4585ab972a2caecae48d052ca4f4453aee82af816b5c3"
     },
     {
       "path": "examples/agent-kubernetes.yaml",
-      "bytes": 493,
-      "sha256": "0a93f4812a031718293f2d80847fc8acbcc800226f91e0d8c0a442a0039bd3eb"
+      "bytes": 547,
+      "sha256": "d23e52ee824490987703ef62301fd3f812335e1d1c80479199186a5057a2ea35"
+    },
+    {
+      "path": "examples/agent-template.yaml",
+      "bytes": 832,
+      "sha256": "bcde86c2f107366b47e3184809dbabc6147b8853f8ecb14dbe8ad990cfca6af0"
     },
     {
       "path": "examples/agent-with-catalog.yaml",
@@ -101,6 +341,11 @@
       "sha256": "eed2f677a1ef8fc521834a8a5c29f0154ecc50408c240d63f62c2000def28625"
     },
     {
+      "path": "presentation.html",
+      "bytes": 137086,
+      "sha256": "bab407697effd2f6b8eae85d84230bb280562de9f4222d3b79614844d46bf484"
+    },
+    {
       "path": "query.py",
       "bytes": 2691,
       "sha256": "3089d983aef0764e8e47834aff319494042d85d0c00a4f8373b41a05c26b80ce"
@@ -116,9 +361,19 @@
       "sha256": "044d8cd10f97f68709c519a6e946fa800bbc8b120831fcfca8f00c721a8a884a"
     },
     {
+      "path": "skills/secure-agent-request-builder/SKILL.md",
+      "bytes": 1751,
+      "sha256": "7d2438acbea3f819294c3299a7c691515925e9825a4b1a10c60e82c4132f1093"
+    },
+    {
       "path": "tests/test_classic.py",
       "bytes": 7471,
       "sha256": "1220544baa4b3d8bb44e08ca8c98bab3230aa0ef2ca2e0187e62c12e013db1d4"
+    },
+    {
+      "path": "tests/test_demo.py",
+      "bytes": 3538,
+      "sha256": "da0ba89f1f706df0257c8c9dffbe8ed4a7bac3f16bcff9b06b76d9b5e0515779"
     },
     {
       "path": "versions.lock.json",

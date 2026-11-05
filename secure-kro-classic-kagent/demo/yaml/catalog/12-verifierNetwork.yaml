@@ -1,0 +1,35 @@
+# KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ${schema.metadata.name}-verifier
+  namespace: ${schema.metadata.namespace}
+spec:
+  podSelector:
+    matchLabels:
+      classic.kagent.dev/verifier: ${schema.metadata.name}
+  policyTypes:
+  - Ingress
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: classic-agents
+      podSelector:
+        matchLabels:
+          gateway.networking.k8s.io/gateway-name: classic-demo
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8081

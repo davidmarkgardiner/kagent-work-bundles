@@ -1,0 +1,15 @@
+# Reference example only. Read its explanation before using it.
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  type: ClusterIP
+  selector:
+    app: kagent
+    kagent: demo
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080

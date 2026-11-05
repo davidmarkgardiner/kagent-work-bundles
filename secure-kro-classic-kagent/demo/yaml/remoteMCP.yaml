@@ -1,0 +1,10 @@
+# Reference example only. Read its explanation before using it.
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: approved-kubernetes-mcp
+  namespace: classic-agents
+spec:
+  description: Approved read-only Kubernetes MCP server
+  url: '{{APPROVED_KUBERNETES_MCP_URL}}'
+  protocol: STREAMABLE_HTTP

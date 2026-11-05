@@ -1,0 +1,50 @@
+# KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: ${schema.metadata.name}
+  namespace: ${schema.metadata.namespace}
+spec:
+  type: Declarative
+  description: KRO-composed native agent without Substrate
+  declarative:
+    runtime: go
+    modelConfig: ${schema.spec.modelConfig}
+    systemMessage: ${schema.spec.systemPrompt}
+    stream: false
+    tools: ${schema.spec.tools.map(id, {"kubernetes-readonly":dyn({"type":dyn("McpServer"),"mcpServer":dyn({"apiGroup":dyn("kagent.dev"),"kind":dyn("RemoteMCPServer"),"name":dyn("approved-kubernetes-mcp"),"toolNames":dyn([dyn("k8s_get_resources"),dyn("k8s_get_events")])})}),"gitlab-readonly":dyn({"type":dyn("McpServer"),"mcpServer":dyn({"apiGroup":dyn("kagent.dev"),"kind":dyn("RemoteMCPServer"),"name":dyn("approved-gitlab-mcp"),"toolNames":dyn([dyn("gitlab_get_project"),dyn("gitlab_get_latest_pipeline")])})}),"denodo-readonly":dyn({"type":dyn("McpServer"),"mcpServer":dyn({"apiGroup":dyn("kagent.dev"),"kind":dyn("RemoteMCPServer"),"name":dyn("approved-denodo-mcp"),"toolNames":dyn([dyn("get_inventory_data_product_details"),dyn("get_namespace_count"),dyn("get_namespace_summary")])})})}[id])}
+    deployment:
+      serviceAccountName: ${runtimeAccount.metadata.name}
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 1000m
+          memory: 256Mi
+      env:
+      - name: HOME
+        value: /tmp
+      podSecurityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+          - ALL
+      volumes:
+      - name: writable-tmp
+        emptyDir:
+          sizeLimit: 64Mi
+      volumeMounts:
+      - name: writable-tmp
+        mountPath: /tmp
+  skills:
+    gitRefs: ${schema.spec.skills.map(id, {"work-guidance":dyn({"url":dyn("{{APPROVED_GITLAB_SKILLS_REPOSITORY_URL}}"),"ref":dyn("{{APPROVED_FULL_COMMIT_ID}}"),"path":dyn("skills/work-guidance"),"name":dyn("work-guidance")})}[id])}
+    gitAuthSecretRef:
+      name: approved-git-credentials

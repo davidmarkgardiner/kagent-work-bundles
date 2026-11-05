@@ -1,0 +1,13 @@
+# Reference example only. Read its explanation before using it.
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  name: approved-model
+  namespace: classic-agents
+spec:
+  provider: OpenAI
+  model: '{{APPROVED_MODEL_NAME}}'
+  apiKeySecret: '{{EXISTING_PROVIDER_SECRET_NAME}}'
+  apiKeySecretKey: '{{EXISTING_PROVIDER_SECRET_KEY}}'
+  openAI:
+    baseUrl: '{{APPROVED_MODEL_GATEWAY_BASE_URL}}'

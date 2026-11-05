@@ -1,0 +1,27 @@
+# Platform baseline, installed before any customer instance.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: classic-listener-verify
+  namespace: classic-agents
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: classic-demo
+    sectionName: verify
+  traffic:
+    jwtAuthentication:
+      mode: Strict
+      preserveToken: false
+      providers:
+      - issuer: '{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}'
+        audiences:
+        - secure-agent-classic
+        jwks:
+          inline: '{{KUBERNETES_JWKS_JSON}}'
+    authorization:
+      action: Require
+      policy:
+        matchExpressions:
+        - jwt.sub == "system:serviceaccount:classic-agents:demo-verifier"

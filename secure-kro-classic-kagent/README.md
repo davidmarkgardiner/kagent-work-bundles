@@ -8,6 +8,12 @@ custom agent runtime. Use the matching controller, CRD chart and runtime images.
 The [image inventory](IMAGES.md) lists exact tags, digests and optional components.
 Run the preflight against the actual work installation before using the manifests.
 
+For the customer demonstration, start with [DEMO-WALKTHROUGH.md](DEMO-WALKTHROUGH.md)
+and open [presentation.html](presentation.html). The bundle includes a customer
+template, catalog, prompt-building skill, terminal driver, split graph YAML and
+[YAML speaker notes](YAML-GUIDE.md). The HTML is an offline illustration with
+dated receipts; the terminal driver reads real receiving-cluster state.
+
 The customer deploys one [ClassicSecureAgent instance](examples/agent.yaml).
 The platform installs the resource graph and security baseline once. The graph
 creates the native Agent, restricted ServiceAccounts, NetworkPolicies, protected HTTPRoutes, JWT policies,
@@ -17,7 +23,7 @@ Kagent owns the native runtime Deployment and its generated configuration Secret
 The [live evidence](evidence/live-classic-0.10.4-2026-11-04.json) records a real native
 Deployment, successful Golden PONG, a separate caller PONG, missing-token HTTP 401
 and verifier-on-caller HTTP 403. KRO reported the current instance Ready. The
-existing Substrate demo remained Ready and uses a separate controller and API.
+existing Substrate installation uses a separate controller and API.
 
 ## What changes from the Substrate bundle
 
@@ -282,12 +288,16 @@ separately before demonstrating a Kubernetes, GitLab or Denodo capability.
 
 - The native controller creates and owns the runtime Deployment and Service.
   KRO owns the Agent and its security resources. The runtime ServiceAccount has
-  token automount disabled. The verifier mounts only a JWT with the custom
+  token automount disabled. kagent separately projects a controller token with
+  audience `kagent`; this is visible in the recorded native Deployment. The verifier mounts only a JWT with the custom
   Gateway audience.
 - NetworkPolicy allows gateway-to-agent traffic and approved egress. Do not expose
   the native Service or controller APIs as an alternate customer front door.
   Apply a receiving-platform controller ingress policy so untrusted pods cannot
   use its session, task or A2A API directly.
+  The reference receipt does not prove NetworkPolicy traffic enforcement. Verify
+  the receiving CNI and explicit ingress/egress denial tests separately from PONG
+  and JWT rejection before claiming blocked network access.
 - Native 0.x skills can add file and shell tools. An OCI or Git skill is executable
   behavior, not only reference text. Keep reviewed immutable sources, non-root
   execution, filesystem restrictions, backend permissions and network boundaries.

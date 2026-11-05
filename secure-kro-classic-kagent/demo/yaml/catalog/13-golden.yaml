@@ -1,0 +1,67 @@
+# KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ${schema.metadata.name}-golden
+  namespace: ${schema.metadata.namespace}
+  annotations:
+    classic.kagent.dev/agent: ${agent.metadata.name}
+    classic.kagent.dev/route: ${verifyRoute.metadata.name}
+    classic.kagent.dev/card-route: ${cardRoute.metadata.name}
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        classic.kagent.dev/verifier: ${schema.metadata.name}
+        classic.kagent.dev/request-uid: ${schema.metadata.uid}
+    spec:
+      serviceAccountName: ${verifierAccount.metadata.name}
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: golden
+        image: '{{APPROVED_GOLDEN_IMAGE_AT_DIGEST}}'
+        command:
+        - python3
+        - -B
+        - /app/golden.py
+        - --config
+        - /golden/config.json
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          requests:
+            cpu: 25m
+            memory: 32Mi
+          limits:
+            cpu: 500m
+            memory: 128Mi
+        volumeMounts:
+        - name: config
+          mountPath: /golden
+          readOnly: true
+        - name: jwt
+          mountPath: /var/run/golden
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: ${goldenConfig.metadata.name}
+      - name: jwt
+        projected:
+          sources:
+          - serviceAccountToken:
+              audience: secure-agent-classic
+              expirationSeconds: 600
+              path: token
