@@ -17,7 +17,9 @@ Some application traffic paths were not ready for the resulting peer-authenticat
 
 The change reportedly passed the usual pull request, peer review and change-request approvals. Those approvals did not prevent the impact. The review must establish what evidence was available, what reviewers were expected to verify, and why the controls did not require successful lower-environment tests and a rehearsed rollback.
 
-Responders neutralised the Kyverno mutation while retaining its object, then used an additional recovery policy or configuration change to allow the owning Flux Kustomization to restore the PeerAuthentication label from GitOps to the previous `1-23` value. Applications reportedly began recovering after reconciliation, approximately 10–20 minutes after that recovery step. The overall incident lasted approximately five hours, with around 40 people involved in the incident call late into the night.
+Responders neutralised the Kyverno mutation while retaining its object, then let Flux reconcile the existing PeerAuthentication manifests already held in GitOps for each application namespace. According to the clarified responder account, no additional recovery policy was introduced.
+
+Each resource returned to its own application namespace's declared value, rather than receiving one universal replacement label. For the broken applications, this restored the older label, such as `1-23`, making the intended authentication policy ineffective again and allowing their traffic to recover. Recovery reportedly began after approximately 10–20 minutes of reconciliation. The overall incident lasted approximately five hours, with around 40 people involved in the incident call late into the night.
 
 Recovery after reversing the policy activation strongly supports this causal account. The exact policy mode, affected traffic paths, controller actions and complete restoration time still need to be established from evidence.
 
@@ -44,8 +46,8 @@ All times below are approximate and based on the responder account. Replace them
 | Around 19:00 | Application disruption reportedly began. | First failing requests, synthetic checks, service metrics, alerts and incident declaration. |
 | Around 23:00 | The reporting responder joined the incident call. Investigation and recovery work were already in progress. | Incident log and decision record. |
 | During recovery, exact time unknown | The offending mutation was changed to a dummy/no-op form while its resource remained present. | Exact before/after policy YAML, merge and reconcile timestamps, policy status and evidence that mutation stopped. |
-| During recovery, exact time unknown | An additional recovery policy or configuration change allowed the owning Flux Kustomization to restore the label recorded in GitOps. | Exact resource kind and diff, mechanism, source revision and controller evidence. |
-| Approximately 10–20 minutes later | Restored labels became effective and applications reportedly began returning online. | Applied policy labels, effective proxy configuration and application traffic recovery. |
+| During recovery, exact time unknown | With the mutation neutralised, Flux reconciled the existing application namespace PeerAuthentication manifests back to their values in GitOps. No additional recovery policy was introduced in the clarified account. | Existing manifests and source revisions for each application namespace, Flux applied revisions and controller evidence. |
+| Approximately 10–20 minutes later | Affected resources had returned to their namespace-specific GitOps labels. For broken applications, the older label made authentication ineffective again and application traffic reportedly recovered. | Per-namespace desired and stored labels, effective policy configuration and application traffic recovery. |
 | Around 00:00, 5 Nov | Restoration was reported. Confirm whether this was first improvement, complete recovery or incident closure. | Application-owner acceptance and the incident record. |
 
 **Time ambiguity:** The account says “12 pm” but also describes the early hours and a five-hour incident beginning at 19:00. This draft interprets that as midnight, 00:00 on 5 November, rather than noon. Confirm before finalising. Do not classify the full five-hour window as controller reconciliation time; the reported reconciliation portion was 10–20 minutes.
@@ -84,16 +86,16 @@ The responder describes this sequence:
 
 1. The team updated the Kyverno mutation into a dummy/no-op form, retaining the policy object but preventing the original mutation.
 2. Removing the policy from GitOps alone was not considered sufficient to delete the live resource because pruning was not enabled or available for that managed resource in this setup.
-3. The team introduced another recovery policy or configuration change that allowed Flux reconciliation to restore the GitOps PeerAuthentication label to `1-23`.
-4. Reconciliation and the observed label reset took approximately 10–20 minutes. Application traffic then began recovering.
+3. PeerAuthentication manifests, described as the existing `.authentication` files, were already held in GitOps for each application namespace. Once the mutation was neutralised, the team let Flux reconcile those existing manifests. The clarified account does not describe introducing another recovery policy.
+4. Flux restored whatever label was declared in each application namespace's existing manifest. For the broken applications, this was the older label, such as `1-23`, which made authentication ineffective again and allowed the application traffic to work. The reported reconciliation and recovery period was approximately 10–20 minutes. Do not assume every namespace had the same original label.
 
-Capture the exact YAML and ordering. The additional recovery resource's kind and mechanism are not established by this account. Do not replace this history with the direct `kubectl` loop discussed during the incident: those were proposed commands, not evidence that they were executed. No workload restart or node reboot is established by the recovery account either.
+Capture the existing namespace manifests, neutralised mutation YAML and actual reconciliation ordering. No newly introduced recovery policy or bulk relabelling is part of the clarified recovery account. Do not replace this history with the direct `kubectl` loop discussed during the incident: those were proposed commands, not evidence that they were executed. No workload restart or node reboot is established by the recovery account either.
 
 Verify that the “dummy” policy was genuinely inert and valid, rather than causing admission errors or failing webhook requests. Confirm both admission and mutate-existing processing stopped; retaining an object or changing one background setting alone is not sufficient proof. [Kyverno mutation behaviour](https://kyverno.io/docs/policy-types/cluster-policy/mutate/).
 
 Flux supports garbage collection through `.spec.prune`; per-resource exclusions and ownership also matter. “Removing the manifest did not delete the object in our configuration” is different from “Flux cannot delete policies.” Record the actual Kustomization settings, resource inventory, exclusions and ownership. Do not enable pruning across a shared Kustomization as an unreviewed emergency fix. [Flux pruning](https://fluxcd.io/flux/components/kustomize/kustomizations/#prune).
 
-**Restored availability is not restored security assurance.** Returning the policy to a revision that the active control plane ignores may deliberately recreate the previous enforcement gap. Record the effective post-mitigation state, obtain explicit time-bounded risk ownership, and plan safe re-enablement after application readiness is proven. Do not silently describe the previous baseline as secure.
+**Restored availability is not restored security assurance.** For the broken applications, the clarified account says that reverting to the older label made authentication ineffective again. This restored the prior enforcement gap rather than fixing application compatibility or proving encrypted traffic. Record and verify that effective state per namespace, obtain explicit time-bounded risk ownership, and plan safe re-enablement after application readiness is proven. Do not silently describe the previous GitOps baseline as secure.
 
 ## Why restoration took too long
 
@@ -107,8 +109,8 @@ Investigate whether responders knew the live Kyverno rule, its background behavi
 
 - [ ] Exact PeerAuthentication resources before activation, during impact and after mitigation, including labels, complete specs and scopes.
 - [ ] Installed Istio images, configured revisions, revision tags and representative proxy connections/configuration. Confirm the literal `1-23` and `1-29` values. The spoken forms “1.2.3”, “1.2.9” and “123” must not be treated as verified binary versions.
-- [ ] Original Kyverno mutation, dummy/no-op replacement and additional recovery resource, including admission/background settings and controller status.
-- [ ] Flux source and applied revisions, Kustomization inventory, pruning settings, resource exclusions, events and reconciliation timestamps for each environment.
+- [ ] Original Kyverno mutation and dummy/no-op replacement, including admission/background settings and controller status. No additional recovery policy is reported in the clarified account.
+- [ ] Existing application namespace `.authentication`/PeerAuthentication manifests and their individual pre-change labels, together with Flux source and applied revisions, Kustomization inventory, pruning settings, resource exclusions, events and reconciliation timestamps for each environment.
 - [ ] Release, review, approval and change-request records, including the test and rollback evidence supplied to approvers.
 - [ ] Affected application and dependency inventory, first failures, TLS errors, traffic/security telemetry and recovery checks using new connections.
 - [ ] Environment promotion chronology and the controls that allowed or blocked progression.
@@ -128,7 +130,7 @@ Priorities and deadlines below are proposals, not existing assignments or approv
 | A4 | P0, before the next related release | Platform engineering owner | Rehearse rollout and rollback under the same Kyverno, Flux ownership and pruning settings. Demonstrate mutation containment, persisted rollback and application recovery within an agreed timed target. Include a mutation that overwrites manual repairs. |
 | A5 | P1, within one week | Change process owner | Review the actual approvals. Require an explicit statement of behavioural effect, scope, lower-environment results, stop conditions and tested rollback. Require relevant technical challenge and application-owner evidence for enforcement changes. Audit a subsequent change against these criteria. |
 | A6 | P1, within one week | Platform policy owner | Inventory dormant or mislabelled security policies and compare intended enforcement with effective runtime behaviour. Create alerts/checks for policy presence without intended enforcement, with owner and exception handling. |
-| A7 | P1, within one week | GitOps owner | Define the lifecycle of non-pruned policies, retirement of the no-op rule and the additional recovery resource. Test that each resource can be made inert, retired or restored predictably without unrelated deletion. Record scope, owner and expiry for emergency artifacts. |
+| A7 | P1, within one week | GitOps owner | Define the lifecycle of non-pruned policies and retirement of the retained no-op rule. Rehearse neutralising mutation and letting Flux restore each application namespace's own declared PeerAuthentication state without unrelated deletion. Record owner and expiry for the no-op workaround and identify insecure baselines rather than treating a successful reconcile as security acceptance. |
 | A8 | P1, before the next enforcement rollout | SRE + mesh owner | Use a bounded canary population with representative traffic, error/TLS/SLO thresholds and explicit hold points. Prove an injected compatibility failure stops wider rollout. Prevent a shared policy change bypassing environment boundaries. |
 | A9 | P1, within two weeks | Incident management owner | Reconstruct stage timings, identify avoidable delay and agree a restoration objective. Run a timed exercise with a named incident commander, technical lead, scribe and application validators; retain the results. |
 | A10 | P1, within two weeks | Observability owner | Provide tested alerts and dashboards for failed requests, TLS handshake failures, effective mTLS traffic and policy changes. Exercise detection using the same class of fault and record alert latency. |
@@ -143,7 +145,7 @@ Use staged canary evaluation and objective promotion criteria rather than relyin
 2. How long had the policy been ineffective, and why did security assurance not detect that state?
 3. In what order did the change reach dev, pre-production and production? What evidence allowed each promotion?
 4. What risk, scope, compatibility and rollback evidence was in the review/change record, and what was missing?
-5. What exactly did the no-op mutation and recovery resource do? Why did this work under the actual ownership/pruning configuration?
+5. How was the mutation made inert, what value did Flux restore from each application namespace's existing manifest, and why did those restored labels make authentication ineffective for the broken applications? Confirm the actual ownership/pruning configuration and reconciliation sequence.
 6. How much time was spent at each recovery stage, and which tested mechanism would shorten the next incident?
 7. Which intended controls remain inactive after mitigation, who owns that risk, and when will compliant enforcement be restored?
 
