@@ -16,6 +16,11 @@
       "sha256": "c044a2b02fcef81f734959fac090c3740dd6f477068d43bc81a33044586da8cc"
     },
     {
+      "path": "NORMAL-VS-SECURE-ONE-SHEET.md",
+      "bytes": 6008,
+      "sha256": "07789516d45e51d6e3914ee49a2ad6761a2275cef6c4100c3270ff17f03a79e7"
+    },
+    {
       "path": "README.md",
       "bytes": 17304,
       "sha256": "8b34caf3e6d2770f89fc89a78c5b732d9aa1bc64ae9f2a26c2979af5e88f3e6f"
