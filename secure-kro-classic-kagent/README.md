@@ -14,6 +14,10 @@ template, catalog, prompt-building skill, terminal driver, split graph YAML and
 [YAML speaker notes](YAML-GUIDE.md). The HTML is an offline illustration with
 dated receipts; the terminal driver reads real receiving-cluster state.
 
+[NEXT-STEPS.md](NEXT-STEPS.md) records the Entra ID/UAMI iteration, Gateway
+telemetry and token-usage evidence, tool and network acceptance tests, and the
+later UI or builder-agent path. The current runtime remains non-Substrate.
+
 The customer deploys one [ClassicSecureAgent instance](examples/agent.yaml).
 The platform installs the resource graph and security baseline once. The graph
 creates the native Agent, restricted ServiceAccounts, NetworkPolicies, protected HTTPRoutes, JWT policies,

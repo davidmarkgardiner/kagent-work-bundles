@@ -11,14 +11,19 @@
       "sha256": "63864714511a1c479e19f7843f9a23a95a48dabe224c016325d7e023a72f2161"
     },
     {
+      "path": "NEXT-STEPS.md",
+      "bytes": 5194,
+      "sha256": "c044a2b02fcef81f734959fac090c3740dd6f477068d43bc81a33044586da8cc"
+    },
+    {
       "path": "README.md",
-      "bytes": 17073,
-      "sha256": "7eb00870c59328177248300d9e9974763517d4e21aac4500c233d5f5b79ccf7f"
+      "bytes": 17304,
+      "sha256": "8b34caf3e6d2770f89fc89a78c5b732d9aa1bc64ae9f2a26c2979af5e88f3e6f"
     },
     {
       "path": "WORK-AGENT-HANDOFF.md",
-      "bytes": 3549,
-      "sha256": "5a0f987b74728fb3662b96f1be23fb8f4d8e67fe06d842fdac4c27ad0d14c9d3"
+      "bytes": 3947,
+      "sha256": "86ad16389799ae7f1c28bf3d48b4432099014bae1a461c3008fdb5670f38570a"
     },
     {
       "path": "YAML-GUIDE.md",
@@ -42,8 +47,8 @@
     },
     {
       "path": "demo/presentation.template.html",
-      "bytes": 22960,
-      "sha256": "273730541c2d8ddd5df8e235e90b62a3e61458e6a461b08a2023419a749765cd"
+      "bytes": 23660,
+      "sha256": "0dff38e8a08b69f59364d0c6313839128d36e3061404eb096a3515a852a3afa3"
     },
     {
       "path": "demo/recorded-native-deployment.yaml",
@@ -342,8 +347,8 @@
     },
     {
       "path": "presentation.html",
-      "bytes": 137086,
-      "sha256": "bab407697effd2f6b8eae85d84230bb280562de9f4222d3b79614844d46bf484"
+      "bytes": 137786,
+      "sha256": "2829e23332ead8cd12215c0265a019162907d83719866176aaa0e55a4cd71185"
     },
     {
       "path": "query.py",

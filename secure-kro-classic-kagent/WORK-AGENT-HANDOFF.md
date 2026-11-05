@@ -51,3 +51,9 @@ resource. The customer template and portable request-builder skill are included.
 The HTML illustrates reconciliation and displays dated receipts; it does not
 perform deployments or claim fresh tool evidence. GitLab writes are not included
 in these read-only adapters.
+
+Keep the next iteration in NEXT-STEPS.md. Prioritize Entra ID caller validation
+and UAMI/Workload Identity for approved agent-to-MCP access. Reuse the existing
+Gateway authentication, observability, token reporting, model catalog and policy
+services. Capture their actual evidence and the separate tool/network checks.
+The UI/builder-agent path remains a later producer of the same customer YAML.
