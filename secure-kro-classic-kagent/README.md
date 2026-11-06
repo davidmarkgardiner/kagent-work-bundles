@@ -31,6 +31,12 @@ observability, and SDLC use cases, with dedicated current-security, planned-Entr
 and Gateway-control sheets. Yesterday's animated decks and YAML explorer are
 linked from that entry point. See [PRESENTATIONS.md](PRESENTATIONS.md) for scope.
 
+For the live onboarding demo, see [LIVE-ONBOARDING.md](LIVE-ONBOARDING.md).
+Run `python3 live_demo.py --context {{APPROVED_DEMO_CONTEXT}}` and open its
+loopback launch URL to onboard or connect to an agent, verify caller access,
+chat through its Gateway API and delete the connected owner by UID.
+Live cluster validation is separate from the local fixture checks.
+
 For Story 2, [SRE Lens asks the right specialists](sre-lens.html) adds a five-slide
 walkthrough of selective delegation, scoped MCP reads, evidence synthesis and
 API consumption. Switch question types to see which specialists are selected.

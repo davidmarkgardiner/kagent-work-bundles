@@ -7,7 +7,7 @@ import re
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parent
-PRIMARY = ['START-HERE.html', 'journey.html', 'sre-lens.html', 'triage.html', 'sdlc.html', 'showcase.html', 'resources.html', 'tomorrow.html', 'presentation.html', 'index.html']
+PRIMARY = ['live-onboarding.html', 'START-HERE.html', 'journey.html', 'sre-lens.html', 'triage.html', 'sdlc.html', 'showcase.html', 'resources.html', 'tomorrow.html', 'presentation.html', 'index.html']
 
 
 class Document(HTMLParser):

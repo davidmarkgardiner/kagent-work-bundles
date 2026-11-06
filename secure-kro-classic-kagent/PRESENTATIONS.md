@@ -183,3 +183,7 @@ Open `START-HERE.html` after extracting the complete folder. No server or instal
 ## SRE Lens
 
 Open `sre-lens.html`. The first slide selects Kubernetes/GitLab for a workload incident, Data for a data question, SNOW/KB for incident guidance, KB alone for a knowledge question, or all five for a cross-system question. A dedicated sheet shows ServiceNow incident reads and KB vector retrieval, including the article indexing flow. Later slides show evidence synthesis with missing/denied-source cases and consumption through the DICE API. These are synthetic routing examples. The older native A2A YAML uses Grafana/data/Kubernetes references and does not install every integration shown by the product illustration. Rebuild with `python3 build_sre_lens.py`, then `python3 prepare_demo_bundle.py`.
+
+## Live onboarding frontend
+
+[Live onboarding](live-onboarding.html) is separate from the synthetic slide flows. Launch `python3 live_demo.py --context {{APPROVED_DEMO_CONTEXT}}` and open its loopback URL. It supports create, connect-existing, current-instance Golden/access checks, API handoff, evidence-backed chat and UID-guarded owner deletion. See [LIVE-ONBOARDING.md](LIVE-ONBOARDING.md) for scope, prerequisites and the current validation boundary.

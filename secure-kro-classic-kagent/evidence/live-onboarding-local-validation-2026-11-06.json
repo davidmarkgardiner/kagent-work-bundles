@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-11-06",
+  "result": "LOCAL_BACKEND_AND_FIXTURE_UI_CHECKED_LIVE_CLUSTER_PENDING",
+  "scope": "No live cluster mutation, provider inference or MCP request during these checks.",
+  "backendTests": 30,
+  "browser": {
+    "fixtureOnly": true,
+    "journey": [
+      "create intent",
+      "connect-existing without owner recreation",
+      "current-instance checks",
+      "four rejection checks plus caller PONG fixture",
+      "API handoff",
+      "two fixture chat responses",
+      "UID-guarded deletion"
+    ],
+    "mobileWidth": 390,
+    "horizontalOverflow": false,
+    "pageErrors": [],
+    "graphRows": 17
+  },
+  "transport": "Real kubectl DELETE exercised against a local fixture API; exact owner path, UID precondition and foreground propagation inspected.",
+  "liveCluster": "Not checked: probed home-lab contexts were unreachable; target selection remains pending.",
+  "namespaceCountBoundary": "Platform backend read supplied to the model; not an agent MCP call.",
+  "telemetry": "Live Kubernetes observations implemented; OTLP trace export not configured.",
+  "entrypoint": "live-onboarding.html",
+  "backend": "live_demo.py"
+}
