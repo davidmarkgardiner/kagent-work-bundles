@@ -38,6 +38,13 @@
 @page{size:1600px 900px;margin:0}
 @media print{html,body{margin:0!important;padding:0!important;width:1600px!important;height:auto!important;min-height:0!important;overflow:visible!important;background:var(--surface)!important;display:block!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}#stage{position:static!important;display:block!important;width:1600px!important;height:auto!important;margin:0!important;border:0!important}#canvas{width:1600px!important;height:auto!important;transform:none!important;position:static!important;display:block!important}.slide,.slide[hidden]{display:block!important;position:relative!important;inset:auto!important;width:1600px!important;height:900px!important;min-height:900px!important;padding:40px 56px!important;break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid}.slide:last-child{break-after:auto;page-break-after:auto}.toolbar,.keyboard-help,dialog,dialog::backdrop,.scenario-group,.diagram-hint,.mobile-hint,.packet,.inspect-hint{display:none!important}.content{position:absolute!important;top:240px!important;left:56px!important;width:1488px!important;margin:0!important}.interaction-row{display:block!important;min-height:25px!important;margin-bottom:10px!important}.print-note{display:block;font-size:14px;color:var(--muted)}.diagram-scroll{overflow:visible!important;border:0!important}.diagram{width:1488px!important;height:450px!important;border:1px solid var(--border)!important;break-inside:avoid;page-break-inside:avoid}.node{opacity:1!important;transform:none!important;box-shadow:none!important;transition:none!important}.route.inactive,.edge-label.inactive,.stop-mark.inactive{opacity:1!important}.legend-row{display:flex!important;gap:20px!important}.legend{display:flex!important;font-size:14px!important;margin:0!important}.status{display:none!important}.takeaway{position:absolute!important;left:56px!important;right:56px!important;bottom:50px!important;display:flex!important;min-height:57px!important;margin:0!important;padding:15px 19px!important;font-size:20px!important}.takeaway strong{display:inline!important;margin:0!important}.slide-footer{position:absolute!important;bottom:20px!important;left:56px!important;right:56px!important;display:flex!important;font-size:13px!important;margin:0!important}.slide-footer span{display:inline!important;margin:0!important}.slide-topline{top:42px!important;right:56px!important}.slide-topline .version{display:inline!important}.illustration-label{font-size:12px!important;padding:5px 10px!important}.accent-rule{width:64px!important;height:5px!important;margin-bottom:25px!important}.eyebrow{font-size:14px!important;max-width:none!important}h1{font-size:48px!important;margin:17px 0 13px!important;line-height:1.12!important}p.intro{font-size:22px!important;line-height:1.4!important}}
 </style>
+<style id="dice-bundle-theme">
+:root{--surface:#ffffff;--backdrop:#f2f2f2;--text:#141414;--body-text:#383838;--muted:#626262;--border:#dedede;--panel:#f6f6f6;--accent:#e60000;--link:#c90000;--link-tint:#fff0f0;--positive:#141414;--positive-tint:#f0f0f0;--reference:#626262;--reference-tint:#f3f3f3;--font:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;--code-font:ui-monospace,Consolas,monospace;--ink:#141414;--paper:#f6f6f6;--red:#e60000;--line:#dedede;--blue:#c90000;--amber:#555555;--bg:#ffffff;--green:#c90000;--soft:#fff0f0;--purple:#c90000;--mono:ui-monospace,Consolas,monospace}
+body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif}h1,h2,h3{font-family:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif}a{color:var(--link);text-underline-offset:3px}button:focus-visible,a:focus-visible,summary:focus-visible{outline-color:#e60000}.sheet,.panel,.summary-sheet,.hardening-card,.simple-flow div,.card,.step{border-radius:12px}.sheet,.summary-sheet{background:#ffffff}.panel,.hardening-card,.step{background:#f6f6f6}.takeaway,.notice,.review{background:#fff0f0;border-left-color:#e60000}.code{background:#141414;color:#ffffff}pre,code{font-family:ui-monospace,Consolas,monospace}.bundle-home{display:block;padding:10px 4vw;font-size:13px;background:white;border-bottom:1px solid #dedede}.reference-banner{font-size:13px;padding:12px 4vw;background:#f6f6f6;border-bottom:1px solid #dedede}.reference-banner a{margin-right:18px}@media print{.bundle-home,.reference-banner{display:none!important}}
+
+.takeaway{background:#eef7ef;border-left-color:#9bc8a2;color:#1c3525}.takeaway strong{color:#356a43}
+
+</style>
 </head>
 <body>
 <svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>
@@ -337,7 +344,7 @@
         {
           "id": "model",
           "title": "Approved model",
-          "detail": "ModelConfig \u2192 model route",
+          "detail": "ModelConfig → model route",
           "source": "model",
           "x": 1130,
           "y": 30,
@@ -800,7 +807,7 @@
         },
         {
           "id": "uami",
-          "title": "Workload \u2192 MCP identity",
+          "title": "Workload → MCP identity",
           "detail": "Federation, audience and backend grants",
           "source": "uami",
           "x": 1130,
@@ -884,7 +891,7 @@
     "jwt": {
       "title": "Caller authentication and authorization",
       "type": "Synthetic AgentgatewayPolicy excerpt",
-      "text": "apiVersion: agentgateway.dev/v1alpha1\nkind: AgentgatewayPolicy\nmetadata:\n  name: illustrative-caller-policy\nspec:\n  targetRefs:\n    - group: gateway.networking.k8s.io\n      kind: HTTPRoute\n      name: sample-invoke\n  traffic:\n    jwtAuthentication:\n      mode: Strict\n      preserveToken: false\n      providers:\n        - issuer: https://issuer.example.invalid/\n          audiences: [illustrative-agent]\n          jwks:\n            inline: \"\u003cPLATFORM_JWKS>\"\n    authorization:\n      action: Require\n      policy:\n        matchExpressions:\n          - jwt.sub == \"system:serviceaccount:demo-agents:sample-caller\"\n# No actual JWT or signing key is embedded.\n"
+      "text": "apiVersion: agentgateway.dev/v1alpha1\nkind: AgentgatewayPolicy\nmetadata:\n  name: illustrative-caller-policy\nspec:\n  targetRefs:\n    - group: gateway.networking.k8s.io\n      kind: HTTPRoute\n      name: sample-invoke\n  traffic:\n    jwtAuthentication:\n      mode: Strict\n      preserveToken: false\n      providers:\n        - issuer: https://issuer.example.invalid/\n          audiences: [illustrative-agent]\n          jwks:\n            inline: \"<PLATFORM_JWKS>\"\n    authorization:\n      action: Require\n      policy:\n        matchExpressions:\n          - jwt.sub == \"system:serviceaccount:demo-agents:sample-caller\"\n# No actual JWT or signing key is embedded.\n"
     },
     "route": {
       "title": "Exact Gateway route",
@@ -936,7 +943,17 @@
       "type": "Reference design, not deployed configuration",
       "text": "Next iteration: agent-to-tool identity\n  Approved ServiceAccount and UAMI/Workload Identity binding\n  Federated credential and correct token audience\n  Explicit allowed MCP operations and backend grants\n  Positive read and denied operation / identity tests\n\nCaller authentication does not automatically grant tool access.\nUser delegation requires its own approved design.\nNormal kagent can remain the runtime for this iteration.\n"
     }
-  }
+  },
+  "deckLinks": [
+    {
+      "label": "Demo home",
+      "href": "START-HERE.html"
+    },
+    {
+      "label": "Journey",
+      "href": "journey.html"
+    }
+  ]
 }</script>
 <script>
 'use strict';

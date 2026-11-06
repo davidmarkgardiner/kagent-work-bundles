@@ -1,0 +1,53 @@
+{
+  "checkedOn": "2026-11-06",
+  "scope": "Offline Story 1 desired-state documentation, including the requested earlier isolation explainers",
+  "artifact": "tomorrow.html",
+  "sha256": "304e95bc418f280aa2f9b1cd9b5b2516f9580bb3e5fae0aaff8d2c4ce70b1d23",
+  "sheets": [
+    "direction",
+    "architecture",
+    "security",
+    "continuity",
+    "memory",
+    "value",
+    "roadmap"
+  ],
+  "checks": {
+    "uniqueIds": "PASS: 23",
+    "linksAndFragments": "PASS: 43 local/external links inspected; local paths and static/dynamically generated deck fragments resolve",
+    "scripts": "PASS: zero scripts",
+    "desktop": "PASS: all seven sheets captured and visually inspected at 1440px viewport width",
+    "offlineInteraction": "PASS: all three continuity selectors and security anchor navigation work with browser networking disabled",
+    "keyboard": "PASS: native radio arrow-key selection",
+    "mobileWidth": "PASS: no document horizontal overflow at 390px",
+    "printLayout": "PASS: all seven sheets fit emulated A3-landscape content height; final security print layout visually inspected",
+    "pdfExport": "NOT RUN",
+    "entryLinks": "PASS: showcase, resource comparison, and Journey links lead to tomorrow.html",
+    "originalExplainers": "PASS: original isolation page, original HTML Kubernetes object-ownership map, and animated boundaries demo links exercised; their original content was not modified",
+    "network": "PASS: the new static demo makes no external requests or backend calls",
+    "console": "New page had no script errors; the original linked HTML briefing requested a missing local favicon.ico, which returned 404",
+    "publicSafety": "REVIEWED_FALSE_POSITIVE: existing live-classic-0.10.4-2026-11-04.json filename matches the strict private-IP pattern; no other hits",
+    "diffWhitespace": "PASS"
+  },
+  "evidenceBoundaries": {
+    "current": "4 November classic lab receipt; no current cluster/model/network revalidation",
+    "historical": "7 October actor lifecycle/card checks and local Infinity fixture remain separate from the integrated target",
+    "memory": "Production target is a design; shared-context bundle has only an evidence template",
+    "recovery": "Native/Pi paired recovery scorecard remains NOT_RUN",
+    "snapshot": "Current kagent documentation describes DATA snapshots with fresh processes; full RAM restoration is a separate runtime/configuration capability",
+    "security": "Entra identity/grants, Gateway request checks, Kubernetes API/admission/network enforcement, and backend scope checks have separate owners; full namespace administration differs from the classic restricted request role",
+    "benefits": "Proposed outcomes and measures, without fabricated savings, recovery results, or readiness"
+  },
+  "primarySourcesChecked": [
+    "https://www.kagent.dev/docs/kagent/1.x/agents/agent-memory/",
+    "https://www.kagent.dev/docs/kagent/1.x/agents/agent-harness/",
+    "https://www.kagent.dev/docs/kagent/1.x/about/substrate-runtime/suspend-and-resume/",
+    "https://github.com/agent-substrate/substrate/blob/main/docs/concepts/architecture.md",
+    "https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/",
+    "https://kubernetes.io/docs/concepts/services-networking/network-policies/",
+    "https://learn.microsoft.com/en-us/entra/identity-platform/access-tokens"
+  ],
+  "githubWrite": false,
+  "clusterChange": false,
+  "providerInference": false
+}

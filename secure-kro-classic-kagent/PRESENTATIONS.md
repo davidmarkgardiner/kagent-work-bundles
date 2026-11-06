@@ -1,6 +1,90 @@
-# Three connected presentation chapters
+# DICE review sheets and connected presentation chapters
 
-Open `journey.html` first. All three decks work offline as standalone HTML files.
+Open [START-HERE.html](START-HERE.html) first for the complete offline demo menu.
+Use [showcase.html](showcase.html) for the 6 November review sheets.
+It gives the two stories an explicit order: the platform we build and how teams
+consume it, followed by how our own teams use it. Its eight sheets cover the
+product, KRO lifecycle and API consumption, current JWT security, planned Entra
+identity, Gateway models/tools/cost/telemetry, three observability iterations,
+GitLab SDLC, and SRE Lens. It works offline and prints one sheet per A3 landscape
+page. Source disclosures stay available on screen; the printable copy retains
+the main proof boundaries and source links.
+
+The existing decks link back to these review sheets. Component names “GEF” and
+“Node.js MCP” await owner clarification. The sheets use generic classifier/data
+labels and identify the inspected Kimi/Denodo sources in their review notes.
+Entra and Gateway-mediated MCP remain planned integrations for the classic demo.
+The review sheets contain no new runtime verification. The current work-bundle
+distribution contains the checked presentation edits and offline references.
+Local browser checks and the remaining review points are recorded in
+[the showcase validation receipt](evidence/showcase-review-validation-2026-11-06.json).
+
+## Story 1 resources and hardening
+
+Start with [resources.html](resources.html). Its two main sheets answer
+**what gets deployed and why** and **how the agent is hardened**. The inventory
+shows all seven kinds in the 14-resource KRO graph and names the purpose of the
+three HTTPRoutes. Shared platform setup and kagent-generated runtime objects
+have separate ownership labels.
+
+Full before/after resource selection and exact YAML remain under the closed
+**Optional resource-by-resource YAML** disclosure. Use it when someone wants
+the implementation detail. The main presentation and print path contain the
+two explanatory sheets.
+
+Rebuild the resource sheet from the bundle sources with
+`python3 build_resource_comparison.py`. It contains no live status or backend
+actions. The optional initial deployment is an illustrative comparison, not a historical
+snapshot or a claim that every ordinary kagent agent is unprotected.
+
+Journey slide 3 is now **Deploy, use, update, and remove**. It describes how to
+close caller access before a material change, run fresh verification, and
+remove access and owned resources when retiring an agent.
+
+After the cover, comparison and lifecycle, slides 4 and 5 show [resource kinds and their purposes](journey.html#resource-purpose)
+and [agent hardening](journey.html#hardening), with arrows connecting their controls. The visible cards explain why
+each object or control exists. Clicking a card opens optional source detail;
+the resource cards include the exact graph templates.
+
+[The resource-comparison validation receipt](evidence/resource-comparison-validation-2026-11-06.json)
+records the offline selector, source-fidelity, keyboard, mobile, and navigation checks.
+
+## Story 1 desired state
+
+The optional [tomorrow.html](tomorrow.html) expands the desired-state discussion.
+The first sheet summarises where DICE is going. Six further sheets explain the
+desired architecture, Entra and Kubernetes controls, a checkpoint/wait/resume
+illustration, the separate types of memory, intended benefits and measurements,
+and the staged adoption path.
+
+The identity and Kubernetes sheet incorporates the earlier shared-cluster
+isolation explanation. It links the original
+[agent-isolation page](../kagent-agentgateway-tenant-isolation/AGENT-ISOLATION-EXPLAINER.html)
+and [animated boundaries demo](../../docs/agent-isolation-slides/index.html).
+Entra owns identity, federation, and grants; Gateway validates and authorizes
+requests; Kubernetes controls admission, API rights, and network paths. The
+full-namespace-admin target and restricted classic-demo role remain distinct.
+
+This is a proposed direction, not a promise of next-day delivery. Current classic
+demo proof, separate historical or fixture work, and desired integrated behaviour
+have separate labels. The document does not migrate the classic runtime or deploy
+durable workflows, memory services, Entra identity, or Substrate.
+
+The roadmap distinguishes persisted task/session state, semantic recall, and
+actor execution state. Current kagent documentation describes data-scope actor
+snapshots with fresh processes on resume. Fuller process-memory snapshots are a
+separate runtime/configuration capability and must be tested on the selected
+version. Neither actor snapshots nor memory retrieval authorise external writes.
+
+Benefits include continuity, security, reuse of reviewed lessons, responsiveness,
+self-service, auditability, and total cost. They are intended outcomes with
+proposed measures; the sheets contain no fabricated savings or recovery results.
+
+[The desired-state validation receipt](evidence/tomorrow-validation-2026-11-06.json)
+records document/browser checks, the original explainer links, and the boundary
+between current proof, historical experiments, and the proposed service.
+
+For the animated walkthrough, open `journey.html` first. All three decks work offline as standalone HTML files.
 Keep them in the same folder to use the Journey / Triage / SDLC links in each
 slide footer. `index.html` remains the earlier architecture deep dive;
 `presentation.html` remains the actual YAML explorer with dated receipts.
@@ -11,8 +95,9 @@ slide footer. `index.html` remains the earlier architecture deep dive;
 | 2 | [SRE triage and application recovery](triage.html) | Explain the original Kafka evidence path and the newer application-owned specialist, bounded classification, reviewable MR, human approval and measured recovery. |
 | 3 | [Agent-assisted SDLC](sdlc.html) | Follow an approved task through PM, builder, tester and reviewer roles, artifact-backed checkpoints, bounded rework and human merge. |
 
-Each chapter has six slides, clickable source/details, presenter notes and
-landscape printing. All diagram states and examples are **illustrations**.
+Journey has nine slides; Triage and SDLC each have six. They include clickable
+source/details, presenter notes and landscape printing. All diagram states and
+examples are **illustrations**.
 No presentation invokes a model, sends Kafka messages, creates an MR, approves a
 change or changes a cluster. Use the terminal walkthrough and receiving-system
 receipts to establish live behaviour.
@@ -32,7 +117,7 @@ active diagram and cancels the previous animation.
 Use arrows or Page Up / Page Down to navigate, Home / End for first / last,
 **R** for Replay and **N** for notes. Native buttons and selectors retain their
 normal keyboard behaviour. On mobile, scroll the diagram sideways inside its
-labelled region. Print exports all six slides in the selected chapter.
+labelled region. Print exports every slide in the selected chapter.
 
 ## Keep the implementation boundaries clear
 
@@ -85,3 +170,11 @@ The native skill excerpt is abbreviated and uses synthetic values; it is not a
 replacement for the complete runnable bundle templates.
 
 Validation is recorded in [the presentation-series check receipt](evidence/presentation-series-validation-2026-11-05.json). It covers HTML/browser/print behaviour, not a new live infrastructure rehearsal.
+
+The existing [mock IDP](presentation.html#configure) accepts the form or its exported customer YAML. **Send simulation** illustrates controller/KRO assembly and Golden checks, then returns an example protected API with its JWT caller contract. Applications and optional VirtualServices use that authenticated Gateway route. Location and requested IAM/Entra identity remain planned onboarding metadata outside the current schema. No cluster or model calls run in the page.
+
+The current Journey order is cover, comparison, lifecycle/API handoff, resource purposes, hardening, tools, skills, Gateway and observability. The no-code cover uses an agent-and-capability constellation, adapted from the HyperFrames hub blueprint in the deck's existing SVG/WAAPI engine. Its paths loop with a three-second pause by default; select Off to stop automatic replay. Reduced-motion and print remain static.
+
+## Work bundle
+
+Open `START-HERE.html` after extracting the complete folder. No server or install is needed. All primary pages use the inline `demo-theme.css` palette. Re-run `prepare_demo_bundle.py` after regenerating the mock IDP or resource sheet. The `references/` snapshots are offline support material, and external upstream links are optional online reading.

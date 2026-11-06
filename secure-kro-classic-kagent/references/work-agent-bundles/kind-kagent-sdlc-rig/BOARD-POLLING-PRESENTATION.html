@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>From GitLab issue to verified draft MR · SDLC rig</title>
+  <style>
+    :root{--paper:#f5f2eb;--white:#fffefa;--ink:#172b32;--muted:#576970;--line:#d6ddd9;--teal:#116a68;--mint:#dcefea;--blue:#326681;--pale-blue:#e8f1f6;--amber:#a35b22;--pale-amber:#faead7;--red:#a1443b;--pale-red:#fae8e3;--shadow:0 18px 50px rgba(16,47,52,.1);--serif:Georgia,"Times New Roman",serif;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}a{color:var(--teal);text-underline-offset:3px}a:hover{color:#0a4847}button{font:inherit}button:focus-visible,a:focus-visible{outline:3px solid var(--amber);outline-offset:3px}.deck{scroll-snap-type:y mandatory;height:100vh;overflow-y:auto}.slide{scroll-snap-align:start;min-height:100vh;display:flex;align-items:center;padding:88px max(5vw,24px) 88px;position:relative}.slide:nth-child(even){background:#ebf0ed}.content{width:min(1190px,100%);margin:0 auto}.eyebrow{font:700 12px/1.2 var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin:0 0 17px}.eyebrow:before{content:"";display:inline-block;vertical-align:middle;width:24px;height:3px;background:currentColor;margin-right:10px}.kicker{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid #a8c9be;background:var(--mint);border-radius:999px;color:#155c50;font:700 11px/1.25 var(--mono);letter-spacing:.05em;text-transform:uppercase}.kicker .dot{height:7px;width:7px;border-radius:50%;background:#1e8c71}h1,h2,h3,p{margin-top:0}h1,h2{font-family:var(--serif);font-weight:500;letter-spacing:-.047em;line-height:1.04}h1{font-size:clamp(48px,7vw,88px);max-width:1000px;margin:18px 0 20px}h2{font-size:clamp(38px,5vw,63px);max-width:1000px;margin-bottom:19px}h3{font-size:19px;letter-spacing:-.02em;margin-bottom:8px}.accent{color:var(--teal);font-style:italic}.lede{font-size:clamp(18px,2vw,23px);color:#41575d;max-width:830px;margin-bottom:30px}.small{font-size:14px;color:var(--muted)}.muted{color:var(--muted)}.mono{font-family:var(--mono)}.hero-grid,.split{display:grid;grid-template-columns:1.45fr .8fr;gap:40px;align-items:center}.big-card{background:var(--white);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:28px}.big-card .display{font-family:var(--mono);font-size:clamp(55px,7vw,100px);line-height:.95;letter-spacing:-.1em;color:var(--teal);display:block;margin:17px 0 10px}.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:44px}.metric,.card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:19px}.metric strong{display:block;font:700 29px/1 var(--mono);color:var(--teal);margin-bottom:7px}.metric span{font-size:13px;color:var(--muted)}.section-head{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:25px}.section-head p{max-width:430px;color:var(--muted);margin-bottom:4px}.flow{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:11px}.flow-card{position:relative;background:var(--white);border:1px solid var(--line);border-top:4px solid var(--teal);border-radius:13px;padding:16px;min-height:180px}.flow-card:not(:last-child):after{content:"→";position:absolute;right:-18px;top:76px;z-index:2;color:var(--teal);font-size:23px}.flow-card:nth-child(4){border-top-color:var(--amber)}.flow-card:nth-child(5){border-top-color:var(--blue)}.flow-card:nth-child(6){border-top-color:#57906d}.flow-card .step{font:700 11px var(--mono);color:var(--teal);letter-spacing:.08em}.flow-card h3{margin:22px 0 8px}.flow-card p{font-size:13px;color:var(--muted);margin:0}.inline-note{margin-top:19px;background:var(--mint);border-left:4px solid var(--teal);padding:14px 17px;border-radius:0 9px 9px 0;font-size:14px}.topology{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:15px;align-items:stretch}.topology .col{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:24px}.topology .col.core{border:2px solid var(--teal);box-shadow:var(--shadow)}.topology .label{font:700 11px var(--mono);color:var(--teal);letter-spacing:.1em;text-transform:uppercase}.topology strong{display:block;font-size:20px;margin:9px 0 7px}.topology p,.topology li{font-size:14px;color:var(--muted)}.topology ul{padding-left:18px;margin:9px 0 0}.path{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:22px}.pill{padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:var(--white);font:700 12px var(--mono)}.arrow{color:var(--teal);font-size:20px}.journey{display:grid;grid-template-columns:1fr 1fr;gap:24px}.ticket{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:25px;box-shadow:var(--shadow)}.ticket .issue-no{font:700 12px var(--mono);color:var(--teal);letter-spacing:.09em}.ticket h3{font-family:var(--serif);font-size:28px;font-weight:500;line-height:1.1;margin:9px 0 12px}.ticket ul{padding-left:19px;color:#3b5157;font-size:15px}.ticket li{margin-bottom:7px}.status{display:inline-block;border-radius:999px;padding:6px 10px;font:700 11px var(--mono);letter-spacing:.04em;text-transform:uppercase}.pass{background:var(--mint);color:#14604f}.fail{background:var(--pale-red);color:var(--red)}.wait{background:var(--pale-amber);color:var(--amber)}.link-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:17px}.link-row a,.link-list a{display:inline-flex;align-items:center;gap:5px;background:var(--white);border:1px solid #bdd3cb;border-radius:9px;padding:8px 11px;text-decoration:none;font-size:13px;font-weight:700}.link-row a:hover,.link-list a:hover{border-color:var(--teal);background:var(--mint)}.timeline{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-top:24px}.time-card{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--white);min-height:179px}.time-card.bad{background:var(--pale-red);border-color:#e9c8c0}.time-card.good{background:var(--mint);border-color:#afd0c4}.time-card .tag{display:block;font:700 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}.time-card.bad .tag{color:var(--red)}.time-card h3{font-size:16px}.time-card p{font-size:13px;color:var(--muted);margin-bottom:0}.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.proof-grid .card{min-height:175px}.proof-grid .num{font:700 27px var(--mono);color:var(--teal);display:block;margin-bottom:10px}.proof-grid p{font-size:14px;color:var(--muted);margin:0}.boundary-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}.boundary-grid .card{padding:25px}.boundary-grid ul{margin:10px 0 0;padding-left:20px}.boundary-grid li{margin:8px 0;color:#435b60}.links-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.link-list{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:20px}.link-list h3{margin-bottom:15px}.link-list a{margin:0 7px 8px 0}.footnote{font-size:13px;color:var(--muted);margin-top:23px}.controls{position:fixed;z-index:20;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(255,254,250,.94);border:1px solid var(--line);box-shadow:0 8px 27px rgba(16,47,52,.13);border-radius:999px;padding:6px 10px;backdrop-filter:blur(12px)}.controls button{border:0;border-radius:50%;width:32px;height:32px;color:var(--ink);background:transparent;cursor:pointer}.controls button:hover{background:var(--mint)}.controls .count{font:700 12px var(--mono);min-width:57px;text-align:center}.progress{position:fixed;top:0;left:0;width:100%;height:4px;background:transparent;z-index:25}.progress span{display:block;height:100%;width:14.285%;background:var(--teal);transition:width .2s}.slide-num{position:absolute;right:max(5vw,24px);bottom:25px;font:700 11px var(--mono);color:#829196}.hint{font-size:13px;color:var(--muted);margin-top:20px}code{font-family:var(--mono);font-size:.88em;background:#e8eeeb;padding:2px 4px;border-radius:4px}@media(max-width:1050px){.flow{grid-template-columns:repeat(3,1fr)}.flow-card:nth-child(3):after{display:none}.timeline{grid-template-columns:repeat(3,1fr)}.topology{grid-template-columns:1fr 1fr}.topology .col:last-child{grid-column:1/-1}}@media(max-width:700px){.slide{padding:65px 20px 85px;align-items:flex-start}.hero-grid,.split,.journey,.boundary-grid,.links-grid{grid-template-columns:1fr}.metric-row,.proof-grid{grid-template-columns:repeat(2,1fr)}.flow{grid-template-columns:repeat(2,1fr)}.flow-card:after{display:none}.topology{grid-template-columns:1fr}.topology .col:last-child{grid-column:auto}.timeline{grid-template-columns:repeat(2,1fr)}.section-head{display:block}.slide-num{display:none}}@media(max-width:480px){.metric-row,.proof-grid,.flow,.timeline{grid-template-columns:1fr}.flow-card{min-height:0}.time-card{min-height:0}.slide{min-height:100vh}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.progress span{transition:none}}@media print{html,body,.deck{height:auto;overflow:visible;background:#fff}.slide{min-height:0;height:190mm;page-break-after:always;break-after:page;padding:12mm 14mm;align-items:flex-start}.controls,.progress{display:none}.flow-card,.ticket,.card,.time-card,.link-list,.topology .col{box-shadow:none}.slide:nth-child(even){background:#fff}.slide-num{display:none}a{color:#165b59}}
+  </style>
+<style id="dice-reference-theme">.reference-banner{font:13px/1.5 system-ui,sans-serif;color:#141414;background:white;border-bottom:2px solid #e60000;padding:12px 4vw}.reference-banner a{color:#c90000;margin-right:18px}@media print{.reference-banner{display:none}}</style>
+</head>
+<body>
+<div id="dice-reference-banner" class="reference-banner"><a href="../../../START-HERE.html">DICE demo home</a>Supporting reference snapshot. Main demonstrations and current proof boundaries are in the demo home.</div>
+  <div class="progress" aria-hidden="true"><span id="progress-fill"></span></div>
+  <main class="deck" id="deck" aria-label="SDLC rig presentation">
+    <section class="slide" id="slide-1" aria-label="Overview">
+      <div class="content">
+        <div class="hero-grid">
+          <div>
+            <p class="eyebrow">SDLC rig · live sandbox walkthrough</p>
+            <h1>From issue to <span class="accent">verified draft MR.</span></h1>
+            <p class="lede">One Kubernetes cluster. One Kimi model route. A project manager delegates small tasks to builder, tester, and reviewer agents, while a GitLab board stores each checkpoint.</p>
+            <span class="kicker"><span class="dot"></span> Evidence captured 27 September 2026</span>
+            <p class="hint">Use the arrows, keyboard ← →, or swipe. GitLab links open in a new tab and require project access.</p>
+          </div>
+          <aside class="big-card" aria-label="Outcome">
+            <span class="kicker"><span class="dot"></span> Bounded pilot result</span>
+            <span class="display">2 / 2</span>
+            <h3>Parent issues accepted</h3>
+            <p class="muted">Each has one child issue, a committed branch, green CI, a reviewer PASS note, and an open draft MR. Neither MR was merged.</p>
+          </aside>
+        </div>
+        <div class="metric-row" aria-label="Pilot metrics">
+          <div class="metric"><strong>1</strong><span>Existing Kubernetes cluster</span></div>
+          <div class="metric"><strong>1</strong><span>Kimi provider route</span></div>
+          <div class="metric"><strong>2m</strong><span>Scheduled board poll</span></div>
+          <div class="metric"><strong>0</strong><span>MRs merged or deployed</span></div>
+        </div>
+      </div><span class="slide-num">01 / 07</span>
+    </section>
+
+    <section class="slide" id="slide-2" aria-label="How work moves">
+      <div class="content">
+        <div class="section-head"><div><p class="eyebrow">The operating loop</p><h2>Every handoff leaves a checkpoint.</h2></div><p>The poller advances one parent issue by one stage per run. It checks GitLab artifacts before changing the board label.</p></div>
+        <div class="flow" aria-label="Issue to acceptance stages">
+          <article class="flow-card"><span class="step">01 · INPUT</span><h3>Label issue</h3><p><code>sdlc-rig-poc</code> + <code>agent:plan</code> puts a sandbox issue on the board.</p></article>
+          <article class="flow-card"><span class="step">02 · PLAN</span><h3>PM splits it</h3><p>The PM reads criteria and creates one child issue. The poller verifies its identity.</p></article>
+          <article class="flow-card"><span class="step">03 · BUILD</span><h3>Worker commits</h3><p>PM delegates over A2A. The builder writes an <code>agentic/</code> branch through scoped GitLab MCP.</p></article>
+          <article class="flow-card"><span class="step">04 · TEST</span><h3>CI gates</h3><p>GitLab CI must pass on the branch SHA. Tester checks the real pipeline and committed files.</p></article>
+          <article class="flow-card"><span class="step">05 · REVIEW</span><h3>Draft MR + note</h3><p>The PM opens a draft MR. Reviewer posts a PASS or CHANGES_REQUESTED note tied to the SHA.</p></article>
+          <article class="flow-card"><span class="step">06 · DECIDE</span><h3>PM accepts</h3><p>Only a green pipeline and matching PASS note can reach <code>agent:accepted</code>.</p></article>
+        </div>
+        <div class="inline-note"><strong>Failure path:</strong> failed CI or requested review changes returns to <code>agent:changes</code> → builder rework → new CI → new review. Old PASS notes cannot approve a new SHA.</div>
+      </div><span class="slide-num">02 / 07</span>
+    </section>
+
+    <section class="slide" id="slide-3" aria-label="Agent architecture">
+      <div class="content">
+        <div class="section-head"><div><p class="eyebrow">Who talks to whom</p><h2>PM delegates. GitLab remembers.</h2></div><p>All agents ran on one control-plane VM and used Kimi through the existing agentgateway model route.</p></div>
+        <div class="topology">
+          <div class="col"><span class="label">Durable input</span><strong>GitLab issue board</strong><p>Parent labels are the queue. Child issues, commits, pipelines, MRs, and notes are durable evidence.</p><span class="status wait">Source of truth</span></div>
+          <div class="col core"><span class="label">Controller + coordinator</span><strong>CronJob → PM agent</strong><p>The two-minute poller calls the PM for one stage. The PM assigns builder, tester, or reviewer through kagent A2A.</p><span class="status pass">One model turn per poll</span></div>
+          <div class="col"><span class="label">Specialist workers</span><strong>Builder · Tester · Reviewer</strong><ul><li>Builder commits allowed files.</li><li>Tester checks GitLab CI.</li><li>Reviewer records a verdict on the draft MR.</li></ul></div>
+        </div>
+        <div class="path" aria-label="Technology path"><span class="pill">Issue labels</span><span class="arrow">→</span><span class="pill">CronJob</span><span class="arrow">→</span><span class="pill">PM + A2A workers</span><span class="arrow">→</span><span class="pill">GitLab MCP + CI</span><span class="arrow">→</span><span class="pill">Draft MR</span></div>
+        <p class="footnote">The model calls use agentgateway. The GitLab MCP route remains direct in this pilot. The Kubernetes worker VMs stayed off; the host had 34 GiB available memory and no swap use at final check.</p>
+      </div><span class="slide-num">03 / 07</span>
+    </section>
+
+    <section class="slide" id="slide-4" aria-label="Issue 40 walkthrough">
+      <div class="content">
+        <p class="eyebrow">Walkthrough A · straightforward path</p>
+        <h2>Issue #40: a small test becomes a draft MR.</h2>
+        <p class="lede">The request was narrow: test that the README’s proposed GitOps patch documents a 64Mi limit and 32Mi request for <code>checkout-worker</code>. No live Kubernetes setting was changed.</p>
+        <div class="journey">
+          <article class="ticket"><span class="issue-no">INPUT → CHILD</span><h3>PM broke up the request</h3><ul><li>Parent <strong>#40</strong> entered with <code>agent:plan</code>.</li><li>PM created child <strong>#42</strong> with measurable criteria.</li><li>Builder worked on <code>agentic/sdlc-rig-40</code>.</li></ul><div class="link-row"><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/work_items/40" target="_blank" rel="noopener noreferrer">Parent #40 ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/work_items/42" target="_blank" rel="noopener noreferrer">Child #42 ↗</a></div></article>
+          <article class="ticket"><span class="issue-no">CI → REVIEW → ACCEPT</span><h3>The receipts matched</h3><ul><li>Final commit <code>2db22445</code>; only three allowed files changed.</li><li>Pipeline <strong>2886845024</strong> and its test job succeeded.</li><li>Reviewer PASS note <strong>3912377782</strong> matched the SHA.</li><li>PM accepted; MR <strong>!10</strong> remains open and draft.</li></ul><div class="link-row"><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/pipelines/2886845024" target="_blank" rel="noopener noreferrer">Green pipeline ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/merge_requests/10" target="_blank" rel="noopener noreferrer">Draft MR !10 ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/merge_requests/10#note_3912377782" target="_blank" rel="noopener noreferrer">Review note ↗</a></div></article>
+        </div>
+        <p class="footnote">A scheduled poll did pick up this issue. A manual Job also overlapped its builder stage during the supervised run; the final GitLab artifact checks still resolved to one accepted parent and one draft MR.</p>
+      </div><span class="slide-num">04 / 07</span>
+    </section>
+
+    <section class="slide" id="slide-5" aria-label="Issue 41 repair loop">
+      <div class="content">
+        <p class="eyebrow">Walkthrough B · the repair loop</p><h2>Issue #41 did not pass first time.</h2>
+        <p class="lede">The test needed to prove a README smoke criterion was inside the <em>Verification</em> section. CI failures and reviewer findings sent it back through the board until that was true.</p>
+        <div class="timeline" aria-label="Issue 41 timeline">
+          <article class="time-card bad"><span class="tag">01 · CI failed</span><h3>First build broke</h3><p>Pipeline 2886848238 failed. The board labelled the parent <code>agent:changes</code> and sent the CI trace to the builder.</p></article>
+          <article class="time-card bad"><span class="tag">02 · Review found a gap</span><h3>Phrase check too broad</h3><p>A green run still searched beyond the Verification heading. Reviewer notes requested a bounded section assertion.</p></article>
+          <article class="time-card bad"><span class="tag">03 · Repair was gated</span><h3>CI caught new errors</h3><p>A missing <code>node:test</code> import and then a regex mistake failed CI. The poller retained the reviewer finding during rework.</p></article>
+          <article class="time-card good"><span class="tag">04 · Timeout recovered</span><h3>Commit beat the reply</h3><p>PM A2A timed out after 150 seconds. GitLab already held a new commit, so the poller resumed from the verified SHA.</p></article>
+          <article class="time-card good"><span class="tag">05 · Accepted</span><h3>Bounded test passed</h3><p>Final pipeline 2886925839 passed. Reviewer PASS note 3912505721 and PM acceptance matched the final SHA.</p></article>
+        </div>
+        <div class="link-row"><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/work_items/41" target="_blank" rel="noopener noreferrer">Parent #41 ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/work_items/43" target="_blank" rel="noopener noreferrer">Child #43 ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/pipelines/2886925839" target="_blank" rel="noopener noreferrer">Final pipeline ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/merge_requests/11" target="_blank" rel="noopener noreferrer">Draft MR !11 ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/merge_requests/11#note_3912505721" target="_blank" rel="noopener noreferrer">Final review ↗</a></div>
+        <p class="footnote">A local negative check moved the phrase out of Verification: the final Node test failed as intended. With the original README, it passed.</p>
+      </div><span class="slide-num">05 / 07</span>
+    </section>
+
+    <section class="slide" id="slide-6" aria-label="Proof and limits">
+      <div class="content">
+        <div class="section-head"><div><p class="eyebrow">What the evidence says</p><h2>Strong pilot proof. Clear limits.</h2></div><p>The artifacts were checked independently from model replies. The deck is a dated walkthrough, not a live dashboard.</p></div>
+        <div class="proof-grid">
+          <article class="card"><span class="num">01</span><h3>Real delegation</h3><p>PM-to-specialist A2A calls invoked builder, tester, and reviewer. The PM did not simply describe work.</p></article>
+          <article class="card"><span class="num">02</span><h3>Verified artifacts</h3><p>Each accepted parent had exactly one child, branch SHA, successful pipeline and test job, draft MR, and matching PASS note.</p></article>
+          <article class="card"><span class="num">03</span><h3>Recovery exercised</h3><p>Failed CI routed to changes. A timed-out PM turn still advanced after its committed SHA was found in GitLab.</p></article>
+        </div>
+        <div class="boundary-grid" style="margin-top:16px">
+          <article class="card"><span class="status pass">Ready for bounded sandbox work</span><h3 style="margin-top:14px">What we can use now</h3><ul><li>One cluster, one model, one fixed sandbox project.</li><li>Two-minute labelled board polling.</li><li>Small, allowed-file tasks ending at a draft MR.</li></ul></article>
+          <article class="card"><span class="status wait">Still to prove</span><h3 style="margin-top:14px">What this run did not establish</h3><ul><li>Fully unattended completion of several issues: most checkpoints were manually accelerated.</li><li>Concurrent manual and scheduled Jobs need a shared lease; suspend before manual runs today.</li><li>Cross-cluster assignment, four-model routing, and MCP gateway policy.</li></ul></article>
+        </div>
+      </div><span class="slide-num">06 / 07</span>
+    </section>
+
+    <section class="slide" id="slide-7" aria-label="Explore the evidence">
+      <div class="content">
+        <p class="eyebrow">Walk it yourself</p><h2>Start with the ticket. Follow the receipts.</h2>
+        <p class="lede">For each issue, read the acceptance criteria, open the child, inspect the pipeline and test job, then compare the MR’s review note with its final commit. The MR is deliberately left for human review.</p>
+        <div class="links-grid">
+          <div class="link-list"><h3>Issue #40 · direct path</h3><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/work_items/40" target="_blank" rel="noopener noreferrer">Parent #40 ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/work_items/42" target="_blank" rel="noopener noreferrer">Child #42 ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/pipelines/2886845024" target="_blank" rel="noopener noreferrer">Pipeline ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/merge_requests/10" target="_blank" rel="noopener noreferrer">Draft MR !10 ↗</a></div>
+          <div class="link-list"><h3>Issue #41 · repair loop</h3><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/work_items/41" target="_blank" rel="noopener noreferrer">Parent #41 ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/work_items/43" target="_blank" rel="noopener noreferrer">Child #43 ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/pipelines/2886848238" target="_blank" rel="noopener noreferrer">First failed CI ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/pipelines/2886925839" target="_blank" rel="noopener noreferrer">Final green CI ↗</a><a href="https://gitlab.com/davidmarkgardiner/debt-payoff-calculator-agentic-factory/-/merge_requests/11" target="_blank" rel="noopener noreferrer">Draft MR !11 ↗</a></div>
+        </div>
+        <div class="inline-note"><strong>Operational next step:</strong> feed another narrow issue with <code>sdlc-rig-poc</code> + <code>agent:plan</code> and let the CronJob take it end to end without manual acceleration. Keep the draft MR as the human handoff.</div>
+        <p class="footnote">Source: <a href="evidence/2026-09-27-board-polling.md">dated board evidence</a> · <a href="README.md">rig runbook</a>. GitLab project links require your GitLab sign-in. Last API link/state check for the two parents, pipelines, and draft MRs: 27 September 2026.</p>
+      </div><span class="slide-num">07 / 07</span>
+    </section>
+  </main>
+  <nav class="controls" aria-label="Presentation controls"><button type="button" id="prev" aria-label="Previous slide">←</button><span class="count" id="slide-count" aria-live="polite">01 / 07</span><button type="button" id="next" aria-label="Next slide">→</button></nav>
+  <script>
+    (()=>{
+      const deck=document.getElementById('deck');
+      const slides=[...deck.querySelectorAll('.slide')];
+      const count=document.getElementById('slide-count');
+      const fill=document.getElementById('progress-fill');
+      let current=0;
+      const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function show(index,updateHash=true){current=Math.max(0,Math.min(slides.length-1,index));slides[current].scrollIntoView({behavior:reduced?'instant':'smooth',block:'start'});count.textContent=String(current+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');fill.style.width=((current+1)/slides.length*100)+'%';if(updateHash)history.replaceState(null,'','#slide-'+(current+1));}
+      document.getElementById('prev').addEventListener('click',()=>show(current-1));
+      document.getElementById('next').addEventListener('click',()=>show(current+1));
+      document.addEventListener('keydown',event=>{if(event.altKey||event.ctrlKey||event.metaKey||/^(A|BUTTON|INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))return;if(event.key==='ArrowRight'||event.key==='PageDown'||event.key===' '){event.preventDefault();show(current+1)}else if(event.key==='ArrowLeft'||event.key==='PageUp'){event.preventDefault();show(current-1)}else if(event.key==='Home'){event.preventDefault();show(0)}else if(event.key==='End'){event.preventDefault();show(slides.length-1)}});
+      let startX=0;deck.addEventListener('touchstart',e=>{startX=e.changedTouches[0].screenX},{passive:true});deck.addEventListener('touchend',e=>{const delta=e.changedTouches[0].screenX-startX;if(Math.abs(delta)>80)show(current+(delta<0?1:-1))},{passive:true});
+      const observer=new IntersectionObserver(entries=>{const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(!visible)return;current=slides.indexOf(visible.target);count.textContent=String(current+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');fill.style.width=((current+1)/slides.length*100)+'%'},{root:deck,threshold:[.45,.7]});slides.forEach(slide=>observer.observe(slide));
+      const initial=Number((location.hash.match(/^#slide-(\d+)$/)||[])[1]);if(initial>0&&initial<=slides.length)requestAnimationFrame(()=>show(initial-1,false));
+    })();
+  </script>
+</body>
+</html>

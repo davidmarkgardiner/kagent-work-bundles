@@ -37,6 +37,17 @@
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @page{size:1600px 900px;margin:0}
 @media print{html,body{margin:0!important;padding:0!important;width:1600px!important;height:auto!important;min-height:0!important;overflow:visible!important;background:var(--surface)!important;display:block!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}#stage{position:static!important;display:block!important;width:1600px!important;height:auto!important;margin:0!important;border:0!important}#canvas{width:1600px!important;height:auto!important;transform:none!important;position:static!important;display:block!important}.slide,.slide[hidden]{display:block!important;position:relative!important;inset:auto!important;width:1600px!important;height:900px!important;min-height:900px!important;padding:40px 56px!important;break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid}.slide:last-child{break-after:auto;page-break-after:auto}.toolbar,.keyboard-help,dialog,dialog::backdrop,.scenario-group,.diagram-hint,.mobile-hint,.packet,.inspect-hint{display:none!important}.content{position:absolute!important;top:240px!important;left:56px!important;width:1488px!important;margin:0!important}.interaction-row{display:block!important;min-height:25px!important;margin-bottom:10px!important}.print-note{display:block;font-size:14px;color:var(--muted)}.diagram-scroll{overflow:visible!important;border:0!important}.diagram{width:1488px!important;height:450px!important;border:1px solid var(--border)!important;break-inside:avoid;page-break-inside:avoid}.node{opacity:1!important;transform:none!important;box-shadow:none!important;transition:none!important}.route.inactive,.edge-label.inactive,.stop-mark.inactive{opacity:1!important}.legend-row{display:flex!important;gap:20px!important}.legend{display:flex!important;font-size:14px!important;margin:0!important}.status{display:none!important}.takeaway{position:absolute!important;left:56px!important;right:56px!important;bottom:50px!important;display:flex!important;min-height:57px!important;margin:0!important;padding:15px 19px!important;font-size:20px!important}.takeaway strong{display:inline!important;margin:0!important}.slide-footer{position:absolute!important;bottom:20px!important;left:56px!important;right:56px!important;display:flex!important;font-size:13px!important;margin:0!important}.slide-footer span{display:inline!important;margin:0!important}.slide-topline{top:42px!important;right:56px!important}.slide-topline .version{display:inline!important}.illustration-label{font-size:12px!important;padding:5px 10px!important}.accent-rule{width:64px!important;height:5px!important;margin-bottom:25px!important}.eyebrow{font-size:14px!important;max-width:none!important}h1{font-size:48px!important;margin:17px 0 13px!important;line-height:1.12!important}p.intro{font-size:22px!important;line-height:1.4!important}}
+
+#resource-purpose .node h2{font-size:20px}
+.slide-action{position:absolute;top:212px;left:56px;font-size:15px}.slide-action a{color:var(--link);text-underline-offset:3px}#lifecycle .node p{overflow-wrap:anywhere}@media(max-width:899px){.slide-action{position:static;margin-top:12px}}
+#intro{--link:#e60000;--link-tint:#fff0f0}#intro h1{font-size:72px}#intro .intro{font-size:40px;font-weight:750;color:#111111;letter-spacing:-.02em;line-height:1.3;padding-bottom:10px;overflow:visible;position:relative;z-index:2}#intro .content{top:300px}#intro .diagram{border:0}#intro .interaction-row,#intro .legend,#intro .print-note{display:none!important}#intro .takeaway{display:none!important}#intro .takeaway strong{color:#b80000}#intro [data-node="intent"] .node-top{margin-bottom:24px}#intro .diagram .node:not([data-node="intent"]){border-radius:50%;border:1.5px solid #141414;background:#fff;padding:0;align-items:center;justify-content:center;box-shadow:0 3px 12px #14141408}#intro .diagram .node:not([data-node="intent"]) .node-top{margin:0;gap:0;justify-content:center}#intro .diagram .node:not([data-node="intent"]) h2,#intro .diagram .node:not([data-node="intent"]) p{display:none}#intro .diagram .node:not([data-node="intent"]) svg{display:block;width:34px;height:34px;flex-basis:34px;color:#141414;stroke-width:1.65}#intro .diagram .node[data-node="agent-hub"]{background:#141414;border:3px solid #e60000;box-shadow:0 0 0 9px #fff,0 0 0 10px #e6000024}#intro .diagram .node[data-node="agent-hub"] svg{width:82px;height:82px;flex-basis:82px;color:#fff;stroke-width:1.5}#intro .diagram .node:not([data-node="intent"]):hover{border-color:#e60000;box-shadow:0 0 0 4px #e6000010}#intro .diagram .route{stroke:#e60000;stroke-width:2.5}#intro .diagram .node[data-node="intent"]{padding-left:0;background:#fff;border:0}#intro .diagram .node[data-node="intent"] h2{font-size:34px}#intro .diagram .node[data-node="intent"] p{font-size:22px;line-height:1.5}#intro .diagram .node[data-node="intent"] svg{display:none}
+</style>
+<style id="dice-bundle-theme">
+:root{--surface:#ffffff;--backdrop:#f2f2f2;--text:#141414;--body-text:#383838;--muted:#626262;--border:#dedede;--panel:#f6f6f6;--accent:#e60000;--link:#c90000;--link-tint:#fff0f0;--positive:#141414;--positive-tint:#f0f0f0;--reference:#626262;--reference-tint:#f3f3f3;--font:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;--code-font:ui-monospace,Consolas,monospace;--ink:#141414;--paper:#f6f6f6;--red:#e60000;--line:#dedede;--blue:#c90000;--amber:#555555;--bg:#ffffff;--green:#c90000;--soft:#fff0f0;--purple:#c90000;--mono:ui-monospace,Consolas,monospace}
+body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif}h1,h2,h3{font-family:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif}a{color:var(--link);text-underline-offset:3px}button:focus-visible,a:focus-visible,summary:focus-visible{outline-color:#e60000}.sheet,.panel,.summary-sheet,.hardening-card,.simple-flow div,.card,.step{border-radius:12px}.sheet,.summary-sheet{background:#ffffff}.panel,.hardening-card,.step{background:#f6f6f6}.takeaway,.notice,.review{background:#fff0f0;border-left-color:#e60000}.code{background:#141414;color:#ffffff}pre,code{font-family:ui-monospace,Consolas,monospace}.bundle-home{display:block;padding:10px 4vw;font-size:13px;background:white;border-bottom:1px solid #dedede}.reference-banner{font-size:13px;padding:12px 4vw;background:#f6f6f6;border-bottom:1px solid #dedede}.reference-banner a{margin-right:18px}@media print{.bundle-home,.reference-banner{display:none!important}}
+
+.takeaway{background:#eef7ef;border-left-color:#9bc8a2;color:#1c3525}.takeaway strong{color:#356a43}
+
 </style>
 </head>
 <body>
@@ -66,8 +77,207 @@
 <script type="application/json" id="deckData">{
   "slides": [
     {
+      "id": "intro",
+      "label": "01 / Secure agents, from intent to API",
+      "title": "DICE / UK8S",
+      "intro": "No-code agent runtime",
+      "cover": true,
+      "takeaway": "Bring a prompt, connect your skills and tools, and expose a protected agent API.",
+      "nodes": [
+        {
+          "id": "intent",
+          "title": "Configure. Connect. Run.",
+          "detail": "Configure agents without writing runtime code. Bring your prompt, skills and tools; get a protected API.",
+          "source": "customer",
+          "x": 10,
+          "y": 95,
+          "w": 480,
+          "h": 250,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "agent-hub",
+          "title": "Agent",
+          "detail": "Native agent assembled from a declarative definition.",
+          "source": "resource-agent",
+          "x": 936,
+          "y": 151,
+          "w": 148,
+          "h": 148,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "skills",
+          "title": "Skills",
+          "detail": "Inspect the illustrative skills source.",
+          "source": "skill-native",
+          "x": 974,
+          "y": 9,
+          "w": 72,
+          "h": 72,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "mcp",
+          "title": "MCP servers",
+          "detail": "Inspect the illustrative mcp servers source.",
+          "source": "kagent-tools",
+          "x": 1194,
+          "y": 54,
+          "w": 72,
+          "h": 72,
+          "tone": "neutral",
+          "icon": "graph"
+        },
+        {
+          "id": "cluster",
+          "title": "Kubernetes clusters",
+          "detail": "Inspect the illustrative kubernetes clusters source.",
+          "source": "kubernetes",
+          "x": 1339,
+          "y": 189,
+          "w": 72,
+          "h": 72,
+          "tone": "neutral",
+          "icon": "network"
+        },
+        {
+          "id": "api",
+          "title": "Protected API",
+          "detail": "Inspect the illustrative protected api source.",
+          "source": "api-handoff",
+          "x": 1194,
+          "y": 344,
+          "w": 72,
+          "h": 72,
+          "tone": "neutral",
+          "icon": "box"
+        },
+        {
+          "id": "tools",
+          "title": "Tool catalogue",
+          "detail": "Inspect the illustrative tool catalogue source.",
+          "source": "catalog",
+          "x": 974,
+          "y": 372,
+          "w": 72,
+          "h": 72,
+          "tone": "neutral",
+          "icon": "tools"
+        },
+        {
+          "id": "identity",
+          "title": "Identity and access",
+          "detail": "Inspect the illustrative identity and access source.",
+          "source": "resource-identities",
+          "x": 734,
+          "y": 344,
+          "w": 72,
+          "h": 72,
+          "tone": "neutral",
+          "icon": "key"
+        },
+        {
+          "id": "models",
+          "title": "Model gateway",
+          "detail": "Inspect the illustrative model gateway source.",
+          "source": "gateway-policy",
+          "x": 634,
+          "y": 189,
+          "w": 72,
+          "h": 72,
+          "tone": "neutral",
+          "icon": "model"
+        },
+        {
+          "id": "security",
+          "title": "Security policies",
+          "detail": "Inspect the illustrative security policies source.",
+          "source": "security",
+          "x": 734,
+          "y": 34,
+          "w": 72,
+          "h": 72,
+          "tone": "neutral",
+          "icon": "shield"
+        }
+      ],
+      "paths": [
+        {
+          "id": "agent-skills",
+          "d": "M1010 151.00L1010 81",
+          "label": "",
+          "tone": "red",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "agent-mcp",
+          "d": "M1073.07 186.30L1199.32 108.83",
+          "label": "",
+          "tone": "red",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "agent-cluster",
+          "d": "M1084 225.00L1339 225",
+          "label": "",
+          "tone": "red",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "agent-api",
+          "d": "M1070.49 267.62L1200.57 359.27",
+          "label": "",
+          "tone": "red",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "agent-tools",
+          "d": "M1010 299.00L1010 372",
+          "label": "",
+          "tone": "red",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "agent-identity",
+          "d": "M947.84 265.15L800.24 360.47",
+          "label": "",
+          "tone": "red",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "agent-models",
+          "d": "M936 225.00L706 225",
+          "label": "",
+          "tone": "red",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "agent-security",
+          "d": "M947.84 184.85L800.24 89.53",
+          "label": "",
+          "tone": "red",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "Open with the platform proposition: a no-code agent runtime connects a central agent to skills, MCP servers, tools, models and clusters. The form is a synthetic prototype. The animated constellation illustrates connectivity only; it does not represent live traffic, existing registration support or execution results. Inspect each icon for the associated source. Custom MCP registration and identity binding still require the proposed platform integrations and reviewed backend permissions. No-code describes the customer experience of configuring an agent without authoring runtime code; the platform still runs the native kagent runtime.",
+      "repeatMs": 3000,
+      "packetDuration": 1200
+    },
+    {
       "id": "compare",
-      "label": "01 / Same agent, repeatable protection",
+      "label": "02 / Same agent, repeatable protection",
       "title": "Same useful agent. Different protection.",
       "intro": "Native kagent runs both versions. KRO assembles the surrounding controls for the secure service.",
       "takeaway": "Keep permissions equal. Demonstrate the security assembly and its denied paths.",
@@ -178,8 +388,456 @@
       "notes": "Open the comparison source. A native agent is not inherently insecure. The baseline here omits the extra composed envelope. Test the same authorized task and the same unauthorized identities on each configured front door. Do not grant broad permissions to manufacture the contrast."
     },
     {
+      "id": "lifecycle",
+      "label": "03 / Deploy, use, update, and remove",
+      "title": "The agent lifecycle, step by step.",
+      "intro": "Drop in one agent definition. The platform builds it, verifies access, then returns a protected API.",
+      "takeaway": "Before a material change, close the caller route and run fresh verification. When retiring the agent, remove access and owned resources.",
+      "nodes": [
+        {
+          "id": "intent",
+          "title": "Your frontend YAML",
+          "detail": "Drop in a definition or choose prompt, skills and tools",
+          "source": "customer",
+          "x": 10,
+          "y": 35,
+          "w": 300,
+          "h": 165,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "compose",
+          "title": "Create 14 resources",
+          "detail": "KRO adds 7 kinds: agent, access and verification",
+          "source": "resource-overview",
+          "x": 580,
+          "y": 35,
+          "w": 300,
+          "h": 165,
+          "tone": "dark",
+          "icon": "graph"
+        },
+        {
+          "id": "verify",
+          "title": "Run Golden checks",
+          "detail": "Check identity denials and model PONG",
+          "source": "golden",
+          "x": 1160,
+          "y": 35,
+          "w": 310,
+          "h": 165,
+          "tone": "neutral",
+          "icon": "check"
+        },
+        {
+          "id": "retire",
+          "title": "Remove the agent",
+          "detail": "Remove caller access and owned resources",
+          "source": "lifecycle",
+          "x": 10,
+          "y": 255,
+          "w": 300,
+          "h": 165,
+          "tone": "neutral",
+          "icon": "key"
+        },
+        {
+          "id": "change",
+          "title": "Update and recheck",
+          "detail": "Close caller access before fresh verification",
+          "source": "lifecycle",
+          "x": 580,
+          "y": 255,
+          "w": 300,
+          "h": 165,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "serve",
+          "title": "Your protected API",
+          "detail": "/classic/classic-agents/demo/invoke",
+          "source": "api-handoff",
+          "x": 1160,
+          "y": 255,
+          "w": 310,
+          "h": 165,
+          "tone": "blue",
+          "icon": "key"
+        }
+      ],
+      "paths": [
+        {
+          "id": "a",
+          "d": "M310 117H580",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "b",
+          "d": "M880 117H1160",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "c",
+          "d": "M1315 200V255",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d",
+          "d": "M1160 337H880",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "e",
+          "d": "M580 337H310",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "f",
+          "d": "M730 255V200",
+          "label": "reverify",
+          "lx": 795,
+          "ly": 230,
+          "tone": "reference",
+          "reference": true,
+          "scenarios": null
+        }
+      ],
+      "notes": "Walk left to right across the top, then right to left across the bottom. Define the request, let KRO assemble resources, run Golden, and use the protected API. Before changing a prompt or platform dependency, retire caller access and run a fresh verification before reopening it. To retire an agent, remove its access and managed resources through the reviewed delivery process. These change and removal steps are an operational procedure, not proof that a completed Golden Job automatically rechecks or revokes access. Entra and UAMI remain a later identity integration. The returned API uses the protected Gateway, with expected subject system:serviceaccount:classic-agents:demo-caller and audience secure-agent-classic. Show presentation.html#configure for the mock IDP submission and synthetic endpoint handoff. A same-cluster app calls that Gateway route with its authorized JWT. An optional VirtualService preserves that route and authentication. Requested location or custom caller identity is planned metadata, outside the current four-field schema.",
+      "action": {
+        "href": "presentation.html#configure",
+        "label": "Try the mock IDP: YAML or form → Send → API handoff"
+      }
+    },
+    {
+      "id": "resource-purpose",
+      "label": "04 / What KRO creates and why",
+      "title": "14 resources. Each has a purpose.",
+      "intro": "See how the seven resource kinds connect. Golden opens the caller route only after verification.",
+      "takeaway": "The platform supplies shared Gateway, model and MCP setup. kagent creates the Deployment, Service and Secret.",
+      "nodes": [
+        {
+          "id": "resource-agent",
+          "title": "Agent ×1",
+          "detail": "Prompt, model, skills and selected MCP tools",
+          "source": "resource-agent",
+          "x": 565,
+          "y": 20,
+          "w": 360,
+          "h": 145,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "resource-identities",
+          "title": "ServiceAccount ×3",
+          "detail": "Separate runtime, verifier and caller identities",
+          "source": "resource-identities",
+          "x": 10,
+          "y": 20,
+          "w": 360,
+          "h": 145,
+          "tone": "neutral",
+          "icon": "identity"
+        },
+        {
+          "id": "resource-network",
+          "title": "NetworkPolicy ×2",
+          "detail": "Agent and verifier network boundaries",
+          "source": "resource-network",
+          "x": 1110,
+          "y": 20,
+          "w": 360,
+          "h": 145,
+          "tone": "neutral",
+          "icon": "network"
+        },
+        {
+          "id": "resource-policies",
+          "title": "AgentgatewayPolicy ×3",
+          "detail": "JWT and authorization for each protected route",
+          "source": "resource-policies",
+          "x": 1150,
+          "y": 285,
+          "w": 330,
+          "h": 155,
+          "tone": "neutral",
+          "icon": "shield"
+        },
+        {
+          "id": "resource-routes",
+          "title": "HTTPRoute ×3",
+          "detail": "AgentCard discovery, Golden verification and caller invocation",
+          "source": "resource-routes",
+          "x": 770,
+          "y": 285,
+          "w": 330,
+          "h": 155,
+          "tone": "neutral",
+          "icon": "graph"
+        },
+        {
+          "id": "resource-config",
+          "title": "ConfigMap ×1",
+          "detail": "Fixed Golden URLs, expected identity and token-file path",
+          "source": "resource-config",
+          "x": 10,
+          "y": 285,
+          "w": 330,
+          "h": 155,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "resource-job",
+          "title": "Job ×1",
+          "detail": "Golden checks pass before KRO creates the caller route",
+          "source": "resource-job",
+          "x": 390,
+          "y": 285,
+          "w": 330,
+          "h": 155,
+          "tone": "blue",
+          "icon": "check"
+        }
+      ],
+      "paths": [
+        {
+          "id": "runtime-identity",
+          "d": "M370 92H565",
+          "label": "runtime identity",
+          "lx": 468,
+          "ly": 77,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "network-agent",
+          "d": "M1110 92H925",
+          "label": "constrains",
+          "lx": 1018,
+          "ly": 77,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "verifier-identity",
+          "d": "M190 165V215H555V285",
+          "label": "verifier identity",
+          "lx": 370,
+          "ly": 204,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "config-job",
+          "d": "M340 362H390",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "job-route",
+          "d": "M720 362H770",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "policy-route",
+          "d": "M1150 362H1100",
+          "label": "",
+          "lx": 0,
+          "ly": 0,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "route-agent",
+          "d": "M935 285V235H745V165",
+          "label": "forwards to agent",
+          "lx": 1030,
+          "ly": 246,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "Read arrows as identity, configuration and protection relationships, rather than one deployment sequence: 1 + 3 + 2 + 3 + 3 + 1 + 1 = 14 resources, counted from spec.resources in the checked RGD. Each card opens a purpose note and the matching unresolved KRO templates; these are not live objects. The three HTTPRoutes separate AgentCard discovery, Golden invocation and approved caller invocation. Policies authenticate and authorize those routes. The shared Gateway, RGD, approved ModelConfig and MCP backends already exist as platform prerequisites; kagent produces Deployment, Service and configuration Secret from the Agent. Neither group is part of the 14 KRO children. Recorded 4 Nov proof covers model/caller PONG and JWT checks only; there is no new network, MCP or telemetry proof. ServiceAccounts supply runtime and verifier identities. NetworkPolicies constrain workloads. ConfigMap configures the Job; successful Golden completion gates the caller HTTPRoute. AgentgatewayPolicies protect the routes, which forward accepted requests to the Agent Service. Other resource dependencies are omitted for readability."
+    },
+    {
+      "id": "hardening",
+      "label": "05 / How the agent is hardened",
+      "title": "Protect the API, identity and runtime.",
+      "intro": "Verification opens the caller route. JWT checks, workload boundaries and backend permissions then constrain its use.",
+      "takeaway": "Routes select the endpoint. JWT policies authorize the caller. Network and pod controls constrain execution.",
+      "nodes": [
+        {
+          "id": "jwt",
+          "title": "Check caller JWT",
+          "detail": "Strict issuer, audience, expiry and exact caller identity",
+          "source": "resource-policies",
+          "x": 550,
+          "y": 25,
+          "w": 390,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "key"
+        },
+        {
+          "id": "identities",
+          "title": "Separate identities",
+          "detail": "Runtime, verifier and caller; no broad Golden API RBAC",
+          "source": "resource-identities",
+          "x": 10,
+          "y": 255,
+          "w": 390,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "identity"
+        },
+        {
+          "id": "network",
+          "title": "Constrain network paths",
+          "detail": "Gateway-only ingress; bounded egress needs CNI proof",
+          "source": "resource-network",
+          "x": 1080,
+          "y": 25,
+          "w": 390,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "network"
+        },
+        {
+          "id": "process",
+          "title": "Restrict the process",
+          "detail": "Non-root, no escalation, read-only root; drop ALL, seccomp and limits",
+          "source": "hardening-runtime",
+          "x": 550,
+          "y": 255,
+          "w": 390,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "shield"
+        },
+        {
+          "id": "backends",
+          "title": "Bound backend access",
+          "detail": "Approved model and named MCP tools; separate backend authentication",
+          "source": "hardening-backends",
+          "x": 1080,
+          "y": 255,
+          "w": 390,
+          "h": 170,
+          "tone": "neutral",
+          "icon": "tools"
+        },
+        {
+          "id": "gate",
+          "title": "Verify, then open access",
+          "detail": "Golden gates caller route creation; no continuous revocation",
+          "source": "resource-job",
+          "x": 10,
+          "y": 25,
+          "w": 390,
+          "h": 170,
+          "tone": "blue",
+          "icon": "check"
+        }
+      ],
+      "paths": [
+        {
+          "id": "golden-caller",
+          "d": "M400 110H550",
+          "label": "opens route",
+          "lx": 475,
+          "ly": 93,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "jwt-ingress",
+          "d": "M940 110H1080",
+          "label": "accepted caller",
+          "lx": 1010,
+          "ly": 93,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "ingress-runtime",
+          "d": "M1275 195V225H745V255",
+          "label": "Gateway ingress",
+          "lx": 1010,
+          "ly": 215,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "runtime-identity",
+          "d": "M400 340H550",
+          "label": "runtime identity",
+          "lx": 475,
+          "ly": 323,
+          "tone": "reference",
+          "reference": true,
+          "scenarios": null
+        },
+        {
+          "id": "runtime-backends",
+          "d": "M940 340H1080",
+          "label": "model / MCP",
+          "lx": 1010,
+          "ly": 323,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "Six controls are shown, not six extra objects. Strict JWT validation is configured on the three route policies, with exact verifier or caller subjects. The three routes have different purposes: AgentCard discovery, Golden invocation, then caller invocation. Separate ServiceAccounts avoid treating API access as backend or Kubernetes authority; Golden has no API Role or RoleBinding. NetworkPolicies express Gateway-only agent ingress and reviewed egress, plus a separate verifier boundary, but effective CNI enforcement and denied-traffic tests remain to be proved. Agent and verifier templates use non-root, no privilege escalation, read-only root filesystems, dropped ALL capabilities and RuntimeDefault seccomp; CPU and memory are limited, and agent /tmp is bounded. Selected model and MCP operations do not replace backend auth or prove MCP execution. Golden success gates caller route creation; close caller access and reverify after material changes because a completed Job is not automatic revocation. Entra/UAMI is desired state, not a currently deployed identity path. Recorded 4 Nov proof remains model/caller PONG and JWT checks only; this deck makes no requests or new network, MCP or telemetry claims. Arrows relate the controls. The top row follows caller access after the Golden release gate; the network path reaches the restricted runtime, whose outbound model and MCP calls require separate backend authority. The dashed identity link shows the runtime ServiceAccount, not a forwarded caller token. This is a control illustration, not a claim that these settings execute as a serial checklist."
+    },
+    {
       "id": "tools",
-      "label": "02 / Approved capability catalog",
+      "label": "06 / Approved capability catalog",
       "title": "Pick the tools the task actually needs.",
       "intro": "Select reviewed bindings at startup. Each MCP server retains its own authentication, scope and data controls.",
       "takeaway": "Selecting a tool exposes an operation. Backend permissions decide what it can do.",
@@ -291,7 +949,7 @@
     },
     {
       "id": "skills",
-      "label": "03 / Skills at startup",
+      "label": "07 / Skills at startup",
       "title": "Select skills. Let kagent load them.",
       "intro": "The customer selects approved skill IDs; the platform resolves native sources and the runtime mounts their contents.",
       "takeaway": "Skills provide reviewed instructions and content. They do not grant access.",
@@ -403,7 +1061,7 @@
     },
     {
       "id": "gateway",
-      "label": "04 / Routing, policy and consumption",
+      "label": "08 / Routing, policy and consumption",
       "title": "The Gateway governs each connection.",
       "intro": "Use explicit caller, model and tool paths. Apply the supported policy at the boundary that owns the decision.",
       "takeaway": "JWT proves a caller identity. Tool grants, route selection and budgets remain distinct.",
@@ -537,7 +1195,7 @@
     },
     {
       "id": "telemetry",
-      "label": "05 / OTel and LGTM",
+      "label": "09 / OTel and LGTM",
       "title": "Follow one request through the system.",
       "intro": "Export real request, model and tool telemetry. Use LGTM to explain behaviour and diagnose application impact.",
       "takeaway": "A dashboard is useful when a real request can be traced to its observed usage and outcome.",
@@ -688,150 +1346,6 @@
         }
       ],
       "notes": "This is reference observability wiring. No live values are shown. Existing platform exporters may take direct paths; the installed collector and exporters decide the real route. Correlate real task and tool-call IDs, suppress sensitive bodies and show missing telemetry as missing."
-    },
-    {
-      "id": "lifecycle",
-      "label": "06 / Operate and evolve",
-      "title": "Creation is the first lifecycle step.",
-      "intro": "The same controlled contract covers deployment, verification, useful work, changes and retirement.",
-      "takeaway": "Reverify changed dependencies and revoke access deliberately; a past Golden pass is not a live lease.",
-      "nodes": [
-        {
-          "id": "intent",
-          "title": "Author + select",
-          "detail": "Prompt, model, skills and tools",
-          "source": "customer",
-          "x": 10,
-          "y": 35,
-          "w": 300,
-          "h": 165,
-          "tone": "neutral",
-          "icon": "file"
-        },
-        {
-          "id": "compose",
-          "title": "Admit + compose",
-          "detail": "Native Agent and security envelope",
-          "source": "graph",
-          "x": 580,
-          "y": 35,
-          "w": 300,
-          "h": 165,
-          "tone": "dark",
-          "icon": "graph"
-        },
-        {
-          "id": "verify",
-          "title": "Golden verification",
-          "detail": "Record actual model-path proof",
-          "source": "golden",
-          "x": 1160,
-          "y": 35,
-          "w": 310,
-          "h": 165,
-          "tone": "neutral",
-          "icon": "check"
-        },
-        {
-          "id": "retire",
-          "title": "Retire + revoke",
-          "detail": "Remove access and owned resources",
-          "source": "lifecycle",
-          "x": 10,
-          "y": 255,
-          "w": 300,
-          "h": 165,
-          "tone": "neutral",
-          "icon": "key"
-        },
-        {
-          "id": "change",
-          "title": "Change + reverify",
-          "detail": "Control revisions and caller exposure",
-          "source": "lifecycle",
-          "x": 580,
-          "y": 255,
-          "w": 300,
-          "h": 165,
-          "tone": "neutral",
-          "icon": "file"
-        },
-        {
-          "id": "serve",
-          "title": "Serve + observe",
-          "detail": "Authenticated tasks, real usage and traces",
-          "source": "otel",
-          "x": 1160,
-          "y": 255,
-          "w": 310,
-          "h": 165,
-          "tone": "blue",
-          "icon": "eye"
-        }
-      ],
-      "paths": [
-        {
-          "id": "a",
-          "d": "M310 117H580",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
-          "tone": "blue",
-          "reference": false,
-          "scenarios": null
-        },
-        {
-          "id": "b",
-          "d": "M880 117H1160",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
-          "tone": "blue",
-          "reference": false,
-          "scenarios": null
-        },
-        {
-          "id": "c",
-          "d": "M1315 200V255",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
-          "tone": "blue",
-          "reference": false,
-          "scenarios": null
-        },
-        {
-          "id": "d",
-          "d": "M1160 337H880",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
-          "tone": "blue",
-          "reference": false,
-          "scenarios": null
-        },
-        {
-          "id": "e",
-          "d": "M580 337H310",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
-          "tone": "blue",
-          "reference": false,
-          "scenarios": null
-        },
-        {
-          "id": "f",
-          "d": "M730 255V200",
-          "label": "reverify",
-          "lx": 795,
-          "ly": 230,
-          "tone": "reference",
-          "reference": true,
-          "scenarios": null
-        }
-      ],
-      "notes": "Explain that the actual Golden result is separate from this illustration. A completed verifier Job is not continuous revocation. Future Entra caller identity and UAMI-to-tool authorization build on this lifecycle. The customer-facing UI or builder agent can produce the same reviewed input YAML."
     }
   ],
   "sources": {
@@ -919,9 +1433,80 @@
       "title": "Token usage, attribution and budgets",
       "text": "Capture actual provider input/output token counters when available.\nCorrelate identity, task, selected model, route, policy decision, latency and tool spans.\nShow unknown for absent usage. Never infer tokens from a coloured diagram or a guessed character ratio.\nRequest limits and LLM-token limits are separate controls.\nLocal counters apply per proxy replica; global budgets require a coordinating service.\nPost-response token accounting can overshoot during in-flight responses. It is not a hard mid-generation spend cutoff.\nCost estimates need an approved pricing catalog and model mapping.\nRedact secrets and sensitive prompt/tool contents before telemetry export.\nPrimary reference: https://agentgateway.dev/docs/kubernetes/latest/documentation/llm/rate-limit/",
       "type": "Illustrative design and configuration notes"
+    },
+    "resource-agent": {
+      "title": "1 × Agent — useful behavior",
+      "type": "Checked KRO catalog templates · illustrative, unresolved CEL",
+      "text": "WHY: Define the useful agent once; kagent turns this declaration into its native runtime. The selected skill references, model name and MCP operations are part of this declaration.\n\nWHY THESE RESOURCES EXIST\nNative kagent Agent: KRO passes the system prompt, existing ModelConfig name and selected MCP operations to the normal declarative Agent. kagent creates the Deployment, Service and generated configuration Secret.\n\nSOURCE TEMPLATES\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: kagent.dev/v1alpha2\nkind: Agent\nmetadata:\n  name: ${schema.metadata.name}\n  namespace: ${schema.metadata.namespace}\nspec:\n  type: Declarative\n  description: KRO-composed native agent without Substrate\n  declarative:\n    runtime: go\n    modelConfig: ${schema.spec.modelConfig}\n    systemMessage: ${schema.spec.systemPrompt}\n    stream: false\n    tools: ${schema.spec.tools.map(id, {\"kubernetes-readonly\":dyn({\"type\":dyn(\"McpServer\"),\"mcpServer\":dyn({\"apiGroup\":dyn(\"kagent.dev\"),\"kind\":dyn(\"RemoteMCPServer\"),\"name\":dyn(\"approved-kubernetes-mcp\"),\"toolNames\":dyn([dyn(\"k8s_get_resources\"),dyn(\"k8s_get_events\")])})}),\"gitlab-readonly\":dyn({\"type\":dyn(\"McpServer\"),\"mcpServer\":dyn({\"apiGroup\":dyn(\"kagent.dev\"),\"kind\":dyn(\"RemoteMCPServer\"),\"name\":dyn(\"approved-gitlab-mcp\"),\"toolNames\":dyn([dyn(\"gitlab_get_project\"),dyn(\"gitlab_get_latest_pipeline\")])})}),\"denodo-readonly\":dyn({\"type\":dyn(\"McpServer\"),\"mcpServer\":dyn({\"apiGroup\":dyn(\"kagent.dev\"),\"kind\":dyn(\"RemoteMCPServer\"),\"name\":dyn(\"approved-denodo-mcp\"),\"toolNames\":dyn([dyn(\"get_inventory_data_product_details\"),dyn(\"get_namespace_count\"),dyn(\"get_namespace_summary\")])})})}[id])}\n    deployment:\n      serviceAccountName: ${runtimeAccount.metadata.name}\n      resources:\n        requests:\n          cpu: 25m\n          memory: 64Mi\n        limits:\n          cpu: 1000m\n          memory: 256Mi\n      env:\n      - name: HOME\n        value: /tmp\n      podSecurityContext:\n        runAsNonRoot: true\n        runAsUser: 1000\n        fsGroup: 1000\n        seccompProfile:\n          type: RuntimeDefault\n      securityContext:\n        allowPrivilegeEscalation: false\n        readOnlyRootFilesystem: true\n        capabilities:\n          drop:\n          - ALL\n      volumes:\n      - name: writable-tmp\n        emptyDir:\n          sizeLimit: 64Mi\n      volumeMounts:\n      - name: writable-tmp\n        mountPath: /tmp\n  skills:\n    gitRefs: ${schema.spec.skills.map(id, {\"work-guidance\":dyn({\"url\":dyn(\"{{APPROVED_GITLAB_SKILLS_REPOSITORY_URL}}\"),\"ref\":dyn(\"{{APPROVED_FULL_COMMIT_ID}}\"),\"path\":dyn(\"skills/work-guidance\"),\"name\":dyn(\"work-guidance\")})}[id])}\n    gitAuthSecretRef:\n      name: approved-git-credentials\n"
+    },
+    "resource-identities": {
+      "title": "3 × ServiceAccount — separate identities",
+      "type": "Checked KRO catalog templates · illustrative, unresolved CEL",
+      "text": "WHY: Keep the running agent, one-shot verifier and API caller distinct. Front-door access does not confer backend permissions.\n\nWHY THESE RESOURCES EXIST\nRuntime identity: No Kubernetes API token is automounted into the native agent. Backend permissions remain separate from chat access. The native controller separately projects a one-hour JWT with audience kagent for its own API, visible in the recorded Deployment.\nGolden identity: The verifier gets only an audience-specific, short-lived projected JWT. It has no Role or RoleBinding to the Kubernetes API.\nCaller identity: Only the exact demo-caller subject is accepted on the caller listener. Minting its JWT requires the operator token-request permission.\n\nSOURCE TEMPLATES\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: v1\nkind: ServiceAccount\nmetadata:\n  name: ${schema.metadata.name}-runtime\n  namespace: ${schema.metadata.namespace}\nautomountServiceAccountToken: false\n---\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: v1\nkind: ServiceAccount\nmetadata:\n  name: ${schema.metadata.name}-verifier\n  namespace: ${schema.metadata.namespace}\nautomountServiceAccountToken: false\n---\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: v1\nkind: ServiceAccount\nmetadata:\n  name: ${schema.metadata.name}-caller\n  namespace: ${schema.metadata.namespace}\nautomountServiceAccountToken: false\n"
+    },
+    "resource-network": {
+      "title": "2 × NetworkPolicy — constrain network paths",
+      "type": "Checked KRO catalog templates · illustrative, unresolved CEL",
+      "text": "WHY: Express separate agent and verifier network boundaries. This is manifest intent; CNI enforcement and denied-traffic tests are required before claiming isolation.\n\nWHY THESE RESOURCES EXIST\nAgent network boundary: Ingress is limited to the approved Gateway pods. Egress permits only the resolved DNS, model, controller and reviewed tool paths. DNS and backend permissions are still separate controls. This is policy intent; enforcement requires a supporting CNI and actual denied-traffic tests, which are not part of the recorded PONG proof.\nVerifier network boundary: All verifier ingress is denied. Its only egress paths are DNS and the two Gateway listeners, including the caller lane used for a negative control.\n\nSOURCE TEMPLATES\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: ${schema.metadata.name}-boundary\n  namespace: ${schema.metadata.namespace}\nspec:\n  podSelector:\n    matchLabels:\n      app: kagent\n      kagent: ${schema.metadata.name}\n  policyTypes:\n  - Ingress\n  - Egress\n  ingress:\n  - from:\n    - namespaceSelector:\n        matchLabels:\n          kubernetes.io/metadata.name: classic-agents\n      podSelector:\n        matchLabels:\n          gateway.networking.k8s.io/gateway-name: classic-demo\n    ports:\n    - protocol: TCP\n      port: 8080\n  egress:\n  - to:\n    - namespaceSelector:\n        matchLabels:\n          kubernetes.io/metadata.name: kube-system\n    ports:\n    - protocol: UDP\n      port: 53\n    - protocol: TCP\n      port: 53\n  - to:\n    - namespaceSelector:\n        matchLabels:\n          kubernetes.io/metadata.name: '{{MODEL_GATEWAY_NAMESPACE}}'\n      podSelector:\n        matchLabels:\n          app: '{{MODEL_GATEWAY_POD_LABEL}}'\n    ports:\n    - protocol: TCP\n      port: 8081\n  - to:\n    - namespaceSelector:\n        matchLabels:\n          kubernetes.io/metadata.name: '{{KAGENT_CONTROLLER_NAMESPACE}}'\n      podSelector:\n        matchLabels:\n          app.kubernetes.io/name: '{{KAGENT_CONTROLLER_LABEL}}'\n    ports:\n    - protocol: TCP\n      port: 8083\n---\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: ${schema.metadata.name}-verifier\n  namespace: ${schema.metadata.namespace}\nspec:\n  podSelector:\n    matchLabels:\n      classic.kagent.dev/verifier: ${schema.metadata.name}\n  policyTypes:\n  - Ingress\n  - Egress\n  egress:\n  - to:\n    - namespaceSelector:\n        matchLabels:\n          kubernetes.io/metadata.name: kube-system\n    ports:\n    - protocol: UDP\n      port: 53\n    - protocol: TCP\n      port: 53\n  - to:\n    - namespaceSelector:\n        matchLabels:\n          kubernetes.io/metadata.name: classic-agents\n      podSelector:\n        matchLabels:\n          gateway.networking.k8s.io/gateway-name: classic-demo\n    ports:\n    - protocol: TCP\n      port: 8080\n    - protocol: TCP\n      port: 8081\n"
+    },
+    "resource-policies": {
+      "title": "3 × AgentgatewayPolicy — protect each route",
+      "type": "Checked KRO catalog templates · illustrative, unresolved CEL",
+      "text": "WHY: Require strict JWT authentication and the exact caller or verifier subject at the Gateway. These policies protect AgentCard, verification and caller routes separately. JWT expiry is validated by the strict JWT implementation; this deck does not execute token tests.\n\nWHY THESE RESOURCES EXIST\nAgentCard policy: The Golden identity can inspect the native AgentCard. Anonymous callers and malformed tokens are denied.\nVerifier route policy: Strict JWT validation checks issuer and audience. Authorization requires the verifier service-account subject.\nCaller route policy: Strict JWT validation and exact caller subject protect invocation. This policy does not give the caller Kubernetes or MCP execution permissions.\n\nSOURCE TEMPLATES\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: agentgateway.dev/v1alpha1\nkind: AgentgatewayPolicy\nmetadata:\n  name: ${schema.metadata.name}-card\n  namespace: ${schema.metadata.namespace}\nspec:\n  targetRefs:\n  - group: gateway.networking.k8s.io\n    kind: HTTPRoute\n    name: ${schema.metadata.name}-card\n  traffic:\n    jwtAuthentication:\n      mode: Strict\n      preserveToken: false\n      providers:\n      - issuer: '{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}'\n        audiences:\n        - secure-agent-classic\n        jwks:\n          inline: '{{KUBERNETES_JWKS_JSON}}'\n    authorization:\n      action: Require\n      policy:\n        matchExpressions:\n        - jwt.sub == \"system:serviceaccount:classic-agents:${schema.metadata.name}-verifier\"\n---\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: agentgateway.dev/v1alpha1\nkind: AgentgatewayPolicy\nmetadata:\n  name: ${schema.metadata.name}-verify\n  namespace: ${schema.metadata.namespace}\nspec:\n  targetRefs:\n  - group: gateway.networking.k8s.io\n    kind: HTTPRoute\n    name: ${schema.metadata.name}-verify\n  traffic:\n    jwtAuthentication:\n      mode: Strict\n      preserveToken: false\n      providers:\n      - issuer: '{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}'\n        audiences:\n        - secure-agent-classic\n        jwks:\n          inline: '{{KUBERNETES_JWKS_JSON}}'\n    authorization:\n      action: Require\n      policy:\n        matchExpressions:\n        - jwt.sub == \"system:serviceaccount:classic-agents:${schema.metadata.name}-verifier\"\n---\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: agentgateway.dev/v1alpha1\nkind: AgentgatewayPolicy\nmetadata:\n  name: ${schema.metadata.name}-invoke\n  namespace: ${schema.metadata.namespace}\nspec:\n  targetRefs:\n  - group: gateway.networking.k8s.io\n    kind: HTTPRoute\n    name: ${schema.metadata.name}-invoke\n  traffic:\n    jwtAuthentication:\n      mode: Strict\n      preserveToken: false\n      providers:\n      - issuer: '{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}'\n        audiences:\n        - secure-agent-classic\n        jwks:\n          inline: '{{KUBERNETES_JWKS_JSON}}'\n    authorization:\n      action: Require\n      policy:\n        matchExpressions:\n        - jwt.sub == \"system:serviceaccount:classic-agents:${schema.metadata.name}-caller\"\n"
+    },
+    "resource-routes": {
+      "title": "3 × HTTPRoute — give each API path a purpose",
+      "type": "Checked KRO catalog templates · illustrative, unresolved CEL",
+      "text": "WHY: HTTPRoute connects a precise public path to the native agent Service; it is routing, not authentication. AgentgatewayPolicy supplies the checks.\n\nTHREE DESTINATIONS\n1. AgentCard discovery: Golden inspects the exact card path on the verification listener.\n2. Verification invocation: Golden calls the exact verification path, rewritten to the native A2A endpoint.\n3. Caller invocation: approved callers use a separate invocation path after Golden succeeds.\n\nWHY THESE RESOURCES EXIST\nAgentCard route: Only the verification listener exposes the exact AgentCard path. Route status must report Accepted and ResolvedRefs.\nGolden invocation route: The verifier-only listener rewrites the exact verification path to the native A2A endpoint. It is distinct from the customer invocation route.\nCustomer invocation route: The annotation references the Golden Job. KRO waits for that Job to succeed before creating the caller route. A successful Job is a recorded gate, not continuous reapproval or revocation.\n\nSOURCE TEMPLATES\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: gateway.networking.k8s.io/v1\nkind: HTTPRoute\nmetadata:\n  name: ${schema.metadata.name}-card\n  namespace: ${schema.metadata.namespace}\n  annotations:\n    classic.kagent.dev/policy: ${cardPolicy.metadata.name}\nspec:\n  parentRefs:\n  - name: classic-demo\n    namespace: classic-agents\n    sectionName: verify\n  rules:\n  - matches:\n    - path:\n        type: Exact\n        value: /classic/classic-agents/${schema.metadata.name}/card\n    filters:\n    - type: URLRewrite\n      urlRewrite:\n        path:\n          type: ReplaceFullPath\n          replaceFullPath: /.well-known/agent-card.json\n    backendRefs:\n    - name: ${agent.metadata.name}\n      namespace: ${agent.metadata.namespace}\n      port: 8080\n---\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: gateway.networking.k8s.io/v1\nkind: HTTPRoute\nmetadata:\n  name: ${schema.metadata.name}-verify\n  namespace: ${schema.metadata.namespace}\n  annotations:\n    classic.kagent.dev/policy: ${verifierPolicy.metadata.name}\nspec:\n  parentRefs:\n  - name: classic-demo\n    namespace: classic-agents\n    sectionName: verify\n  rules:\n  - matches:\n    - path:\n        type: Exact\n        value: /classic/classic-agents/${schema.metadata.name}/verify\n    filters:\n    - type: URLRewrite\n      urlRewrite:\n        path:\n          type: ReplaceFullPath\n          replaceFullPath: /\n    backendRefs:\n    - name: ${agent.metadata.name}\n      namespace: ${agent.metadata.namespace}\n      port: 8080\n---\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: gateway.networking.k8s.io/v1\nkind: HTTPRoute\nmetadata:\n  name: ${schema.metadata.name}-invoke\n  namespace: ${schema.metadata.namespace}\n  annotations:\n    classic.kagent.dev/policy: ${callerPolicy.metadata.name}\n    classic.kagent.dev/verified-job: ${golden.metadata.name}\nspec:\n  parentRefs:\n  - name: classic-demo\n    namespace: classic-agents\n    sectionName: caller\n  rules:\n  - matches:\n    - path:\n        type: Exact\n        value: /classic/classic-agents/${schema.metadata.name}/invoke\n    filters:\n    - type: URLRewrite\n      urlRewrite:\n        path:\n          type: ReplaceFullPath\n          replaceFullPath: /\n    backendRefs:\n    - name: ${agent.metadata.name}\n      namespace: ${agent.metadata.namespace}\n      port: 8080\n"
+    },
+    "resource-config": {
+      "title": "1 × ConfigMap — bind Golden to this agent",
+      "type": "Checked KRO catalog templates · illustrative, unresolved CEL",
+      "text": "WHY: Give the verifier fixed expected identity and URLs for this instance. Do not put a provider key or JWT value in configuration.\n\nWHY THESE RESOURCES EXIST\nGolden ConfigMap: Fixed URLs, expected agent name, owner UID and token file path bind the Job to this instance. It contains no provider key or JWT value. The token is projected at runtime.\n\nSOURCE TEMPLATES\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: ${schema.metadata.name}-golden\n  namespace: ${schema.metadata.namespace}\ndata:\n  config.json: '{\"invokeURL\": \"http://classic-demo.classic-agents.svc.cluster.local:8081/classic/classic-agents/${schema.metadata.name}/verify\",\n    \"cardURL\": \"http://classic-demo.classic-agents.svc.cluster.local:8081/classic/classic-agents/${schema.metadata.name}/card\",\n    \"callerURL\": \"http://classic-demo.classic-agents.svc.cluster.local:8080/classic/classic-agents/${schema.metadata.name}/invoke\",\n    \"expectedAgent\": \"${schema.metadata.name}\", \"requestUID\": \"${schema.metadata.uid}\", \"tokenFile\": \"/var/run/golden/token\",\n    \"timeoutSeconds\": 480}'\n"
+    },
+    "resource-job": {
+      "title": "1 × Job — verify before opening caller access",
+      "type": "Checked KRO catalog templates · illustrative, unresolved CEL",
+      "text": "WHY: Check AgentCard, denied requests and one actual model PONG before KRO creates the caller route. The readiness condition is a creation gate, not continuous reapproval.\n\nRGD dependency: golden.readyWhen includes ${golden.status.succeeded == 1}; callerRoute references ${golden.metadata.name}.\n\nWHY THESE RESOURCES EXIST\nGolden verification Job: After the Agent and verifier routes are ready, the Job checks the card and denied requests, then makes one real model request for PONG. It requires completed native assistant output. backoffLimit is zero.\nCustomer invocation route: The annotation references the Golden Job. KRO waits for that Job to succeed before creating the caller route. A successful Job is a recorded gate, not continuous reapproval or revocation.\n\nSOURCE TEMPLATES\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: batch/v1\nkind: Job\nmetadata:\n  name: ${schema.metadata.name}-golden\n  namespace: ${schema.metadata.namespace}\n  annotations:\n    classic.kagent.dev/agent: ${agent.metadata.name}\n    classic.kagent.dev/route: ${verifyRoute.metadata.name}\n    classic.kagent.dev/card-route: ${cardRoute.metadata.name}\nspec:\n  backoffLimit: 0\n  activeDeadlineSeconds: 600\n  template:\n    metadata:\n      labels:\n        classic.kagent.dev/verifier: ${schema.metadata.name}\n        classic.kagent.dev/request-uid: ${schema.metadata.uid}\n    spec:\n      serviceAccountName: ${verifierAccount.metadata.name}\n      automountServiceAccountToken: false\n      restartPolicy: Never\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 65532\n        seccompProfile:\n          type: RuntimeDefault\n      containers:\n      - name: golden\n        image: '{{APPROVED_GOLDEN_IMAGE_AT_DIGEST}}'\n        command:\n        - python3\n        - -B\n        - /app/golden.py\n        - --config\n        - /golden/config.json\n        securityContext:\n          readOnlyRootFilesystem: true\n          allowPrivilegeEscalation: false\n          capabilities:\n            drop:\n            - ALL\n        resources:\n          requests:\n            cpu: 25m\n            memory: 32Mi\n          limits:\n            cpu: 500m\n            memory: 128Mi\n        volumeMounts:\n        - name: config\n          mountPath: /golden\n          readOnly: true\n        - name: jwt\n          mountPath: /var/run/golden\n          readOnly: true\n      volumes:\n      - name: config\n        configMap:\n          name: ${goldenConfig.metadata.name}\n      - name: jwt\n        projected:\n          sources:\n          - serviceAccountToken:\n              audience: secure-agent-classic\n              expirationSeconds: 600\n              path: token\n---\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: gateway.networking.k8s.io/v1\nkind: HTTPRoute\nmetadata:\n  name: ${schema.metadata.name}-invoke\n  namespace: ${schema.metadata.namespace}\n  annotations:\n    classic.kagent.dev/policy: ${callerPolicy.metadata.name}\n    classic.kagent.dev/verified-job: ${golden.metadata.name}\nspec:\n  parentRefs:\n  - name: classic-demo\n    namespace: classic-agents\n    sectionName: caller\n  rules:\n  - matches:\n    - path:\n        type: Exact\n        value: /classic/classic-agents/${schema.metadata.name}/invoke\n    filters:\n    - type: URLRewrite\n      urlRewrite:\n        path:\n          type: ReplaceFullPath\n          replaceFullPath: /\n    backendRefs:\n    - name: ${agent.metadata.name}\n      namespace: ${agent.metadata.namespace}\n      port: 8080\n"
+    },
+    "resource-overview": {
+      "title": "14 KRO resources — what each adds",
+      "type": "Checked RGD count and purpose · illustration only",
+      "text": "KRO CREATES 14 RESOURCES ACROSS 7 KINDS\n1 Agent — system prompt, model, skills and selected MCP tools.\n3 ServiceAccounts — separate runtime, Golden verifier and caller identities.\n2 NetworkPolicies — agent and verifier network boundaries.\n3 AgentgatewayPolicies — JWT authentication and exact-subject authorization.\n3 HTTPRoutes — AgentCard discovery, verification invocation and caller invocation.\n1 ConfigMap — fixed Golden URLs and expected identity; no token value.\n1 Job — Golden checks before the caller route is created.\n\nOWNERSHIP BOUNDARY\nThe shared Gateway, RGD, approved ModelConfig and MCP backends are platform prerequisites, outside these 14 KRO children.\nkagent generates the native Deployment, Service and configuration Secret from the Agent; those are not additional KRO graph nodes.\n\nPROOF BOUNDARY\nThe source graph and templates describe the composition. Recorded 4 Nov proof covers model/caller PONG and JWT checks only. This offline deck performs no live requests and adds no network, MCP or telemetry proof. Entra/UAMI remain desired-state work.\n"
+    },
+    "hardening-runtime": {
+      "title": "Restricted agent and verifier processes",
+      "type": "Checked Agent / Job security settings · illustrative templates",
+      "text": "WHY: Restrict the process even after a request passes the front door. Agent and Golden run as non-root, disallow privilege escalation, use read-only root filesystems, drop ALL capabilities and set RuntimeDefault seccomp. CPU and memory limits bound both; the agent writable /tmp emptyDir has a 64Mi size limit. These settings are not a sandbox-breakout proof.\n\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: kagent.dev/v1alpha2\nkind: Agent\nmetadata:\n  name: ${schema.metadata.name}\n  namespace: ${schema.metadata.namespace}\nspec:\n  type: Declarative\n  description: KRO-composed native agent without Substrate\n  declarative:\n    runtime: go\n    modelConfig: ${schema.spec.modelConfig}\n    systemMessage: ${schema.spec.systemPrompt}\n    stream: false\n    tools: ${schema.spec.tools.map(id, {\"kubernetes-readonly\":dyn({\"type\":dyn(\"McpServer\"),\"mcpServer\":dyn({\"apiGroup\":dyn(\"kagent.dev\"),\"kind\":dyn(\"RemoteMCPServer\"),\"name\":dyn(\"approved-kubernetes-mcp\"),\"toolNames\":dyn([dyn(\"k8s_get_resources\"),dyn(\"k8s_get_events\")])})}),\"gitlab-readonly\":dyn({\"type\":dyn(\"McpServer\"),\"mcpServer\":dyn({\"apiGroup\":dyn(\"kagent.dev\"),\"kind\":dyn(\"RemoteMCPServer\"),\"name\":dyn(\"approved-gitlab-mcp\"),\"toolNames\":dyn([dyn(\"gitlab_get_project\"),dyn(\"gitlab_get_latest_pipeline\")])})}),\"denodo-readonly\":dyn({\"type\":dyn(\"McpServer\"),\"mcpServer\":dyn({\"apiGroup\":dyn(\"kagent.dev\"),\"kind\":dyn(\"RemoteMCPServer\"),\"name\":dyn(\"approved-denodo-mcp\"),\"toolNames\":dyn([dyn(\"get_inventory_data_product_details\"),dyn(\"get_namespace_count\"),dyn(\"get_namespace_summary\")])})})}[id])}\n    deployment:\n      serviceAccountName: ${runtimeAccount.metadata.name}\n      resources:\n        requests:\n          cpu: 25m\n          memory: 64Mi\n        limits:\n          cpu: 1000m\n          memory: 256Mi\n      env:\n      - name: HOME\n        value: /tmp\n      podSecurityContext:\n        runAsNonRoot: true\n        runAsUser: 1000\n        fsGroup: 1000\n        seccompProfile:\n          type: RuntimeDefault\n      securityContext:\n        allowPrivilegeEscalation: false\n        readOnlyRootFilesystem: true\n        capabilities:\n          drop:\n          - ALL\n      volumes:\n      - name: writable-tmp\n        emptyDir:\n          sizeLimit: 64Mi\n      volumeMounts:\n      - name: writable-tmp\n        mountPath: /tmp\n  skills:\n    gitRefs: ${schema.spec.skills.map(id, {\"work-guidance\":dyn({\"url\":dyn(\"{{APPROVED_GITLAB_SKILLS_REPOSITORY_URL}}\"),\"ref\":dyn(\"{{APPROVED_FULL_COMMIT_ID}}\"),\"path\":dyn(\"skills/work-guidance\"),\"name\":dyn(\"work-guidance\")})}[id])}\n    gitAuthSecretRef:\n      name: approved-git-credentials\n\n---\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: batch/v1\nkind: Job\nmetadata:\n  name: ${schema.metadata.name}-golden\n  namespace: ${schema.metadata.namespace}\n  annotations:\n    classic.kagent.dev/agent: ${agent.metadata.name}\n    classic.kagent.dev/route: ${verifyRoute.metadata.name}\n    classic.kagent.dev/card-route: ${cardRoute.metadata.name}\nspec:\n  backoffLimit: 0\n  activeDeadlineSeconds: 600\n  template:\n    metadata:\n      labels:\n        classic.kagent.dev/verifier: ${schema.metadata.name}\n        classic.kagent.dev/request-uid: ${schema.metadata.uid}\n    spec:\n      serviceAccountName: ${verifierAccount.metadata.name}\n      automountServiceAccountToken: false\n      restartPolicy: Never\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 65532\n        seccompProfile:\n          type: RuntimeDefault\n      containers:\n      - name: golden\n        image: '{{APPROVED_GOLDEN_IMAGE_AT_DIGEST}}'\n        command:\n        - python3\n        - -B\n        - /app/golden.py\n        - --config\n        - /golden/config.json\n        securityContext:\n          readOnlyRootFilesystem: true\n          allowPrivilegeEscalation: false\n          capabilities:\n            drop:\n            - ALL\n        resources:\n          requests:\n            cpu: 25m\n            memory: 32Mi\n          limits:\n            cpu: 500m\n            memory: 128Mi\n        volumeMounts:\n        - name: config\n          mountPath: /golden\n          readOnly: true\n        - name: jwt\n          mountPath: /var/run/golden\n          readOnly: true\n      volumes:\n      - name: config\n        configMap:\n          name: ${goldenConfig.metadata.name}\n      - name: jwt\n        projected:\n          sources:\n          - serviceAccountToken:\n              audience: secure-agent-classic\n              expirationSeconds: 600\n              path: token\n"
+    },
+    "hardening-backends": {
+      "title": "Approved model and MCP operations — separate backend authority",
+      "type": "Checked catalog bindings and design boundary",
+      "text": "WHY: Keep agent capability explicit. The Agent references an existing approved ModelConfig, selected skill refs and named operations on approved RemoteMCPServers. The model and MCP backends need their own authentication, authorization, credential handling and transport security. A caller JWT grants access to the agent API; it does not grant Kubernetes, GitLab or database access. The RGD does not create those backend identities or prove successful MCP calls. Entra/UAMI integration remains desired state, not deployed by these templates.\n\n# KRO template from spec.resources. CEL is resolved by KRO.\napiVersion: kagent.dev/v1alpha2\nkind: Agent\nmetadata:\n  name: ${schema.metadata.name}\n  namespace: ${schema.metadata.namespace}\nspec:\n  type: Declarative\n  description: KRO-composed native agent without Substrate\n  declarative:\n    runtime: go\n    modelConfig: ${schema.spec.modelConfig}\n    systemMessage: ${schema.spec.systemPrompt}\n    stream: false\n    tools: ${schema.spec.tools.map(id, {\"kubernetes-readonly\":dyn({\"type\":dyn(\"McpServer\"),\"mcpServer\":dyn({\"apiGroup\":dyn(\"kagent.dev\"),\"kind\":dyn(\"RemoteMCPServer\"),\"name\":dyn(\"approved-kubernetes-mcp\"),\"toolNames\":dyn([dyn(\"k8s_get_resources\"),dyn(\"k8s_get_events\")])})}),\"gitlab-readonly\":dyn({\"type\":dyn(\"McpServer\"),\"mcpServer\":dyn({\"apiGroup\":dyn(\"kagent.dev\"),\"kind\":dyn(\"RemoteMCPServer\"),\"name\":dyn(\"approved-gitlab-mcp\"),\"toolNames\":dyn([dyn(\"gitlab_get_project\"),dyn(\"gitlab_get_latest_pipeline\")])})}),\"denodo-readonly\":dyn({\"type\":dyn(\"McpServer\"),\"mcpServer\":dyn({\"apiGroup\":dyn(\"kagent.dev\"),\"kind\":dyn(\"RemoteMCPServer\"),\"name\":dyn(\"approved-denodo-mcp\"),\"toolNames\":dyn([dyn(\"get_inventory_data_product_details\"),dyn(\"get_namespace_count\"),dyn(\"get_namespace_summary\")])})})}[id])}\n    deployment:\n      serviceAccountName: ${runtimeAccount.metadata.name}\n      resources:\n        requests:\n          cpu: 25m\n          memory: 64Mi\n        limits:\n          cpu: 1000m\n          memory: 256Mi\n      env:\n      - name: HOME\n        value: /tmp\n      podSecurityContext:\n        runAsNonRoot: true\n        runAsUser: 1000\n        fsGroup: 1000\n        seccompProfile:\n          type: RuntimeDefault\n      securityContext:\n        allowPrivilegeEscalation: false\n        readOnlyRootFilesystem: true\n        capabilities:\n          drop:\n          - ALL\n      volumes:\n      - name: writable-tmp\n        emptyDir:\n          sizeLimit: 64Mi\n      volumeMounts:\n      - name: writable-tmp\n        mountPath: /tmp\n  skills:\n    gitRefs: ${schema.spec.skills.map(id, {\"work-guidance\":dyn({\"url\":dyn(\"{{APPROVED_GITLAB_SKILLS_REPOSITORY_URL}}\"),\"ref\":dyn(\"{{APPROVED_FULL_COMMIT_ID}}\"),\"path\":dyn(\"skills/work-guidance\"),\"name\":dyn(\"work-guidance\")})}[id])}\n    gitAuthSecretRef:\n      name: approved-git-credentials\n"
+    },
+    "api-handoff": {
+      "title": "The API returned to the user",
+      "type": "Synthetic dashboard handoff · current JWT contract",
+      "text": "EXAMPLE PROTECTED GATEWAY ENDPOINT\nhttp://{{GATEWAY_SERVICE_DNS}}:8080/classic/classic-agents/demo/invoke\n\nCURRENT CALLER CONTRACT\nSubject: system:serviceaccount:classic-agents:demo-caller\nAudience: secure-agent-classic\nIssuer: {{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}\nUse a valid short-lived JWT issued for this caller. The page collects and returns no token.\n\nCONSUME IT\nSame-cluster application -> protected Gateway route -> native Agent.\nAn optional VirtualService forwards to this protected path and preserves Authorization, or uses its own separately authorized identity. The native Service is a backend, not a client bypass. Model and MCP permissions remain separate.\n\nTRY THE MOCK IDP\npresentation.html#configure\nFill the form or import its customer YAML. Send runs a local simulation and returns an example API after simulated Golden checks. No cluster or model request is made.\n\nPLANNED ONBOARDING\nLocation and requested IAM / Entra caller identity are separate request metadata. They do not alter the current graph or caller binding. A connected dashboard and custom identity binding require platform-side implementation. The current CR status does not return an endpoint."
     }
   },
   "deckLinks": [
+    {
+      "label": "Demo home",
+      "href": "START-HERE.html"
+    },
+    {
+      "label": "DICE review",
+      "href": "showcase.html"
+    },
+    {
+      "label": "Resources and hardening",
+      "href": "resources.html"
+    },
+    {
+      "label": "Tomorrow",
+      "href": "tomorrow.html"
+    },
     {
       "label": "Journey",
       "href": "journey.html"
@@ -943,7 +1528,7 @@ const $=id=>document.getElementById(id);
 const svgNS='http://www.w3.org/2000/svg';
 const mobile=matchMedia('(max-width:899px)');
 const reduced=matchMedia('(prefers-reduced-motion:reduce)');
-const state={index:0,scenario:new Map(),raf:null,generation:0,effects:[],markers:[],sourceOpener:null,notesOpener:null,printing:false,printScroll:[],repeatMs:0,repeatTimer:null};
+const state={index:0,scenario:new Map(),raf:null,generation:0,effects:[],markers:[],sourceOpener:null,notesOpener:null,printing:false,printScroll:[],repeatMs:0,repeatOverrides:new Map(),repeatTimer:null};
 const elements=new Map();
 function element(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 function svg(tag,attrs){const e=document.createElementNS(svgNS,tag);for(const [k,v]of Object.entries(attrs))e.setAttribute(k,v);return e}
@@ -953,6 +1538,7 @@ function buildSlide(slide,index){
  article.append(element('div','accent-rule'),element('div','eyebrow',slide.label));
  const topline=element('div','slide-topline');topline.append(element('span','version','Native kagent · KRO · agentgateway'),element('span','illustration-label','Illustration / synthetic examples'));article.append(topline);
  const heading=element('h1','',slide.title);heading.id=slide.id+'-title';heading.tabIndex=-1;article.append(heading,element('p','intro',slide.intro));
+ if(slide.action){const action=element('p','slide-action');const link=element('a','',slide.action.label);link.href=slide.action.href;action.append(link);article.append(action);}
  const content=element('div','content');const interaction=element('div','interaction-row');const scenarioGroup=element('div','scenario-group');scenarioGroup.setAttribute('role','group');scenarioGroup.setAttribute('aria-label','Illustrated scenarios');
  for(const option of slide.scenarios||[]){const button=element('button','scenario','Illustration: '+option.label);button.dataset.scenario=option.id;button.addEventListener('click',()=>{state.scenario.set(slide.id,option.id);applyScenario(slide);play()});scenarioGroup.append(button)}
  interaction.append(scenarioGroup,element('div','diagram-hint','Click a component for source / details'),element('div','print-note','Illustrative architecture. Solid = main flow; dashed = reference or optional path.'));
@@ -960,6 +1546,8 @@ function buildSlide(slide,index){
  const scroller=element('div','diagram-scroll');scroller.tabIndex=0;scroller.setAttribute('role','region');scroller.setAttribute('aria-label',slide.title+' diagram; scroll horizontally on narrow screens');
  const diagram=element('div','diagram');diagram.setAttribute('role','group');diagram.setAttribute('aria-label','Interactive components and labelled connection paths');
  const lines=svg('svg',{class:'connections',viewBox:'0 0 1488 450','aria-hidden':'true'});const defs=svg('defs',{});for(const [tone,fill]of [['blue','var(--link)'],['reference','var(--reference)'],['red','var(--accent)']]){const arrow=svg('marker',{id:slide.id+'-arrow-'+tone,viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:6,markerHeight:6,orient:'auto'});arrow.append(svg('path',{d:'M1 1L7 4L1 7Z',fill}));defs.append(arrow)}lines.append(defs);const pathMap=new Map();
+ if(slide.cover){const art=svg('g',{'aria-hidden':'true',class:'cover-orbits'});for(const item of [{"tag":"circle","attrs":{"cx":1010,"cy":225,"r":109,"fill":"none","stroke":"#141414","stroke-opacity":0.075,"stroke-width":1}},{"tag":"circle","attrs":{"cx":1010,"cy":225,"r":128,"fill":"none","stroke":"#e60000","stroke-opacity":0.06,"stroke-width":1}}]){const ring=svg(item.tag,item.attrs);ring.classList.add('cover-halo');art.append(ring)}lines.append(art);}
+
  for(const p of slide.paths){const line=svg('path',{d:p.d,class:'route'+(p.reference?' reference':'')+(p.tone==='red'?' red':''),'data-path':p.id,'marker-end':'url(#'+slide.id+'-arrow-'+(p.tone==='red'?'red':p.reference?'reference':'blue')+')'});lines.append(line);pathMap.set(p.id,line);if(p.label){const label=svg('text',{x:p.lx,y:p.ly,class:'edge-label'+(p.reference?' reference':'')+(p.tone==='red'?' red':''),'data-label-path':p.id});label.textContent=p.label;lines.append(label)}}
  for(const stop of slide.stops||[]){const g=svg('g',{class:'stop-mark','data-stop-scenario':stop.scenario});g.append(svg('path',{d:`M${stop.x-6} ${stop.y-6}L${stop.x+6} ${stop.y+6}M${stop.x+6} ${stop.y-6}L${stop.x-6} ${stop.y+6}`}));lines.append(g)}
  diagram.append(lines);
@@ -976,29 +1564,31 @@ function isActivePath(slide,path){return !path.scenarios||path.scenarios.include
 function applyScenario(slide){const e=elements.get(slide.id);const id=state.scenario.get(slide.id);for(const b of e.scenarioGroup.children)b.setAttribute('aria-pressed',String(b.dataset.scenario===id));for(const path of slide.paths){const active=isActivePath(slide,path);e.pathMap.get(path.id).classList.toggle('inactive',!active);const label=e.lines.querySelector('[data-label-path="'+path.id+'"]');if(label)label.classList.toggle('inactive',!active)}for(const g of e.lines.querySelectorAll('[data-stop-scenario]'))g.classList.toggle('inactive',g.dataset.stopScenario!==id);const scenario=slide.scenarios?.find(s=>s.id===id);e.status.textContent=scenario?scenario.status:'Illustration only. No backend calls or tests run in this deck.'}
 function cancelMotion(){clearTimeout(state.repeatTimer);state.repeatTimer=null;state.generation++;if(state.raf!==null)cancelAnimationFrame(state.raf);state.raf=null;for(const effect of state.effects)effect.cancel();state.effects=[];for(const marker of state.markers)marker.remove();state.markers=[];for(const path of document.querySelectorAll('.route')){path.style.strokeDasharray='';path.style.strokeDashoffset=''}}
 function canAnimate(){return !reduced.matches&&!document.hidden&&!state.printing&&!$('sourceDialog').open&&!$('notesDialog').open}
-function scheduleRepeat(){clearTimeout(state.repeatTimer);state.repeatTimer=null;if(state.repeatMs&&canAnimate())state.repeatTimer=setTimeout(play,state.repeatMs)}
+function repeatDelay(){return state.repeatOverrides.get(current().id)??current().repeatMs??state.repeatMs}
+function scheduleRepeat(){clearTimeout(state.repeatTimer);state.repeatTimer=null;const delay=repeatDelay();if(delay&&canAnimate())state.repeatTimer=setTimeout(play,delay)}
 function updateRepeatControl(){$('repeat').disabled=reduced.matches;$('repeat').title=reduced.matches?'Automatic motion is paused by your reduced-motion preference.':'Pause after each flow completes. Repeats the current slide.'}
 function duration(token,fallback){const raw=getComputedStyle(document.documentElement).getPropertyValue(token).trim();return raw.endsWith('ms')?Number.parseFloat(raw):raw.endsWith('s')?Number.parseFloat(raw)*1000:fallback}
-function play(){cancelMotion();const slide=current();const e=elements.get(slide.id);applyScenario(slide);if(!canAnimate())return;const generation=state.generation;const enter=duration('--enter-duration',450);const packet=duration('--packet-duration',850);const paths=slide.paths.filter(p=>isActivePath(slide,p));for(const [i,node]of Array.from(e.diagram.querySelectorAll('.node')).entries()){state.effects.push(node.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'translateY(0)'}],{duration:enter,delay:i*90,easing:'cubic-bezier(.2,.65,.3,1)',fill:'backwards'}))}
+function play(){cancelMotion();const slide=current();const e=elements.get(slide.id);applyScenario(slide);if(!canAnimate())return;const generation=state.generation;const enter=duration('--enter-duration',450);const packet=slide.packetDuration??duration('--packet-duration',850);const paths=slide.paths.filter(p=>isActivePath(slide,p));for(const [i,node]of Array.from(e.diagram.querySelectorAll('.node')).filter(()=>!slide.cover).entries()){state.effects.push(node.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'translateY(0)'}],{duration:enter,delay:i*90,easing:'cubic-bezier(.2,.65,.3,1)',fill:'backwards'}))}
+ if(slide.cover){for(const ring of e.lines.querySelectorAll('.cover-halo'))state.effects.push(ring.animate([{opacity:.35},{opacity:1},{opacity:.35}],{duration:1300,iterations:2,fill:'none',easing:'ease-in-out'}));}
  const travels=paths.map((path,i)=>{const line=e.pathMap.get(path.id);const length=line.getTotalLength();const marker=svg('circle',{r:6,fill:color(path),class:'packet',opacity:0,'data-reference':String(path.reference)});e.lines.append(marker);state.markers.push(marker);return {path,line,length,marker,start:330+i*170}});const start=performance.now();const end=Math.max(enter+slide.nodes.length*90,...travels.map(t=>t.start+packet))+80;
  function tick(now){if(generation!==state.generation)return;const elapsed=now-start;for(const t of travels){const p=Math.max(0,Math.min(1,(elapsed-t.start)/packet));if(!t.path.reference){t.line.style.strokeDasharray=t.length+' '+t.length;t.line.style.strokeDashoffset=String(t.length*(1-p))}t.marker.setAttribute('opacity',elapsed>=t.start&&p<1?'1':'0');const point=t.line.getPointAtLength(t.length*p);t.marker.setAttribute('cx',point.x);t.marker.setAttribute('cy',point.y)}if(elapsed<end)state.raf=requestAnimationFrame(tick);else{cancelMotion();e.status.textContent=(slide.scenarios?.find(s=>s.id===state.scenario.get(slide.id))?.status||'Illustration complete. Inspect a component or replay the flow.')+' No live result is represented.';scheduleRepeat()}}
  state.raf=requestAnimationFrame(tick);
 }
 function fit(){if(mobile.matches){$('stage').style.width='';$('stage').style.height='';document.documentElement.style.setProperty('--scale','1');return}const scale=Math.min((innerWidth-48)/1600,(innerHeight-118)/900);document.documentElement.style.setProperty('--scale',String(scale));$('stage').style.width=1600*scale+'px';$('stage').style.height=900*scale+'px'}
-function showSlide(index,{animate=true,hash=true,focus=false}={}){cancelMotion();state.index=Math.max(0,Math.min(data.slides.length-1,index));const slide=current();for(const entry of data.slides){const active=entry.id===slide.id;const article=elements.get(entry.id).article;article.hidden=!active;article.inert=!active;article.setAttribute('aria-hidden',String(!active))}applyScenario(slide);$('previous').disabled=state.index===0;$('next').disabled=state.index===data.slides.length-1;$('slideCounter').textContent=(state.index+1)+' / '+data.slides.length;$('slideAnnouncement').textContent='Slide '+(state.index+1)+' of '+data.slides.length+'. '+slide.title;if(hash&&location.hash!=='#'+slide.id)location.hash=slide.id;if(focus)elements.get(slide.id).heading.focus({preventScroll:true});if(mobile.matches)window.scrollTo({top:0,behavior:'instant'});fit();if(animate)play();else scheduleRepeat()}
+function showSlide(index,{animate=true,hash=true,focus=false}={}){cancelMotion();state.index=Math.max(0,Math.min(data.slides.length-1,index));const slide=current();for(const entry of data.slides){const active=entry.id===slide.id;const article=elements.get(entry.id).article;article.hidden=!active;article.inert=!active;article.setAttribute('aria-hidden',String(!active))}applyScenario(slide);$('repeat').value=String(repeatDelay());$('previous').disabled=state.index===0;$('next').disabled=state.index===data.slides.length-1;$('slideCounter').textContent=(state.index+1)+' / '+data.slides.length;$('slideAnnouncement').textContent='Slide '+(state.index+1)+' of '+data.slides.length+'. '+slide.title;if(hash&&location.hash!=='#'+slide.id)location.hash=slide.id;if(focus)elements.get(slide.id).heading.focus({preventScroll:true});if(mobile.matches)window.scrollTo({top:0,behavior:'instant'});fit();if(animate)play();else scheduleRepeat()}
 function sourceText(){const source=data.sources[$('sourceSelect').value];$('sourceCode').textContent=source.text;$('sourceMeta').textContent=source.type+' · Illustration only';$('sourceCode').scrollTop=0;$('sourceCode').scrollLeft=0;$('copyStatus').textContent=''}
 function openSource(id,opener){cancelMotion();state.sourceOpener=opener||document.activeElement;$('sourceSelect').value=id;sourceText();$('sourceDialog').showModal();$('sourceSelect').focus()}
 function openNotes(opener){cancelMotion();state.notesOpener=opener||document.activeElement;$('notesTitle').textContent='Slide '+(state.index+1)+' / Presenter notes';$('notesText').textContent=current().notes;$('notesDialog').showModal();$('closeNotes').focus()}
 $('sourceSelect').addEventListener('change',sourceText);$('sourceDialog').addEventListener('close',()=>{if(state.sourceOpener?.isConnected)state.sourceOpener.focus({preventScroll:true});scheduleRepeat()});$('notesDialog').addEventListener('close',()=>{if(state.notesOpener?.isConnected)state.notesOpener.focus({preventScroll:true});scheduleRepeat()});$('closeSource').addEventListener('click',()=>$('sourceDialog').close());$('closeNotes').addEventListener('click',()=>$('notesDialog').close());
 $('copySource').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('sourceCode').textContent);$('copyStatus').textContent='Copied source text.'}catch{const range=document.createRange();range.selectNodeContents($('sourceCode'));const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);$('sourceCode').focus();$('copyStatus').textContent='Clipboard unavailable. Text selected; press Cmd+C or Ctrl+C to copy manually.'}});
-$('repeat').addEventListener('change',()=>{state.repeatMs=Number($('repeat').value);cancelMotion();if(state.repeatMs)play()});
+$('repeat').addEventListener('change',()=>{const delay=Number($('repeat').value);if(current().repeatMs!==undefined)state.repeatOverrides.set(current().id,delay);else state.repeatMs=delay;cancelMotion();if(delay)play()});
 $('previous').addEventListener('click',()=>showSlide(state.index-1));$('next').addEventListener('click',()=>showSlide(state.index+1));$('replay').addEventListener('click',play);$('notes').addEventListener('click',event=>openNotes(event.currentTarget));$('details').addEventListener('click',event=>openSource(current().nodes[0].source,event.currentTarget));$('print').addEventListener('click',()=>{cancelMotion();window.print()});
 document.addEventListener('keydown',event=>{if(event.ctrlKey||event.metaKey||event.altKey||event.target.closest('input,textarea,select,[contenteditable],dialog')||$('sourceDialog').open||$('notesDialog').open||window.getSelection()?.toString())return;const key=event.key.toLowerCase();if(event.shiftKey&&key.startsWith('arrow'))return;let target=null;if(['arrowright','pagedown'].includes(key))target=state.index+1;if(['arrowleft','pageup'].includes(key))target=state.index-1;if(key==='home')target=0;if(key==='end')target=data.slides.length-1;if(target!==null){event.preventDefault();showSlide(target,{focus:true})}else if(key==='r'){event.preventDefault();play()}else if(key==='n'){event.preventDefault();openNotes(event.target)}});
 window.addEventListener('hashchange',()=>{const index=data.slides.findIndex(s=>'#'+s.id===location.hash);if(index>=0&&index!==state.index)showSlide(index,{hash:false})});window.addEventListener('resize',()=>{cancelMotion();fit();scheduleRepeat()});document.addEventListener('visibilitychange',()=>{cancelMotion();scheduleRepeat()});reduced.addEventListener('change',()=>{cancelMotion();updateRepeatControl();scheduleRepeat()});
 window.addEventListener('beforeprint',()=>{cancelMotion();state.printing=true;state.printScroll=Array.from(document.querySelectorAll('.diagram-scroll,.source-code'),e=>({e,left:e.scrollLeft,top:e.scrollTop}));for(const item of state.printScroll){item.e.scrollLeft=0;item.e.scrollTop=0}for(const entry of elements.values()){entry.article.hidden=false;entry.article.inert=true}});
 window.addEventListener('afterprint',()=>{state.printing=false;showSlide(state.index,{animate:false,hash:false});for(const item of state.printScroll){item.e.scrollLeft=item.left;item.e.scrollTop=item.top}state.printScroll=[]});
 updateRepeatControl();
-const initial=data.slides.findIndex(s=>'#'+s.id===location.hash);showSlide(initial>=0?initial:0,{animate:false});
+const initial=data.slides.findIndex(s=>'#'+s.id===location.hash);showSlide(initial>=0?initial:0,{animate:data.slides[initial>=0?initial:0].cover===true});
 </script>
 </body>
 </html>

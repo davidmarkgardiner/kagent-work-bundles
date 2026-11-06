@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-11-06",
+  "scope": "Local offline demo packaging; no cluster/model calls or new runtime proof",
+  "primaryPages": 9,
+  "htmlPagesIncludingSupport": 26,
+  "offlineSupportFiles": 61,
+  "theme": "Red, white and black with soft green takeaways; historical reference styling retained",
+  "headline": "No-code agent runtime; graphic moved down to preserve full text at 1280x720 and 1600x1050",
+  "checks": [
+    "All local HTML targets stay within the bundle and exist",
+    "No absolute file URLs remain in HTML navigation",
+    "No external runtime assets in main or copied HTML pages",
+    "Nine main pages embed identical shared theme",
+    "JavaScript syntax checked in 19 HTML pages",
+    "Primary pages checked at 390px width",
+    "Cover headline has at least 18px separation from illustration at laptop and presentation sizes",
+    "Green takeaway background checked in browser",
+    "Mock IDP Send and API handoff work with network disabled",
+    "No external requests or page runtime errors during primary page checks",
+    "Dark supporting reference retains readable original palette",
+    "Preparation script rerun produces identical files",
+    "Gitleaks scan found no secrets",
+    "No RFC1918 addresses found"
+  ],
+  "browserMethod": "Isolated extracted copy served over loopback; network disabled for interactive handoff. Chrome direct file opening requested; visual file-tab inspection unavailable because computer-use host was unavailable.",
+  "separateWorkspaceSources": "Not copied; marked as not included in supporting source page.",
+  "remainingReview": "Team feedback and further presentation tweaks."
+}

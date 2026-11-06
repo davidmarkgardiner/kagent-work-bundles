@@ -1,0 +1,47 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: chat-mcp-auth
+  namespace: tenant-gateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: chat-mcp
+  traffic:
+    jwtAuthentication:
+      mode: Strict
+      providers:
+        - issuer: https://login.microsoftonline.com/{{TEAM_CHAT_ENTRA_TENANT_ID}}/v2.0
+          audiences:
+            - api://{{TEAM_CHAT_ENTRA_CLIENT_ID}}
+            - "{{TEAM_CHAT_ENTRA_CLIENT_ID}}"
+          jwks:
+            remote:
+              backendRef:
+                name: entra-jwks
+                kind: AgentgatewayBackend
+                group: agentgateway.dev
+                port: 443
+              jwksPath: /{{TEAM_CHAT_ENTRA_TENANT_ID}}/discovery/v2.0/keys
+      mcp:
+        provider: Entra
+        clientId: "{{TEAM_CHAT_ENTRA_CLIENT_ID}}"
+        resourceMetadata:
+          resource: https://{{TEAM_CHAT_MCP_HOSTNAME}}/mcp
+          scopesSupported:
+            - api://{{TEAM_CHAT_ENTRA_CLIENT_ID}}/mcp_access
+          bearerMethodsSupported:
+            - header
+    authorization:
+      action: Allow
+      policy:
+        matchExpressions:
+          - '"team-chat.mcp.use" in jwt.roles'
+  backend:
+    mcp:
+      authorization:
+        action: Allow
+        policy:
+          matchExpressions:
+            - 'mcp.tool.name == "lookup_release"'

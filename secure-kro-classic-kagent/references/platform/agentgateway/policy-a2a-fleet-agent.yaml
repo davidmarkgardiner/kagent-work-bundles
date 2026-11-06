@@ -1,0 +1,47 @@
+# AgentgatewayPolicy — rate limit + timeout for worker-to-management A2A.
+#
+# DEPLOY ON: management cluster
+#
+# Plan-B variant. PR 0 against `proxmox-k8s` (2026-05-14) confirmed the
+# installed CRD does NOT support `AgentgatewayPolicy.spec.backend.a2a`,
+# so the gateway-side CEL identity check is unavailable here. Identity
+# is enforced upstream at the Istio AuthorizationPolicy layer (see
+# `istio-authorization-policy.yaml`). This policy keeps what IS
+# supported and useful at the gateway: rate limiting and request
+# timeout for the cross-cluster escalation path.
+#
+# When a future agentgateway release ships `backend.a2a.authorization`,
+# add a CEL `matchExpressions` clause here checking
+# `x-kagent-cluster` + `x-kagent-agent` as defense-in-depth on top of
+# the Istio identity gate.
+#
+# Apply:
+#   kubectl apply --dry-run=server -f policy-a2a-fleet-agent.yaml
+#   kubectl apply -f policy-a2a-fleet-agent.yaml
+# ---
+
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: a2a-fleet-policy
+  namespace: agentgateway-system
+  labels:
+    app.kubernetes.io/part-of: agentgateway
+    demo: a2a-fleet
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: a2a-fleet-route
+  traffic:
+    # Cross-cluster escalation should be rare; keep the budget tight.
+    rateLimit:
+      local:
+        - requests: 2
+          unit: Seconds
+          burst: 5
+    # A2A request/response cycles can be long-running. Match kagent's
+    # timeout floor (≥120s mentioned in README troubleshooting Layer 2).
+    # CRD shape on v1alpha1: `traffic.timeouts.request`.
+    timeouts:
+      request: "120s"

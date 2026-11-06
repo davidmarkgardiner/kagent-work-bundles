@@ -1,4 +1,49 @@
-# Secure KRO agent with native kagent 0.x, without Substrate
+# DICE / UK8S demo work bundle
+
+Open [START-HERE.html](START-HERE.html) for the complete offline demo menu.
+Download the repository ZIP, extract the `secure-kro-classic-kagent` folder,
+and keep its contents together. Chrome or Edge can open the HTML files directly;
+no server, Python, npm, cluster connection or model account is needed for the demo.
+See [DEMO-QUICKSTART.md](DEMO-QUICKSTART.md) for the recommended presentation order.
+
+All main demo pages use the same red, white and black theme, light green takeaways, system fonts, controls
+and source-inspection conventions. The `references/` folder contains the linked
+supporting snapshots needed for offline review. External upstream-documentation
+links remain optional online references. The interactive examples are synthetic;
+dated evidence is labelled separately from current runtime proof.
+
+For later edits, change the HTML directly. The mock IDP and resource sheet also
+have generators. After rebuilding either, run `python3 prepare_demo_bundle.py`
+to embed `demo-theme.css` consistently. The existing runtime implementation and
+manifest instructions below are optional engineering material, not demo setup.
+
+Download location:
+
+https://github.com/davidmarkgardiner/kagent-work-bundles/tree/main/secure-kro-classic-kagent
+
+The archive at https://github.com/davidmarkgardiner/kagent-work-bundles/archive/refs/heads/main.zip contains the folder above. Open its `START-HERE.html`. `DEMO-FILES.sha256` records the checked files; `python3 verify_demo_bundle.py` optionally verifies the folder after extraction.
+
+## Native kagent implementation
+
+Start the 6 November review at [the DICE showcase sheets](showcase.html).
+They separate the platform product and API consumption from our own SRE,
+observability, and SDLC use cases, with dedicated current-security, planned-Entra,
+and Gateway-control sheets. Yesterday's animated decks and YAML explorer are
+linked from that entry point. See [PRESENTATIONS.md](PRESENTATIONS.md) for scope.
+
+For Story 1, start with [resources and hardening](resources.html).
+Two sheets explain every kind in the 14-resource KRO composition, why it exists,
+and how the agent is hardened. The full before/after YAML inspector is optional
+and collapsed. It runs offline without scripts or backend calls. Rebuild it
+with `python3 build_resource_comparison.py`.
+
+
+The existing [mock IDP](presentation.html#configure) accepts the form or its exported customer YAML. **Send simulation** illustrates controller/KRO assembly and Golden checks, then returns an example protected API with its JWT caller contract. Applications and optional VirtualServices use that authenticated Gateway route. Location and requested IAM/Entra identity remain planned onboarding metadata outside the current schema. No cluster or model calls run in the page.
+
+For a deeper discussion, [where we are taking DICE](tomorrow.html) covers the desired state.
+It explains durable task/session recovery, governed memory, actor execution on
+Substrate, and the intended benefits and proof needed beyond today's secure API.
+The first sheet stands alone; the following sheets expand the target design.
 
 This is a separate work bundle for the normal `kagent.dev/v1alpha2` declarative
 Agent runtime. Kagent creates an ordinary Deployment and Service. This bundle
@@ -22,8 +67,10 @@ YAML explorer/terminal walkthrough for the actual configuration and live proof.
 
 The [three-chapter presentation guide](PRESENTATIONS.md) adds separate
 [secure-agent journey](journey.html), [SRE triage/application recovery](triage.html)
-and [SDLC delivery](sdlc.html) decks. Each has six slides and links to the other
-chapters. The kinetic decks now offer **Repeat after: Off / 3 / 5 / 10 seconds**
+and [SDLC delivery](sdlc.html) decks. Journey has nine slides. Its DICE / UK8S cover introduces the no-code agent platform with an animated
+agent connecting to icon-only capabilities. Comparison and lifecycle/API handoff
+follow in positions 2 and 3, then resources and hardening in positions 4 and 5. Triage and SDLC each have six slides.
+All link to the other chapters. The kinetic decks offer **Repeat after: Off / 3 / 5 / 10 seconds**
 for the current flow. All new examples are synthetic; no animation is live proof.
 
 [NEXT-STEPS.md](NEXT-STEPS.md) records the Entra ID/UAMI iteration, Gateway

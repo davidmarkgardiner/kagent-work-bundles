@@ -1,0 +1,40 @@
+{
+  "checkedOn": "2026-11-06",
+  "artifact": "showcase.html",
+  "scope": "Local documentation and browser review. No runtime rehearsal or publication.",
+  "sheets": ["platform", "lifecycle", "today", "entra", "gateway", "observability", "sdlc", "lens"],
+  "checks": {
+    "localLinkAndFragmentTargets": "PASS: 48 links inspected, local targets exist, local fragments resolve",
+    "uniqueIds": "PASS: 16 unique IDs",
+    "scriptElements": "PASS: zero scripts in the new review page",
+    "desktopVisualReview": "PASS: all eight sheets captured and visually inspected at 1440px viewport width",
+    "mobileWidth": "PASS: no document horizontal overflow at 390px viewport width",
+    "navigationAndDisclosures": "PASS: anchor navigation and three exact YAML disclosures exercised",
+    "existingDeckBacklinks": "PASS: Journey, Triage, and SDLC DICE-review links exercised in browser",
+    "printLayout": "PASS: all eight sections fit the emulated printable content height without horizontal overflow; Gateway print screenshot visually inspected",
+    "pdfExport": "NOT RUN: no PDF generated",
+    "browserConsole": "PASS: inspected browser console reported zero errors and warnings before final content-only edits",
+    "publicSafetyScan": "REVIEWED_FALSE_POSITIVE: strict scanner matches 10.4 in the existing live-classic-0.10.4-2026-11-04.json receipt link; no other hits",
+    "diffWhitespace": "PASS"
+  },
+  "sourceBoundaries": {
+    "currentProof": "4 November classic lab model/caller PONG and JWT rejection receipt; not refreshed runtime state",
+    "referenceGrant": "Conditional cross-namespace example; same-namespace classic backend requires no grant",
+    "entra": "Planned for this composition",
+    "gatewayMcp": "Integration design; inspected SDLC rig uses direct GitLab MCP",
+    "onboarding": "Product pattern; current tested classic slot is bounded to classic-agents/demo",
+    "classifier": "Source uses a bounded Kimi call before durable admission; GEF name unconfirmed",
+    "dataAdapter": "Generic data MCP label; Node.js name unconfirmed, inspected catalog names Denodo",
+    "sdlc": "Inspected board rig polls labelled tickets; no claimed new webhook execution"
+  },
+  "workCheckpoint": {
+    "blockingFirstSteps": "Completed source and existing-artifact inspection before authoring the new sheets",
+    "independentWorkstreams": "Read-only source review ran separately from documentation authoring",
+    "sharedMutableState": "One documentation writer; existing unrelated workspace changes preserved",
+    "smallestSafeDecomposition": "One new static review page, navigation-data additions to existing decks, and guide updates"
+  },
+  "reviewRemaining": ["David's narrative feedback", "Classifier and third MCP adapter names", "Receiving-system evidence before presenting planned integrations as live"],
+  "githubWrite": false,
+  "clusterChange": false,
+  "providerInference": false
+}

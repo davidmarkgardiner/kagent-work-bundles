@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="icon" href="data:,">
+<title>DICE | The platform we build. The platform we use.</title>
+<style>
+:root{--ink:#191919;--paper:#f4f3ee;--red:#e60000;--line:#d7d5ce;--blue:#245a8b;--amber:#875313;--muted:#575752}
+*{box-sizing:border-box}html{scroll-padding-top:90px}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}a{color:var(--blue);text-underline-offset:4px;overflow-wrap:anywhere}a:hover{color:var(--red)}a:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:5px}.skip{position:fixed;top:-100px;background:white;padding:12px;z-index:10}.skip:focus{top:0}.masthead{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:24px;padding:14px 4vw}.brand{font-weight:900;font-size:24px;letter-spacing:-1px;color:var(--red);text-decoration:none}.masthead nav{display:flex;gap:17px;overflow-x:auto;white-space:nowrap;font-size:13px;padding:4px}.masthead nav a{color:var(--ink)}main{max-width:1400px;margin:auto;padding:28px 32px 60px}.sheet{background:white;margin:0 0 28px;padding:42px 48px;border:1px solid var(--line);scroll-margin-top:0;position:relative}.sheet:target{border-color:var(--red)}.eyebrow{font-size:12px;font-weight:750;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 16px}.eyebrow::before{content:"";display:inline-block;width:32px;height:4px;background:var(--red);margin:0 12px 3px 0}h1,h2,h3,p{margin-top:0}h1{font-size:clamp(38px,4.5vw,64px);line-height:1.06;letter-spacing:-.045em;max-width:1000px;margin-bottom:22px}h2{font-size:clamp(29px,3vw,43px);line-height:1.12;letter-spacing:-.035em;margin-bottom:16px}h3{font-size:19px;line-height:1.25;margin-bottom:10px}.lead{font-size:21px;line-height:1.45;max-width:1050px;color:#3e3e39;margin-bottom:25px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.panel{border:1px solid var(--line);padding:23px;background:#fafaf7;min-width:0}.panel.dark{background:var(--ink);color:white;border-color:var(--ink)}.panel.dark a{color:#b7d9fa}.panel.red{border-top:4px solid var(--red)}.number{font:750 13px/1 system-ui;color:var(--red);display:block;margin-bottom:12px}.tag{display:inline-block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;border:1px solid currentColor;padding:4px 7px;margin-bottom:13px;color:var(--blue)}.tag.planned{color:var(--amber)}.panel p:last-child{margin-bottom:0}.flow{display:flex;align-items:stretch;gap:0;margin:25px 0}.step{flex:1;min-width:0;background:var(--paper);border:1px solid var(--line);padding:16px;font-size:14px}.step strong{display:block;font-size:17px;margin-bottom:5px}.arrow{align-self:center;padding:0 9px;color:var(--red);font-weight:800}.takeaway{border-left:4px solid var(--red);padding:13px 18px;margin:25px 0 20px;background:var(--paper);font-size:18px}.foot{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin:22px 0 0}.foot a{display:inline-block;margin-right:13px}.links{display:flex;gap:15px;flex-wrap:wrap;margin-top:18px}.links a{font-weight:650;font-size:14px}.small{font-size:13px;color:var(--muted)}ul,ol{padding-left:21px;margin:10px 0 0}li{margin-bottom:7px}code{font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}pre{font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#f1f0eb;padding:17px;border:1px solid var(--line);max-height:400px;overflow:auto;margin-bottom:0}summary{cursor:pointer;color:var(--blue);font-weight:650;padding:8px 0}details{margin-top:13px}.timeline{display:grid;grid-template-columns:90px 1fr;gap:20px;padding:20px 0;border-bottom:1px solid var(--line)}.timeline:last-of-type{border-bottom:0}.era{color:var(--red);font-weight:800;font-size:22px}.timeline h3{margin-bottom:6px}.path{font-weight:650;color:var(--blue);margin:8px 0}table{border-collapse:collapse;width:100%;font-size:14px;margin-top:16px}th,td{padding:12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--paper)}.review{background:#fff8e9;border-left:4px solid #bc8125;padding:14px 18px;font-size:14px;margin-top:20px}.subtle{color:var(--muted)}
+@media(max-width:800px){.masthead{display:block;padding:10px 16px}.brand{font-size:21px}.masthead nav{gap:16px}main{padding:16px 12px 30px}.sheet{padding:28px 22px}.grid,.three{grid-template-columns:1fr}.lead{font-size:18px}.flow{flex-direction:column}.arrow{transform:rotate(90deg);padding:6px}.timeline{grid-template-columns:1fr;gap:5px}.era{font-size:17px}.foot a{margin-top:6px}table{font-size:12px}th,td{padding:9px 6px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@page{size:A3 landscape;margin:12mm}
+@media print{body{background:white;font-size:13px}.masthead,.skip,.screen-only{display:none}main{padding:0;max-width:none}.sheet{border:0;margin:0;padding:10mm 12mm;break-after:page;break-inside:avoid;min-height:245mm}.sheet:last-child{break-after:auto}h1{font-size:46px}h2{font-size:34px}.lead{font-size:18px}.panel{padding:18px}.foot{font-size:10px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.flow{flex-direction:row}.arrow{transform:none;padding:0 9px}.timeline{grid-template-columns:90px 1fr}.screen-only,details{display:none}a{color:var(--blue)}.sheet,.panel,.step,.takeaway,th{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+<style id="dice-bundle-theme">
+:root{--surface:#ffffff;--backdrop:#f2f2f2;--text:#141414;--body-text:#383838;--muted:#626262;--border:#dedede;--panel:#f6f6f6;--accent:#e60000;--link:#c90000;--link-tint:#fff0f0;--positive:#141414;--positive-tint:#f0f0f0;--reference:#626262;--reference-tint:#f3f3f3;--font:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;--code-font:ui-monospace,Consolas,monospace;--ink:#141414;--paper:#f6f6f6;--red:#e60000;--line:#dedede;--blue:#c90000;--amber:#555555;--bg:#ffffff;--green:#c90000;--soft:#fff0f0;--purple:#c90000;--mono:ui-monospace,Consolas,monospace}
+body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif}h1,h2,h3{font-family:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif}a{color:var(--link);text-underline-offset:3px}button:focus-visible,a:focus-visible,summary:focus-visible{outline-color:#e60000}.sheet,.panel,.summary-sheet,.hardening-card,.simple-flow div,.card,.step{border-radius:12px}.sheet,.summary-sheet{background:#ffffff}.panel,.hardening-card,.step{background:#f6f6f6}.takeaway,.notice,.review{background:#fff0f0;border-left-color:#e60000}.code{background:#141414;color:#ffffff}pre,code{font-family:ui-monospace,Consolas,monospace}.bundle-home{display:block;padding:10px 4vw;font-size:13px;background:white;border-bottom:1px solid #dedede}.reference-banner{font-size:13px;padding:12px 4vw;background:#f6f6f6;border-bottom:1px solid #dedede}.reference-banner a{margin-right:18px}@media print{.bundle-home,.reference-banner{display:none!important}}
+
+.takeaway{background:#eef7ef;border-left-color:#9bc8a2;color:#1c3525}.takeaway strong{color:#356a43}
+
+</style>
+</head>
+<body>
+<a class="skip" href="#platform">Skip to the review sheets</a>
+<header class="masthead"><a class="brand" href="#platform">DICE</a><nav aria-label="Review sheets"><a href="START-HERE.html">Demo home</a><a href="#platform">1. Two stories</a><a href="#lifecycle">2. Build and consume</a><a href="#today">3. Security today</a><a href="#entra">4. Entra tomorrow</a><a href="#gateway">5. Gateway</a><a href="#observability">6. Three iterations</a><a href="#sdlc">7. SDLC</a><a href="#lens">8. SRE Lens</a></nav></header>
+<main>
+<section class="sheet" id="platform" aria-labelledby="platform-title">
+<p class="eyebrow">Morning review · 6 November 2026 · 01 / 08</p>
+<h1 id="platform-title">The platform we build.<br>The platform we use.</h1>
+<p class="lead">DICE gives teams a governed way to build, deploy, and consume agents. We use those same capabilities to investigate incidents and deliver software.</p>
+<div class="grid">
+<article class="panel red"><span class="number">STORY 1 · DICE AS A PRODUCT</span><h2 style="font-size:19px;letter-spacing:normal">Teams bring the purpose. We assemble the platform.</h2><p>A team supplies a small agent definition and selects approved models, skills, and tools. KRO assembles the native kagent agent and its security resources. The team consumes the protected API from its application or workflow.</p><p><a href="#lifecycle">Follow the build and deployment lifecycle</a></p><p><a href="#today">Inspect security today</a> · <a href="#entra">Review Entra tomorrow</a> · <a href="#gateway">See the Gateway controls</a></p></article>
+<article class="panel dark"><span class="number">STORY 2 · DICE AS OUR OWN CUSTOMER</span><h2 style="font-size:19px;letter-spacing:normal">Our SRE and delivery teams consume the product.</h2><p>We extend LGTM with source-level incident triage, connect GitLab work to specialist delivery agents, and give SREs one conversation across operational systems.</p><p><a href="#observability">See the three observability iterations</a></p><p><a href="#sdlc">Follow a Kanban ticket</a> · <a href="#lens">Ask through SRE Lens</a></p></article>
+</div>
+<div class="takeaway">One product story, followed by concrete examples of our own teams using it.</div>
+<div class="links"><a href="resources.html">Story 1: what we deploy and how it is hardened</a><a href="triage.html">Story 2: Triage demo</a><a href="sdlc.html">Story 2: SDLC demo</a></div><details><summary>More Story 1 detail</summary><p><a href="journey.html#compare">Journey demo</a> · <a href="tomorrow.html">Desired state</a> · <a href="presentation.html">Exact YAML explorer</a></p></details>
+<p class="foot">These are offline explanation sheets. Current-demo claims refer to inspected source and dated lab receipts. Planned controls and customer scenarios are labelled separately. No cluster or provider call runs from this page.</p>
+</section>
+
+<section class="sheet" id="lifecycle" aria-labelledby="lifecycle-title">
+<p class="eyebrow">Story 1 · Build, deploy, and consume · 02 / 08</p>
+<h2 id="lifecycle-title">A small request becomes an agent API.</h2>
+<p class="lead">KRO, the Kube Resource Orchestrator, assembles the resources. Native kagent runs the agent. The platform owns credentials and the security configuration.</p>
+<div class="flow" aria-label="Agent lifecycle"><div class="step"><strong>1. Define</strong>Drop in frontend YAML or choose a prompt, skills and tools.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>2. Deliver</strong>Review the YAML through the team's GitOps process.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>3. Assemble</strong>KRO creates the Agent, identities, policies, routes, and verification Job.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>4. Verify</strong>Golden tests the model path before KRO creates the caller route.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>5. Receive your API</strong>The dashboard returns the protected endpoint and its allowed caller contract.</div></div>
+<div class="grid"><article class="panel"><h3>What the team supplies</h3><p>The classic request has four spec fields. Catalog choices resolve to reviewed native configuration and explicit tool names.</p><pre>apiVersion: demo.kagent.dev/v1alpha1
+kind: ClassicSecureAgent
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  modelConfig: approved-model
+  systemPrompt: Reply accurately and concisely. Use only the approved tools when asked.
+  skills: []
+  tools: []</pre></article><article class="panel"><h3>What the team receives</h3><ul><li>A native Agent and generated runtime Service in its allocated namespace.</li><li>A protected invocation route and an AgentCard describing the A2A interface.</li><li>Approved model and tool bindings, with platform-owned credentials.</li><li>A versioned definition and verification evidence that operators can inspect.</li></ul><h3 style="margin-top:20px">The API returned to the user</h3><pre>http://{{GATEWAY_SERVICE_DNS}}:8080/classic/classic-agents/demo/invoke</pre><p class="small">Current JWT subject <code>system:serviceaccount:classic-agents:demo-caller</code>, audience <code>secure-agent-classic</code>. The trusted issuer supplies the token at runtime.</p><p><a href="presentation.html#configure">Try the mock IDP: YAML or form → Send → API handoff</a></p></article></div>
+<div class="takeaway">An application can add a VirtualService or another API layer where needed. It must preserve the authenticated Gateway path and caller permissions.</div>
+<p class="small">The checked lab supports one bounded <code>classic-agents/demo</code> slot. The mock IDP is a local simulation. Location and custom IAM / Entra identity are planned request metadata; today's graph does not apply them. Repeated team onboarding and arbitrary namespace provisioning remain the product direction.</p>
+<div class="links"><a href="resources.html">See what we deploy and why</a><a href="journey.html#lifecycle">See how we deploy, use, update, and remove an agent</a></div>
+<p class="foot"><a href="examples/agent.yaml">Customer YAML</a><a href="demo/yaml/model/resourcegraphdefinition.yaml">KRO graph</a><a href="DEMO-WALKTHROUGH.md">API demonstration steps</a><a href="README.md">Current contract and runtime</a></p>
+</section>
+
+<section class="sheet" id="today" aria-labelledby="today-title">
+<p class="eyebrow">Story 1 · Current security composition · 03 / 08</p>
+<h2 id="today-title">Routes select the agent. JWT policy admits the caller.</h2>
+<p class="lead">The current classic demo uses Kubernetes service-account JWTs, separate verifier and caller identities, and protected Agent Gateway routes.</p>
+<div class="flow" aria-label="Current authenticated request"><div class="step"><strong>Caller identity</strong>Short-lived JWT with the expected issuer, audience, and subject.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>Gateway listener</strong>Platform chooses which namespaces can attach routes.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>HTTPRoute + policy</strong>Match the invocation path. Require a valid JWT and the exact permitted caller.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>Agent Service</strong>Forward the accepted request to the native A2A endpoint.</div></div>
+<div class="grid three"><article class="panel"><h3>HTTPRoute</h3><p>Selects the path and backend. Attached JWT validation checks the token. Authorization checks the permitted identity.</p><p>The caller route is created only after Golden succeeds. A completed verification Job is a dated check, not a continuous revocation service.</p></article><article class="panel"><h3>ReferenceGrant</h3><p>The backend owner permits a specified route namespace to reference its Service across namespaces.</p><p><strong>The current classic layout needs no grant</strong> because its route and backend share a namespace. Shared layouts may need one. Gateway attachment uses <code>allowedRoutes</code>.</p><p>A grant does not authenticate a request.</p></article><article class="panel"><h3>Controls underneath</h3><p>Separate ServiceAccounts, narrow RBAC, restricted runtime settings, approved tools, and NetworkPolicy intent constrain the workload.</p><p>Customers manage the request, while the platform owns child policies and credentials. Direct-Service and controller bypass tests must be verified on the receiving cluster.</p></article></div>
+<div class="takeaway">Recorded on 4 November: model and caller PONG passed. Missing caller JWT returned 401. A verifier identity on the caller route returned 403.</div>
+<details><summary>Inspect the current route, JWT policy, and conditional grant YAML</summary><p><a href="demo/yaml/catalog/14-callerRoute.yaml">Exact caller HTTPRoute template</a> · <a href="demo/yaml/catalog/08-callerPolicy.yaml">Exact JWT and authorization template</a> · <a href="demo/yaml/referenceGrant.yaml">ReferenceGrant example</a></p><p>Use the clickable YAML explorer for the complete graph and resource notes.</p><h3>Caller HTTPRoute template</h3><pre># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ${schema.metadata.name}-invoke
+  namespace: ${schema.metadata.namespace}
+  annotations:
+    classic.kagent.dev/policy: ${callerPolicy.metadata.name}
+    classic.kagent.dev/verified-job: ${golden.metadata.name}
+spec:
+  parentRefs:
+  - name: classic-demo
+    namespace: classic-agents
+    sectionName: caller
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /classic/classic-agents/${schema.metadata.name}/invoke
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplaceFullPath
+          replaceFullPath: /
+    backendRefs:
+    - name: ${agent.metadata.name}
+      namespace: ${agent.metadata.namespace}
+      port: 8080
+</pre><h3>Strict JWT validation and caller authorization</h3><pre># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: ${schema.metadata.name}-invoke
+  namespace: ${schema.metadata.namespace}
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: ${schema.metadata.name}-invoke
+  traffic:
+    jwtAuthentication:
+      mode: Strict
+      preserveToken: false
+      providers:
+      - issuer: &#x27;{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}&#x27;
+        audiences:
+        - secure-agent-classic
+        jwks:
+          inline: &#x27;{{KUBERNETES_JWKS_JSON}}&#x27;
+    authorization:
+      action: Require
+      policy:
+        matchExpressions:
+        - jwt.sub == &quot;system:serviceaccount:classic-agents:${schema.metadata.name}-caller&quot;
+</pre><h3>Conditional cross-namespace ReferenceGrant example</h3><pre># Reference example only. Read its explanation before using it.
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-reviewed-route-to-demo
+  namespace: classic-agents
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: &#x27;{{APPROVED_ROUTE_NAMESPACE}}&#x27;
+  to:
+  - group: &#x27;&#x27;
+    kind: Service
+    name: demo
+</pre></details>
+<p class="foot"><a href="presentation.html">Clickable YAML explorer</a><a href="evidence/live-classic-0.10.4-2026-11-04.json">Dated classic lab receipt</a><a href="MONDAY-COMPONENTS-AND-POLICIES.md">Control inventory</a>Current demo uses the versions in the dated receipt and lock file. MCP calls, network denial, and dashboards need separate evidence.</p>
+</section>
+
+<section class="sheet" id="entra" aria-labelledby="entra-title">
+<p class="eyebrow">Story 1 · Next identity integration · 04 / 08</p>
+<h2 id="entra-title">Entra adds organisational identity at each boundary.</h2>
+<p class="lead">Planned for this composition. Entra still issues tokens that the Gateway must validate and authorize. A user's permission to invoke an agent does not grant that agent access to a backend.</p>
+<div class="grid"><article class="panel red"><span class="tag planned">Planned · Incoming caller</span><h3>Person or application → agent</h3><div class="path">Entra token → Gateway validation → invocation role → approved agent</div><ul><li>Register the protected API and define its intended audience.</li><li>Validate the approved issuer, signature, audience, and expiry.</li><li>Authorize the intended user or application using the agreed claims and roles.</li><li>Keep verifier and caller identity contracts separate.</li></ul></article><article class="panel red"><span class="tag planned">Planned · Outgoing workload</span><h3>Agent or Gateway → MCP and model</h3><div class="path">ServiceAccount → federation → UAMI → resource-scoped access token</div><ul><li>Bind the workload to its approved managed identity.</li><li>Acquire a token for the destination's audience where that backend supports Entra.</li><li>Grant only the required model or tool operations at the destination.</li><li>Use a separate, reviewed delegated flow if acting on behalf of the user is required.</li></ul></article></div>
+<div class="takeaway">Caller authentication, agent invocation permission, and backend permission are three separate checks.</div>
+<div class="grid"><div><h3>What continues to apply</h3><p>HTTPRoutes, conditional ReferenceGrants, NetworkPolicies, explicit tool lists, namespace RBAC, and versioned definitions still constrain access.</p></div><div><h3>What proves the next iteration</h3><p>One allowed caller and tool read, plus denials for wrong audience, expired token, unauthorized role, another agent's tools, and an unapproved operation. Check token renewal and the defined revocation behaviour.</p></div></div>
+<p class="foot"><a href="NEXT-STEPS.md">Entra and UAMI acceptance plan</a><a href="references/work-agent-bundles/kagent-agentgateway-tenant-isolation/profiles/aks-entra/README.md">Existing Entra reference overlay</a>Federation reference: <a href="https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation">https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation</a></p>
+</section>
+
+<section class="sheet" id="gateway" aria-labelledby="gateway-title">
+<p class="eyebrow">Story 1 · Models, tools, cost, and visibility · 05 / 08</p>
+<h2 id="gateway-title">One governed connection to models and tools.</h2>
+<p class="lead">Agent Gateway is the shared policy and routing point. The model garden defines approved model choices. MCP adapters expose bounded operations on systems and data.</p>
+<div class="flow" aria-label="Gateway topology"><div class="step"><strong>Application</strong>Calls the permitted agent API.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>Native agent</strong>Uses its approved model and explicit tool list.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>Agent Gateway</strong>Routes, authorizes, limits, and records supported traffic.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>Two backend families</strong>Model garden and provider APIs.<br>MCP tools and their protected resources.</div></div>
+<div class="grid three"><article class="panel"><h3>Authenticate both families</h3><p><strong>Models.</strong> Authorize the calling workload for an approved model. The Gateway uses the provider's required credential, such as a managed identity or a platform-held API key.</p><p><strong>MCP tools.</strong> Authenticate the agent at the tool boundary, allow named operations, and retain the adapter's own resource permissions. Backend credentials remain platform-owned.</p><p>Use OAuth or Entra where supported. Never forward a caller token to a destination with a different audience.</p></article><article class="panel"><h3>Control token use and cost</h3><ol><li>Allow approved models and tool names. Keep prompts and tool responses bounded.</li><li>Set output-token limits, request limits, concurrency, and deadlines.</li><li>Apply team or identity token budgets. Global limits need shared accounting.</li><li>Bound retries and specialist turns. Escalate only admitted incident evidence.</li><li>Attribute actual input and output usage to team, agent, and model.</li></ol><p class="small">Usage-based token limits can account after completion. Pair them with generation limits. A token quota alone is not an exact currency cap.</p></article><article class="panel"><h3>Observe the complete request</h3><p>Carry task, session, and available trace IDs through the agent, Gateway, model, and MCP call.</p><ul><li><strong>Metrics.</strong> Volume, input/output tokens, latency, errors, policy denials, and budget rejections.</li><li><strong>Logs.</strong> Route and selected model, caller attribution, tool outcome, and policy decision. Redact credentials and sensitive content.</li><li><strong>Traces.</strong> Correlate the hops through OTel and the existing LGTM collectors and backends.</li></ul></article></div>
+<div class="takeaway">Show a real request beside its policy result, tool receipt, token counters, and trace. The operator can then explain both the answer and its cost.</div>
+<p class="small">This is the shared-platform integration design. The checked SDLC rig sends models through Gateway and calls GitLab MCP directly. Gateway-mediated MCP authentication and telemetry remain a separate integration to prove. The classic PONG receipt proves neither cost controls nor an end-to-end trace.</p>
+<p class="foot"><a href="MONDAY-COMPONENTS-AND-POLICIES.md">Available controls and proof boundaries</a><a href="NEXT-STEPS.md">Telemetry acceptance checks</a>Token accounting: <a href="https://agentgateway.dev/docs/kubernetes/latest/documentation/llm/rate-limit/">https://agentgateway.dev/docs/kubernetes/latest/documentation/llm/rate-limit/</a></p>
+</section>
+
+<section class="sheet" id="observability" aria-labelledby="observability-title">
+<p class="eyebrow">Story 2 · We consume DICE for cluster reliability · 06 / 08</p>
+<h2 id="observability-title">Three short iterations. Each builds on the last.</h2>
+<p class="lead">We started with LGTM observability, added evidence-first triage, then moved incident admission closer to the application.</p>
+<div class="timeline"><div class="era">01</div><div><h3>Collect and inspect with LGTM</h3><p class="path">Application and Kubernetes signals → Alloy → LGTM → SRE dashboards and alerts</p><p>Alloy collects logs and events at source. Loki holds logs, Mimir holds metrics, Tempo holds traces where wired, and Grafana presents the evidence. SREs investigate the signals and decide what to do.</p></div></div>
+<div class="timeline"><div class="era">02</div><div><h3>Add source-level health triage</h3><p class="path">Alloy → Vector → Kafka → Argo → read-only kagent → GitLab issue</p><p>Our health-triage capability gathers source evidence and sends bounded candidates through Kafka. The management-side agent investigates and creates an evidence-backed work item. LGTM continues to serve operators. Collection and transport do not require an LLM on every log line.</p></div></div>
+<div class="timeline"><div class="era">03</div><div><h3>Admit important incidents beside the application</h3><p class="path">Application evidence → bounded model classifier → durable threshold gate → kagent specialist</p><p>An application-owned integration selects evidence. A classifier assesses the candidate; a durable gate checks the criticality and confidence threshold before dispatch. The specialist can prepare a remediation MR. Human approval and the controlled delivery path precede execution and recovery checks.</p></div></div>
+<div class="takeaway">Use observability to see the problem, triage to explain it, and governed remediation to resolve an approved change.</div>
+<details><summary>Source distinctions for review</summary><p>The application specialist runs alongside the application, not inside its binary. The inspected classifier uses Kimi with a 0.95 admission threshold; the hourly top-N selector is deterministic. “GEF” remains an unconfirmed name, so these sheets use “model classifier.” These are successive patterns, not a claim that every component is one live deployment.</p></details>
+<div class="links"><a href="triage.html">Play the detailed triage and recovery demo</a></div>
+<p class="foot"><a href="references/observability/README.md">LGTM and Alloy sources</a><a href="references/work-agent-bundles/evidence-first-worker-triage/README.md">Original Kafka evidence path</a><a href="references/work-agent-bundles/kyverno-application-specialist/live/CLASSIFIER.md">Classifier and admission limits</a><a href="references/work-agent-bundles/kyverno-application-specialist/live/DASHBOARD-FLOW.md">Approval and recovery flow</a></p>
+</section>
+
+<section class="sheet" id="sdlc" aria-labelledby="sdlc-title">
+<p class="eyebrow">Story 2 · We consume DICE for software delivery · 07 / 08</p>
+<h2 id="sdlc-title">A labelled Kanban ticket becomes reviewable work.</h2>
+<p class="lead">A team assigns work to the agent workflow through its GitLab board. Specialist agents plan, build, test, and review within the task's permitted scope.</p>
+<div class="flow" aria-label="GitLab delivery flow"><div class="step"><strong>1. Select a ticket</strong>Acceptance criteria and approved agent labels.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>2. Ingest</strong>A listener or board poller admits eligible work.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>3. Delegate</strong>PM coordinates builder, tester, and reviewer agents.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>4. Verify</strong>Read back commits, CI, draft MR, and review on the current head.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>5. Human merge</strong>A person reviews and accepts the delivery.</div></div>
+<div class="grid"><article class="panel"><span class="tag">Inspected implementation</span><h3>The GitLab board is the work queue.</h3><p>The reference rig polls every two minutes for <code>sdlc-rig-poc</code> and <code>agent:plan</code>. It advances one checkpoint per run and uses a shared writer Lease.</p><p>Failed CI routes work to <code>agent:changes</code>. Three unsuccessful stage attempts route it to <code>agent:blocked</code>.</p><p>“Listener” describes the product entry point. The source-grounded rig here is a poller, rather than a claimed webhook execution.</p></article><article class="panel"><h3>Permissions follow the role.</h3><p>GitLab MCP exposes named issue, branch, file, pipeline, draft-MR, and review-note operations. The agents receive no merge, delete, project-settings, or arbitrary GitLab API tool.</p><p>Model requests use Agent Gateway. GitLab remains the source of truth for artifacts and state. An agent saying “done” does not advance the workflow without the corresponding artifacts.</p><p>The same pattern can accept a bounded engineering task raised during SRE triage.</p></article></div>
+<div class="takeaway">Teams use their existing board to assign bounded work. They receive a tested draft MR and evidence to support a human decision.</div>
+<div class="links"><a href="sdlc.html">Play the specialist-role and checkpoint demo</a></div>
+<p class="foot"><a href="references/work-agent-bundles/kind-kagent-sdlc-rig/README.md">Board labels, poller, permissions, and historical run references</a><a href="references/work-agent-bundles/health-triage-sdlc-handoff/README.md">Triage-to-delivery handoff</a>This sheet describes the reference rig and product workflow, not a new GitLab run.</p>
+</section>
+
+<section class="sheet" id="lens" aria-labelledby="lens-title">
+<p class="eyebrow">Story 2 · We consume DICE through one SRE conversation · 08 / 08</p>
+<h2 id="lens-title">SRE Lens asks the right specialists.</h2>
+<p class="lead">An SRE talks to one orchestration agent. It chooses the permitted specialist agents, gathers evidence through their MCP tools, and returns one cited answer.</p>
+<div class="flow" aria-label="SRE Lens orchestration"><div class="step"><strong>SRE or application</strong>“What explains the errors in this workload, and is there related work?”</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>SRE Lens agent</strong>Route by the question. Delegate only to permitted specialists.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>Specialist agents</strong>GitLab, Kubernetes, and data specialists use their scoped MCP operations.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><strong>One response</strong>Combine observations, evidence links, uncertainty, and the proposed next action.</div></div>
+<div class="grid three"><article class="panel"><h3>GitLab MCP</h3><p>Find related tickets, changes, MRs, and pipeline status. Link the operational question to engineering work.</p></article><article class="panel"><h3>Kubernetes MCP</h3><p>Read the permitted namespace and workload state, events, and configuration to corroborate the incident.</p></article><article class="panel"><h3>Data MCP</h3><p>Read approved, bounded database or data-service results. Existing catalog material names Denodo; PostgreSQL has a separate typed, read-only adapter.</p><p class="small">The “Node.js MCP” name in the brief awaits confirmation. Runtime language alone does not identify the data backend.</p></article></div>
+<div class="takeaway">SRE Lens is also an API consumer of DICE. The same agent API can be embedded in another application or operational workflow.</div>
+<div class="grid"><div><h3>What to demonstrate</h3><p>Ask one cross-system question. Show which specialists were selected, their actual delegation and tool receipts, and the final cited answer.</p></div><div><h3>What remains distinct</h3><p>Permission to speak to the orchestrator does not grant every specialist's tools. Each delegation and backend operation retains its own authorization boundary.</p></div></div>
+<details><summary>Review the scope before publication</summary><p>The previous Lens deck describes the intended customer experience and a sample orchestrator. It does not install every integration. Confirm the receiving system's specialist inventory, third adapter name, and routing receipts before presenting the full topology as live.</p><p>Recommended live walkthrough: one agent request, one allowed invocation, one denied invocation, one approved tool read, and its trace and usage record. Then show one incident and one delivery task through that same product.</p></details>
+<div class="links"><a href="references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/06-sre-lens.html">Open the earlier SRE Lens demo</a><a href="references/docs/demos/microsoft-2026-10-15/EVIDENCE.md">Read the earlier claim and evidence map</a><a href="#platform">Return to the two stories</a></div>
+<p class="foot">Review draft for David. Confirm the two component names and current workplace integration status before GitHub publication. Existing demos and dated evidence remain accessible throughout the sheets.</p>
+</section>
+</main>
+</body>
+</html>

@@ -11,32 +11,46 @@
 @media(max-width:880px){.grid,.inspector{grid-template-columns:1fr}.flow{grid-template-columns:repeat(3,1fr)}.resource-list{max-height:220px;display:grid;grid-template-columns:1fr 1fr}.proof-grid{grid-template-columns:1fr 1fr}.future{grid-template-columns:1fr}header{padding:12px 20px}nav{gap:12px}.section-head{display:block}.code{font-size:12px}}
 @media(max-width:480px){main{padding:20px 16px 40px}header strong{font-size:13px}nav a{font-size:12px}nav{gap:8px}h2{font-size:29px}.card{padding:16px}.flow{grid-template-columns:1fr 1fr}.resource-list{grid-template-columns:1fr}.proof-grid div{padding:14px}.proof-grid b{font-size:27px}.buttons button{flex:1 1 140px}section{padding:32px 0}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}@media print{header,button,.resource-list{display:none}.grid,.inspector{display:block}.code{white-space:pre-wrap;max-height:none}.card{break-inside:avoid}body{background:white}}
+
+[hidden]{display:none!important}.onboarding-note{border-left:3px solid var(--green);padding:10px 14px;background:var(--soft)}.import-box{padding:16px;border:2px dashed var(--line);border-radius:6px;margin-top:12px}.import-box.dragging{border-color:var(--green);background:var(--soft)}.import-box textarea{min-height:180px;font:12px/1.5 var(--mono)}.import-box input[type=file]{max-width:100%;margin:10px 0}.handoff{border:2px solid var(--green);background:var(--paper);padding:24px;border-radius:8px;margin-top:24px;scroll-margin-top:100px}.handoff code,.handoff dd{overflow-wrap:anywhere}.endpoint{display:block;padding:15px;background:var(--soft);font:14px/1.6 var(--mono);overflow-wrap:anywhere;user-select:all}.identity-contract{display:grid;grid-template-columns:100px minmax(0,1fr);gap:7px 14px;font-size:14px}.identity-contract dt{font-weight:600}.identity-contract dd{margin:0}.handoff .grid{margin-top:18px}.handoff .card{padding:16px}.sim-status{font-weight:600;color:var(--green)}.import-error{color:#9d3021}.form-actions{margin-top:20px}.planned-fields{margin-top:14px}.planned-fields label{font-weight:500}#importStatus{margin:10px 0 0}.flow button{overflow-wrap:anywhere}.code.customer{white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:600px){header{flex-direction:column;align-items:flex-start;gap:8px}nav{flex-wrap:wrap;gap:8px 16px}.handoff{padding:16px}.identity-contract{grid-template-columns:1fr;gap:4px}.identity-contract dd{margin-bottom:8px}.endpoint{font-size:12px}.section-head{display:block}}
+@media print{.import-box,.form-actions,.planned-fields{display:none}.handoff{break-inside:avoid}.endpoint{white-space:pre-wrap}.flow{grid-template-columns:repeat(3,1fr)}}
+</style>
+<style id="dice-bundle-theme">
+:root{--surface:#ffffff;--backdrop:#f2f2f2;--text:#141414;--body-text:#383838;--muted:#626262;--border:#dedede;--panel:#f6f6f6;--accent:#e60000;--link:#c90000;--link-tint:#fff0f0;--positive:#141414;--positive-tint:#f0f0f0;--reference:#626262;--reference-tint:#f3f3f3;--font:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;--code-font:ui-monospace,Consolas,monospace;--ink:#141414;--paper:#f6f6f6;--red:#e60000;--line:#dedede;--blue:#c90000;--amber:#555555;--bg:#ffffff;--green:#c90000;--soft:#fff0f0;--purple:#c90000;--mono:ui-monospace,Consolas,monospace}
+body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif}h1,h2,h3{font-family:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif}a{color:var(--link);text-underline-offset:3px}button:focus-visible,a:focus-visible,summary:focus-visible{outline-color:#e60000}.sheet,.panel,.summary-sheet,.hardening-card,.simple-flow div,.card,.step{border-radius:12px}.sheet,.summary-sheet{background:#ffffff}.panel,.hardening-card,.step{background:#f6f6f6}.takeaway,.notice,.review{background:#fff0f0;border-left-color:#e60000}.code{background:#141414;color:#ffffff}pre,code{font-family:ui-monospace,Consolas,monospace}.bundle-home{display:block;padding:10px 4vw;font-size:13px;background:white;border-bottom:1px solid #dedede}.reference-banner{font-size:13px;padding:12px 4vw;background:#f6f6f6;border-bottom:1px solid #dedede}.reference-banner a{margin-right:18px}@media print{.bundle-home,.reference-banner{display:none!important}}
+
+.takeaway{background:#eef7ef;border-left-color:#9bc8a2;color:#1c3525}.takeaway strong{color:#356a43}
+
 </style>
 </head>
 <body>
-<header><strong>Secure agent / KRO</strong><nav aria-label="Presentation"><a href="#configure">Configure</a><a href="#deploy">Deploy</a><a href="#inspect">Inspect</a><a href="#prove">Prove</a></nav></header>
+<header><strong>Secure agent / KRO</strong><nav aria-label="Presentation"><a href="START-HERE.html">Demo home</a><a href="#configure">Configure</a><a href="#deploy">Deploy</a><a href="#handoff">API handoff</a><a href="#inspect">Inspect</a><a href="#prove">Prove</a></nav></header>
 <main>
-<div class="eyebrow">One customer file. Platform-owned security.</div>
+<div class="eyebrow">DICE mock IDP · offline simulation</div>
 <h1>One YAML.<br>A <em>protected</em> agent.</h1>
-<p class="intro">Choose an approved model, describe the job and select skills and tools. KRO creates the native kagent Agent and its security resources. Golden tests the model before the customer route opens.</p>
+<p class="intro">Bring a small YAML or fill in the form. The platform assembles the agent and its security controls, then returns its protected API. Try the complete handoff below.</p><p class="onboarding-note">Synthetic demonstration. Send illustrates the cluster process locally. This page makes no cluster or model requests.</p>
 <div class="chips"><span class="chip">kagent 0.10.4</span><span class="chip">KRO 0.9.4</span><span class="chip">agentgateway 1.7.0</span><span class="chip">No Substrate runtime</span></div>
 <section id="configure">
-<div class="section-head"><div><div class="eyebrow">01 / Customer intent</div><h2>This is the file you apply.</h2></div><p>The platform installs the RGD, approved backend catalog and Gateway baseline once. This form exports only the customer instance. Catalog tool and skill entries are receiving-platform examples, not a live inventory.</p></div>
+<div class="section-head"><div><div class="eyebrow">01 / Customer intent</div><h2>Tell us what your agent needs.</h2></div><p>The platform installs the RGD, approved backend catalog and Gateway baseline once. This form exports the current customer instance. Send demonstrates the proposed dashboard experience. Catalog choices are examples, not a live inventory.</p></div>
 <div class="grid"><div class="card">
 <label class="field">Example scenario<select id="scenario"></select></label>
 <label class="field">Approved model config<select id="model"></select></label>
 <label class="field" for="prompt">System prompt<textarea id="prompt" maxlength="4096" placeholder="Please put your system prompt here. Describe the agent's task, scope and limits."></textarea></label>
 <fieldset><legend>Available skill catalog</legend><div id="skills"></div></fieldset>
 <fieldset><legend>Available read-only tool catalog</legend><div id="tools"></div></fieldset>
-<p class="note">Give <code>skills/secure-agent-request-builder/SKILL.md</code> and the resolved catalog to your assistant. Describe the agent in normal language and ask it to fill the template.</p>
+<details class="planned-fields"><summary>Request a location or caller identity</summary><p class="note">Planned onboarding options. These identifiers are request metadata, outside today's ClassicSecureAgent schema. They do not change placement or permissions in this demo. Do not enter a JWT or secret.</p><label class="field" for="requestedLocation">Requested location<input id="requestedLocation" type="text" maxlength="160" placeholder="{{APPROVED_CLUSTER}} / {{APPROVED_NAMESPACE}}"></label><label class="field" for="requestedIdentity">Requested IAM / Entra caller identity<input id="requestedIdentity" type="text" maxlength="200" placeholder="{{CALLER_IDENTITY_REFERENCE}}"></label></details>
 <div class="notice" id="profileNotice"></div>
-</div><div class="card"><div class="code-top"><span id="customerPath">Customer YAML</span><span id="characterCount"></span></div><pre class="code customer" id="customerYaml" tabindex="0"></pre><div class="buttons"><button class="primary" id="copyYaml">Copy customer YAML</button><button id="downloadYaml">Download customer YAML</button></div><p id="announcement" role="status" aria-live="polite"></p><details><summary>See the starter template</summary><pre class="code template-view" id="starterTemplate" tabindex="0"></pre></details></div></div>
+<details id="yamlImport"><summary>Drop or paste customer YAML</summary><div class="import-box" id="dropZone"><label class="field" for="yamlPaste">Customer YAML<textarea id="yamlPaste" spellcheck="false" placeholder="Paste the YAML exported by this form, or drop its .yaml file here."></textarea></label><label for="yamlFile">Choose a YAML file</label><input id="yamlFile" type="file" accept=".yaml,.yml,text/yaml,application/yaml"><p class="note">Supports this form's four-field manifest, literal prompt blocks, lists and comments. One document, up to 32 KiB. Other YAML syntax is rejected.</p><div class="buttons"><button id="loadYaml" type="button">Load YAML into form</button><button id="clearImport" type="button">Clear imported text</button></div><p id="importStatus" role="status" aria-live="polite"></p></div></details>
+</div><div class="card"><div class="code-top"><span id="customerPath">Customer YAML</span><span id="characterCount"></span></div><pre class="code customer" id="customerYaml" tabindex="0"></pre><div class="buttons"><button class="primary" id="copyYaml">Copy customer YAML</button><button id="downloadYaml">Download customer YAML</button></div><p id="announcement" role="status" aria-live="polite"></p><div class="form-actions"><button class="primary" id="sendSimulation" type="button">Send simulation</button><p class="note">Submit the form values shown above. The current slot is <code>classic-agents/demo</code>.</p></div><details><summary>See the starter template</summary><pre class="code template-view" id="starterTemplate" tabindex="0"></pre></details></div></div>
 </section>
 <section id="deploy">
-<div class="section-head"><div><div class="eyebrow">02 / Platform reconciliation</div><h2>KRO builds the boundary.</h2></div><p>Security exists before customer access opens. The native Agent creates a normal Deployment and Service. Golden has a separate identity and listener; its successful Job unlocks the caller route.</p></div>
-<svg class="arch" viewBox="0 0 1120 135" role="img" aria-label="Customer YAML enters KRO, which creates an Agent and security resources; Golden passes before the caller route opens"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#626b65"/></marker></defs><g fill="#fff" stroke="#dcded6"><rect x="5" y="25" width="190" height="75" rx="7"/><rect x="245" y="25" width="180" height="75" rx="7"/><rect x="475" y="5" width="220" height="115" rx="7"/><rect x="745" y="25" width="160" height="75" rx="7"/><rect x="955" y="25" width="160" height="75" rx="7"/></g><g stroke="#626b65" marker-end="url(#arrow)"><path d="M195 63H238"/><path d="M425 63H468"/><path d="M695 63H738"/><path d="M905 63H948"/></g><g font-family="system-ui" text-anchor="middle" fill="#202623" font-size="18"><text x="100" y="68">Customer YAML</text><text x="335" y="68">KRO / RGD</text><text x="585" y="42">Native Agent</text><text x="585" y="74">JWT + network policies</text><text x="585" y="102" font-size="14">Verifier routes first</text><text x="825" y="58">Golden</text><text x="825" y="80" font-size="14">Actual model PONG</text><text x="1035" y="58">Caller route</text><text x="1035" y="80" font-size="14">JWT required</text></g></svg>
-<div class="buttons"><button id="play">Play deployment illustration</button><button id="reset">Reset illustration</button></div><p class="note" id="playStatus" aria-live="polite">Illustration only. This page never deploys resources or reads cluster status.</p>
+<div class="section-head"><div><div class="eyebrow">02 / Platform reconciliation</div><h2>We build it. You receive an API.</h2></div><p>Security exists before customer access opens. The native Agent creates a normal Deployment and Service. Golden has a separate identity and listener; its successful Job unlocks the caller route.</p></div>
+<svg class="arch" viewBox="0 0 1120 135" role="img" aria-label="Customer YAML enters KRO, which creates an Agent and security resources; Golden passes before the caller route opens"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#626b65"/></marker></defs><g fill="#fff" stroke="#dcded6"><rect x="5" y="25" width="190" height="75" rx="7"/><rect x="245" y="25" width="180" height="75" rx="7"/><rect x="475" y="5" width="220" height="115" rx="7"/><rect x="745" y="25" width="160" height="75" rx="7"/><rect x="955" y="25" width="160" height="75" rx="7"/></g><g stroke="#626b65" marker-end="url(#arrow)"><path d="M195 63H238"/><path d="M425 63H468"/><path d="M695 63H738"/><path d="M905 63H948"/></g><g font-family="system-ui" text-anchor="middle" fill="#202623" font-size="18"><text x="100" y="68">Customer YAML</text><text x="335" y="68">KRO / RGD</text><text x="585" y="42">Native Agent</text><text x="585" y="74">JWT + network policies</text><text x="585" y="102" font-size="14">Verifier routes first</text><text x="825" y="58">Golden</text><text x="825" y="80" font-size="14">Simulated checks</text><text x="1035" y="58">Caller route</text><text x="1035" y="80" font-size="14">JWT required</text></g></svg>
+<div class="buttons"><button id="play">Replay submission simulation</button><button id="reset">Reset illustration</button></div><p class="note" id="playStatus" aria-live="polite">Illustration only. This page never deploys resources or reads cluster status.</p>
 <div class="flow" id="flow"></div>
+<details><summary>Demonstrate a blocked handoff</summary><label class="check"><input id="blockGolden" type="checkbox">Simulate a failed Golden check. Keep the API unavailable.</label></details>
+<section id="handoff" class="handoff" hidden aria-labelledby="handoffTitle"><span class="badge">Synthetic API handoff</span><h3 id="handoffTitle">Your protected API is returned.</h3><p>No resources were deployed. This is the endpoint contract a connected dashboard would return after successful checks.</p><code class="endpoint" id="returnedEndpoint"></code><dl class="identity-contract"><dt>JWT subject</dt><dd id="returnedSubject"></dd><dt>Audience</dt><dd id="returnedAudience"></dd><dt>Issuer</dt><dd id="returnedIssuer"></dd></dl><p class="note">Only a valid JWT for this configured caller is accepted. Other callers are denied. Tokens come from the trusted issuer at runtime; this page collects and returns no token.</p><p class="notice" id="requestedOptions" hidden></p><div class="grid"><article class="card"><h3>Connect your application</h3><p>Same-cluster app → protected Gateway API → agent. Supply a short-lived JWT with the subject and audience above.</p></article><article class="card"><h3>Use a VirtualService</h3><p>Optionally expose your app's route through a VirtualService. Forward to this protected Gateway path and preserve Authorization, or use a separately authorized service identity.</p></article></div><details><summary>Inspect the returned contract</summary><pre class="code" id="handoffContract" tabindex="0"></pre><p class="note">The native Agent Service remains the Gateway backend. Model and MCP authentication remain separate. The current CR status does not publish an endpoint; this card illustrates a future dashboard response.</p></details><p><a href="journey.html#lifecycle">Return to the lifecycle slides</a> · <a href="resources.html">See what we deploy and why</a></p></section>
 <div class="notice">No JWT value is stored in the customer YAML. Golden receives a projected token with a dedicated audience. An authorized operator can mint a short-lived caller token for the terminal demonstration. ReferenceGrants are needed only for reviewed cross-namespace backend references.</div>
 </section>
 <section id="inspect">
@@ -72,23 +86,133 @@ python3 demo.py --context "$DEMO_CONTEXT" show callerRoute</pre></div>
 const data=JSON.parse(document.getElementById('demoData').textContent);
 const byId=id=>document.getElementById(id);
 let currentResource='agent';let generation=0;
+const onboarding={phase:'editing',revision:0,importEpoch:0,importPhase:'empty',request:null,step:0};
 for(const scenario of data.catalog.scenarios){const o=document.createElement('option');o.value=scenario.id;o.textContent=scenario.label;byId('scenario').append(o)}
 for(const model of data.catalog.models){const o=document.createElement('option');o.value=model.id;o.textContent=model.label+' / '+model.id;byId('model').append(o)}
 for(const kind of ['skills','tools'])for(const entry of data.catalog[kind]){const label=document.createElement('label');label.className='check';const input=document.createElement('input');input.type='checkbox';input.value=entry.id;input.dataset.catalog=kind;input.addEventListener('change',update);const span=document.createElement('span');span.textContent=entry.label;span.title=entry.status;label.append(input,span);byId(kind).append(label)}
 const selected=kind=>Array.from(document.querySelectorAll('input[data-catalog="'+kind+'"]:checked'),e=>e.value);
 function ownerYaml(){const prompt=byId('prompt').value.trim();const lines=['apiVersion: demo.kagent.dev/v1alpha1','kind: ClassicSecureAgent','metadata:','  name: demo','  namespace: classic-agents','spec:','  modelConfig: '+JSON.stringify(byId('model').value),'  systemPrompt: |',...prompt.split('\n').map(line=>'    '+line)];for(const key of ['skills','tools']){const values=selected(key);lines.push('  '+key+':'+(values.length?'':' []'));for(const v of values)lines.push('    - '+JSON.stringify(v))}return lines.join('\n')+'\n'}
 function profile(){return selected('skills').length||selected('tools').length?'catalog':'model'}
-function update(){byId('customerYaml').textContent=ownerYaml();const length=byId('prompt').value.trim().length;byId('characterCount').textContent=length+' / 4096';const invalid=!length||length>4096||(profile()==='catalog'&&!selected('skills').length);byId('copyYaml').disabled=invalid;byId('downloadYaml').disabled=invalid;byId('profileNotice').textContent=invalid?'Fill the system prompt. The catalog-enabled graph also requires at least one approved skill.':profile()==='catalog'?'Catalog profile selected. The platform must resolve Git/MCP endpoints, operation names, credentials and egress before applying this instance. Tool and skill execution are separate acceptance tests.':'Model-only profile selected. The checked example uses no skills or tools. It demonstrates native deployment, JWT controls and a Golden model PONG.';showResource(currentResource);updateCommands()}
+function update(){invalidateRun('Request changed. Send the current form to illustrate a new handoff.');byId('customerYaml').textContent=ownerYaml();const length=byId('prompt').value.trim().length;byId('characterCount').textContent=length+' / 4096';const invalid=!length||length>4096||(profile()==='catalog'&&!selected('skills').length);byId('copyYaml').disabled=invalid;byId('downloadYaml').disabled=invalid;byId('sendSimulation').disabled=invalid||['pending','error','reading'].includes(onboarding.importPhase)||!validIdentityReference();byId('profileNotice').textContent=invalid?'Fill the system prompt. The catalog-enabled graph also requires at least one approved skill.':profile()==='catalog'?'Catalog profile selected. The platform must resolve Git/MCP endpoints, operation names, credentials and egress before applying this instance. Tool and skill execution are separate acceptance tests.':'Model-only profile selected. The checked example uses no skills or tools. It demonstrates native deployment, JWT controls and a Golden model PONG.';showResource(currentResource);updateCommands()}
 function chooseScenario(){const s=data.catalog.scenarios.find(s=>s.id===byId('scenario').value);byId('prompt').value=s.owner.spec.systemPrompt;byId('model').value=s.owner.spec.modelConfig;for(const e of document.querySelectorAll('input[data-catalog]'))e.checked=s[e.dataset.catalog].includes(e.value);byId('customerPath').textContent=s.file+' / customer input';update()}
 function updateCommands(){const s=data.catalog.scenarios.find(s=>s.id===byId('scenario').value);const tool=data.catalog.tools.find(t=>selected('tools').includes(t.id));const prompt=tool?tool.prompt:data.catalog.scenarios[0].prompt;byId('applyCommand').textContent='# Direct application of the checked customer file:\nkubectl --context "$DEMO_CONTEXT" apply --validate=strict -f '+s.file+'\n\n# Or use the presenter helper to display and hash it before applying:\npython3 demo.py --context "$DEMO_CONTEXT" apply --file '+s.file+'\n\n# Choose ONE apply command above, then verify:\npython3 demo.py --context "$DEMO_CONTEXT" verify';byId('queryCommand').textContent='python3 demo.py --context "$DEMO_CONTEXT" query --mint-token \\\n  --prompt '+JSON.stringify(prompt)+(tool?'':' --expect PONG');byId('scenarioProof').textContent=s.proof+' Commands above refer to the checked example file. To use edited form values, download your YAML and pass its exact path to --file. Use a fresh approved demo slot; the helper never deletes an existing instance.'}
 for(const r of data.resources){const b=document.createElement('button');b.dataset.resource=r.id;const span=document.createElement('span');span.textContent=r.title;const small=document.createElement('small');small.textContent=r.owner+' / '+r.kind;b.append(span,small);b.addEventListener('click',()=>showResource(r.id));byId('resourceList').append(b)}
 function showResource(id){const r=data.resources.find(r=>r.id===id);currentResource=id;for(const b of byId('resourceList').children)b.classList.toggle('active',b.dataset.resource===id);byId('resourceOwner').textContent=r.owner;byId('resourceTitle').textContent=r.title;byId('resourceExplanation').textContent=r.explanation;byId('resourceOrigin').textContent=r.origin;byId('resourcePath').textContent=r.path.replace('/model/','/'+profile()+'/');byId('resourceYaml').textContent=r.yaml[profile()]}
 async function copy(text){try{await navigator.clipboard.writeText(text);byId('announcement').textContent='Copied.'}catch{const t=document.createElement('textarea');t.value=text;document.body.append(t);t.select();const ok=document.execCommand('copy');t.remove();byId('announcement').textContent=ok?'Copied.':'Clipboard unavailable. Select and copy the YAML text.'}}
 byId('copyYaml').addEventListener('click',()=>copy(ownerYaml()));byId('copyResource').addEventListener('click',()=>copy(byId('resourceYaml').textContent));byId('downloadYaml').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([ownerYaml()],{type:'application/yaml'}));const a=document.createElement('a');a.href=url;a.download='my-secure-agent.yaml';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
-const steps=[['Agent','agent','Native Deployment + Service'],['Network','network','Approved ingress and egress'],['JWT routes','verifierPolicy','Verifier identity and routes'],['Golden config','goldenConfig','Owner UID + fixed endpoints'],['Golden PONG','golden','One model verification'],['Caller route','callerRoute','Opens after Golden succeeds']];
-for(const [i,step]of steps.entries()){const b=document.createElement('button');b.innerHTML='<b>'+String(i+1).padStart(2,'0')+'</b>';const title=document.createElement('span');title.textContent=step[0];const small=document.createElement('small');small.textContent=step[2];b.append(title,small);b.addEventListener('click',()=>{showResource(step[1]);byId('inspect').scrollIntoView()});byId('flow').append(b)}
-function reset(){generation++;for(const b of byId('flow').children)b.classList.remove('played');byId('playStatus').textContent='Illustration only. This page never deploys resources or reads cluster status.'}
-byId('reset').addEventListener('click',reset);byId('play').addEventListener('click',async()=>{reset();const run=generation;for(const [i,b] of Array.from(byId('flow').children).entries()){if(run!==generation)return;b.classList.add('played');byId('playStatus').textContent='Illustrating step '+(i+1)+': '+steps[i][0]+'. No cluster operation is running.';await new Promise(resolve=>setTimeout(resolve,180))}if(run===generation)byId('playStatus').textContent='Illustration complete. Read the dated receipt below or run the terminal commands for fresh proof.'});
+const apiContract={endpoint:'http://{{GATEWAY_SERVICE_DNS}}:8080/classic/classic-agents/demo/invoke',subject:'system:serviceaccount:classic-agents:demo-caller',audience:'secure-agent-classic',issuer:'{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}'};
+const steps=[
+ ['Customer YAML','resourceGraph','Accept the reviewed request'],
+ ['Controller / KRO','agent','Create 14 managed resources'],
+ ['Native kagent','nativeService','Create Deployment and Service'],
+ ['Protect access','callerPolicy','Bind routes, JWT and network rules'],
+ ['Golden checks','golden','Verify before opening the caller route'],
+ ['Return your API','callerRoute','Endpoint and allowed caller contract']
+];
+for(const [i,step]of steps.entries()){
+ const b=document.createElement('button');const number=document.createElement('b');number.textContent=String(i+1).padStart(2,'0');
+ const title=document.createElement('span');title.textContent=step[0];const small=document.createElement('small');small.textContent=step[2];b.append(number,title,small);
+ b.addEventListener('click',()=>{showResource(step[1]);byId('inspect').scrollIntoView()});byId('flow').append(b);
+}
+function validIdentityReference(){return !/(?:bearer\s|eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]+\.|^[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]+)/i.test(byId('requestedIdentity').value.trim());}
+function invalidateRun(message){
+ if(onboarding.importPhase==='reading'){onboarding.importPhase='empty';byId('yamlFile').value='';setImportStatus('The file read was cancelled because the request changed. Choose the file again to import it.');}
+ generation++;onboarding.revision++;onboarding.importEpoch++;onboarding.phase='editing';onboarding.request=null;onboarding.step=0;
+ byId('handoff').hidden=true;byId('handoffContract').textContent='';
+ for(const b of byId('flow').children)b.classList.remove('played');byId('playStatus').textContent=message;
+}
+function validateOwner(owner){
+ const exact=(o,keys,label)=>{if(!o||typeof o!=='object'||Array.isArray(o))throw Error(label+' must be a mapping.');const actual=Object.keys(o);if(actual.length!==keys.length||actual.some(k=>!keys.includes(k)))throw Error(label+' accepts only '+keys.join(', ')+'.');};
+ exact(owner,['apiVersion','kind','metadata','spec'],'Document');exact(owner.metadata,['name','namespace'],'metadata');exact(owner.spec,['modelConfig','systemPrompt','skills','tools'],'spec');
+ if(owner.apiVersion!=='demo.kagent.dev/v1alpha1'||owner.kind!=='ClassicSecureAgent')throw Error('Use a demo.kagent.dev/v1alpha1 ClassicSecureAgent.');
+ if(owner.metadata.name!=='demo'||owner.metadata.namespace!=='classic-agents')throw Error('The current demo slot is classic-agents/demo. Location requests stay separate.');
+ if(!data.catalog.models.some(x=>x.id===owner.spec.modelConfig))throw Error('Select an approved modelConfig.');
+ if(typeof owner.spec.systemPrompt!=='string'||!owner.spec.systemPrompt.trim()||owner.spec.systemPrompt.length>4096||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(owner.spec.systemPrompt))throw Error('The system prompt must contain 1 to 4096 printable characters.');
+ for(const kind of ['skills','tools']){const values=owner.spec[kind];if(!Array.isArray(values)||values.some(v=>typeof v!=='string'||!data.catalog[kind].some(x=>x.id===v))||new Set(values).size!==values.length)throw Error('Use unique approved '+kind+' IDs.');}
+ if((owner.spec.skills.length||owner.spec.tools.length)&&owner.spec.skills.length!==1)throw Error('The catalog profile needs the work-guidance skill.');
+ return owner;
+}
+function readDraft(){
+ const owner=validateOwner({apiVersion:'demo.kagent.dev/v1alpha1',kind:'ClassicSecureAgent',metadata:{name:'demo',namespace:'classic-agents'},spec:{modelConfig:byId('model').value,systemPrompt:byId('prompt').value.trim(),skills:selected('skills'),tools:selected('tools')}});
+ if(!validIdentityReference())throw Error('Use a caller identity reference, not a JWT or bearer token.');
+ return {owner,requestedOnboarding:{location:byId('requestedLocation').value.trim(),callerIdentity:byId('requestedIdentity').value.trim()},blockGolden:byId('blockGolden').checked};
+}
+function parseOwnerYaml(text){
+ if(new TextEncoder().encode(text).length>32768)throw Error('YAML is limited to 32 KiB.');
+ const lines=text.replace(/\r\n?/g,'\n').split('\n');let pos=0;
+ const blank=line=>/^\s*(?:#.*)?$/.test(line);
+ const indent=line=>(line.match(/^ */)||[''])[0].length;
+ const scalar=raw=>{
+  const t=raw.trim();if(t==='[]')return [];
+  if(t.startsWith('"')){const m=t.match(/^("(?:[^"\\]|\\.)*")\s*(?:#.*)?$/);if(!m)throw Error('Unsupported quoted scalar.');return JSON.parse(m[1]);}
+  if(t.startsWith("'")){const m=t.match(/^'((?:[^']|'')*)'\s*(?:#.*)?$/);if(!m)throw Error('Unsupported quoted scalar.');return m[1].replace(/''/g,"'");}
+  const v=t.replace(/\s+#.*$/,'').trim();if(/^(?:null|~|true|false|yes|no|on|off|[-+]?(?:[0-9][0-9_]*(?:\.[0-9_]*)?(?:e[-+]?[0-9]+)?|\.[0-9]+(?:e[-+]?[0-9]+)?|\.inf|\.nan)|0[xob][0-9a-f_]+|[0-9]{4}-[0-9]{2}-[0-9]{2}.*)$/i.test(v))throw Error('Quote typed YAML scalars or use a literal prompt block.');if(!v||/^[!&*|>{\[\]@`]/.test(v)||/\s:[\s]|:\s/.test(v)||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(v))throw Error('Unsupported scalar. Use the format exported by this form.');return v;
+ };
+ function block(level){
+  while(pos<lines.length&&blank(lines[pos]))pos++;
+  if(pos>=lines.length||indent(lines[pos])!==level)throw Error('Unsupported or missing YAML indentation.');
+  const list=lines[pos].slice(level).startsWith('- ');const value=list?[]:Object.create(null);
+  while(pos<lines.length){
+   const line=lines[pos];if(blank(line)){pos++;continue;}const n=indent(line);if(n<level)break;
+   if(n!==level||line.includes('\t'))throw Error('Use two-space indentation and no tabs outside the prompt.');
+   const body=line.slice(level);if(body==='---'||body==='...'||body.startsWith('%'))throw Error('Use one YAML document without directives.');
+   if(list){if(!body.startsWith('- '))throw Error('Unsupported list syntax.');value.push(scalar(body.slice(2)));pos++;continue;}
+   const match=body.match(/^([A-Za-z][A-Za-z0-9]*):(?:\s+(.*))?$/);if(!match)throw Error('Unsupported YAML syntax. Use the exported manifest format.');
+   const key=match[1],raw=match[2]||'';if(Object.prototype.hasOwnProperty.call(value,key))throw Error('Duplicate YAML key '+key+'.');pos++;
+   if(/^\|[-+]?\s*(?:#.*)?$/.test(raw)){
+    const parts=[];while(pos<lines.length){const next=lines[pos];if(next.trim()&&indent(next)<level+2)break;parts.push(next.trim()?next.slice(level+2):'');pos++;}
+    value[key]=parts.join('\n').replace(/\n+$/,'')+(raw.trim().startsWith('|-')?'':'\n');
+   }else if(!raw.trim()||raw.trim().startsWith('#'))value[key]=block(level+2);else value[key]=scalar(raw);
+  }
+  return value;
+ }
+ const result=block(0);while(pos<lines.length&&blank(lines[pos]))pos++;if(pos!==lines.length)throw Error('Unexpected YAML content.');return validateOwner(result);
+}
+function setImportStatus(message,error=false){byId('importStatus').textContent=message;byId('importStatus').classList.toggle('import-error',error);}
+function importOwnerYaml(){
+ invalidateRun('YAML import changed the request.');
+ try{
+  const owner=parseOwnerYaml(byId('yamlPaste').value);byId('model').value=owner.spec.modelConfig;byId('prompt').value=owner.spec.systemPrompt.trim();
+  for(const e of document.querySelectorAll('input[data-catalog]'))e.checked=owner.spec[e.dataset.catalog].includes(e.value);
+  onboarding.importPhase='loaded';byId('customerPath').textContent='Imported customer YAML / form is the current request';update();setImportStatus('Loaded into the form. Send uses the form values above.');
+ }catch(error){onboarding.importPhase='error';update();setImportStatus(error.message+' Your previous form values were kept.',true);}
+}
+function clearImportedText(){onboarding.importPhase='empty';byId('yamlPaste').value='';byId('yamlFile').value='';update();setImportStatus('Imported text cleared. Send uses the form values.');}
+async function readYamlFile(file){
+ if(!file)return;invalidateRun('Reading a local YAML file.');onboarding.importPhase='reading';const epoch=onboarding.importEpoch;byId('sendSimulation').disabled=true;
+ try{if(file.size>32768)throw Error('YAML is limited to 32 KiB.');const text=await file.text();if(epoch!==onboarding.importEpoch)return;byId('yamlPaste').value=text;onboarding.importPhase='pending';update();setImportStatus('File loaded locally. Load YAML into the form before sending.');}
+ catch(error){if(epoch!==onboarding.importEpoch)return;onboarding.importPhase='error';update();setImportStatus(error.message,true);}
+}
+function renderHandoff(request){
+ byId('returnedEndpoint').textContent=apiContract.endpoint;byId('returnedSubject').textContent=apiContract.subject;byId('returnedAudience').textContent=apiContract.audience;byId('returnedIssuer').textContent=apiContract.issuer;
+ const proposed=request.requestedOnboarding;byId('requestedOptions').hidden=!proposed.location&&!proposed.callerIdentity;
+ byId('requestedOptions').textContent='Requested location: '+(proposed.location||'current demo slot')+'. Requested caller: '+(proposed.callerIdentity||'current demo caller')+'. Planned options only. Neither request changes this endpoint or its allowed caller. A connected IDP must verify the requested identity and location before binding access and returning an API.';
+ byId('handoffContract').textContent=JSON.stringify({mode:'synthetic',endpoint:apiContract.endpoint,namespace:request.owner.metadata.namespace,agent:request.owner.metadata.name,authentication:{type:'JWT',subject:apiContract.subject,audience:apiContract.audience,issuer:apiContract.issuer},requestedOnboarding:proposed,requestedOptionsApplied:false},null,2);
+ byId('handoff').hidden=false;
+}
+async function sendSimulation(){
+ if(['pending','error','reading'].includes(onboarding.importPhase)){setImportStatus('Load the YAML into the form or clear it before sending.',true);return;}
+ let request;try{request=readDraft();}catch(error){byId('announcement').textContent=error.message;return;}
+ invalidateRun('Synthetic submission started.');const run=generation;onboarding.phase='running';onboarding.request=JSON.parse(JSON.stringify(request));
+ byId('deploy').scrollIntoView({behavior:'auto'});
+ for(const [i,b]of Array.from(byId('flow').children).entries()){
+  if(run!==generation)return;onboarding.step=i;byId('playStatus').textContent='Synthetic step '+(i+1)+' of '+steps.length+'. '+steps[i][0]+'. No cluster operation is running.';
+  if(i===4&&request.blockGolden){onboarding.phase='blocked';byId('playStatus').textContent='Synthetic Golden failure. Caller access remains closed. No API handoff was returned.';return;}
+  b.classList.add('played');await new Promise(resolve=>setTimeout(resolve,400));
+ }
+ if(run!==generation)return;onboarding.phase='complete';renderHandoff(onboarding.request);byId('playStatus').textContent='Synthetic flow complete. The API contract is returned below. No resources were deployed.';byId('handoff').scrollIntoView({behavior:'auto'});
+}
+byId('sendSimulation').addEventListener('click',sendSimulation);byId('play').addEventListener('click',sendSimulation);
+byId('reset').addEventListener('click',()=>{clearImportedText();invalidateRun('Simulation reset. No API handoff is active.');});
+byId('loadYaml').addEventListener('click',importOwnerYaml);byId('clearImport').addEventListener('click',clearImportedText);
+byId('yamlPaste').addEventListener('input',()=>{onboarding.importPhase=byId('yamlPaste').value.trim()?'pending':'empty';update();setImportStatus(onboarding.importPhase==='pending'?'Load this YAML into the form before sending.':'Send uses the form values.');});
+byId('yamlFile').addEventListener('change',event=>readYamlFile(event.target.files[0]));
+for(const name of ['requestedLocation','requestedIdentity'])byId(name).addEventListener('input',()=>{update();if(!validIdentityReference())byId('announcement').textContent='Use an identity reference, not a JWT or bearer token.';else byId('announcement').textContent='';});
+byId('blockGolden').addEventListener('change',update);
+byId('dropZone').addEventListener('dragover',event=>{event.preventDefault();byId('dropZone').classList.add('dragging');});
+byId('dropZone').addEventListener('dragleave',()=>byId('dropZone').classList.remove('dragging'));
+byId('dropZone').addEventListener('drop',event=>{event.preventDefault();byId('dropZone').classList.remove('dragging');readYamlFile(event.dataTransfer.files[0]);});
+
 byId('scenario').addEventListener('change',chooseScenario);byId('model').addEventListener('change',update);byId('prompt').addEventListener('input',update);byId('starterTemplate').textContent=data.template;byId('receipt').textContent=JSON.stringify(data.evidence.golden,null,2);chooseScenario();
 </script>
 </body></html>

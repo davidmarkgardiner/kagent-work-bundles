@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="How HTTPRoutes, identity, namespace ownership, and backend permissions isolate agents on a shared Kubernetes cluster.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23285645'/%3E%3Cpath d='M9 23l7-15 7 15M12 18h8' fill='none' stroke='%23faf9f5' stroke-width='2'/%3E%3C/svg%3E">
+  <title>How our agents stay isolated</title>
+  <style>
+    :root{--paper:#faf9f5;--ink:#20241f;--muted:#545c53;--line:#d7d9cf;--green:#285645;--green-bg:#edf4ee;--blue:#244d77;--blue-bg:#eef3f9;--rust:#973f2c;--rust-bg:#fbefe9;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;--serif:Georgia,"Times New Roman",serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:var(--blue);text-underline-offset:4px}a:hover{text-decoration-thickness:2px}a:focus-visible,summary:focus-visible{outline:3px solid var(--rust);outline-offset:5px}.skip{position:absolute;left:12px;top:-100px;background:white;padding:12px;z-index:3}.skip:focus{top:12px}.wrap{max-width:1180px;margin:auto;padding:0 32px}.topbar{border-bottom:1px solid var(--line);background:var(--paper)}.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:74px}.brand{font:12px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--green)}nav{display:flex;gap:22px;font-size:13px}nav a{color:var(--muted);text-decoration:none}.hero{padding:64px 0 48px;display:grid;grid-template-columns:1.6fr 1fr;gap:60px;align-items:center}.eyebrow{font:11px/1.5 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin:0 0 20px}.eyebrow:before{content:"";display:inline-block;width:24px;height:2px;margin:0 10px 3px 0;background:var(--green)}h1{font:clamp(42px,5.3vw,66px)/1.05 var(--serif);letter-spacing:-.035em;margin:0 0 24px;max-width:700px}h1 em{font-weight:normal;color:var(--green)}.intro{font-size:18px;color:var(--muted);max-width:640px;margin:0}.mental-model{border-left:2px solid var(--green);padding:6px 0 6px 26px}.mental-model p{margin:0 0 22px}.mental-model p:last-child{margin-bottom:0}.mental-model b{display:block;font:22px/1.2 var(--serif);margin-bottom:7px}.mental-model span{font-size:14px;color:var(--muted)}.status{display:flex;gap:12px;align-items:baseline;border-block:1px solid var(--line);padding:15px 0;font-size:13px;color:var(--muted)}.status strong{color:var(--ink);font-weight:600;white-space:nowrap}.section{padding:52px 0;border-bottom:1px solid var(--line)}.section-head{display:flex;align-items:baseline;gap:20px;margin-bottom:16px}.section-number{font:12px var(--mono);color:var(--green)}h2{font:32px/1.18 var(--serif);letter-spacing:-.02em;margin:0}h3{font-size:17px;line-height:1.3;margin:0 0 12px}.section-lead{max-width:780px;color:var(--muted);margin:0 0 28px}.diagram-shell{background:#fff;border:1px solid var(--line);padding:12px}.diagram-scroll{overflow:auto}.architecture{display:block;width:100%;min-width:850px;height:auto}.architecture text{font-family:system-ui,-apple-system,sans-serif;fill:var(--ink)}.architecture .label{font-size:12px;letter-spacing:.6px;font-weight:600}.architecture .node-title{font-size:16px;font-weight:600}.architecture .small{font-size:12px;fill:var(--muted)}.architecture .tiny{font-size:11px;fill:var(--muted)}.architecture .wire{fill:none;stroke:var(--green);stroke-width:2.5}.architecture .deny-wire{fill:none;stroke:var(--rust);stroke-width:2;stroke-dasharray:6 5}.diagram-caption{font-size:13px;color:var(--muted);margin:14px 6px 3px}.legend{display:flex;flex-wrap:wrap;gap:10px 24px;font-size:12px;margin:0 0 15px;color:var(--muted)}.legend span{display:flex;align-items:center;gap:7px}.dot{width:9px;height:9px;display:inline-block;border-radius:50%;background:var(--blue)}.dot.green{background:var(--green)}.dot.rust{background:var(--rust)}.request-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:30px}.request{border-top:2px solid var(--blue);padding-top:18px}.request:last-child{border-color:var(--green)}.request .kicker{font:11px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 9px}.request p{font-size:14px;margin:0 0 12px}.request ol{padding-left:20px;font-size:14px;margin:0}.request li{margin:5px 0}.callout{border-left:3px solid var(--rust);background:var(--rust-bg);padding:20px 24px;margin:28px 0 0}.callout h3{color:var(--rust)}.callout p{font-size:14px;margin:0}.table-scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;text-align:left;font-size:14px}th{font:11px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:13px 14px;border-bottom:2px solid var(--line)}td{vertical-align:top;padding:18px 14px;border-bottom:1px solid var(--line)}td:first-child{font-weight:600;min-width:170px}td p{margin:0}code{font:12px/1.6 var(--mono);background:#eceee7;padding:2px 5px;border-radius:3px;overflow-wrap:anywhere}.scope-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}.scope-block{padding-top:18px;border-top:2px solid var(--green)}.scope-block:last-child{border-color:var(--blue)}.scope-block p,.scope-block li{font-size:14px}.scope-block ul{padding-left:20px}.outcomes{display:grid;grid-template-columns:1fr 1fr;gap:0 32px}.outcome{padding:20px 0;border-top:1px solid var(--line)}.outcome strong{display:block;font-size:15px;margin-bottom:7px}.outcome p{font-size:14px;margin:0;color:var(--muted)}.verdict{font:11px var(--mono);color:var(--green);display:inline-block;margin-bottom:9px}.verdict.deny{color:var(--rust)}.trust-boundary{display:grid;grid-template-columns:1fr 1.6fr;gap:38px;background:var(--green-bg);padding:30px;margin-top:28px}.trust-boundary h3{font:24px/1.2 var(--serif);color:var(--green)}.trust-boundary p{font-size:14px;margin:0}.footnote{font-size:13px;color:var(--muted);margin:24px 0 0}.sources{padding:38px 0 50px}.sources h2{font:23px var(--serif);margin-bottom:18px}.source-list{list-style:none;padding:0;margin:0}.source-list li{margin:12px 0;font-size:13px}.source-list a{overflow-wrap:anywhere}.source-list small{display:block;color:var(--muted);margin-top:3px}.footer-line{display:flex;justify-content:space-between;gap:18px;border-top:1px solid var(--line);padding-top:20px;margin-top:30px;font:11px var(--mono);color:var(--muted)}
+    @media(max-width:760px){.wrap{padding:0 20px}.topbar .wrap{align-items:flex-start;flex-direction:column;gap:10px;padding-top:20px;padding-bottom:16px}nav{gap:18px;flex-wrap:wrap}.hero{grid-template-columns:1fr;gap:28px;padding:38px 0 32px}.mental-model{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding-left:18px}.mental-model p{margin:0}.mental-model b{font-size:20px}.status{display:block}.status strong{display:block;margin-bottom:5px}.section{padding:36px 0}.section-head{gap:12px}h2{font-size:28px}.request-grid,.scope-grid,.outcomes,.trust-boundary{grid-template-columns:1fr;gap:24px}.trust-boundary{padding:24px;gap:8px}.diagram-shell{padding:8px}.diagram-caption{font-size:12px}.diagram-caption:before{content:"Scroll the diagram sideways on small screens. ";font-weight:600}.footer-line{flex-direction:column;gap:8px}td,th{padding:14px 10px}table{min-width:650px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{body{background:#fff;font-size:11px}.topbar,nav,.skip{display:none}.wrap{max-width:none;padding:0}.hero{padding:20px 0;gap:20px}h1{font-size:38px}.section{padding:24px 0}.diagram-scroll{overflow:visible}.architecture{min-width:0}.diagram-caption:before{content:""}.section,.request,.scope-block,.outcome,.trust-boundary{break-inside:avoid}table{min-width:0;font-size:11px}.source-list{font-size:10px}a{color:inherit}.status{padding:10px 0}.sources{padding-bottom:0}}
+  </style>
+<style id="dice-reference-theme">.reference-banner{font:13px/1.5 system-ui,sans-serif;color:#141414;background:white;border-bottom:2px solid #e60000;padding:12px 4vw}.reference-banner a{color:#c90000;margin-right:18px}@media print{.reference-banner{display:none}}</style>
+</head>
+<body>
+<div id="dice-reference-banner" class="reference-banner"><a href="../../../START-HERE.html">DICE demo home</a>Supporting reference snapshot. Main demonstrations and current proof boundaries are in the demo home.</div>
+  <a href="#main" class="skip">Skip to the explanation</a>
+  <header class="topbar"><div class="wrap"><div class="brand">Agent platform / architecture notes</div><nav aria-label="Page sections"><a href="#request-flow">Request flow</a><a href="#controls">Controls</a><a href="#ownership">Ownership</a><a href="#boundaries">Boundaries</a></nav></div></header>
+  <main id="main" class="wrap">
+    <div class="hero">
+      <div><p class="eyebrow">Shared cluster · separate authority</p><h1>How our agents <br>stay <em>isolated.</em></h1><p class="intro">An HTTPRoute selects a destination. Isolation comes from who can use that route, what the destination permits, and whether callers can bypass the gateway.</p></div>
+      <aside class="mental-model" aria-label="The two main questions"><p><b>Where does it go?</b><span>The HTTPRoute selects the approved agent or MCP backend.</span></p><p><b>Is this call allowed?</b><span>Identity policy, tool permissions, and backend controls decide.</span></p></aside>
+    </div>
+    <div class="status"><strong>Design explanation</strong><span>This page describes the intended shared-cluster contract. It is not evidence that the workplace configuration or Entra flow has passed runtime verification.</span></div>
+
+    <section id="request-flow" class="section" aria-labelledby="flow-title">
+      <div class="section-head"><span class="section-number">01</span><h2 id="flow-title">Two requests. Two permission checks.</h2></div>
+      <p class="section-lead">The caller asks a named agent for help. That agent makes a separate request to its approved tools using its own identity. Both requests pass through the platform gateway.</p>
+      <div class="legend" aria-label="Diagram legend"><span><i class="dot" aria-hidden="true"></i>Platform-controlled access</span><span><i class="dot green" aria-hidden="true"></i>Approved request path</span><span><i class="dot rust" aria-hidden="true"></i>Denied path</span></div>
+      <figure class="diagram-shell" style="margin:0">
+        <div class="diagram-scroll" tabindex="0" role="region" aria-label="Architecture diagram, scroll horizontally on small screens">
+          <svg class="architecture" viewBox="0 0 1080 745" role="img" aria-labelledby="svg-title svg-desc">
+            <title id="svg-title">Agent A uses a platform-owned gateway for incoming calls and outgoing MCP requests</title>
+            <desc id="svg-desc">Within a shared cluster, the platform namespace contains two logical gateway paths. First, a caller token is checked before an HTTPRoute forwards to Agent A in Team A's namespace. Second, Agent A uses its own token to access an MCP route. The approved MCP validates tool arguments and resource scope. Unapproved cross-team calls and direct backend bypasses are blocked. The two gateway paths belong to the same platform deployment.</desc>
+            <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#285645"/></marker></defs>
+            <rect x="16" y="104" width="1048" height="620" rx="12" fill="#fafbf8" stroke="#cbd2c7"/>
+            <text x="38" y="132" class="label">SHARED KUBERNETES CLUSTER</text>
+            <rect x="60" y="16" width="288" height="62" rx="7" fill="#fff" stroke="#b8c3b5"/>
+            <text x="80" y="42" class="node-title">User or calling application</text><text x="80" y="62" class="small">Carries the caller's A2A token</text>
+            <rect x="40" y="150" width="330" height="466" rx="8" fill="#eef3f9" stroke="#b6c7d9"/>
+            <text x="60" y="176" class="label">PLATFORM GATEWAY NAMESPACE</text>
+            <path d="M204 78V146" class="wire" marker-end="url(#arrow)"/>
+            <rect x="60" y="192" width="290" height="148" rx="6" fill="#fff" stroke="#8fa8c4"/>
+            <text x="80" y="219" class="node-title">1. Caller → agent</text>
+            <text x="80" y="244" class="small">Verify token, audience, role, identity,</text><text x="80" y="263" class="small">and permission to invoke Agent A.</text>
+            <line x1="80" y1="281" x2="330" y2="281" stroke="#d7d9cf"/>
+            <text x="80" y="305" class="node-title">HTTPRoute → named Agent A</text><text x="80" y="325" class="tiny">Forward through the approved runtime endpoint</text>
+            <rect x="430" y="150" width="290" height="190" rx="8" fill="#edf4ee" stroke="#acc2b1"/>
+            <text x="450" y="176" class="label">TEAM A NAMESPACE</text>
+            <rect x="450" y="204" width="250" height="110" rx="6" fill="#fff" stroke="#acc2b1"/>
+            <text x="470" y="233" class="node-title">Agent A</text><text x="470" y="258" class="small">Runs the team's agent logic.</text><text x="470" y="280" class="small">Uses its own outbound identity.</text><text x="470" y="299" class="tiny">The caller's token is not inherited.</text>
+            <path d="M350 252H449" class="wire" marker-end="url(#arrow)"/>
+            <rect x="782" y="150" width="256" height="190" rx="8" fill="#f4f3ed" stroke="#c8c5b7"/>
+            <text x="802" y="176" class="label">TEAM B NAMESPACE</text>
+            <text x="802" y="218" class="node-title">Agent B</text><text x="802" y="244" class="small">Independent permission required.</text><text x="802" y="276" class="small">Agent A gains no access merely</text><text x="802" y="295" class="small">by sharing this cluster.</text>
+            <path d="M575 314V368H205V413" class="wire" marker-end="url(#arrow)"/>
+            <rect x="323" y="354" width="300" height="27" rx="4" fill="#fafbf8"/><text x="337" y="372" class="small">New request with Agent A's MCP token</text>
+            <rect x="60" y="416" width="290" height="174" rx="6" fill="#fff" stroke="#8fa8c4"/>
+            <text x="80" y="445" class="node-title">2. Agent → MCP</text>
+            <text x="80" y="470" class="small">Verify the agent identity, audience,</text><text x="80" y="489" class="small">role, destination, and allowed tool.</text>
+            <line x1="80" y1="508" x2="330" y2="508" stroke="#d7d9cf"/>
+            <text x="80" y="535" class="node-title">HTTPRoute → approved MCP</text><text x="80" y="561" class="small">Same platform gateway deployment.</text><text x="80" y="579" class="tiny">A separate listener or protected route.</text>
+            <rect x="622" y="416" width="416" height="200" rx="8" fill="#eef3f9" stroke="#b6c7d9"/>
+            <text x="642" y="442" class="label">PROTECTED BACKEND NAMESPACE</text>
+            <rect x="642" y="460" width="376" height="132" rx="6" fill="#fff" stroke="#8fa8c4"/>
+            <text x="662" y="488" class="node-title">Approved MCP and downstream access</text>
+            <text x="662" y="513" class="small">Validate tool arguments and target resources.</text><text x="662" y="533" class="small">Use a backend identity with limited permissions.</text><text x="662" y="565" class="small">Return only the authorised result.</text>
+            <path d="M350 480H640" class="wire" marker-end="url(#arrow)"/>
+            <rect x="388" y="451" width="193" height="23" rx="4" fill="#fafbf8"/><text x="400" y="467" class="small">Allowed identity + capability</text>
+            <path d="M700 257H765" class="deny-wire"/><path d="M748 248L764 266M764 248L748 266" stroke="#973f2c" stroke-width="2.5"/>
+            <path d="M575 314V394H830V450" class="deny-wire"/><path d="M821 440L839 456M839 440L821 456" stroke="#973f2c" stroke-width="2.5"/>
+            <rect x="681" y="378" width="273" height="29" rx="4" fill="#fbefe9"/><text x="694" y="397" class="small" style="fill:#973f2c">Direct backend bypass blocked</text>
+            <rect x="40" y="640" width="998" height="59" rx="6" fill="#fff" stroke="#d7d9cf"/>
+            <text x="60" y="664" class="small">Cross-namespace backend reference? The destination owner supplies a narrowly scoped ReferenceGrant.</text>
+            <text x="60" y="684" class="tiny">This permits the configuration reference. Runtime identity checks still decide whether each request is allowed.</text>
+          </svg>
+        </div>
+        <figcaption class="diagram-caption">Solid arrows show the authorised flow. Red dashed paths show access the design must deny. Gateway policy and HTTPRoute are separate logical controls, shown together at each gateway entry.</figcaption>
+      </figure>
+      <div class="request-grid">
+        <article class="request"><p class="kicker">Request 1 / incoming A2A</p><h3>May this caller invoke Agent A?</h3><ol><li>The caller obtains a token for the protected A2A API.</li><li>The gateway validates the token and the approved caller-to-agent mapping.</li><li>The route forwards to the exact Agent A endpoint.</li></ol></article>
+        <article class="request"><p class="kicker">Request 2 / outgoing MCP</p><h3>May Agent A use this tool?</h3><ol><li>The running agent obtains its own token for the protected MCP API.</li><li>The gateway checks that identity, the destination, and the permitted capability.</li><li>The MCP adapter checks arguments and enforces downstream resource permissions.</li></ol></article>
+      </div>
+      <aside class="callout"><h3>An incoming permission does not become an outgoing permission</h3><p>A caller may invoke Agent A while Agent A has only read access to a specific MCP tool. Calling Agent A does not grant access to Agent B, write tools, or other teams' resources.</p></aside>
+    </section>
+
+    <section id="controls" class="section" aria-labelledby="controls-title">
+      <div class="section-head"><span class="section-number">02</span><h2 id="controls-title">What each control actually does</h2></div>
+      <p class="section-lead">These controls answer different questions. A valid route and a reachable Service do not establish permission to invoke an agent or tool.</p>
+      <div class="table-scroll" role="region" aria-label="Isolation controls comparison" tabindex="0"><table><thead><tr><th scope="col">Control</th><th scope="col">Question it answers</th><th scope="col">Our design</th></tr></thead><tbody>
+        <tr><td>HTTPRoute</td><td>Where does a matching request go?</td><td>The platform owns routes with fixed matches and named agent or MCP destinations.</td></tr>
+        <tr><td>Gateway <code>allowedRoutes</code></td><td>Which namespaces may attach routes to a listener?</td><td>Shared listeners accept routes only from approved platform-controlled namespaces.</td></tr>
+        <tr><td>ReferenceGrant</td><td>May a route reference this backend across namespaces?</td><td>The destination owner grants a reference from the platform route namespace to a named target. This does not authenticate callers.</td></tr>
+        <tr><td>Identity and access policy</td><td>Who may invoke this agent, MCP, or capability?</td><td>Validate signature, issuer, audience, expiry, identity, role, and approved destination. Deny requests without an access grant.</td></tr>
+        <tr><td>MCP tool and resource checks</td><td>What operation may reach which resources?</td><td>Restrict tool discovery and calls. Validate resource arguments and use a narrowly scoped downstream identity.</td></tr>
+        <tr><td>Network and admission controls</td><td>Can a workload bypass or weaken these checks?</td><td>Protect backends and controller APIs from direct access. Keep mandatory cross-team enforcement outside team control.</td></tr>
+      </tbody></table></div>
+      <p class="footnote">Route attachment to a Gateway uses <code>allowedRoutes</code>. A cross-namespace backend reference uses <code>ReferenceGrant</code>. They are separate handshakes.</p>
+    </section>
+
+    <section id="ownership" class="section" aria-labelledby="ownership-title">
+      <div class="section-head"><span class="section-number">03</span><h2 id="ownership-title">Namespace scope and ownership are separate</h2></div>
+      <p class="section-lead">An HTTPRoute is namespaced. In our design it lives in a platform namespace, even when it sends traffic to an agent in a team namespace.</p>
+      <div class="scope-grid">
+        <article class="scope-block"><h3>The team manages its namespace</h3><p>Teams retain namespace-scoped administration through their CLI or delivery pipeline.</p><ul><li>Agent behaviour, prompts, and application code.</li><li>Application Deployments, Services, and configuration.</li><li>Namespaced resources within the team's approved authority.</li></ul><p>This authority does not extend to other teams, platform namespaces, or cluster-scoped objects.</p></article>
+        <article class="scope-block"><h3>The platform protects shared access</h3><p>Shared permission enforcement lives outside the team's administrative control.</p><ul><li>Gateway listeners, HTTPRoutes, and access policies.</li><li>Shared backend configuration and protected credentials.</li><li>External identity grants and mandatory cluster-level controls.</li></ul><p>The destination owner approves backend references and downstream capability access. Team-editable objects cannot grant authority over another namespace.</p></article>
+      </div>
+      <aside class="trust-boundary"><h3>A team administrator is inside that team's trust boundary.</h3><p>A namespace administrator can change namespaced policies, launch Pods with available ServiceAccounts, and read namespace Secrets. Do not place credentials with broader authority there. Standard NetworkPolicies are additive, so isolation cannot rely solely on policies the same administrator can change.</p></aside>
+    </section>
+
+    <section id="boundaries" class="section" aria-labelledby="boundaries-title">
+      <div class="section-head"><span class="section-number">04</span><h2 id="boundaries-title">What happens when access is attempted?</h2></div>
+      <p class="section-lead">These are the required outcomes to verify in the target environment. They describe the design contract, not a live test result.</p>
+      <div class="outcomes">
+        <article class="outcome"><span class="verdict">ALLOW</span><strong>Approved caller invokes Agent A.</strong><p>The gateway validates the caller and forwards the request to the named agent endpoint.</p></article>
+        <article class="outcome"><span class="verdict">ALLOW</span><strong>Agent A uses its approved read tool.</strong><p>Its own MCP token, the named tool, and the requested resource scope must all pass validation.</p></article>
+        <article class="outcome"><span class="verdict deny">DENY</span><strong>Agent A requests unapproved Agent B.</strong><p>Agent A needs a separate A2A permission grant. An MCP token or shared cluster membership grants no such access.</p></article>
+        <article class="outcome"><span class="verdict deny">DENY</span><strong>A permitted tool targets another team's data.</strong><p>The adapter and downstream identity reject the resource target even if the tool name itself is allowed.</p></article>
+        <article class="outcome"><span class="verdict deny">DENY</span><strong>A team creates an HTTPRoute to a shared listener.</strong><p>The platform Gateway rejects attachment from an unapproved route namespace. Creating an object does not grant access.</p></article>
+        <article class="outcome"><span class="verdict deny">DENY</span><strong>A workload calls the MCP Service directly.</strong><p>Enforced backend network controls and backend authentication prevent bypass of the approved gateway path.</p></article>
+      </div>
+      <aside class="callout"><h3>Two routes do not isolate two agents sharing credentials</h3><p>If Agent A and Agent B share a namespace, process, or usable credential, separate HTTPRoutes do not establish separate authority. For mutually isolated agents, use separately enforced identities and runtime boundaries, often separate namespaces. A namespace alone also does not provide dedicated compute isolation.</p></aside>
+      <p class="footnote">Write operations require a separate permission path. In our workflow model, agents submit constrained workflow requests, and the approved workflow executor holds the resource-changing permissions.</p>
+    </section>
+
+    <section class="sources" aria-labelledby="sources-title"><h2 id="sources-title">Design basis and further reading</h2><ul class="source-list">
+      <li><a href="../../platform/agentgateway/CLAVES-ADR-MEETING-BRIEF.md">Current shared-platform ownership and HTTPRoute contract</a><small>Repository source. Defines full team namespace administration and platform-controlled shared access.</small></li>
+      <li><a href="ARCHITECTURE.md">Tenant isolation rehearsal architecture</a><small>Repository source. The rehearsal uses a restricted application-editor role. That role model differs from the full namespace administration contract explained here.</small></li>
+      <li><a href="https://gateway-api.sigs.k8s.io/reference/api-types/httproute/">https://gateway-api.sigs.k8s.io/reference/api-types/httproute/</a><small>HTTPRoute matching, attachment, and destination references.</small></li>
+      <li><a href="https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/">https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/</a><small>Destination-owner consent for cross-namespace references.</small></li>
+      <li><a href="https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/">https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/</a><small>Gateway listeners and allowed route namespaces.</small></li>
+    </ul><div class="footer-line"><span>Agent isolation / shared-cluster design</span><span>Single-file explainer · works offline · print ready</span></div></section>
+  </main>
+</body>
+</html>

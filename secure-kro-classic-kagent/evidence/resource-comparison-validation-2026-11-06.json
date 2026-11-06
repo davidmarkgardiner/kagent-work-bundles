@@ -1,0 +1,53 @@
+{
+  "checkedOn": "2026-11-06",
+  "scope": "Offline HTML documentation and browser interaction only",
+  "artifact": "resources.html",
+  "artifactSha256": "ee67ae22af2ea7fd19fc200fe79d53c467f09a03bbd8a89d5ae21b63c10c138c",
+  "counts": {
+    "deploymentModes": 2,
+    "initialResourceViews": 5,
+    "secureResourceViews": 23,
+    "kroCreatedPerAgent": 14,
+    "uniqueHtmlIds": 90,
+    "scriptElements": 0
+  },
+  "kroKinds": {
+    "ServiceAccount": 3,
+    "Agent": 1,
+    "NetworkPolicy": 2,
+    "AgentgatewayPolicy": 3,
+    "HTTPRoute": 3,
+    "ConfigMap": 1,
+    "Job": 1
+  },
+  "checks": {
+    "exactKroYaml": "PASS: all 14 embedded catalog templates match their source text exactly",
+    "browserSelectors": "PASS: all 28 resource selectors show their associated panel",
+    "offlineSelectors": "PASS: all 28 resource selectors exercised with browser networking disabled",
+    "keyboard": "PASS: arrow-key navigation for deployment mode and resource selections",
+    "mobile": "PASS: both modes checked at 390px viewport width with no document overflow; final mobile view visually inspected",
+    "desktop": "PASS: initial Agent and secure Golden Job views visually inspected after the side-by-side YAML layout change",
+    "print": "PASS: both deployment modes and their representative Agent and Golden YAML panels become visible under print media; no PDF exported",
+    "navigation": "PASS: review-sheet entry, Journey lifecycle link, and Journey resource-comparison backlink exercised",
+    "lifecycleSlide": "PASS: slide 6 has concrete deployment, use, update, and removal wording; its presenter notes were exercised",
+    "externalRequests": "PASS: only local static-page requests observed; no external asset or backend request",
+    "browserConsole": "PASS: zero errors and warnings",
+    "deterministicRebuild": "PASS: regeneration leaves the HTML SHA-256 unchanged",
+    "pythonCompile": "PASS",
+    "localLinks": "PASS: local HTML link targets exist",
+    "diffWhitespace": "PASS",
+    "publicSafetyScan": "REVIEWED_FALSE_POSITIVES: two Kubernetes secret volume-reference keys and the public kagent image version 0.10.4 match the strict pattern; no secret values are included; generator scan passes"
+  },
+  "boundaries": {
+    "initialDeployment": "Illustrative native Agent and abbreviated runtime shape, not a historical deployment snapshot",
+    "platform": "Shared Gateway, RGD, listener policies, model and MCP references are outside the 14 KRO-created per-agent resources",
+    "runtime": "kagent owns generated Deployment, Service, and configuration Secret; no Secret contents are shown",
+    "referenceGrant": "Conditional cross-namespace reference example, not installed in the same-namespace graph",
+    "networkPolicy": "Intent only; no fresh CNI enforcement test",
+    "golden": "Template inspection only; no Job or inference invoked",
+    "entra": "Next integration for this composition"
+  },
+  "githubWrite": false,
+  "clusterChange": false,
+  "providerInference": false
+}
