@@ -18,9 +18,9 @@ BYO-KAgent gives teams a repeatable, auditable, GitOps-native path to ship their
   Agent Owner                    Platform                           Cluster
   ──────────                     ────────                           ───────
 
-  1. Copy _template/             
-     Fill request.yaml           
-     Open PR labelled            
+  1. Copy _template/
+     Fill request.yaml
+     Open PR labelled
      'byo-kagent'   ──────────►  Argo Events Sensor
                                   │
                                   ▼
@@ -166,7 +166,7 @@ spec:
   reason: "Frontend debugging — read-only pod inspection"
 ```
 
-**Why not just use `RemoteMCPServer.allowedNamespaces`?**  
+**Why not just use `RemoteMCPServer.allowedNamespaces`?**
 `allowedNamespaces` controls which namespaces can *connect* to the MCP server — it can't express "agent X may use tool A but not tool B from the same server." `ToolGrant` adds per-agent, per-tool-name, expiry-aware authorization. The audit trail lives in the grant CR.
 
 ---

@@ -182,4 +182,3 @@ Sources: [Gateway identity, control and telemetry notes](sources.html#gateway-gu
 **3. Discussion after the demo.** Close with the concrete scope of the next pilot. Keep any environment changes as follow-up work. The meeting pack itself launches no classifier, model, incident, cluster change, merge or deployment.
 
 Sources: [David's conceptual application-embedded agent brief](sources.html#future-brief), [Gateway identity, control and telemetry notes](sources.html#gateway-guide)
-

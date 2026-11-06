@@ -52,7 +52,10 @@ def collect():
         target.parent.mkdir(parents=True, exist_ok=True)
         if source.suffix.lower() != '.html':
             if source != target:
-                target.write_bytes(source.read_bytes())
+                if source.suffix.lower() == '.md':
+                    target.write_text('\n'.join(line.rstrip() for line in source.read_text().splitlines()).rstrip() + '\n')
+                else:
+                    target.write_bytes(source.read_bytes())
                 copied.append(str(target.relative_to(ROOT)))
             continue
         text = source.read_text()
