@@ -13,4 +13,4 @@ Interactive flows are synthetic illustrations: they make no model calls or deplo
 
 The main demos share red, white and black styling with light green takeaways. Older supporting references retain their original layouts; separate-workspace sources are explicitly marked when they are not included.
 
-The SRE Lens demo has four slides. Switch question types to see which specialists are selected, inspect their MCP boundaries, compare complete and partial evidence, then show the API handoff. Routing and receipts are synthetic examples.
+The SRE Lens demo has five slides. Switch question types to see which specialists are selected, inspect their MCP boundaries, compare complete and partial evidence, then show the API handoff. Try **Incident + KB** and **Knowledge question** to show the two new specialists. SNOW means ServiceNow; vector search retrieves KB articles. Routing and receipts are synthetic examples.

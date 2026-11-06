@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-11-06",
+  "scope": "Offline synthetic SRE Lens expansion; no model, MCP, cluster, ServiceNow, GitLab or embedding requests",
+  "slides": 5,
+  "sourcePopups": 19,
+  "specialists": [
+    "Kubernetes",
+    "GitLab",
+    "Data",
+    "SNOW / ServiceNow",
+    "KB / vector article retrieval"
+  ],
+  "checks": [
+    "Five routing scenarios select matching outbound and return paths",
+    "Incident + KB selects SNOW and KB; Knowledge question selects KB alone",
+    "Complete, partial and denied examples preserve five source statuses",
+    "All nodes open populated source details and every slide has presenter notes",
+    "No node text overflow at presentation size",
+    "390px viewport has no page overflow",
+    "Five print slides visible",
+    "Replay packet positions visibly change",
+    "Offline interactions make zero network requests",
+    "Existing Triage renderer reused unchanged"
+  ],
+  "knowledgeGrounding": "Inspected local doc2vec/querydoc POC: approved Git articles -> doc2vec -> platform-kb.db -> querydoc MCP -> knowledge Agent. This HTML performs no retrieval. Document access and freshness require receiving-system validation.",
+  "serviceNowGrounding": "User-described incident specialist; approved read-only adapter illustrated, no installed ServiceNow integration or transaction claimed.",
+  "sourceData": "demo/sre-lens-data.json",
+  "entrypoint": "sre-lens.html"
+}

@@ -54,7 +54,7 @@ def verify():
                     if not (ROOT / urlsplit(link['href']).path).is_file():
                         errors.append(page.name + ': missing chapter link ' + link['href'])
     lens = json.loads(re.search(r'id="deckData">(.*?)</script>', (ROOT / 'sre-lens.html').read_text(), re.S).group(1))
-    if [slide['id'] for slide in lens['slides']] != ['route', 'reads', 'receipts', 'consume']:
+    if [slide['id'] for slide in lens['slides']] != ['route', 'reads', 'incident-knowledge', 'receipts', 'consume']:
         errors.append('Unexpected SRE Lens chapters')
     for slide in lens['slides']:
         for node in slide['nodes']:

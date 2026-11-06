@@ -96,7 +96,7 @@ slide footer. `index.html` remains the earlier architecture deep dive;
 | 3 | [SRE triage and application recovery](triage.html) | Explain the original Kafka evidence path and the newer application-owned specialist, bounded classification, reviewable MR, human approval and measured recovery. |
 | 4 | [Agent-assisted SDLC](sdlc.html) | Follow an approved task through PM, builder, tester and reviewer roles, artifact-backed checkpoints, bounded rework and human merge. |
 
-Journey has nine slides, SRE Lens has four, and Triage and SDLC each have six. They include clickable
+Journey has nine slides, SRE Lens has five, and Triage and SDLC each have six. They include clickable
 source/details, presenter notes and landscape printing. All diagram states and
 examples are **illustrations**.
 No presentation invokes a model, sends Kafka messages, creates an MR, approves a
@@ -182,4 +182,4 @@ Open `START-HERE.html` after extracting the complete folder. No server or instal
 
 ## SRE Lens
 
-Open `sre-lens.html`. The first slide selects Kubernetes and GitLab for a workload incident, Data for a data question, or all three for a cross-system question. Later slides show scoped MCP reads, evidence synthesis with missing/denied-source cases, and consumption through the DICE API. These are synthetic routing examples. The older native A2A YAML uses Grafana/data/Kubernetes references and does not install every integration shown by the product illustration. Rebuild with `python3 build_sre_lens.py`, then `python3 prepare_demo_bundle.py`.
+Open `sre-lens.html`. The first slide selects Kubernetes/GitLab for a workload incident, Data for a data question, SNOW/KB for incident guidance, KB alone for a knowledge question, or all five for a cross-system question. A dedicated sheet shows ServiceNow incident reads and KB vector retrieval, including the article indexing flow. Later slides show evidence synthesis with missing/denied-source cases and consumption through the DICE API. These are synthetic routing examples. The older native A2A YAML uses Grafana/data/Kubernetes references and does not install every integration shown by the product illustration. Rebuild with `python3 build_sre_lens.py`, then `python3 prepare_demo_bundle.py`.
