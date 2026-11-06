@@ -1,0 +1,31 @@
+{
+  "uiNamespace": "dice-demo-ui",
+  "agentNamespace": "classic-agents",
+  "agentName": "demo",
+  "image": "{{APPROVED_DEMO_UI_IMAGE_AT_SHA256_DIGEST}}",
+  "uiOrigin": "https://{{DEMO_UI_HOST}}",
+  "agentUrl": "https://{{AGENT_API_HOST}}/classic/classic-agents/demo/invoke",
+  "istioGateway": "{{EXISTING_ISTIO_GATEWAY_NAMESPACE}}/{{EXISTING_ISTIO_GATEWAY_NAME}}",
+  "gatewayName": "classic-demo",
+  "jwtAudience": "secure-agent-classic",
+  "kagentNamespace": "{{CLASSIC_KAGENT_CONTROLLER_NAMESPACE}}",
+  "kagentDeployment": "{{CLASSIC_KAGENT_CONTROLLER_DEPLOYMENT}}",
+  "kagentConfigMaps": [
+    "{{CLASSIC_KAGENT_RUNTIME_CONFIGMAP}}"
+  ],
+  "kroNamespace": "{{KRO_CONTROLLER_NAMESPACE}}",
+  "kroDeployment": "{{KRO_CONTROLLER_DEPLOYMENT}}",
+  "sessionSecret": "dice-demo-session",
+  "ingressNamespace": "{{ISTIO_INGRESS_POD_NAMESPACE}}",
+  "ingressPodLabels": {
+    "{{INGRESS_POD_LABEL_KEY}}": "{{INGRESS_POD_LABEL_VALUE}}"
+  },
+  "apiServerCIDRs": [
+    "{{APPROVED_API_EGRESS_CIDR}}"
+  ],
+  "apiServerPort": 443,
+  "agentIngressCIDRs": [
+    "{{APPROVED_AGENT_INGRESS_EGRESS_CIDR}}"
+  ],
+  "agentIngressPort": 443
+}

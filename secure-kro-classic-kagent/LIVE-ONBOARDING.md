@@ -1,5 +1,8 @@
 # Live agent onboarding
 
+For a browser-free fallback, use [TERMINAL-DEMO.md](TERMINAL-DEMO.md). The included
+terminal console uses the same live backend gates, agent endpoint and UID-bound teardown.
+
 This adds a live frontend to the existing classic-agent composition. The static
 presentations and mock IDP stay available for the illustrated walkthrough.
 The downloaded HTML has no cluster connection by itself. The running backend
@@ -10,6 +13,16 @@ records a live deploy, Golden/caller checks, interactive questions and teardown 
 21 captured resources while preserving the shared platform. The home profile is
 model-only. AKS/VirtualService mode is prepared but has not been connected or
 validated at work; it requires the actual receiving context and HTTPS URL.
+
+## AKS at work: host the demo in the cluster
+
+The UI and backend can run alongside the agent. Use [hosted/README.md](hosted/README.md)
+for the Dockerfile, generated Kubernetes workload and Istio VirtualServices. The
+backend uses a scoped Pod ServiceAccount instead of a laptop kubeconfig. The browser
+uses the UI HTTPS origin; agent calls use the separately authenticated agent HTTPS
+endpoint. This hosting recipe still requires receiving-cluster validation.
+
+The local-backend option below remains useful for rehearsal.
 
 ## AKS at work: use the existing VirtualService
 

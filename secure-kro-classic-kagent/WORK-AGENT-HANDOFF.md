@@ -1,17 +1,29 @@
-# Replicate the native 0.x demo without Substrate
+# Replicate the live onboarding demo in AKS
+
+For a browser-free fallback, use [TERMINAL-DEMO.md](TERMINAL-DEMO.md). The included
+terminal console uses the same live backend gates, agent endpoint and UID-bound teardown.
 
 Use this bundle instead of `secure-kro-native-owner-form` for work systems that
 use the normal kagent Deployment runtime. Do not port AgentTemplate, Harness,
 actor or snapshot resources from the other bundle.
 
+For the interactive demo, host the supplied UI/backend in the same AKS cluster
+as the agent. Follow [hosted/README.md](hosted/README.md): it includes the image
+build, private inputs, scoped ServiceAccount permissions, admission guard,
+NetworkPolicy and separate Istio VirtualServices for the UI and protected agent API.
+This is prepared for receiving-cluster validation; the home rehearsal is not AKS proof.
+
 1. Read the version installation section in README.md. Preserve the existing
    Helm release, approved PostgreSQL database and credentials. Back up the database
    before controller migrations. Use helm-values-no-substrate.yaml as reviewed
-   overrides with the existing private values, not as a replacement for them.
+   overrides only if a separately approved platform installation is needed, not as a
+   replacement for private values.
    Run the read-only preflight against the actual workplace classic controller.
-   Establish KRO 0.9.4 and inspect the served `kagent.dev/v1alpha2` schema. The lab
+   Discover the installed versions first; do not change shared controllers for this demo.
+   Confirm KRO 0.9.4 and inspect the served `kagent.dev/v1alpha2` schema. The lab
    reference is kagent 0.10.4. Read IMAGES.md and versions.lock.json. Upgrade the
-   matching controller, CRD chart and runtime image family together. The read-only
+   matching controller, CRD chart and runtime image family together only as a
+   separately approved migration; otherwise report incompatible installed versions. The read-only
    preflight must report NonSubstrateParityEstablished after the rollout.
    Do not use the 1.x api.kagent.dev API for this bundle.
 2. Read README.md and fill a private platform profile. Reuse the existing model,
@@ -35,9 +47,10 @@ actor or snapshot resources from the other bundle.
 Return installed controller images, the resolved receiving-cluster manifests,
 actual native Deployment and Service evidence, Job receipt, caller task ID and
 negative-control results. Keep environment endpoints and credentials private.
-Do not build an orchestration workflow, UI or builder agent for this replication.
+Reuse live-onboarding.html and live_demo.py; do not build a second UI or an
+orchestration workflow. The backend creates the same single customer owner YAML.
 
-The latest overall release observed on 2026-11-04 is 1.0.0-rc1 and its native
+The overall release observed on 2026-11-04 was 1.0.0-rc1 and its native
 agent path requires Substrate. 0.10.4 is the parity target for this non-Substrate
 bundle. Do not swap only the controller image or change YAML API strings to
 imitate the other release. The earlier 0.8.0-beta4 receipt is historical evidence;
@@ -48,12 +61,14 @@ examples/agent-demo.yaml in VS Code. Use demo.py apply/watch/verify/show/query
 to display the exact file, observe actual resources, match Golden to this owner
 UID and invoke through the protected Gateway. YAML-GUIDE.md explains every
 resource. The customer template and portable request-builder skill are included.
-The HTML illustrates reconciliation and displays dated receipts; it does not
-perform deployments or claim fresh tool evidence. GitLab writes are not included
+The static decks illustrate reconciliation and display dated receipts. The separate
+live-onboarding.html uses its running backend for actual deploy, status, caller checks,
+chat and teardown; opening the file alone does not connect to a cluster. GitLab writes are not included
 in these read-only adapters.
 
 Keep the next iteration in NEXT-STEPS.md. Prioritize Entra ID caller validation
 and UAMI/Workload Identity for approved agent-to-MCP access. Reuse the existing
 Gateway authentication, observability, token reporting, model catalog and policy
 services. Capture their actual evidence and the separate tool/network checks.
-The UI/builder-agent path remains a later producer of the same customer YAML.
+The supplied live UI already produces the customer payload. A builder agent remains
+a future optional producer of that same contract.

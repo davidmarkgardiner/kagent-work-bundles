@@ -1,5 +1,9 @@
 # Demonstrate one YAML becoming a protected native agent
 
+For the current live UI and terminal fallback, start with [LIVE-ONBOARDING.md](LIVE-ONBOARDING.md)
+and [TERMINAL-DEMO.md](TERMINAL-DEMO.md). The commands below retain the older
+YAML-first, lab-port-forward walkthrough; workplace chat uses the exact HTTPS Istio URL.
+
 Show [presentation.html](presentation.html), open the customer YAML in VS Code,
 then use the terminal commands below. The customer applies one instance. The
 platform must already have installed the approved model/tool catalog, RGD,
@@ -211,8 +215,8 @@ The lab host was unreachable on 2026-11-05, so no new live inference, tool test 
 NetworkPolicy traffic-enforcement test was performed while packaging these assets.
 Use the commands above for a fresh receiving-cluster demonstration.
 
-For a future iteration, a UI or builder agent can export this same instance
-schema. Entra/UAMI caller access and agent-to-MCP identity verification remain
+The live onboarding UI now produces this same instance schema. A builder agent
+remains an optional future producer. Entra/UAMI caller access and agent-to-MCP identity verification remain
 separate integrations with positive and negative acceptance tests.
 
 Rebuild the presentation and split YAML after changing graph sources:

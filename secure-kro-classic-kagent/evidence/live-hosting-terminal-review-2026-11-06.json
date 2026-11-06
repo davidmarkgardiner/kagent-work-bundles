@@ -1,0 +1,42 @@
+{
+  "checkedAt": "2026-11-06T20:34:39.807824+00:00",
+  "scope": "UI polish, hosted AKS recipe and terminal fallback",
+  "homeTerminal": {
+    "source": "terminal_demo.py sharing live_demo.Backend",
+    "ownerUID": "6fee77b7-78be-461b-80d8-291c7fd8488d",
+    "connectedExisting": true,
+    "createdOrDeletedThisPass": false,
+    "callerPongTaskID": "01a1b291-9d6a-76cd-80fe-57ab87fc03f0",
+    "answerTaskID": "01a1b291-a46c-7aae-b906-458d89817034",
+    "answerSha256": "6f31bcc71b8a8738decc62c28827cef59f856b2bbaa369e014284ed2dfa32ea9",
+    "missingJWT": 401,
+    "invalidJWT": 401,
+    "wrongAudience": 401,
+    "wrongSubject": 403,
+    "modelCall": "actual native A2A / existing model Gateway; not a fixture"
+  },
+  "hostingPreparation": {
+    "kubernetesServerDryRun": {
+      "passed": true,
+      "objects": 14,
+      "applied": false
+    },
+    "containerBuild": "Pending approved digest-pinned receiving-environment bases",
+    "istioServerValidation": "Pending receiving cluster",
+    "aksLiveDeployment": "Not performed",
+    "networkEnforcement": "Not proven"
+  },
+  "visualQA": {
+    "widths": [
+      1440,
+      900,
+      390
+    ],
+    "horizontalOverflow": false,
+    "liveHomeAnswerRendered": true,
+    "detector": "No regex findings; degraded mode because parser dependencies unavailable"
+  },
+  "unitTests": {
+    "passed": 52
+  }
+}

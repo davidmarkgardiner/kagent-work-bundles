@@ -1,4 +1,4 @@
-"""Serve the live onboarding UI on loopback; kubectl credentials stay server-side."""
+"""Serve the live onboarding UI locally or behind Istio; credentials stay server-side."""
 import argparse
 from contextlib import contextmanager
 import hashlib
@@ -46,6 +46,14 @@ def validate_agent_url(value):
     return value
 
 
+def validate_public_origin(value):
+    url = urllib.parse.urlsplit(value)
+    if (url.scheme != 'https' or not url.hostname or url.username or url.password
+            or url.query or url.fragment or url.path not in ('', '/') or any(c.isspace() for c in value)):
+        raise ValueError('Use the demo UI HTTPS origin without a path, credentials, query or fragment.')
+    return urllib.parse.urlunsplit((url.scheme, url.netloc, '', '', ''))
+
+
 def owned_by(obj, uid):
     return any(ref.get('uid') == uid for ref in obj.get('metadata', {}).get('ownerReferences', []))
 
@@ -67,7 +75,10 @@ def route_ready(obj):
 class Backend:
     def __init__(self, args):
         self.args = args
-        self.base = [args.kubectl, '--context', args.context, '--request-timeout=10s', '-n', args.namespace]
+        self.base = [args.kubectl]
+        if not getattr(args, 'in_cluster', False):
+            self.base += ['--context', args.context]
+        self.base += ['--request-timeout=10s', '-n', args.namespace]
         self.lock = threading.Lock()
         self.uid = None
         self.access = None
@@ -100,7 +111,8 @@ class Backend:
         objects = result.get('items', []) if result.get('kind') == 'List' else [result]
         # Include controller-generated descendants without ever returning Secret data.
         columns = '{range .items[*]}{.kind}{"\\t"}{.metadata.name}{"\\t"}{.metadata.uid}{"\\t"}{.metadata.ownerReferences[*].uid}{"\\n"}{end}'
-        metadata = self.run('get', 'pods,replicasets,secrets', '-o', 'jsonpath='+columns)
+        kinds = 'pods,replicasets' if getattr(self.args, 'in_cluster', False) else 'pods,replicasets,secrets'
+        metadata = self.run('get', kinds, '-o', 'jsonpath='+columns)
         descendants = []
         for line in metadata.splitlines():
             parts = line.split('\t')
@@ -276,13 +288,14 @@ class Backend:
                      model=declarative.get('modelConfig'), tools=declarative.get('tools', []), skills=spec.get('skills', {}),
                      callerVerification=dict(passed=bool(verified), checks=self.access['checks'] if verified else []),
                      runtimeImage=container.get('image'),
+                     nativeSecretMetadataChecked=not getattr(self.args, 'in_cluster', False),
                      runtimeServiceAccount=pod_spec.get('serviceAccountName'),
                      runtimeAutomountToken=(find('ServiceAccount', '-runtime') or {}).get('automountServiceAccountToken'),
                      podSecurityContext=pod_spec.get('securityContext', {}), containerSecurityContext=container.get('securityContext', {}),
                      networkPolicyPresent=bool(find('NetworkPolicy', '-boundary')),
                      networkPolicy=(find('NetworkPolicy', '-boundary') or {}).get('spec'),
                      networkEnforcement='Not proven by this demo; verify CNI enforcement and alternate-controller/API paths separately.',
-                     authority='Facts read by the local platform backend. The model cannot establish its own permissions.',
+                     authority='Facts read by the configured platform backend. The model cannot establish its own permissions.',
                      apiScope='The Gateway caller route requires this identity. This does not prove every other path to the agent is blocked.')
         result = dict(connected=connected, exists=bool(owner), uid=uid, name=name, namespace=self.args.namespace,
                       stages=stages, resources=resource_rows, facts=facts, golden=golden,
@@ -296,7 +309,7 @@ class Backend:
             remaining = [r for r in resource_rows if r['uid'] in self.deletion['uids']]
             result['deletion'] = dict(remaining=remaining, complete=not remaining, capturedCount=len(self.deletion['uids']),
                                       error=self.deletion.get('error'),
-                                      scope='Owner, graph resources and discovered runtime descendants, including Pods, ReplicaSets and Secret metadata. Shared platform resources remain.')
+                                      scope='Captured owner, graph and runtime descendants. Hosted mode excludes Secret metadata; verify native Secret cleanup separately with the platform operator. Shared platform resources remain.')
             if not remaining:
                 self.event('Deleted', 'Captured graph resources are gone. Shared platform resources were kept.')
                 self.last_deletion = result['deletion']
@@ -518,12 +531,16 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def authorized(self):
-        expected_host = '127.0.0.1:'+str(self.server.server_port)
+        public_origin = getattr(self.server, 'public_origin', None)
+        expected_origin = public_origin or 'http://127.0.0.1:'+str(self.server.server_port)
+        expected_host = urllib.parse.urlsplit(expected_origin).netloc
         origin = self.headers.get('Origin')
-        return (self.headers.get('Host') == expected_host and origin in (None, 'http://'+expected_host)
+        return (self.headers.get('Host') == expected_host and origin in (None, expected_origin)
                 and secrets.compare_digest(self.headers.get('X-Demo-Key', ''), self.server.key))
 
     def do_GET(self):
+        if self.path == '/healthz':
+            return self.send(200, dict(status='serving'))
         if self.path == '/':
             return self.send(200, (ROOT / 'live-onboarding.html').read_bytes(), 'text/html; charset=utf-8')
         if self.path == '/favicon.ico':
@@ -535,8 +552,9 @@ class Handler(BaseHTTPRequestHandler):
             with backend.lock:
                 if self.path == '/api/config':
                     result = dict(name=backend.args.name, context=backend.args.context, namespace=backend.args.namespace,
-                                  readNamespace=backend.args.read_namespace, transport='Kubernetes API via local backend',
+                                  readNamespace=backend.args.read_namespace, transport='Kubernetes API via Pod ServiceAccount' if getattr(backend.args, 'in_cluster', False) else 'Kubernetes API via local backend',
                                   environment=getattr(backend.args, 'environment', 'home-lab'),
+                                  hosted=bool(getattr(backend.args, 'in_cluster', False)),
                                   invocationTransport='AKS VirtualService HTTPS' if getattr(backend.args, 'agent_url', None) else 'Home/lab Gateway port-forward',
                                   telemetry='Live Kubernetes observations; OTLP export is not configured.')
                 elif self.path == '/api/platform':
@@ -593,7 +611,9 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--context', required=True)
+    target = parser.add_mutually_exclusive_group(required=True)
+    target.add_argument('--context')
+    target.add_argument('--in-cluster', action='store_true', help='Use the Pod ServiceAccount and in-cluster Kubernetes API.')
     parser.add_argument('--environment', choices=['home-lab', 'aks'], required=True)
     parser.add_argument('--agent-url', help='Exact HTTPS invoke endpoint exposed by the existing workplace VirtualService.')
     parser.add_argument('--kubectl', default='kubectl')
@@ -605,11 +625,25 @@ def main():
     parser.add_argument('--allow-tool', action='append', default=[])
     parser.add_argument('--allow-skill', action='append', default=[])
     parser.add_argument('--port', type=int, default=8766)
+    parser.add_argument('--listen-address', choices=['127.0.0.1', '0.0.0.0'], default='127.0.0.1')
+    parser.add_argument('--public-origin', help='Canonical HTTPS origin of the Istio-exposed demo UI.')
+    parser.add_argument('--session-key-file', type=Path, help='Mounted operator-session Secret; never printed by hosted mode.')
     parser.add_argument('--kagent-namespace', default='kagent')
     parser.add_argument('--kagent-deployment', default='kagent-controller')
     parser.add_argument('--kro-namespace', default='kro-system')
     parser.add_argument('--kro-deployment', default='kro')
     args = parser.parse_args()
+    if args.public_origin:
+        try:
+            args.public_origin = validate_public_origin(args.public_origin)
+        except ValueError as error:
+            parser.error(str(error))
+    if args.in_cluster:
+        args.context = 'in-cluster ServiceAccount'
+        if args.environment != 'aks' or not args.public_origin or not args.session_key_file:
+            parser.error('In-cluster mode requires AKS mode, the public HTTPS origin and a mounted session-key file.')
+    if args.listen_address != '127.0.0.1' and (not args.public_origin or not args.session_key_file):
+        parser.error('A non-loopback listener requires --public-origin and --session-key-file.')
     if args.environment == 'aks' and not args.agent_url:
         parser.error('--environment aks requires --agent-url for the existing HTTPS VirtualService.')
     if args.agent_url and args.environment != 'aks':
@@ -622,9 +656,18 @@ def main():
     for value in (args.namespace, args.name, args.gateway, args.read_namespace):
         if not re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,48}[a-z0-9])?', value):
             parser.error('Use short Kubernetes DNS labels for the demo slot and namespaces.')
-    server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
-    server.backend, server.key = Backend(args), secrets.token_urlsafe(32)
-    print('Live demo: http://127.0.0.1:'+str(server.server_port)+'/#key='+server.key, flush=True)
+    if args.session_key_file:
+        key = args.session_key_file.read_text().strip()
+        if len(key) < 32 or len(key) > 256 or any(c.isspace() for c in key):
+            parser.error('The mounted session key must be 32–256 characters without whitespace.')
+    else:
+        key = secrets.token_urlsafe(32)
+    server = ThreadingHTTPServer((args.listen_address, args.port), Handler)
+    server.backend, server.key, server.public_origin = Backend(args), key, args.public_origin
+    if args.public_origin:
+        print('Hosted demo: '+args.public_origin+' — enter the operator session key in the page.', flush=True)
+    else:
+        print('Live demo: http://127.0.0.1:'+str(server.server_port)+'/#key='+server.key, flush=True)
     print('Use Deploy agent or Connect in the frontend. Ctrl-C stops the local server; it does not delete the agent.', flush=True)
     try:
         server.serve_forever()

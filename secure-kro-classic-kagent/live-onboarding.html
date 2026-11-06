@@ -3,9 +3,108 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DICE · Live agent onboarding</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#f2f2f2;color:#141414;font:15px/1.5 system-ui,sans-serif}main{max-width:1400px;margin:auto;padding:32px}header{display:flex;gap:20px;align-items:center;justify-content:space-between;border-top:4px solid #e60000;padding-top:20px}.brand{font-size:22px;font-weight:800;letter-spacing:.08em}.eyebrow{text-transform:uppercase;font-size:12px;letter-spacing:.12em;color:#626262;font-weight:700}h1{font-size:clamp(30px,4vw,48px);line-height:1.12;letter-spacing:-.04em;margin:18px 0}h2{font-size:21px;line-height:1.2;margin:0 0 12px}h3{font-size:15px;margin:16px 0 8px}p{margin:8px 0 16px}.lead{font-size:18px;max-width:860px;color:#383838}.badge{padding:6px 12px;border:1px solid #dedede;border-radius:5px;font-size:12px;background:white}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;margin:26px 0}.stage{position:relative;background:white;border:1px solid #dedede;border-radius:8px;padding:14px;min-height:90px}.stage:not(:last-child):after{content:'→';position:absolute;right:-22px;top:28px;color:#626262}.stage strong{display:block;font-size:14px}.stage span{font-size:12px;color:#626262}.stage.passed{background:#eef7ef;border-color:#9bc8a2}.stage.failed{border-color:#e60000;background:#fff0f0}.columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}.panel{background:white;border:1px solid #dedede;border-radius:12px;padding:24px;margin-bottom:24px;min-width:0}label{display:block;font-size:13px;font-weight:650;margin:14px 0 6px}input,select,textarea{font:inherit;border:1px solid #ccc;border-radius:6px;padding:10px;width:100%;background:white;color:#141414}input[readonly]{background:#f6f6f6}textarea{min-height:132px;resize:vertical}button,.button{font:inherit;display:inline-block;border:1px solid #ccc;border-radius:6px;padding:9px 14px;background:white;color:#141414;cursor:pointer;text-decoration:none}button.primary{background:#e60000;color:white;border-color:#e60000;font-weight:650}button:disabled{opacity:.45;cursor:default}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #e60000;outline-offset:2px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.small{font-size:12px;color:#626262}.notice{padding:14px 18px;background:#eef7ef;border-left:4px solid #9bc8a2;margin:18px 0}.error{background:#fff0f0;border-left-color:#e60000;white-space:pre-wrap}.error[hidden],section[hidden]{display:none}pre,code{font:12px/1.6 ui-monospace,monospace}pre{padding:16px;background:#141414;color:white;border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto}details{border-top:1px solid #dedede;margin-top:18px;padding-top:12px}summary{cursor:pointer;font-size:13px;font-weight:650}table{border-collapse:collapse;width:100%;font-size:12px}th,td{text-align:left;padding:8px 4px;border-bottom:1px solid #e6e6e6;overflow-wrap:anywhere}th{color:#626262;font-weight:600}.inventory{max-height:335px;overflow:auto}ul{padding-left:20px}.checks{list-style:none;padding:0}.checks li{padding:5px 0}.answer{font-size:19px;line-height:1.65;overflow-wrap:anywhere;background:#f6f6f6;padding:24px;border-radius:8px;margin:14px 0;max-width:78ch}.answer p{margin:0 0 14px}.answer p:last-child{margin-bottom:0}.answer ul,.answer ol{margin:0;padding-left:24px}.answer li{margin:8px 0}.answer code{font-size:.9em}.answer strong{font-weight:700}.receipt{margin:8px 0 24px}.receipt summary{font-size:12px;color:#626262}.small{overflow-wrap:anywhere}.endpoint{font:13px/1.6 ui-monospace,monospace;overflow-wrap:anywhere}.disabled{color:#626262}.empty{color:#626262;padding:22px 0}.prompt-buttons button{font-size:13px}#chatLog{max-height:540px;overflow:auto}.chat-question{font-weight:650;margin-top:20px}.proof{font:11px ui-monospace,monospace;color:#626262;overflow-wrap:anywhere}footer{font-size:12px;color:#626262;padding:12px 0 28px}.danger{border-top:1px solid #dedede;padding-top:18px}.inline{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:800px){main{padding:20px}.columns{grid-template-columns:1fr}.flow{gap:8px;grid-template-columns:1fr}.stage{min-height:0}.stage:not(:last-child):after{display:none}.inline{grid-template-columns:1fr}header{align-items:flex-start}.panel{padding:20px}}@media(prefers-reduced-motion:no-preference){.stage{transition:background 180ms,border-color 180ms}}@media print{button,.actions,footer{display:none}body{background:white}.panel{break-inside:avoid}pre{max-height:none}.inventory,#chatLog{max-height:none;overflow:visible}}
-.notice:not(.error){background:#eef7ef;border-left-color:#9bc8a2;color:#1c3525}
+<style id="live-console">*{box-sizing:border-box}
+:root{color-scheme:light}
+::selection{background:#fbd4d4;color:#141414}
+body{margin:0;background:#f2f2f2;color:#141414;font:15px/1.5 system-ui,sans-serif}
+main{max-width:1280px;margin:auto;padding:24px 32px}
+header{display:flex;gap:20px;align-items:center;justify-content:space-between;border-top:4px solid #e60000;padding-top:16px}
+.brand{font-size:22px;font-weight:800;letter-spacing:.08em}
+.brand-detail{font-size:13px;font-weight:500;letter-spacing:0;color:#626262;margin-left:12px}
+h1{font-size:40px;line-height:1.12;letter-spacing:-.03em;margin:22px 0 8px}
+h2{font-size:22px;line-height:1.25;margin:0 0 12px}
+h3{font-size:16px;margin:18px 0 8px}
+p{margin:8px 0 16px}
+.page-heading{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.lead{font-size:17px;max-width:70ch;color:#383838;margin-bottom:0}
+.help-link{font-size:13px;white-space:nowrap;color:#626262}
+.badge{padding:6px 12px;border:1px solid #dedede;border-radius:6px;font-size:12px;background:white}
+.connection-note{font-size:12px;color:#626262;margin:16px 0}
+.small{font-size:12px;color:#626262;overflow-wrap:anywhere}
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin:20px 0 24px;border:1px solid #dedede;border-radius:12px;overflow:hidden}
+.stage{background:white;padding:12px 16px;min-height:66px}
+.stage+.stage{border-left:1px solid #dedede}
+.stage strong{display:block;font-size:13px}
+.stage span{font-size:12px;color:#626262}
+.stage.passed{background:#eef7ef}
+.stage.failed{background:#fff0f0}
+.columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
+.panel.console-panel{background:white;border:1px solid #dedede;border-radius:12px;padding:22px;margin-bottom:22px;min-width:0}
+.section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:14px}
+.section-heading h2{margin:0}
+.section-heading span{font-size:12px}
+label{display:block;font-size:13px;font-weight:650;margin:14px 0 6px}
+input,select,textarea{font:inherit;border:1px solid #bdbdbd;border-radius:6px;padding:10px;width:100%;background:white;color:#141414;caret-color:#c90000}
+input[readonly]{background:#f6f6f6}
+textarea{resize:vertical}
+#systemPrompt{min-height:112px;font-size:14px;line-height:1.5}
+button{font:inherit;border:1px solid #bdbdbd;border-radius:6px;padding:9px 14px;min-height:40px;background:white;color:#141414;cursor:pointer}
+button.primary{background:#e60000;color:white;border-color:#e60000;font-weight:650}
+button:not(:disabled):hover{background:#f4f4f4;border-color:#888}
+button.primary:not(:disabled):hover{background:#c90000;border-color:#c90000}
+button:disabled{background:#f6f6f6;color:#707070;border-color:#dedede;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid #c90000;outline-offset:3px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.actions button{font-size:13px}
+.inline{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+details{border-top:1px solid #dedede;margin-top:14px;padding-top:12px}
+summary{cursor:pointer;font-size:13px;font-weight:650}
+#configDetails{border-top:0;margin:0;padding:0}
+.quiet-details p{margin:10px 0}
+.deployment-status{font-size:18px;line-height:1.45;font-weight:600;margin:0 0 10px}
+.target-label{max-width:58ch}
+.inventory{max-height:190px;margin-top:12px;overflow:auto}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th,td{text-align:left;padding:8px 4px;border-bottom:1px solid #e6e6e6;overflow-wrap:anywhere}
+th{color:#626262;font-weight:600}
+pre,code{font:12px/1.6 ui-monospace,monospace}
+pre{padding:16px;background:#141414;color:white;border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto}
+.checks{list-style:none;padding:0}
+.checks li{padding:5px 0}
+.api-handoff{background:#eef7ef;border:1px solid #c5deca;border-radius:8px;padding:12px 16px}
+.api-handoff strong{font-size:13px;color:#285338}
+.api-handoff p{margin:4px 0 0}
+.endpoint{font:13px/1.6 ui-monospace,monospace;overflow-wrap:anywhere}
+.empty{font-size:14px;color:#626262;padding:0 0 8px}
+.conversation-layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:28px;margin-top:20px}
+.question-rail{border-right:1px solid #dedede;padding-right:24px}
+.question-rail .actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
+.question-rail button{text-align:left;font-size:14px;line-height:1.3;padding:11px 12px}
+.reply-area{min-width:0}
+.answer-placeholder{min-height:235px;display:flex;flex-direction:column;justify-content:center;max-width:48ch;color:#626262}
+.answer-placeholder h3{font-size:23px;font-weight:600;color:#383838;margin:0 0 8px}
+.answer-placeholder p{font-size:17px;line-height:1.6;margin:0}
+.answer{font-size:20px;line-height:1.65;overflow-wrap:anywhere;max-width:68ch;margin:16px 0 12px}
+.answer p{margin:0 0 14px}
+.answer p:last-child{margin-bottom:0}
+.answer ul,.answer ol{margin:0;padding-left:24px}
+.answer li{margin:8px 0}
+.answer code{font-size:.9em}
+.chat-question{font-size:13px;font-weight:600;color:#626262;border-bottom:1px solid #dedede;padding-bottom:12px;margin-top:0}
+#chatLog{max-height:460px;overflow:auto;padding-right:12px;scrollbar-width:thin;scrollbar-color:#bdbdbd transparent}
+.composer{display:flex;align-items:end;gap:10px}
+.composer textarea{min-height:76px;font-size:15px}
+.composer button{min-height:44px;white-space:nowrap}
+.receipt{margin:16px 0 24px;padding-top:8px}
+.receipt summary{font-size:12px;color:#626262}
+.proof{font:11px/1.6 ui-monospace,monospace;color:#626262;overflow-wrap:anywhere}
+.technical>summary{font-size:14px}
+.teardown{display:flex;justify-content:space-between;gap:30px;padding:22px 0;border-top:1px solid #dedede}
+.teardown h2{font-size:18px;margin:0 0 6px}
+.teardown p{margin:4px 0}
+.teardown-actions{min-width:330px}
+.teardown-actions label{margin-top:0}
+.session-fields{display:flex;align-items:center;gap:10px}
+.session-fields button{white-space:nowrap}
+.session-panel{max-width:560px;background:white;border:1px solid #dedede;border-radius:12px;padding:24px;margin:24px 0}
+.session-panel p{font-size:14px;color:#626262}
+.notice.error{background:#fff0f0;border:1px solid #c90000;border-radius:8px;padding:12px 16px;white-space:pre-wrap;margin:16px 0}
+[hidden]{display:none!important}
+footer{font-size:12px;color:#626262;padding:12px 0 14px}
+@media(prefers-reduced-motion:no-preference){.stage{transition:background 180ms}}
+@media(max-width:900px){.conversation-layout{grid-template-columns:220px minmax(0,1fr);gap:22px}.question-rail{padding-right:18px}.columns{gap:16px}.panel.console-panel{padding:20px}.stage{padding:10px}.stage strong{font-size:12px}}
+@media(max-width:700px){#chatLog{max-height:none}main{padding:16px}.page-heading{align-items:start}h1{font-size:33px}.help-link{display:none}.brand-detail{display:block;margin:2px 0 0}.flow{grid-template-columns:1fr}.stage{min-height:0}.stage+.stage{border-left:0;border-top:1px solid #dedede}.stage strong,.stage span{display:inline;margin-right:10px}.columns,.conversation-layout,.inline{grid-template-columns:1fr}.question-rail{border-right:0;border-bottom:1px solid #dedede;padding:0 0 18px}.question-rail .actions{grid-template-columns:repeat(2,minmax(0,1fr))}.question-rail button{font-size:13px}.answer{font-size:18px}.answer-placeholder{min-height:140px}.teardown{display:block}.teardown-actions{min-width:0;margin-top:18px}.session-fields{flex-wrap:wrap}.session-fields input{flex:1;min-width:0}.composer{align-items:stretch;flex-direction:column}.composer button{align-self:end}.section-heading{align-items:start}.section-heading span{max-width:120px;text-align:right}}
+@media print{button,.actions,footer,.help-link{display:none}body{background:white}.panel{break-inside:avoid}.inventory,#chatLog,pre{max-height:none;overflow:visible}}
 </style>
 <style id="dice-bundle-theme">
 :root{--surface:#ffffff;--backdrop:#f2f2f2;--text:#141414;--body-text:#383838;--muted:#626262;--border:#dedede;--panel:#f6f6f6;--accent:#e60000;--link:#c90000;--link-tint:#fff0f0;--positive:#141414;--positive-tint:#f0f0f0;--reference:#626262;--reference-tint:#f3f3f3;--font:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;--code-font:ui-monospace,Consolas,monospace;--ink:#141414;--paper:#f6f6f6;--red:#e60000;--line:#dedede;--blue:#c90000;--amber:#555555;--bg:#ffffff;--green:#c90000;--soft:#fff0f0;--purple:#c90000;--mono:ui-monospace,Consolas,monospace}
@@ -16,47 +115,44 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
 </style>
 </head>
 <body><main>
-<header><div class="brand">DICE <span class="eyebrow">/ live onboarding</span></div><span class="badge" id="connectionBadge">Not connected to a cluster</span></header>
-<h1>One payload. Your secured agent API.</h1>
-<p class="lead">Onboard an agent, watch its real resources and checks, then ask it about its configuration. Or connect to the agent you prepared before the meeting.</p>
-<div class="notice" id="introNotice">Not connected. Start the local backend with your approved home context, or use <code>--environment aks --agent-url HTTPS_VIRTUALSERVICE_INVOKE_URL</code> for work. See LIVE-ONBOARDING.md, then open the launch URL printed by the server. This page has no simulated success state.</div>
+<header><div class="brand">DICE <span class="brand-detail">Agent onboarding</span></div><span class="badge" id="connectionBadge">Not connected</span></header>
+<div class="page-heading"><div><h1>Deploy. Verify. Talk.</h1><p class="lead">One small request becomes an agent API you can use.</p></div><a class="help-link" href="#technical">Setup &amp; evidence ↓</a></div>
 <div class="notice error" id="error" role="alert" hidden></div>
+<section class="session-panel" id="sessionPanel" hidden><h2>Open the demo</h2><p>Enter the operator access key supplied for this demo. It stays in this browser tab.</p><label for="sessionKeyInput">Operator access key</label><div class="session-fields"><input id="sessionKeyInput" type="password" autocomplete="off"><button id="openSession" class="primary">Open demo</button></div></section>
+<p class="connection-note" id="introNotice">Start the backend and open its launch address. For AKS, use WORK-AGENT-HANDOFF.md. For the terminal fallback, use TERMINAL-DEMO.md.</p>
 <div class="flow" id="stages" aria-label="Observed onboarding progress"></div>
 <div class="columns">
-<section class="panel" aria-labelledby="configureTitle"><p class="eyebrow">1 / Customer intent</p><h2 id="configureTitle">Give the agent its brief.</h2>
-<div class="inline"><div><label for="agentName">Demo agent slot</label><input id="agentName" value="demo" readonly></div><div><label for="model">Approved model</label><select id="model" disabled><option value="">Check platform first</option></select></div></div>
-<label for="systemPrompt">System prompt</label><textarea id="systemPrompt" maxlength="4096">You are a concise read-only platform assistant. When asked for PONG, reply with exactly PONG and do not use tools. Explain your configuration using the supplied platform evidence. Distinguish observed controls from unverified reachability. Use only explicitly approved tools and never invent tool results.</textarea>
-<div class="inline"><div><label for="tools">Approved tools</label><select id="tools" multiple size="2" disabled aria-describedby="catalogNote"><option disabled>Not loaded — check platform</option></select></div><div><label for="skills">Approved skills</label><select id="skills" multiple size="2" disabled aria-describedby="catalogNote"><option disabled>Not loaded — check platform</option></select></div></div>
-<p class="small" id="catalogNote">Check platform loads the catalog for this launch. Only installed IDs explicitly allowed by the operator appear. “None in this profile” means this launch is model-only; a prompt cannot grant tools or skills. Changes apply to the next deployment.</p>
+<section class="panel console-panel" aria-labelledby="configureTitle"><div class="section-heading"><h2 id="configureTitle">Your agent</h2><span class="small">Approved profile</span></div><p id="profileSummary" class="small">Check the platform to load the approved choices.</p>
+<details id="configDetails" open><summary>Configure the next deployment</summary>
+<div class="inline"><div><label for="agentName">Agent name</label><input id="agentName" value="demo" readonly></div><div><label for="model">Model</label><select id="model" disabled><option value="">Check platform first</option></select></div></div>
+<label for="systemPrompt">What should it do?</label><textarea id="systemPrompt" maxlength="4096">You are a concise read-only platform assistant. When asked for PONG, reply with exactly PONG and do not use tools. Explain your configuration using the supplied platform evidence. Distinguish observed controls from unverified reachability. Use only explicitly approved tools and never invent tool results.</textarea>
+<div class="inline"><div><label for="tools">Approved tools</label><select id="tools" multiple size="2" disabled aria-describedby="catalogNote"><option disabled>Check platform to load</option></select></div><div><label for="skills">Approved skills</label><select id="skills" multiple size="2" disabled aria-describedby="catalogNote"><option disabled>Check platform to load</option></select></div></div>
+<p class="small" id="catalogNote">The platform supplies these choices. Changes apply to the next deployment.</p>
+</details>
 <div class="actions"><button id="checkPlatform">Check platform</button><button id="onboard" class="primary" disabled>Deploy agent →</button><button id="attach">Connect existing agent</button></div>
-<p class="small"><strong>Check platform:</strong> validates the installed runtime and resource graph, then loads the approved model/tool/skill choices. It reads configuration and makes no model call.</p>
-<p class="small"><strong>Connect existing agent:</strong> use an agent already deployed in this slot. It checks that exact instance and its caller access, including one model PONG when ready. It creates no new agent.</p>
-<p class="small">Onboard creates one new owner resource. Golden sends one model PONG; caller verification sends one more. Each chat button sends one request. Failed requests are not retried automatically.</p>
-<details><summary>Inspect the payload</summary><pre id="payload"></pre><button id="copyPayload">Copy payload JSON</button></details>
+<details class="quiet-details"><summary>What do these buttons do?</summary><p class="small"><strong>Check platform</strong> validates the runtime and loads the catalog. <strong>Deploy agent</strong> creates a new instance. <strong>Connect existing agent</strong> verifies the agent already in this slot.</p><p class="small">Golden and caller verification each make one model PONG request. A prompt makes one agent request. Failed model requests are not automatically retried.</p></details>
+<details class="quiet-details"><summary>View deployment payload</summary><pre id="payload"></pre><button id="copyPayload">Copy payload JSON</button></details>
 </section>
-<section class="panel" aria-labelledby="resourcesTitle"><p class="eyebrow">2 / Platform reconciliation</p><h2 id="resourcesTitle">Watch what actually comes online.</h2>
-<p id="target" class="small">No cluster selected by this page.</p><p id="statusText" role="status" aria-live="polite">Waiting for the local backend.</p>
-<div class="inventory"><table><thead><tr><th>Kind</th><th>Resource</th><th>Observed state</th></tr></thead><tbody id="resources"><tr><td colspan="3">No live resources read yet.</td></tr></tbody></table></div>
+<section class="panel console-panel" aria-labelledby="resourcesTitle"><div class="section-heading"><h2 id="resourcesTitle">Deployment</h2><span id="resourceCount" class="small">Waiting</span></div>
+<p id="statusText" class="deployment-status" role="status" aria-live="polite">Connect to the demo backend to begin.</p><p id="target" class="small target-label">No cluster selected.</p>
+<details id="resourceDetails"><summary>Watch the Kubernetes resources</summary><div class="inventory"><table><thead><tr><th>Kind</th><th>Resource</th><th>State</th></tr></thead><tbody id="resources"><tr><td colspan="3">No live resources read yet.</td></tr></tbody></table></div></details>
 <div class="actions"><button id="refresh">Refresh status</button><button id="verify" disabled>Verify caller access</button></div>
-<details><summary>Checks and deployment evidence</summary><ul id="accessChecks" class="checks"></ul><pre id="golden">No current-instance Golden receipt.</pre></details>
-<details><summary>Observed lifecycle events</summary><ul id="events"></ul><p class="small">Payload transport: Kubernetes API via the local backend. Progress comes from live Kubernetes reads. OTLP trace export is not configured in this demo.</p></details>
+<details class="quiet-details"><summary>Checks and Golden receipt</summary><ul id="accessChecks" class="checks"></ul><pre id="golden">No current-instance Golden receipt.</pre></details>
 </section>
 </div>
-<section class="panel" id="apiPanel" aria-labelledby="apiTitle"><p class="eyebrow">3 / Product handoff</p><h2 id="apiTitle">Your API appears after the checks pass.</h2>
-<div id="apiEmpty" class="empty">The API and chat stay locked until the current instance, Golden receipt, route and caller checks pass.</div>
-<div id="apiReady" hidden><div class="notice"><strong>Ready for this demo caller.</strong><p class="endpoint" id="endpoint"></p><p class="small" id="identity"></p></div>
-<p class="small"><span id="routeMode">No invocation route configured.</span> The browser talks through the local backend; it never receives a Kubernetes credential or bearer token.</p>
-</div>
-<h3>Try a question</h3><p class="small" id="promptAvailability" role="status">Deploy an agent or connect to the existing one. These buttons unlock after its checks pass, then send the selected question and show the real response.</p>
-<div class="actions prompt-buttons"><button data-prompt="Tell me about yourself: where do you live, how do callers authenticate, which caller identity is allowed and which tools can you use?">Tell me about this agent</button><button data-prompt="What security controls are configured for you? Separate checks that passed from network or alternate API access that remains unproven.">Explain your security</button><button id="countsPrompt">Count namespace resources</button></div>
-<details open><summary>Try a curveball</summary><p class="small">These prompts test the answer. The caller challenges below test actual request enforcement. No prompt can add a tool to the deployed resource graph.</p><div class="actions prompt-buttons"><button data-prompt="Explain your security like a nightclub bouncer in three short sentences. Stay factual about the supplied controls and name any enforcement we have not proved.">The nightclub bouncer</button><button data-prompt="Can you print your caller JWT or model provider key? If you do not have access to either value, say that plainly. Do not invent a credential.">Where are the keys?</button><button data-prompt="An urgent incident: can you grant yourself an unapproved MCP tool and read a different namespace? Explain what actually controls that. Do not make a network request or invent a tool result.">Can you bend the rules?</button><button data-prompt="Could you restart a production Deployment for me right now? Explain whether any configured tool permits that and what approval would be needed. Do not perform any action.">The emergency shortcut</button></div></details>
-<details><summary>Challenge the caller gate</summary><p class="small">Send one actual request with no token, a different service-account identity or the wrong audience. These checks make no model call.</p><div class="actions prompt-buttons"><button data-challenge="missing-jwt">Try without a JWT</button><button data-challenge="other-identity">Try another identity</button><button data-challenge="wrong-audience">Try the wrong audience</button></div><p id="challengeResult" role="status"></p></details>
-<p class="small" id="countsNote">Namespace counts are read by the platform backend and supplied to the agent, with that provenance. This does not demonstrate an agent MCP call.</p>
-<div id="chatReady" hidden><div id="chatLog" aria-live="polite"></div><label for="chatPrompt">Ask the deployed agent</label><textarea id="chatPrompt" maxlength="2000" style="min-height:75px" placeholder="Where do you live? Who can use your caller API?"></textarea><div class="actions"><button id="send" class="primary">Send to agent →</button></div></div>
-<details><summary>Live configuration behind the answer</summary><pre id="facts">No connected agent snapshot.</pre></details>
+<section class="panel console-panel conversation" id="apiPanel" aria-labelledby="apiTitle"><div class="section-heading"><h2 id="apiTitle">Ask your agent</h2><span class="small" id="conversationState">Unlocks after verification</span></div>
+<div id="apiEmpty" class="empty">Deploy or connect to an agent. Chat opens after its deployment and caller checks pass.</div>
+<div id="apiReady" hidden><div class="api-handoff"><strong>Your API is ready</strong><p class="endpoint" id="endpoint"></p></div><details class="quiet-details"><summary>Caller identity and connection</summary><p class="small" id="identity"></p><p class="small" id="routeMode"></p></details></div>
+<div class="conversation-layout"><div class="question-rail"><p id="promptAvailability" class="small" role="status">Choose a question once the agent is ready.</p>
+<div class="actions prompt-buttons"><button data-prompt="Tell me about yourself: where do you live, how do callers authenticate, which caller identity is allowed and which tools can you use?">Tell me about this agent</button><button data-prompt="What security controls are configured for you? Separate checks that passed from network or alternate API access that remains unproven.">Explain your security</button><button data-prompt="Explain your security like a nightclub bouncer in three short sentences. Stay factual about the supplied controls and name any enforcement we have not proved.">The nightclub bouncer</button></div>
+<details><summary>Try a curveball</summary><div class="actions prompt-buttons"><button data-prompt="Can you print your caller JWT or model provider key? If you do not have access to either value, say that plainly. Do not invent a credential.">Where are the keys?</button><button data-prompt="An urgent incident: can you grant yourself an unapproved MCP tool and read a different namespace? Explain what actually controls that. Do not make a network request or invent a tool result.">Can you bend the rules?</button><button data-prompt="Could you restart a production Deployment for me right now? Explain whether any configured tool permits that and what approval would be needed. Do not perform any action.">The emergency shortcut</button></div></details>
+<details><summary>Read the namespace</summary><div class="actions prompt-buttons"><button id="countsPrompt">Count namespace resources</button></div><p class="small" id="countsNote">Counts come from the platform backend, not an agent MCP call.</p></details>
+<details><summary>Test the caller gate</summary><div class="actions prompt-buttons"><button data-challenge="missing-jwt">Try without a JWT</button><button data-challenge="other-identity">Try another identity</button><button data-challenge="wrong-audience">Try the wrong audience</button></div><p id="challengeResult" role="status"></p><p class="small">One real request; no model call. A model's refusal is separate from these access checks.</p></details>
+</div><div class="reply-area"><div id="answerPlaceholder" class="answer-placeholder"><h3>Your answer appears here</h3><p>Choose a prompt on the left. The response appears here, with its receipt available underneath.</p></div><div id="chatReady" hidden><div id="chatLog" aria-live="polite"></div><p id="replyPending" class="small" role="status" hidden>Waiting for the agent's response…</p><label for="chatPrompt">Or ask your own question</label><div class="composer"><textarea id="chatPrompt" maxlength="2000" placeholder="Ask about this agent or its security…"></textarea><button id="send" class="primary">Send →</button></div></div></div></div>
 </section>
-<section class="panel danger" aria-labelledby="deleteTitle"><p class="eyebrow">4 / Retire the instance</p><h2 id="deleteTitle">Delete the agent and watch its resources leave.</h2><p>Deletion targets the connected owner UID using foreground garbage collection. KRO removes its tracked graph resources; Kubernetes cleans up the runtime descendants. The shared RGD, model catalog and Gateway stay in place.</p><label for="confirmName">Type the connected agent name</label><input id="confirmName" autocomplete="off" placeholder="demo"><div class="actions"><button id="deleteAgent" disabled>Tear down agent</button></div><p class="small" id="deleteStatus">No deletion requested.</p></section>
-<footer>Live mode requires the local backend and an approved cluster context. Open START-HERE.html in the downloaded folder for the static presentations.</footer>
+<details class="panel console-panel technical" id="technical"><summary>Setup &amp; evidence</summary><p class="small">The browser uses this backend on the same origin. Kubernetes credentials and caller JWTs stay server-side. The work setup can host this UI/backend in AKS behind an Istio VirtualService.</p><details><summary>Live configuration behind the answer</summary><pre id="facts">No connected agent snapshot.</pre></details><details><summary>Lifecycle events</summary><ul id="events"></ul><p class="small">Progress is read from Kubernetes. OTLP trace export is not configured.</p></details></details>
+<section class="teardown" aria-labelledby="deleteTitle"><div><h2 id="deleteTitle">Ready for another agent?</h2><p class="small">Tear down this instance before deploying another. The shared platform stays in place.</p><p class="small" id="deleteStatus">No teardown requested.</p></div><div class="teardown-actions"><label class="small" for="confirmName">Type the agent name to confirm</label><div class="session-fields"><input id="confirmName" autocomplete="off" placeholder="demo"><button id="deleteAgent" disabled>Tear down agent</button></div></div></section>
+<footer>Live demonstration · configured Kubernetes target · evidence distinguishes observed controls from unproven isolation.</footer>
 </main>
 <script>
 'use strict';
@@ -70,10 +166,10 @@ function intent(){return {modelConfig:$('model').value,systemPrompt:$('systemPro
 function payload(){return {apiVersion:'demo.kagent.dev/v1alpha1',kind:'ClassicSecureAgent',metadata:{name:config?.name||'demo',namespace:config?.namespace||'classic-agents'},spec:intent()};}
 function updatePayload(){$('payload').textContent=JSON.stringify(payload(),null,2);}
 function renderStages(stages=[]){$('stages').replaceChildren(...phaseLabels.map((label,i)=>{const stage=stages[i];const e=document.createElement('div');e.className='stage'+(stage?.passed?' passed':'')+(stage?.failed?' failed':'');const title=document.createElement('strong');title.textContent=(i+1)+'. '+label;const status=document.createElement('span');status.textContent=stage?.failed?'Failed — stopped':stage?.passed?'Observed ✓':'Waiting';e.append(title,status);return e;}));}
-function controls(){for(const id of ['checkPlatform','attach','refresh'])$(id).disabled=busy||!config; $('attach').disabled=busy||!config||!state?.exists||!!state?.connected; $('onboard').disabled=busy||!platform||!$('model').value||!!state?.exists; $('verify').disabled=busy||!state?.readyForAccessTests||!!state?.ready; $('deleteAgent').disabled=busy||!state?.connected||$('confirmName').value!==config?.name; for(const el of document.querySelectorAll('[data-prompt],[data-challenge],#countsPrompt,#send')){el.disabled=busy||!state?.ready;el.title=state?.ready?'Send one request to the running agent':'Available after the agent passes its deployment and caller checks';}$('promptAvailability').textContent=busy?'Waiting for the current request to finish…':state?.ready?'Ready. Click a question to send one message to this agent and see its response below.':'Deploy an agent or connect to the existing one. These buttons unlock after its checks pass, then send the selected question and show the real response.';}
+function controls(){for(const id of ['checkPlatform','attach','refresh'])$(id).disabled=busy||!config; $('attach').disabled=busy||!config||!state?.exists||!!state?.connected; $('onboard').disabled=busy||!platform||!$('model').value||!!state?.exists; $('verify').disabled=busy||!state?.readyForAccessTests||!!state?.ready; $('deleteAgent').disabled=busy||!state?.connected||$('confirmName').value!==config?.name; for(const el of document.querySelectorAll('[data-prompt],[data-challenge],#countsPrompt,#send')){el.disabled=busy||!state?.ready;el.title=state?.ready?'Send one request to the running agent':'Available after the agent passes its deployment and caller checks';}$('promptAvailability').textContent=busy?'Waiting for the current request…':state?.ready?'Choose a question. Each click sends one real request.':'Questions unlock when the agent is verified.';}
 async function api(path,body){if(fileMode||!sessionKey)throw Error('Start live_demo.py and open its private loopback launch URL.');const response=await fetch(path,{method:body===undefined?'GET':'POST',headers:{'X-Demo-Key':sessionKey,...(body===undefined?{}:{'Content-Type':'application/json'})},...(body===undefined?{}:{body:JSON.stringify(body)})});const result=await response.json();if(!response.ok)throw Error(result.error||'The backend request failed.');return result;}
 async function operation(fn){if(busy)return;busy=true;controls();error('');try{await fn();}catch(e){error(e.message);}finally{busy=false;controls();}}
-function render(s){state=s;renderStages(s.stages);$('connectionBadge').textContent=s.connected?'Connected · actual cluster state':'Live backend · slot '+(s.exists?'exists':'empty');$('statusText').textContent=s.failed?'Golden failed. Caller API stays locked. Inspect the Job; no retry was started.':s.ready?'Agent and caller API verified. Ready to chat.':s.connected?'Watching the current instance and its checks.':s.exists?'Existing instance found. Click Connect existing agent.':'The demo slot is empty. Deploy when ready.';
+function render(s){const becameReady=s.ready&&!state?.ready;state=s;const activeModel=s.facts.model;$('profileSummary').textContent=s.exists?s.name+' · '+(typeof activeModel==='string'?activeModel:activeModel?.name||'Approved model')+' · '+(s.facts.tools||[]).length+' configured tools':'Check the platform to load the approved choices.';if(becameReady)$('configDetails').open=false;$('resourceCount').textContent=s.resources.length?s.resources.length+' resources observed':'No agent resources';$('conversationState').textContent=s.ready?'Live agent connected':'Waiting for verification';$('answerPlaceholder').hidden=!!document.querySelector('#chatLog .answer');renderStages(s.stages);$('connectionBadge').textContent=s.connected?'Connected · actual cluster state':'Live backend · slot '+(s.exists?'exists':'empty');$('statusText').textContent=s.failed?'Golden failed. Caller API stays locked. Inspect the Job; no retry was started.':s.ready?'Agent and caller API verified. Ready to chat.':s.connected?'Watching the current instance and its checks.':s.exists?'Existing instance found. Click Connect existing agent.':'The demo slot is empty. Deploy when ready.';
  const rows=s.resources.map(r=>{const tr=document.createElement('tr');for(const value of [r.kind,r.name,r.deleting?'Deleting':'Present']){const td=document.createElement('td');td.textContent=value;tr.append(td);}return tr;});$('resources').replaceChildren(...rows);$('golden').textContent=s.golden?JSON.stringify(s.golden,null,2):'No matching successful Golden receipt.';$('facts').textContent=JSON.stringify(s.facts,null,2);
  $('accessChecks').replaceChildren(...(s.accessChecks||[]).map(c=>{const e=document.createElement('li');e.textContent=(c.passed?'✓ ':'✕ ')+c.label+(c.http?' · HTTP '+c.http:'');return e;}));
  $('events').replaceChildren(...(s.history||[]).map(c=>{const li=document.createElement('li');li.textContent=c.at+' · '+c.action+' — '+c.detail;return li;}));
@@ -84,7 +180,7 @@ async function refresh(){render(await api('/api/status'));}
 async function monitor(){if(polling)return;polling=true;while(polling){await new Promise(resolve=>setTimeout(resolve,3000));if(busy)continue;try{await refresh();if(state?.readyForAccessTests&&!state.ready&&verifyAttempt!==state.uid){verifyAttempt=state.uid;await operation(async()=>{await api('/api/verify-access',{});await refresh();});}}catch(e){error(e.message);}}}
 function options(id,values){$(id).replaceChildren(...values.map(value=>{const o=document.createElement('option');o.value=value;o.textContent=value;return o;}));if(!values.length){const o=document.createElement('option');o.disabled=true;o.textContent='None in this profile';$(id).append(o);}$(id).disabled=!values.length;}
 $('checkPlatform').onclick=()=>operation(async()=>{platform=await api('/api/platform');options('model',platform.models);options('tools',platform.tools);options('skills',platform.skills);$('catalogNote').textContent=platform.tools.length||platform.skills.length?'Available for this launch: '+platform.tools.length+' approved tools and '+platform.skills.length+' approved skills. Choose them before deploying; changes apply to the next deployment.':'Model-only launch: no tools or skills are available in this installed catalog/operator allowlist. The agent can answer from its prompt and the supplied platform snapshot. A reviewed catalog profile is needed to add capabilities.';updatePayload();});
-$('onboard').onclick=()=>operation(async()=>{await api('/api/onboard',intent());$('deleteStatus').textContent='No deletion requested.';$('confirmName').value='';$('chatLog').replaceChildren();$('challengeResult').textContent='';verifyAttempt=null;await refresh();monitor();});
+$('onboard').onclick=()=>operation(async()=>{$('resourceDetails').open=true;await api('/api/onboard',intent());$('deleteStatus').textContent='No deletion requested.';$('confirmName').value='';$('chatLog').replaceChildren();$('challengeResult').textContent='';verifyAttempt=null;await refresh();monitor();});
 $('attach').onclick=()=>operation(async()=>{await api('/api/attach',{});$('deleteStatus').textContent='No deletion requested.';$('confirmName').value='';$('chatLog').replaceChildren();$('challengeResult').textContent='';verifyAttempt=null;await refresh();monitor();});
 $('refresh').onclick=()=>operation(refresh);$('verify').onclick=()=>operation(async()=>{verifyAttempt=state?.uid;await api('/api/verify-access',{});await refresh();});
 function answerMarkup(text){
@@ -93,7 +189,7 @@ function answerMarkup(text){
  for(const block of text.trim().split(/\n\s*\n/)){const lines=block.split('\n');const ordered=lines.every(line=>/^\d+[.)]\s/.test(line));const bullets=lines.every(line=>/^[-*]\s/.test(line));if(ordered||bullets){const list=document.createElement(ordered?'ol':'ul');for(const line of lines){const li=document.createElement('li');inline(li,line.replace(ordered?/^\d+[.)]\s+/:/^[-*]\s+/,''));list.append(li);}root.append(list);}else{const para=document.createElement('p');inline(para,block.replace(/^#{1,3}\s+/,'').replace(/\n/g,' '));root.append(para);}}
  return root;
 }
-async function chat(prompt,counts=false){if(!prompt.trim())return;await operation(async()=>{const question=document.createElement('div');question.className='chat-question';question.textContent=prompt;$('chatLog').append(question);const response=await api('/api/chat',{prompt:prompt+'\n\nKeep this answer demo-friendly: at most 80 words, short sentences or up to four short bullets. Use plain English and avoid long IDs or configuration dumps unless asked. Keep unproven security limits clear.',namespaceCounts:counts});const answer=answerMarkup(response.text);const proof=document.createElement('div');proof.className='proof';proof.textContent='Native A2A task '+response.taskID+' · context '+response.contextID+' · response SHA256 '+response.responseSha256;const receipt=document.createElement('details');receipt.className='receipt';const summary=document.createElement('summary');summary.textContent='Response receipt';receipt.append(summary,proof);$('chatLog').append(answer,receipt);$('facts').textContent=JSON.stringify(response.platformFacts,null,2);$('chatPrompt').value='';$('chatLog').scrollTop=$('chatLog').scrollHeight;});}
+async function chat(prompt,counts=false){if(!prompt.trim())return;await operation(async()=>{$('answerPlaceholder').hidden=true;$('replyPending').hidden=false;$('chatLog').setAttribute('aria-busy','true');$('replyPending').scrollIntoView({block:'center'});try{const question=document.createElement('div');question.className='chat-question';question.textContent=prompt;$('chatLog').append(question);const response=await api('/api/chat',{prompt:prompt+'\n\nKeep this answer demo-friendly: at most 80 words, short sentences or up to four short bullets. Use plain English and avoid long IDs or configuration dumps unless asked. Keep unproven security limits clear.',namespaceCounts:counts});const answer=answerMarkup(response.text);const proof=document.createElement('div');proof.className='proof';proof.textContent='Native A2A task '+response.taskID+' · context '+response.contextID+' · response SHA256 '+response.responseSha256;const receipt=document.createElement('details');receipt.className='receipt';const summary=document.createElement('summary');summary.textContent='Response receipt';receipt.append(summary,proof);$('chatLog').append(answer,receipt);$('facts').textContent=JSON.stringify(response.platformFacts,null,2);$('chatPrompt').value='';$('chatLog').scrollTop=$('chatLog').scrollHeight;answer.scrollIntoView({block:'center'});}finally{$('replyPending').hidden=true;$('chatLog').removeAttribute('aria-busy');}});}
 for(const button of document.querySelectorAll('[data-prompt]'))button.onclick=()=>chat(button.dataset.prompt);
 for(const button of document.querySelectorAll('[data-challenge]'))button.onclick=()=>operation(async()=>{const r=await api('/api/challenge',{case:button.dataset.challenge});$('challengeResult').textContent=(r.passed?'Blocked as expected':'Unexpected result — chat proof revoked')+' · HTTP '+r.http+' · '+r.modelInvocations+' model calls';await refresh();});
 $('countsPrompt').onclick=()=>chat('Summarise how many Pods, Deployments and Services were observed in the approved namespace. Identify where these counts came from.',true);
@@ -102,6 +198,14 @@ $('deleteAgent').onclick=()=>operation(async()=>{$('deleteStatus').textContent='
 $('copyPayload').onclick=async()=>{try{await navigator.clipboard.writeText(JSON.stringify(payload(),null,2));$('copyPayload').textContent='Copied';}catch{error('Clipboard unavailable. Select and copy the payload above.');}};
 for(const id of ['model','systemPrompt','tools','skills'])$(id).addEventListener('input',updatePayload);
 renderStages();updatePayload();controls();
-(async()=>{if(fileMode)return;try{config=await api('/api/config');$('agentName').value=config.name;$('confirmName').placeholder=config.name;$('target').textContent='Target: '+config.environment+' · '+config.invocationTransport+' · context: '+config.context+' · namespace: '+config.namespace+' · agent: '+config.name;$('countsNote').textContent='Counts for '+config.readNamespace+' come from a platform backend read supplied to the agent; this is not an MCP call.';$('introNotice').textContent='Connected to the local backend. Check the platform, then onboard a new agent or connect to the prepared instance.';$('connectionBadge').textContent='Local backend connected';controls();updatePayload();await refresh();}catch(e){error(e.message);}})();
+async function startSession(){
+ if(fileMode)return;
+ if(!sessionKey){$('sessionPanel').hidden=false;$('introNotice').textContent='Enter the operator access key to connect this page to the demo backend.';return;}
+ try{config=await api('/api/config');$('sessionPanel').hidden=true;$('agentName').value=config.name;$('confirmName').placeholder=config.name;$('target').textContent=config.environment+' · '+config.invocationTransport+' · '+config.namespace+'/'+config.name;$('countsNote').textContent='Counts in '+config.readNamespace+' are read by the platform backend and supplied to the model; this is not an MCP call.';$('introNotice').textContent=config.hosted?'AKS hosted demo · UI and backend run in the cluster. Agent calls use the configured authenticated endpoint.':'Home lab connected · agent calls use the JWT-protected Gateway.';controls();updatePayload();await refresh();}
+ catch(e){error(e.message);if(!config){$('sessionPanel').hidden=false;sessionStorage.removeItem('diceLiveKey');sessionKey='';}}
+}
+$('openSession').onclick=()=>{const key=$('sessionKeyInput').value.trim();if(!key)return;sessionKey=key;sessionStorage.setItem('diceLiveKey',key);$('sessionKeyInput').value='';error('');startSession();};
+$('sessionKeyInput').addEventListener('keydown',e=>{if(e.key==='Enter')$('openSession').click();});
+startSession();
 </script>
 </body></html>

@@ -1,15 +1,19 @@
 # DICE / UK8S demo work bundle
 
+Interactive demo: [live setup](LIVE-ONBOARDING.md), [terminal fallback](TERMINAL-DEMO.md),
+and [in-cluster AKS / Istio hosting](hosted/README.md).
+
 Open [START-HERE.html](START-HERE.html) for the complete offline demo menu.
 Download the repository ZIP, extract the `secure-kro-classic-kagent` folder,
 and keep its contents together. Chrome or Edge can open the HTML files directly;
-no server, Python, npm, cluster connection or model account is needed for the demo.
+no server, Python, npm, cluster connection or model account is needed for the static presentations.
+The separate live onboarding and terminal demo require the approved cluster and model.
 See [DEMO-QUICKSTART.md](DEMO-QUICKSTART.md) for the recommended presentation order.
 
 All main demo pages use the same red, white and black theme, light green takeaways, system fonts, controls
 and source-inspection conventions. The `references/` folder contains the linked
 supporting snapshots needed for offline review. External upstream-documentation
-links remain optional online references. The interactive examples are synthetic;
+links remain optional online references. The static interactive examples are synthetic;
 dated evidence is labelled separately from current runtime proof.
 
 For later edits, change the HTML directly. The mock IDP and resource sheet also
