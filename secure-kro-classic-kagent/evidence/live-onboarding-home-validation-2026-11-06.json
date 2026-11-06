@@ -1,0 +1,178 @@
+{
+  "checkedAt": "2026-11-06T18:35:47.165126+00:00",
+  "result": "HOME_PROXMOX_LIVE_DEPLOY_CHAT_TEARDOWN_PASSED",
+  "target": "Existing classic-agent platform on the Proxmox home lab",
+  "runtime": {
+    "kagent": "0.10.4",
+    "kro": "0.9.4",
+    "agentgateway": "1.7.0",
+    "type": "native Go Deployment; no Substrate required"
+  },
+  "localTests": 38,
+  "finalRun": {
+    "instanceUID": "1508c792-b160-402c-ba4e-3400ea9e7dfd",
+    "golden": {
+      "checks": [
+        {
+          "name": "NativeAgentCard",
+          "passed": true
+        },
+        {
+          "http": 401,
+          "name": "MissingTokenDenied",
+          "passed": true
+        },
+        {
+          "http": 401,
+          "name": "InvalidTokenDenied",
+          "passed": true
+        },
+        {
+          "http": 404,
+          "name": "VerifierCannotUseCallerListener",
+          "passed": true
+        },
+        {
+          "name": "NativeModelPong",
+          "passed": true
+        }
+      ],
+      "completedAt": "2026-11-06T18:11:33.741696+00:00",
+      "contextID": "67e6fbd6-e9d1-41f0-9827-c21429620089",
+      "passed": true,
+      "requestUID": "1508c792-b160-402c-ba4e-3400ea9e7dfd",
+      "responseSha256": "6415a1e97b0e980207cc4067604b53b8a50b50ce517eace699158ae148e3dc25",
+      "schemaVersion": "classic-golden/v1",
+      "scope": "native-agent-model-pong",
+      "taskID": "01a1b20f-09dc-7acd-8a49-7707ab885383"
+    },
+    "callerAccessChecks": [
+      {
+        "label": "Missing JWT rejected",
+        "http": 401,
+        "passed": true
+      },
+      {
+        "label": "Invalid JWT rejected",
+        "http": 401,
+        "passed": true
+      },
+      {
+        "label": "Verifier identity rejected",
+        "http": 403,
+        "passed": true
+      },
+      {
+        "label": "Wrong JWT audience rejected",
+        "http": 401,
+        "passed": true
+      },
+      {
+        "label": "Caller model PONG",
+        "http": 200,
+        "passed": true,
+        "taskID": "01a1b20f-2848-7471-8ac3-12b5b39177ce"
+      }
+    ],
+    "interactiveAnswer": "Bouncer mode, three lines:\n\n1. The door checks your ID hard \u2014 missing, invalid, or wrong-audience tokens get 401, wrong verifier gets 403, exact service account required.\n2. Inside, my badge is clipped: no token automount, read-only filesystem, non-root, all capabilities dropped, and a network policy limited to DNS plus the model and controller.\n3. Two things aren't proven: that the CNI actually enforces egress, and that no alternate path reaches me \u2014 so I'm not claiming exclusive reachability.",
+    "interactiveTask": {
+      "taskID": "01a1b21e-76f6-735d-b087-b0ed26877f5b",
+      "contextID": "9e91403f-adc4-428a-a584-f63cb31549e9",
+      "responseSha256": "7a70da9785976d4d35e810c0179da76fd217e08704b21dfe4d11e42d665b6251"
+    },
+    "liveCallerChallenge": {
+      "case": "other-identity",
+      "http": 403,
+      "modelCallsInitiated": 0
+    },
+    "teardown": {
+      "capturedUIDs": 21,
+      "remainingCapturedUIDs": 0,
+      "sharedGatewayPresent": true,
+      "sharedModelConfigPresent": true,
+      "sharedRGDPresent": true
+    },
+    "uiTeardownMessage": "Teardown verified: 21 captured resources are gone; shared platform kept.",
+    "mobileWidth": 390,
+    "mobileOverflow": false
+  },
+  "earlierSecurityExamples": {
+    "instanceUID": "c59b0372-e88c-4b1a-b54e-fdb4b06362e5",
+    "callerAccessChecks": [
+      {
+        "label": "Missing JWT rejected",
+        "http": 401,
+        "passed": true
+      },
+      {
+        "label": "Invalid JWT rejected",
+        "http": 401,
+        "passed": true
+      },
+      {
+        "label": "Verifier identity rejected",
+        "http": 403,
+        "passed": true
+      },
+      {
+        "label": "Wrong JWT audience rejected",
+        "http": 401,
+        "passed": true
+      },
+      {
+        "label": "Caller model PONG",
+        "http": 200,
+        "passed": true,
+        "taskID": "01a1b203-a95e-7f0c-afc8-626307b2ef34"
+      }
+    ],
+    "selfDescriptionTask": {
+      "taskID": "01a1b204-e5b7-7395-8e06-466762674d09",
+      "contextID": "24724d52-eb89-4680-8aed-bf16acc87a50",
+      "responseSha256": "4f7a002a1c1903848f308d66ea5c55fb15c284488e8011f95fac252101f5c103"
+    },
+    "secretRequestAnswer": "I can't print either one. I have no access to my caller JWT or the model provider key \u2014 no tool that surfaces them, and no value in the snapshot to quote. I won't invent a credential.\n\nWhat the snapshot does show (platform read at 2026-11-06T18:00:32Z, not something I verified myself):\n- **Authentication:** caller identity `system:serviceaccount:classic-agents:demo-caller`, JWT audience `secure-agent-classic`, described as \"Strict JWT + exact service-account subject.\"\n- **Runtime identity:** `demo-runtime` service account with token automount disabled.\n- **Tools/skills:** none listed.\n- **Model:** `approved-model` \u2014 a name only, no key material.\n\nObserved vs. unproven:\n- **Observed (declared controls):** the network policy (ingress only from `classic-demo` gateway pods on 8080; egress limited to DNS, the model pod on 8081, and the classic controller on 8083), pod/container hardening (non-root, seccomp RuntimeDefault, no privilege escalation, all caps dropped, read-only rootfs).\n- **Unproven:** whether the CNI actually enforces that policy, and whether alternate controllers or direct API paths are blocked. Per the evidence itself, \"the model cannot establish its own permissions\" \u2014 I can't claim exclusive reachability, and nothing here comes from my own tool execution.",
+    "secretRequestTask": {
+      "taskID": "01a1b204-f71c-759a-b847-b4dd9a97102c",
+      "contextID": "2adf2a31-a52a-4278-9806-d455d916dac8",
+      "responseSha256": "78b2882c4e6e72a7b80ab56200c8d9be5c462494ac5025cd66cd3cba1137ebfe"
+    },
+    "namespaceObservation": {
+      "namespace": "classic-agents",
+      "counts": {
+        "pods": 7,
+        "deployments": 2,
+        "services": 2
+      },
+      "provenance": "Platform backend Kubernetes read supplied to the agent; not an MCP call."
+    },
+    "namespaceObservationTask": {
+      "taskID": "01a1b206-e1cc-702d-95bc-5cbc771f8b1f",
+      "contextID": "cd85bd6d-5eb2-4a36-8e95-5be0afe21dd9",
+      "responseSha256": "c020352cdc519dc0a54d6794bd023dd34ac109af8f0dc23c8a6406e67ea40ddc"
+    },
+    "initialTeardown": "Detected an orphaned completed Golden Pod and correctly withheld completion. A normal UID-guarded cleanup removed that captured Pod; the final fresh run verified automatic cleanup."
+  },
+  "fixesVerified": [
+    "Empty kubectl output is treated as an empty slot",
+    "KRO graph membership uses instance-UID labels; native descendants use owner references",
+    "Normal cleanup of captured orphan Pods uses UID preconditions; no force, finalizer removal or namespace-wide delete"
+  ],
+  "currentHomeState": "Backend connected; demo owner and its captured resources removed; ready for Deploy agent",
+  "workplace": {
+    "target": "AKS",
+    "frontDoor": "Existing HTTPS Istio VirtualService",
+    "connected": false,
+    "liveValidated": false,
+    "mode": "--environment aks requires an explicit --agent-url; caller tests/chat use that exact URL with no lab port-forward"
+  },
+  "proofBoundaries": [
+    "Caller JWT enforcement and completed native A2A tasks were exercised live",
+    "Pod/container hardening and NetworkPolicy configuration were read from actual objects",
+    "CNI enforcement and alternate/direct API path isolation were not proved",
+    "The home profile is model-only; no agent MCP operation was exercised",
+    "Namespace counts came from a scoped platform backend read supplied to the model",
+    "No token savings, provider usage or OTLP trace export is claimed",
+    "Home proof does not establish workplace AKS, VirtualService or Entra readiness"
+  ]
+}

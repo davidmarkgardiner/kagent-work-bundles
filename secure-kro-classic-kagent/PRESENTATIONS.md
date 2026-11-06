@@ -186,4 +186,4 @@ Open `sre-lens.html`. The first slide selects Kubernetes/GitLab for a workload i
 
 ## Live onboarding frontend
 
-[Live onboarding](live-onboarding.html) is separate from the synthetic slide flows. Launch `python3 live_demo.py --context {{APPROVED_DEMO_CONTEXT}}` and open its loopback URL. It supports create, connect-existing, current-instance Golden/access checks, API handoff, evidence-backed chat and UID-guarded owner deletion. See [LIVE-ONBOARDING.md](LIVE-ONBOARDING.md) for scope, prerequisites and the current validation boundary.
+[Live onboarding](live-onboarding.html) is separate from the synthetic slide flows. Launch `python3 live_demo.py --environment home-lab --context {{APPROVED_HOME_CONTEXT}}` and open its loopback URL. It supports create, connect-existing, current-instance Golden/access checks, API handoff, evidence-backed chat and UID-guarded owner deletion. See [LIVE-ONBOARDING.md](LIVE-ONBOARDING.md) for scope, prerequisites and the current validation boundary.

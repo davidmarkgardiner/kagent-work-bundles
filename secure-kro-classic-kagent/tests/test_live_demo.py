@@ -51,11 +51,34 @@ def fixture():
                         ('NetworkPolicy','-boundary'),('NetworkPolicy','-verifier'),('AgentgatewayPolicy','-verify'),
                         ('AgentgatewayPolicy','-card'),('HTTPRoute','-verify'),('HTTPRoute','-card'),('ConfigMap','-golden')]:
         objects.append(obj(kind,'demo'+suffix,kind+suffix+'-1','owner-1'))
+    for entry in objects:
+        if entry['kind'] not in ('ClassicSecureAgent', 'Deployment', 'Service'):
+            entry['metadata'].pop('ownerReferences', None)
+            entry['metadata']['labels'] = {'kro.run/instance-id':'owner-1','kro.run/owned':'true'}
     receipt = dict(schemaVersion='classic-golden/v1', passed=True, requestUID='owner-1', taskID='golden-task', contextID='golden-context')
     return objects, receipt
 
 
 class LiveDemoTests(unittest.TestCase):
+    def test_real_kubectl_empty_output_is_an_empty_slot_not_a_json_error(self):
+        b=backend();b.run=lambda *args,**kwargs:''
+        state=b.inspect()
+        self.assertFalse(state['exists'])
+        self.assertFalse(state['ready'])
+        self.assertEqual(state['resources'],[])
+
+    def test_workplace_endpoint_requires_https_and_cannot_embed_credentials(self):
+        accepted='https://agents.example.com/classic/classic-agents/demo/invoke'
+        self.assertEqual(live_demo.validate_agent_url(accepted),accepted)
+        for url in ['http://agents.example.com/invoke','https://user:password@agents.example.com/invoke',
+                    'https://agents.example.com/invoke?token=secret','https://agents.example.com/invoke#fragment']:
+            with self.assertRaises(ValueError):live_demo.validate_agent_url(url)
+
+    def test_virtualservice_mode_never_opens_a_lab_port_forward(self):
+        b=backend();b.args.agent_url='https://agents.example.com/invoke'
+        with patch.object(live_demo.subprocess,'Popen',side_effect=AssertionError('No port-forward in VirtualService mode')):
+            with b.gateway() as url:self.assertEqual(url,b.args.agent_url)
+
     def connected(self):
         b = backend()
         objects, receipt = fixture()
@@ -90,7 +113,7 @@ class LiveDemoTests(unittest.TestCase):
             elif change == 'subject':
                 candidate[6]['spec']['traffic']['authorization']['policy']['matchExpressions'] = ['true']
             elif change == 'ownership':
-                candidate[5]['metadata']['ownerReferences'] = [dict(uid='other-owner')]
+                candidate[5]['metadata']['labels']['kro.run/instance-id'] = 'other-owner'
             else:
                 candidate[6]['spec']['traffic']['jwtAuthentication']['providers'][0]['audiences'] = ['other']
             b.inventory = lambda: copy.deepcopy(candidate)
@@ -130,6 +153,26 @@ class LiveDemoTests(unittest.TestCase):
                 b.verify_access()
             self.assertEqual(call.call_count, 5)
             self.assertIsNone(b.access)
+
+    def test_live_challenge_sends_one_bodyless_request_and_reports_actual_denial(self):
+        b, _, _ = self.connected()
+        @contextmanager
+        def gateway():yield 'http://127.0.0.1/invoke'
+        b.gateway=gateway;b.token=lambda *args:'different-identity'
+        with patch.object(live_demo.query.transport,'request',return_value=(403,{})) as call:
+            result=b.challenge(dict(case='other-identity'))
+        self.assertTrue(result['passed'])
+        self.assertEqual(result['modelInvocations'],0)
+        self.assertEqual(call.call_args.args,('http://127.0.0.1/invoke','different-identity'))
+
+    def test_unexpected_challenge_result_revokes_chat_proof(self):
+        b, _, _ = self.connected()
+        @contextmanager
+        def gateway():yield 'http://127.0.0.1/invoke'
+        b.gateway=gateway;b.access=dict(uid=b.uid,fingerprint=b.inspect()['fingerprint'],checks=[])
+        with patch.object(live_demo.query.transport,'request',return_value=(200,{})):
+            self.assertFalse(b.challenge(dict(case='missing-jwt'))['passed'])
+        self.assertIsNone(b.access)
 
     def test_payload_cannot_choose_a_namespace_command_or_unapproved_tool(self):
         b = backend()
@@ -193,6 +236,35 @@ class LiveDemoTests(unittest.TestCase):
         self.assertTrue(state['deletion']['complete'])
         self.assertTrue(state['exists'])
         self.assertFalse(state['connected'])
+
+    def orphan_case(self):
+        b=backend();b.uid='owner-1'
+        b.deletion=dict(rootUID='owner-1',uids={'owner-1','job-1','pod-1'},cleanupSubmitted=set(),
+                        captured={'pod-1':dict(kind='Pod',name='demo-golden-pod',owners=['job-1'])})
+        pod=dict(metadata=dict(uid='pod-1'))
+        b.get=lambda kind,name: None if kind==live_demo.OWNER else pod
+        writes=[];b.run=lambda *args,**kw:writes.append((args,kw)) or '{}'
+        return b,pod,writes
+
+    def test_captured_orphan_pod_cleanup_is_uid_guarded_and_submitted_once(self):
+        b,_,writes=self.orphan_case();b.cleanup_orphans_once();b.cleanup_orphans_once()
+        self.assertEqual(len(writes),1)
+        self.assertEqual(writes[0][0][2],'/api/v1/namespaces/classic-agents/pods/demo-golden-pod')
+        options=json.loads(writes[0][1]['text'])
+        self.assertEqual(options['preconditions'],dict(uid='pod-1'))
+        self.assertNotIn('gracePeriodSeconds',options)
+
+    def test_orphan_cleanup_preserves_replacement_pods(self):
+        b,pod,writes=self.orphan_case();pod['metadata']['uid']='new-pod'
+        b.cleanup_orphans_once();self.assertEqual(writes,[])
+
+    def test_orphan_cleanup_leaves_managed_pods_and_existing_owner_alone(self):
+        b,pod,writes=self.orphan_case();pod['metadata']['ownerReferences']=[dict(uid='job-1')]
+        b.cleanup_orphans_once();self.assertEqual(writes,[])
+        pod['metadata'].pop('ownerReferences');b.get=lambda *args:dict(metadata=dict(uid='owner-1'))
+        b.cleanup_orphans_once();self.assertEqual(writes,[])
+        b.get=lambda *args:dict(metadata=dict(uid='replacement-owner'))
+        b.cleanup_orphans_once();self.assertEqual(writes,[])
 
 
 class HTTPBoundaryTests(unittest.TestCase):

@@ -32,10 +32,12 @@ and Gateway-control sheets. Yesterday's animated decks and YAML explorer are
 linked from that entry point. See [PRESENTATIONS.md](PRESENTATIONS.md) for scope.
 
 For the live onboarding demo, see [LIVE-ONBOARDING.md](LIVE-ONBOARDING.md).
-Run `python3 live_demo.py --context {{APPROVED_DEMO_CONTEXT}}` and open its
+Run `python3 live_demo.py --environment home-lab --context {{APPROVED_HOME_CONTEXT}}` and open its
 loopback launch URL to onboard or connect to an agent, verify caller access,
 chat through its Gateway API and delete the connected owner by UID.
-Live cluster validation is separate from the local fixture checks.
+The live Proxmox home cycle passed deploy, checks, chat and teardown of 21 captured resources.
+See [the home receipt](evidence/live-onboarding-home-validation-2026-11-06.json).
+Workplace AKS remains unconnected; its mode requires the actual HTTPS VirtualService URL.
 
 For Story 2, [SRE Lens asks the right specialists](sre-lens.html) adds a five-slide
 walkthrough of selective delegation, scoped MCP reads, evidence synthesis and
