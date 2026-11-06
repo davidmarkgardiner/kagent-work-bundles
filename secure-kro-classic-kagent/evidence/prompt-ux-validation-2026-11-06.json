@@ -1,0 +1,56 @@
+{
+  "checkedAt": "2026-11-06T20:01:24.075716+00:00",
+  "scope": "Prompt discovery and control explanations; existing live backend behavior unchanged",
+  "fixtureChecks": {
+    "promptsVisibleBeforeDeployment": true,
+    "lockedUntilChecks": true,
+    "selectedPromptSentInPayload": true,
+    "responseRendered": true,
+    "mobileWidth": 390,
+    "mobileOverflow": false
+  },
+  "liveHomeCheck": {
+    "instanceUID": "6fee77b7-78be-461b-80d8-291c7fd8488d",
+    "callerVerification": {
+      "passed": true,
+      "checks": [
+        {
+          "label": "Missing JWT rejected",
+          "http": 401,
+          "passed": true
+        },
+        {
+          "label": "Invalid JWT rejected",
+          "http": 401,
+          "passed": true
+        },
+        {
+          "label": "Verifier identity rejected",
+          "http": 403,
+          "passed": true
+        },
+        {
+          "label": "Wrong JWT audience rejected",
+          "http": 401,
+          "passed": true
+        },
+        {
+          "label": "Caller model PONG",
+          "http": 200,
+          "passed": true,
+          "taskID": "01a1b272-a18c-7780-b5e8-d83649fe1e3b"
+        }
+      ]
+    },
+    "nativeTaskReceipt": "Native A2A task 01a1b273-0213-7a02-a994-cd727e7f0079 \u00b7 context 537be60a-a83e-4ac4-8f33-111a240b7cb2 \u00b7 response SHA256 ab8bf5da608d1d260e0c73d64e0567b37c13a6051df8f0f5e4f1dd46d57a5601",
+    "fixtureResponse": false,
+    "agentLeftRunning": true
+  },
+  "catalog": "Model-only home profile; no MCP tool or native skill configured in this launch",
+  "changes": [
+    "Explain Check platform and Connect existing agent beside the controls",
+    "Distinguish unloaded catalog from none available in this profile",
+    "Display clickable examples before readiness, keeping invocation disabled until checks pass",
+    "Disable Connect existing agent when the slot is empty or already connected"
+  ]
+}

@@ -120,6 +120,10 @@ change the shared listener policy to make another name work.
 
 ## Make the security conversation interactive
 
+Example questions are visible before deployment, with buttons disabled until the
+agent passes its checks. Clicking one then sends the selected question and shows
+the returned answer and native task receipt.
+
 Use **Try a curveball** for the nightclub-bouncer explanation, a request for keys,
 a question about extra tools/another namespace, or the emergency shortcut. These
 are real model responses with native task receipts; a refusal is not scored as
