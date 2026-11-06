@@ -9,7 +9,7 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent.parent
-PRIMARY = ['START-HERE.html', 'journey.html', 'triage.html', 'sdlc.html', 'showcase.html', 'resources.html', 'tomorrow.html', 'presentation.html', 'index.html']
+PRIMARY = ['START-HERE.html', 'journey.html', 'sre-lens.html', 'triage.html', 'sdlc.html', 'showcase.html', 'resources.html', 'tomorrow.html', 'presentation.html', 'index.html']
 THEME = (ROOT / 'demo-theme.css').read_text()
 STYLE = '<style id="dice-bundle-theme">\n' + THEME + '\n</style>'
 

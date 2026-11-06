@@ -7,7 +7,7 @@ import re
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parent
-PRIMARY = ['START-HERE.html', 'journey.html', 'triage.html', 'sdlc.html', 'showcase.html', 'resources.html', 'tomorrow.html', 'presentation.html', 'index.html']
+PRIMARY = ['START-HERE.html', 'journey.html', 'sre-lens.html', 'triage.html', 'sdlc.html', 'showcase.html', 'resources.html', 'tomorrow.html', 'presentation.html', 'index.html']
 
 
 class Document(HTMLParser):
@@ -53,6 +53,13 @@ def verify():
                 for link in data.get('deckLinks', []):
                     if not (ROOT / urlsplit(link['href']).path).is_file():
                         errors.append(page.name + ': missing chapter link ' + link['href'])
+    lens = json.loads(re.search(r'id="deckData">(.*?)</script>', (ROOT / 'sre-lens.html').read_text(), re.S).group(1))
+    if [slide['id'] for slide in lens['slides']] != ['route', 'reads', 'receipts', 'consume']:
+        errors.append('Unexpected SRE Lens chapters')
+    for slide in lens['slides']:
+        for node in slide['nodes']:
+            if node['source'] not in lens['sources']:
+                errors.append('Missing Lens source: ' + node['source'])
     journey = json.loads(re.search(r'id="deckData">(.*?)</script>', (ROOT / 'journey.html').read_text(), re.S).group(1))
     order = [slide['id'] for slide in journey['slides']]
     if order != ['intro', 'compare', 'lifecycle', 'resource-purpose', 'hardening', 'tools', 'skills', 'gateway', 'telemetry']:

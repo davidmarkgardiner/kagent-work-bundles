@@ -1,0 +1,946 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="icon" href="data:,">
+<title>SRE Lens asks the right specialists | Interactive architecture</title>
+<style>
+:root {
+  --surface:#ffffff;
+  --backdrop:#e7e6e2;
+  --text:#141414;
+  --body-text:#383838;
+  --muted:#666462;
+  --border:#e3e1dc;
+  --panel:#f6f5f2;
+  --accent:#e60000;
+  --link:#1f5fa6;
+  --link-tint:#e9f0f9;
+  --positive:#17804a;
+  --positive-tint:#e5f3eb;
+  --reference:#9a5c12;
+  --reference-tint:#fdf0dc;
+  --font:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --code-font:ui-monospace,Consolas,monospace;
+  --panel-radius:16px;
+  --node-radius:12px;
+  --layout-gap:24px;
+  --enter-duration:450ms;
+  --packet-duration:850ms;
+  --scale:1;
+}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:var(--font);color:var(--text);background:var(--backdrop)}body{height:100dvh;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:18px 24px 100px}button,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,pre:focus-visible{outline:3px solid var(--link);outline-offset:4px}button:disabled{cursor:default;opacity:.38}button:focus:not(:focus-visible){outline:none}[hidden]{display:none!important}#stage{position:relative;flex:none;background:var(--surface)}#canvas{position:relative;width:1600px;height:900px;transform:scale(var(--scale));transform-origin:top left;background:var(--surface)}.slide{position:absolute;inset:0;width:1600px;height:900px;padding:40px 56px;background:var(--surface)}.accent-rule{width:64px;height:5px;background:var(--accent);margin-bottom:25px}.eyebrow{font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}h1{font-size:48px;font-weight:720;line-height:1.12;letter-spacing:-.025em;margin:17px 0 13px;max-width:1480px}p.intro{font-size:22px;line-height:1.4;color:var(--body-text);margin:0;max-width:1440px}.slide-topline{position:absolute;right:56px;top:42px;font-size:13px;color:var(--muted);display:flex;gap:15px;align-items:center}.illustration-label{border:1px solid var(--border);padding:5px 10px;border-radius:4px;background:var(--panel);letter-spacing:.035em;font-size:12px}.content{position:absolute;top:240px;left:56px;width:1488px}.interaction-row{display:flex;align-items:center;justify-content:space-between;min-height:32px;gap:20px;margin-bottom:9px}.scenario-group{display:flex;gap:calc(var(--layout-gap) / 3);flex-wrap:wrap}.scenario{border:1px solid var(--border);background:var(--surface);color:var(--body-text);border-radius:6px;padding:8px 12px;font-size:15px}.scenario[aria-pressed=true]{color:var(--link);border-color:var(--link);background:var(--link-tint)}.diagram-hint{font-size:14px;color:var(--muted)}.mobile-hint{display:none}.diagram-scroll{overflow:visible}.diagram{position:relative;width:1488px;height:450px;border:1px solid var(--border);border-radius:var(--panel-radius);background:var(--surface)}.connections{position:absolute;inset:0;width:1488px;height:450px;overflow:visible;pointer-events:none}.route{fill:none;stroke:var(--link);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.route.reference{stroke:var(--reference);stroke-dasharray:8 7}.route.red{stroke:var(--accent)}.route.inactive{opacity:.14}.edge-label{font:16px var(--font);fill:var(--muted);text-anchor:middle;paint-order:stroke;stroke:var(--surface);stroke-width:6;stroke-linejoin:round}.edge-label.red{fill:var(--accent)}.edge-label.reference{fill:var(--reference)}.edge-label.inactive{opacity:.2}.packet{pointer-events:none}.stop-mark{stroke:var(--accent);stroke-width:3;stroke-linecap:round}.stop-mark.inactive{opacity:.12}.node{position:absolute;text-align:left;display:flex;flex-direction:column;justify-content:center;padding:22px;background:var(--panel);border:1px solid var(--border);border-radius:var(--node-radius);color:var(--text);transition:border-color 140ms,box-shadow 140ms}.node:hover{border-color:var(--link);box-shadow:0 0 0 2px var(--link-tint)}.node-top{display:flex;align-items:center;gap:11px;margin-bottom:12px}.node svg{width:30px;height:30px;flex:0 0 30px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.node h2{font-size:22px;line-height:1.2;letter-spacing:-.015em;margin:0;font-weight:680}.node p{font-size:16px;line-height:1.4;color:var(--body-text);margin:0}.node.dark{background:var(--text);border-color:var(--text);color:var(--surface)}.node.dark p{color:var(--surface)}.node.blue{background:var(--link-tint);border-color:var(--link);color:var(--link)}.node.reference{background:var(--reference-tint);border-color:var(--reference);color:var(--reference)}.node.compact{padding:11px 18px}.node.compact .node-top{margin-bottom:5px;gap:9px}.node.compact h2{font-size:18px}.node.compact svg{height:24px;width:24px;flex-basis:24px}.node.compact p{font-size:14px}.node.code-node{justify-content:flex-start;padding:23px;background:var(--panel)}.node.code-node .node-top{margin-bottom:8px}.inline-code{font:15px/1.7 var(--code-font);white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;margin:10px 0 0;color:var(--body-text)}.node .inspect-hint{font-size:12px;color:var(--muted);margin-top:auto;padding-top:12px}.legend-row{display:flex;justify-content:space-between;align-items:center;gap:25px;margin-top:12px;font-size:14px;color:var(--muted)}.legend{display:flex;gap:20px;align-items:center}.legend span{display:flex;align-items:center;gap:8px}.legend i{display:inline-block;width:35px;border-top:2px solid var(--link)}.legend i.dashed{border-top:2px dashed var(--reference)}.status{font-size:14px;line-height:1.4;max-width:980px;color:var(--body-text);min-height:20px}.strips{position:absolute;left:16px;right:16px;bottom:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.strip{background:var(--panel);border:1px solid var(--border);padding:12px 16px;border-radius:8px;min-width:0}.strip strong{display:block;font-size:17px;line-height:1.3;margin-bottom:3px}.strip p{font-size:14px;line-height:1.35;color:var(--body-text);margin:0}.takeaway{position:absolute;left:56px;right:56px;bottom:50px;min-height:57px;display:flex;align-items:center;gap:18px;padding:15px 19px;border-left:4px solid var(--link);background:var(--link-tint);font-size:20px;line-height:1.4;color:var(--text)}.takeaway strong{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--link);white-space:nowrap}.deck-link{color:var(--link);text-underline-offset:3px}.slide-footer{position:absolute;bottom:20px;left:56px;right:56px;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:13px}.toolbar{position:fixed;bottom:17px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:10px;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:9px 12px;max-width:calc(100vw - 24px)}.toolbar button{border:1px solid var(--border);background:var(--surface);border-radius:6px;padding:9px 13px;color:var(--body-text);font-size:14px;white-space:nowrap}.toolbar button:hover{background:var(--link-tint);color:var(--link);border-color:var(--link)}.repeat-control{display:flex;align-items:center;gap:7px;font-size:12px;white-space:nowrap;color:var(--muted)}.repeat-control select{border:1px solid var(--border);background:var(--surface);color:var(--body-text);border-radius:6px;padding:9px 5px;font-size:13px}.repeat-control select:disabled{opacity:.5}.toolbar .primary{background:var(--link);border-color:var(--link);color:var(--surface)}.toolbar .primary:hover{background:var(--link);color:var(--surface)}#slideCounter{min-width:72px;text-align:center;font-size:14px;color:var(--muted);white-space:nowrap}.keyboard-help{font-size:11px;color:var(--muted);text-align:center;position:fixed;bottom:1px;left:0;right:0;pointer-events:none}.print-note{display:none}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}dialog{border:1px solid var(--border);border-radius:var(--panel-radius);background:var(--surface);color:var(--text);padding:26px;width:min(900px,calc(100vw - 40px));max-height:calc(100dvh - 40px);overflow:auto}dialog::backdrop{background:rgba(20,20,20,.38)}dialog h2{font-size:27px;letter-spacing:-.02em;margin:0 0 18px}dialog label{display:block;font-size:14px;font-weight:650}dialog select{display:block;margin:8px 0 14px;width:100%;padding:11px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text)}.source-meta{font-size:13px;color:var(--reference);margin:0 0 12px}.source-code{max-height:53dvh;overflow:auto;border:1px solid var(--border);border-radius:8px;background:var(--panel);padding:18px;white-space:pre;font:14px/1.6 var(--code-font);color:var(--body-text);margin:0}.dialog-buttons{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}.dialog-buttons button{border:1px solid var(--border);background:var(--surface);border-radius:6px;padding:10px 15px}.dialog-buttons .primary{background:var(--link);border-color:var(--link);color:var(--surface)}#copyStatus{font-size:13px;min-height:20px;margin:10px 0 0;color:var(--body-text)}#notesText{white-space:pre-line;line-height:1.7;color:var(--body-text);font-size:17px}#notesTitle{margin-bottom:12px}.reference-note{font-size:14px;color:var(--muted);line-height:1.5}
+@media(max-width:899px){html,body{height:auto;min-height:100%;overflow:visible}body{display:block;padding:14px 12px 190px}#stage{width:100%!important;height:auto!important}#canvas{width:100%;height:auto;transform:none}.slide{position:relative;inset:auto;width:100%;height:auto;min-height:0;padding:28px 24px}.accent-rule{margin-bottom:20px;width:54px;height:4px}.eyebrow{font-size:11px;max-width:65%}.slide-topline{top:28px;right:24px;gap:0}.slide-topline .version{display:none}.illustration-label{font-size:10px;padding:4px 6px}h1{font-size:32px;line-height:1.12;margin:22px 0 14px}p.intro{font-size:18px;line-height:1.5}.content{position:static;width:auto;margin-top:24px}.interaction-row{display:block;margin-bottom:14px}.scenario-group{gap:7px}.scenario{padding:8px 9px;font-size:13px}.diagram-hint{margin-top:12px;font-size:12px}.mobile-hint{display:block;color:var(--link);font-size:12px;margin:12px 0 8px}.diagram-scroll{overflow-x:auto;overflow-y:hidden;border-radius:var(--panel-radius);border:1px solid var(--border);max-width:100%;overscroll-behavior-x:contain}.diagram{border:0;border-radius:0}.legend-row{display:block;margin-top:16px}.legend{gap:13px;flex-wrap:wrap;font-size:12px;margin-bottom:12px}.legend i{width:25px}.status{font-size:14px;min-height:0}.takeaway{position:static;margin-top:24px;display:block;min-height:0;padding:16px;font-size:17px}.takeaway strong{display:block;margin-bottom:7px}.slide-footer{position:static;display:block;font-size:11px;margin-top:24px}.slide-footer span{display:block;margin-top:6px}.toolbar{left:8px;right:8px;bottom:17px;transform:none;max-width:none;flex-wrap:wrap;padding:8px;gap:7px}.toolbar button{padding:8px 10px;font-size:12px}#slideCounter{min-width:55px;font-size:12px}.keyboard-help{font-size:9px;background:var(--backdrop);bottom:2px}.source-code{font-size:12px;max-height:50dvh}dialog{padding:20px}dialog h2{font-size:23px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@page{size:1600px 900px;margin:0}
+@media print{html,body{margin:0!important;padding:0!important;width:1600px!important;height:auto!important;min-height:0!important;overflow:visible!important;background:var(--surface)!important;display:block!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}#stage{position:static!important;display:block!important;width:1600px!important;height:auto!important;margin:0!important;border:0!important}#canvas{width:1600px!important;height:auto!important;transform:none!important;position:static!important;display:block!important}.slide,.slide[hidden]{display:block!important;position:relative!important;inset:auto!important;width:1600px!important;height:900px!important;min-height:900px!important;padding:40px 56px!important;break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid}.slide:last-child{break-after:auto;page-break-after:auto}.toolbar,.keyboard-help,dialog,dialog::backdrop,.scenario-group,.diagram-hint,.mobile-hint,.packet,.inspect-hint{display:none!important}.content{position:absolute!important;top:240px!important;left:56px!important;width:1488px!important;margin:0!important}.interaction-row{display:block!important;min-height:25px!important;margin-bottom:10px!important}.print-note{display:block;font-size:14px;color:var(--muted)}.diagram-scroll{overflow:visible!important;border:0!important}.diagram{width:1488px!important;height:450px!important;border:1px solid var(--border)!important;break-inside:avoid;page-break-inside:avoid}.node{opacity:1!important;transform:none!important;box-shadow:none!important;transition:none!important}.route.inactive,.edge-label.inactive,.stop-mark.inactive{opacity:1!important}.legend-row{display:flex!important;gap:20px!important}.legend{display:flex!important;font-size:14px!important;margin:0!important}.status{display:none!important}.takeaway{position:absolute!important;left:56px!important;right:56px!important;bottom:50px!important;display:flex!important;min-height:57px!important;margin:0!important;padding:15px 19px!important;font-size:20px!important}.takeaway strong{display:inline!important;margin:0!important}.slide-footer{position:absolute!important;bottom:20px!important;left:56px!important;right:56px!important;display:flex!important;font-size:13px!important;margin:0!important}.slide-footer span{display:inline!important;margin:0!important}.slide-topline{top:42px!important;right:56px!important}.slide-topline .version{display:inline!important}.illustration-label{font-size:12px!important;padding:5px 10px!important}.accent-rule{width:64px!important;height:5px!important;margin-bottom:25px!important}.eyebrow{font-size:14px!important;max-width:none!important}h1{font-size:48px!important;margin:17px 0 13px!important;line-height:1.12!important}p.intro{font-size:22px!important;line-height:1.4!important}}
+</style>
+<style id="dice-bundle-theme">
+:root{--surface:#ffffff;--backdrop:#f2f2f2;--text:#141414;--body-text:#383838;--muted:#626262;--border:#dedede;--panel:#f6f6f6;--accent:#e60000;--link:#c90000;--link-tint:#fff0f0;--positive:#141414;--positive-tint:#f0f0f0;--reference:#626262;--reference-tint:#f3f3f3;--font:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;--code-font:ui-monospace,Consolas,monospace;--ink:#141414;--paper:#f6f6f6;--red:#e60000;--line:#dedede;--blue:#c90000;--amber:#555555;--bg:#ffffff;--green:#c90000;--soft:#fff0f0;--purple:#c90000;--mono:ui-monospace,Consolas,monospace}
+body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif}h1,h2,h3{font-family:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif}a{color:var(--link);text-underline-offset:3px}button:focus-visible,a:focus-visible,summary:focus-visible{outline-color:#e60000}.sheet,.panel,.summary-sheet,.hardening-card,.simple-flow div,.card,.step{border-radius:12px}.sheet,.summary-sheet{background:#ffffff}.panel,.hardening-card,.step{background:#f6f6f6}.takeaway,.notice,.review{background:#fff0f0;border-left-color:#e60000}.code{background:#141414;color:#ffffff}pre,code{font-family:ui-monospace,Consolas,monospace}.bundle-home{display:block;padding:10px 4vw;font-size:13px;background:white;border-bottom:1px solid #dedede}.reference-banner{font-size:13px;padding:12px 4vw;background:#f6f6f6;border-bottom:1px solid #dedede}.reference-banner a{margin-right:18px}@media print{.bundle-home,.reference-banner{display:none!important}}
+
+.takeaway{background:#eef7ef;border-left-color:#9bc8a2;color:#1c3525}.takeaway strong{color:#356a43}
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>
+<symbol id="icon-file" viewBox="0 0 32 32"><path d="M8 3h11l6 6v20H8zM19 3v7h6M12 15h9M12 20h9M12 25h6"/></symbol>
+<symbol id="icon-graph" viewBox="0 0 32 32"><rect x="2" y="12" width="8" height="8" rx="2"/><rect x="23" y="2" width="7" height="8" rx="2"/><rect x="23" y="22" width="7" height="8" rx="2"/><path d="M10 16h7V6h6M17 16v10h6"/></symbol>
+<symbol id="icon-agent" viewBox="0 0 32 32"><rect x="5" y="9" width="22" height="18" rx="5"/><path d="M16 9V4M13 4h6M11 16v2M21 16v2M11 23h10M2 15v6M30 15v6"/></symbol>
+<symbol id="icon-shield" viewBox="0 0 32 32"><path d="M16 3 27 8v9c0 6-6 10-11 13C11 27 5 23 5 17V8zM10 16l4 4 8-9"/></symbol>
+<symbol id="icon-key" viewBox="0 0 32 32"><circle cx="11" cy="12" r="7"/><path d="m16 17 12 12M22 23l4-4M25 26l4-4"/></symbol>
+<symbol id="icon-model" viewBox="0 0 32 32"><path d="m16 3 12 7-12 7L4 10zM4 16l12 7 12-7M4 22l12 7 12-7"/></symbol>
+<symbol id="icon-tools" viewBox="0 0 32 32"><path d="M5 5h22v22H5zM5 12h22M12 12v15M16 17h7M16 22h5M9 8h1M14 8h1"/></symbol>
+<symbol id="icon-eye" viewBox="0 0 32 32"><path d="M2 16s5-9 14-9 14 9 14 9-5 9-14 9S2 16 2 16z"/><circle cx="16" cy="16" r="4"/></symbol>
+<symbol id="icon-check" viewBox="0 0 32 32"><rect x="5" y="3" width="22" height="27" rx="3"/><path d="m10 17 4 4 9-11M11 7h10"/></symbol>
+<symbol id="icon-network" viewBox="0 0 32 32"><rect x="11" y="2" width="10" height="8" rx="2"/><rect x="2" y="23" width="10" height="7" rx="2"/><rect x="20" y="23" width="10" height="7" rx="2"/><path d="M16 10v7M7 23v-6h18v6"/></symbol>
+<symbol id="icon-identity" viewBox="0 0 32 32"><circle cx="12" cy="9" r="5"/><path d="M3 28v-4a9 9 0 0 1 15-7M23 15l7 4v5c0 3-4 5-7 7-3-2-7-4-7-7v-5z"/></symbol>
+<symbol id="icon-box" viewBox="0 0 32 32"><rect x="4" y="4" width="24" height="24" rx="4"/><path d="M10 11h12M10 17h12M10 23h6"/></symbol>
+</defs></svg>
+<main id="stage" aria-label="Interactive secure-agent architecture presentation"><div id="canvas"></div></main>
+<nav class="toolbar" aria-label="Slide controls">
+<button id="previous" aria-label="Previous slide">← Previous</button><span id="slideCounter" aria-live="polite" aria-atomic="true"></span><button id="next" class="primary" aria-label="Next slide">Next →</button>
+<button id="replay" aria-label="Replay illustrated flow, shortcut R">Replay · R</button><label class="repeat-control" for="repeat">Repeat after <select id="repeat" aria-label="Pause between automatic replays"><option value="0">Off</option><option value="3000">3 seconds</option><option value="5000">5 seconds</option><option value="10000">10 seconds</option></select></label><button id="notes" aria-label="Presenter notes, shortcut N">Notes · N</button><button id="details">Sources / details</button><button id="print">Print all slides</button>
+</nav>
+<div class="keyboard-help">← → / PgUp PgDn · Home End · R replay · N notes · Click a component to inspect</div>
+<div class="sr-only" id="slideAnnouncement" role="status" aria-live="polite"></div>
+<dialog id="sourceDialog" aria-labelledby="sourceHeading"><h2 id="sourceHeading">Component source and details</h2><label for="sourceSelect">Choose a component</label><select id="sourceSelect"></select><p class="source-meta" id="sourceMeta"></p><pre class="source-code" id="sourceCode" tabindex="0"></pre><p id="copyStatus" role="status" aria-live="polite"></p><div class="dialog-buttons"><button id="copySource" class="primary">Copy source text</button><button id="closeSource">Close</button></div></dialog>
+<dialog id="notesDialog" aria-labelledby="notesTitle"><h2 id="notesTitle">Presenter notes</h2><p id="notesText"></p><p class="reference-note">All sample values and states in this deck are illustrative. No workplace data, credentials or real execution receipts are embedded.</p><div class="dialog-buttons"><button id="closeNotes">Close notes</button></div></dialog>
+<script type="application/json" id="deckData">{
+  "slides": [
+    {
+      "id": "route",
+      "label": "01 / SRE Lens",
+      "title": "SRE Lens asks the right specialists.",
+      "intro": "One request goes to Lens. It asks only the permitted specialists needed for the question.",
+      "takeaway": "Delegate by the question and permission. Return one answer with its sources.",
+      "scenarios": [
+        {
+          "id": "workload",
+          "label": "Workload incident",
+          "status": "Workload incident selects Kubernetes + GitLab. Data remains available but is not called. All paths and results are synthetic."
+        },
+        {
+          "id": "data",
+          "label": "Data question",
+          "status": "Data question selects Data only. Kubernetes and GitLab remain available but are not called. All paths and results are synthetic."
+        },
+        {
+          "id": "cross",
+          "label": "Cross-system",
+          "status": "Cross-system selects Kubernetes + GitLab + Data. Selection still requires separate delegation and tool permissions. All paths and results are synthetic."
+        }
+      ],
+      "nodes": [
+        {
+          "id": "caller",
+          "title": "SRE or app",
+          "detail": "One operational question",
+          "source": "question",
+          "x": 20,
+          "y": 155,
+          "w": 230,
+          "h": 145,
+          "tone": "neutral",
+          "icon": "identity"
+        },
+        {
+          "id": "lens",
+          "title": "SRE Lens",
+          "detail": "Choose permitted specialists",
+          "source": "routing",
+          "x": 335,
+          "y": 155,
+          "w": 250,
+          "h": 145,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "kubernetes",
+          "title": "Kubernetes Agent",
+          "detail": "Available · workload evidence",
+          "source": "kubernetes",
+          "x": 740,
+          "y": 20,
+          "w": 300,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "gitlab",
+          "title": "GitLab Agent",
+          "detail": "Available · related work",
+          "source": "gitlab",
+          "x": 740,
+          "y": 175,
+          "w": 300,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "data",
+          "title": "Data Agent",
+          "detail": "Available · approved data",
+          "source": "data",
+          "x": 740,
+          "y": 330,
+          "w": 300,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "answer",
+          "title": "One answer",
+          "detail": "Citations, gaps and next read",
+          "source": "answer",
+          "x": 1190,
+          "y": 155,
+          "w": 280,
+          "h": 145,
+          "tone": "neutral",
+          "icon": "file"
+        }
+      ],
+      "paths": [
+        {
+          "id": "question",
+          "d": "M250 225H335",
+          "label": "ask",
+          "lx": 292,
+          "ly": 214,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "delegate-kubernetes",
+          "d": "M585 190H655V70H740",
+          "label": "delegate",
+          "lx": 684,
+          "ly": 58,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "workload",
+            "cross"
+          ]
+        },
+        {
+          "id": "delegate-gitlab",
+          "d": "M585 225H740",
+          "label": "delegate",
+          "lx": 661,
+          "ly": 214,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "workload",
+            "cross"
+          ]
+        },
+        {
+          "id": "delegate-data",
+          "d": "M585 260H655V380H740",
+          "label": "delegate",
+          "lx": 684,
+          "ly": 368,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "data",
+            "cross"
+          ]
+        },
+        {
+          "id": "return-kubernetes",
+          "d": "M1040 70H1140V190H1190",
+          "label": "findings",
+          "lx": 1090,
+          "ly": 58,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "workload",
+            "cross"
+          ]
+        },
+        {
+          "id": "return-gitlab",
+          "d": "M1040 225H1190",
+          "label": "findings",
+          "lx": 1114,
+          "ly": 214,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "workload",
+            "cross"
+          ]
+        },
+        {
+          "id": "return-data",
+          "d": "M1040 380H1140V260H1190",
+          "label": "findings",
+          "lx": 1090,
+          "ly": 368,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "data",
+            "cross"
+          ]
+        }
+      ],
+      "notes": "Start with Workload incident. Follow the single question into Lens, then the two selected delegations and their return findings. Select Data question and both directions switch to Data only. Cross-system selects all three. The unselected routes fade; the cards remain visible as available inventory, never completed work. The combined answer is returned to the original caller. This is an offline explanation, not a routing decision or execution receipt. The GitLab/Kubernetes/Data topology is the user-described illustration in showcase.html#lens. The inspected native A2A YAML instead names Grafana, data-compliance and Kubernetes specialists. Open the Lens source to inspect that exact illustrative YAML. It does not install this full topology. No component is identified as Node.js because that name remains unconfirmed."
+    },
+    {
+      "id": "reads",
+      "label": "02 / Scoped evidence",
+      "title": "An Agent reasons. Its MCP reads.",
+      "intro": "Each specialist uses its own scoped tool adapter. Backend access belongs to a separate identity and grant.",
+      "takeaway": "Agent delegation, MCP tool permission and backend read access are separate checks.",
+      "nodes": [
+        {
+          "id": "k-agent",
+          "title": "Kubernetes Agent",
+          "detail": "Investigate the permitted workload",
+          "source": "kubernetes",
+          "x": 20,
+          "y": 20,
+          "w": 300,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "k-mcp",
+          "title": "Kubernetes MCP",
+          "detail": "Scoped read operations",
+          "source": "kubernetes",
+          "x": 535,
+          "y": 20,
+          "w": 310,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "tools"
+        },
+        {
+          "id": "k-backend",
+          "title": "Kubernetes API",
+          "detail": "Namespace + RBAC scope",
+          "source": "backend-auth",
+          "x": 1120,
+          "y": 20,
+          "w": 350,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "shield"
+        },
+        {
+          "id": "g-agent",
+          "title": "GitLab Agent",
+          "detail": "Connect symptoms to related work",
+          "source": "gitlab",
+          "x": 20,
+          "y": 175,
+          "w": 300,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "g-mcp",
+          "title": "GitLab MCP",
+          "detail": "Approved project reads",
+          "source": "gitlab",
+          "x": 535,
+          "y": 175,
+          "w": 310,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "tools"
+        },
+        {
+          "id": "g-backend",
+          "title": "GitLab project",
+          "detail": "Separate read credential",
+          "source": "backend-auth",
+          "x": 1120,
+          "y": 175,
+          "w": 350,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "key"
+        },
+        {
+          "id": "d-agent",
+          "title": "Data Agent",
+          "detail": "Ask an approved data question",
+          "source": "data",
+          "x": 20,
+          "y": 330,
+          "w": 300,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "d-mcp",
+          "title": "Data MCP",
+          "detail": "Typed, bounded read operations",
+          "source": "data",
+          "x": 535,
+          "y": 330,
+          "w": 310,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "tools"
+        },
+        {
+          "id": "d-backend",
+          "title": "Approved data backend",
+          "detail": "Separate principal + grants",
+          "source": "backend-auth",
+          "x": 1120,
+          "y": 330,
+          "w": 350,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "key"
+        }
+      ],
+      "paths": [
+        {
+          "id": "k-tools",
+          "d": "M320 55H535",
+          "label": "tool read",
+          "lx": 426,
+          "ly": 44,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "k-result",
+          "d": "M535 90H320",
+          "label": "bounded result",
+          "lx": 426,
+          "ly": 112,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "k-auth",
+          "d": "M845 55H1120",
+          "label": "backend identity",
+          "lx": 981,
+          "ly": 44,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "k-return",
+          "d": "M1120 90H845",
+          "label": "read result",
+          "lx": 981,
+          "ly": 112,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "g-tools",
+          "d": "M320 210H535",
+          "label": "tool read",
+          "lx": 426,
+          "ly": 199,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "g-result",
+          "d": "M535 245H320",
+          "label": "bounded result",
+          "lx": 426,
+          "ly": 267,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "g-auth",
+          "d": "M845 210H1120",
+          "label": "backend identity",
+          "lx": 981,
+          "ly": 199,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "g-return",
+          "d": "M1120 245H845",
+          "label": "read result",
+          "lx": 981,
+          "ly": 267,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d-tools",
+          "d": "M320 365H535",
+          "label": "tool read",
+          "lx": 426,
+          "ly": 354,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d-result",
+          "d": "M535 400H320",
+          "label": "bounded result",
+          "lx": 426,
+          "ly": 422,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d-auth",
+          "d": "M845 365H1120",
+          "label": "backend identity",
+          "lx": 981,
+          "ly": 354,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d-return",
+          "d": "M1120 400H845",
+          "label": "read result",
+          "lx": 981,
+          "ly": 422,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "These are three illustrative read lanes. The Agent is the specialist that plans and interprets. MCP is its tool interface, not another reasoning agent. Tool names and availability must come from the receiving server discovery response. The source popups list operations by intent rather than inventing deployed tool names. Kubernetes reads remain inside allowed namespaces and RBAC. GitLab reads remain inside approved projects. Data reads use an approved adapter and backend grants. Existing catalog material names Denodo; the PostgreSQL typed adapter is a separate option with explicit limits. Do not treat the two as one installation. The user-described Data specialist does not confirm a Node.js server or a specific backend. No apply, delete, arbitrary SQL, write or remediation action runs here. Return arrows depict bounded source results, not observed live responses."
+    },
+    {
+      "id": "receipts",
+      "label": "03 / One evidence-backed answer",
+      "title": "Combine evidence. Keep the gaps visible.",
+      "intro": "Each claim keeps its source. Missing or denied evidence stays visible.",
+      "takeaway": "Unavailable and denied evidence stays unknown. A human chooses the next action.",
+      "scenarios": [
+        {
+          "id": "complete",
+          "label": "Complete",
+          "status": "Complete · Kubernetes, GitLab and Data returned synthetic observations. Correlation only; no root cause proven."
+        },
+        {
+          "id": "partial",
+          "label": "Partial",
+          "status": "Partial · Kubernetes + Data returned. GitLab is unavailable, so related changes remain unknown. No silent retry."
+        },
+        {
+          "id": "denied",
+          "label": "Denied",
+          "status": "Denied · Kubernetes + GitLab returned. Data access is denied, so data evidence remains unknown. No fallback."
+        }
+      ],
+      "nodes": [
+        {
+          "id": "k-receipt",
+          "title": "Kubernetes receipt",
+          "detail": "Synthetic · inspect scenario status",
+          "source": "receipt-kubernetes",
+          "x": 20,
+          "y": 20,
+          "w": 350,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "g-receipt",
+          "title": "GitLab receipt",
+          "detail": "Synthetic · inspect scenario status",
+          "source": "receipt-gitlab",
+          "x": 20,
+          "y": 175,
+          "w": 350,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "d-receipt",
+          "title": "Data receipt",
+          "detail": "Synthetic · inspect scenario status",
+          "source": "receipt-data",
+          "x": 20,
+          "y": 330,
+          "w": 350,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "aggregate",
+          "title": "SRE Lens",
+          "detail": "Keep source IDs and uncertainty",
+          "source": "aggregate",
+          "x": 620,
+          "y": 150,
+          "w": 300,
+          "h": 150,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "combined",
+          "title": "One cited answer",
+          "detail": "Knowns, gaps and a next read",
+          "source": "answer",
+          "x": 1140,
+          "y": 150,
+          "w": 330,
+          "h": 150,
+          "tone": "neutral",
+          "icon": "file"
+        }
+      ],
+      "paths": [
+        {
+          "id": "k-status",
+          "d": "M370 70H490V185H620",
+          "label": "source status",
+          "lx": 442,
+          "ly": 58,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "g-status",
+          "d": "M370 225H620",
+          "label": "source status",
+          "lx": 494,
+          "ly": 214,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d-status",
+          "d": "M370 380H490V265H620",
+          "label": "source status",
+          "lx": 442,
+          "ly": 368,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "compose",
+          "d": "M920 225H1140",
+          "label": "cite + qualify",
+          "lx": 1030,
+          "ly": 214,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "The scenario status below the diagram explicitly names each source outcome. Source receipt cards are neutral because the existing renderer changes paths and scenario text, not node content. Every source-status path remains active in every scenario. An unavailable or denied receipt still needs to reach Lens as an explicit status. An inactive line cannot stand in for a failure result. Complete means all three illustrative required sources returned, not that the diagnosis is correct or a cause is proven. Partial keeps Kubernetes and Data observations while GitLab-related change information remains unknown. Denied keeps Kubernetes and GitLab observations while Data evidence remains unknown. Each receipt popup includes every scenario with synthetic IDs and provenance. The answer popup shows the different claims and next reads. Never infer an automatic fix, retry, alternate credential or provider switch. Any change belongs to a separate reviewed, human-approved workflow."
+    },
+    {
+      "id": "consume",
+      "label": "04 / DICE as a product",
+      "title": "Embed the same Lens conversation.",
+      "intro": "An application can consume DICE through the agent API. Each permission boundary still applies.",
+      "takeaway": "API access opens the conversation. Separate grants control delegation, tools and resources.",
+      "nodes": [
+        {
+          "id": "caller-grant",
+          "title": "Caller permission",
+          "detail": "May this caller invoke Lens?",
+          "source": "permissions",
+          "x": 20,
+          "y": 10,
+          "w": 430,
+          "h": 85,
+          "tone": "neutral",
+          "icon": "identity"
+        },
+        {
+          "id": "agent-grant",
+          "title": "Specialist permission",
+          "detail": "May Lens delegate to this Agent?",
+          "source": "permissions",
+          "x": 525,
+          "y": 10,
+          "w": 430,
+          "h": 85,
+          "tone": "neutral",
+          "icon": "shield"
+        },
+        {
+          "id": "tool-grant",
+          "title": "MCP + backend permission",
+          "detail": "Which reads and resource scope?",
+          "source": "backend-auth",
+          "x": 1030,
+          "y": 10,
+          "w": 440,
+          "h": 85,
+          "tone": "neutral",
+          "icon": "key"
+        },
+        {
+          "id": "consumer",
+          "title": "SRE app",
+          "detail": "Text or bounded input",
+          "source": "api",
+          "x": 20,
+          "y": 135,
+          "w": 250,
+          "h": 145,
+          "tone": "neutral",
+          "icon": "box"
+        },
+        {
+          "id": "api",
+          "title": "DICE agent API",
+          "detail": "Documented A2A text envelope",
+          "source": "api",
+          "x": 365,
+          "y": 135,
+          "w": 270,
+          "h": 145,
+          "tone": "neutral",
+          "icon": "network"
+        },
+        {
+          "id": "orchestrator",
+          "title": "SRE Lens",
+          "detail": "Permitted specialist routes",
+          "source": "routing",
+          "x": 750,
+          "y": 135,
+          "w": 250,
+          "h": 145,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "response",
+          "title": "One response",
+          "detail": "Cited findings + explicit gaps",
+          "source": "answer",
+          "x": 1190,
+          "y": 135,
+          "w": 280,
+          "h": 145,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "observability",
+          "title": "Traces + usage receipts",
+          "detail": "Correlate actual hops. Missing spans or usage remain unknown.",
+          "source": "observability",
+          "x": 365,
+          "y": 335,
+          "w": 780,
+          "h": 95,
+          "tone": "neutral",
+          "icon": "eye"
+        }
+      ],
+      "paths": [
+        {
+          "id": "invoke",
+          "d": "M270 207H365",
+          "label": "invoke",
+          "lx": 316,
+          "ly": 196,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "api-route",
+          "d": "M635 207H750",
+          "label": "request",
+          "lx": 692,
+          "ly": 196,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "api-response",
+          "d": "M1000 207H1190",
+          "label": "response",
+          "lx": 1095,
+          "ly": 196,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "record",
+          "d": "M875 280V310H755V335",
+          "label": "correlate",
+          "lx": 978,
+          "ly": 315,
+          "tone": "reference",
+          "reference": true,
+          "scenarios": null
+        }
+      ],
+      "notes": "DICE can be consumed by an SRE interface or another application/workflow. Input may originate as text or a bounded application payload, but the currently documented runtime example serializes the request in an A2A message part with kind=text. The source popup shows that envelope. This does not claim an implemented typed-payload API or new SDK. API invocation is separate from permission to use a specialist, call an MCP tool or read the backend resource. The reference YAML demonstrates Agent-type delegation and allowedNamespaces namespace opt-in. Namespace selection is not Entra user authorization. Tokens must have the correct audience at each boundary; there is no pass-through JWT assumption. Native delegation alone does not establish that every hop traverses agentgateway. For a real demonstration collect actual invocation, delegation, tool and backend results and correlate observed trace spans. Use actual usage telemetry where present; absent usage, spans or provider receipts remain unknown. All IDs and outputs here are synthetic, with no live counters, latency or cost claims."
+    }
+  ],
+  "sources": {
+    "question": {
+      "title": "Example questions and specialist selection",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"topology\": \"User-described GitLab, Kubernetes and Data specialists. Illustrative inventory only.\",\n  \"workload_incident\": {\n    \"question\": \"What explains this workload's errors, and is there related engineering work?\",\n    \"selected\": [\n      \"Kubernetes\",\n      \"GitLab\"\n    ],\n    \"unselected\": [\n      \"Data\"\n    ]\n  },\n  \"data_question\": {\n    \"question\": \"What do the approved data observations say about this incident?\",\n    \"selected\": [\n      \"Data\"\n    ],\n    \"unselected\": [\n      \"Kubernetes\",\n      \"GitLab\"\n    ]\n  },\n  \"cross_system\": {\n    \"question\": \"Compare the workload symptoms, related change and approved data observations.\",\n    \"selected\": [\n      \"Kubernetes\",\n      \"GitLab\",\n      \"Data\"\n    ],\n    \"unselected\": []\n  },\n  \"rules\": [\n    \"Select only relevant and permitted specialists.\",\n    \"Return selected specialists' findings into one response.\",\n    \"An unselected specialist is available inventory, not a completed call.\",\n    \"No live execution, model or backend request occurs.\"\n  ]\n}"
+    },
+    "routing": {
+      "title": "Lens routing and exact native A2A reference",
+      "type": "Inspected local illustrative YAML and explicit topology difference",
+      "text": "ILLUSTRATIVE TOPOLOGY\nThe deck follows showcase.html#lens and the user-described GitLab, Kubernetes and Data inventory. Those integrations are not claimed as installed or current.\n\nINSPECTED SOURCE\ndocs/demos/microsoft-2026-10-15/yaml-walkthrough/04-a2a-orchestrator.yaml names Grafana, data-compliance and Kubernetes specialists, not the complete GitLab/Lens illustration. Agent-type tools demonstrate native delegation. Destination allowedNamespaces is namespace opt-in, separate from caller authentication and backend tool grants. The YAML does not install every tool integration. No live model-backed result is proven by this example.\n\nEXACT REFERENCE YAML\n# STEP 04 - Attach specialist agents with A2A\n\napiVersion: kagent.dev/v1alpha2\nkind: Agent  # This is a separate orchestration Agent for the SRE conversation.\nmetadata:\n  name: sre-chat  # SRE talks to this single chatbot rather than opening every specialist separately.\n  namespace: team-sre\nspec:\n  type: Declarative\n  description: SRE chatbot delegates investigations to permitted specialists.\n  declarative:\n    modelConfig: model-garden  # The chatbot uses the same model-garden connection pattern as the triage agent.\n    # We instruct it to delegate investigations and combine the cited findings.\n    systemMessage: Delegate questions to the relevant permitted specialist. Return one\n      cited answer.\n    tools:  # These tools are named specialist agents; their own tool permissions remain separate.\n    - type: Agent  # An Agent-type tool lets the chatbot delegate a task over A2A.\n      agent:\n        apiGroup: kagent.dev\n        kind: Agent\n        name: grafana-evidence  # This specialist supplies Grafana metrics and application telemetry when configured.\n        namespace: specialists  # The destination lives in the specialist namespace and must allow the caller.\n    - type: Agent\n      agent:\n        apiGroup: kagent.dev\n        kind: Agent\n        name: data-compliance  # This specialist supplies approved data, incident or compliance context.\n        namespace: specialists\n    - type: Agent\n      agent:\n        apiGroup: kagent.dev\n        kind: Agent\n        name: kubernetes-triage  # This specialist supplies Kubernetes runtime evidence for the same investigation.\n        namespace: specialists\n---\n# Minimal destination Agent: illustrates namespace opt-in.\n# ModelConfig/model-garden in specialists and approved Grafana tools are separate\n# prerequisites; this object does not pretend to install that tool integration.\napiVersion: kagent.dev/v1alpha2\nkind: Agent  # The second document defines a minimal destination agent, not another chatbot.\nmetadata:\n  name: grafana-evidence  # This name matches the Grafana specialist reference in the first document.\n  namespace: specialists\nspec:\n  type: Declarative\n  description: Grafana evidence specialist with explicit caller namespace opt-in.\n  allowedNamespaces:  # The destination opts in to permitted cross-namespace Agent references.\n    from: Selector  # We choose caller namespaces by a platform-controlled label.\n    selector:\n      matchLabels:\n        team: sre  # The SRE namespace must carry this label; this is separate from Entra authorization.\n  declarative:\n    modelConfig: model-garden  # This ModelConfig must also exist in the specialists namespace.\n    systemMessage: |  # Actual Grafana tools are a prerequisite; this example must report missing evidence honestly.\n      Return cited observations from approved evidence.\n      Report missing access instead of inventing metrics.\n"
+    },
+    "kubernetes": {
+      "title": "Kubernetes specialist and scoped MCP reads",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"agent_role\": \"Corroborate workload observations inside the approved namespace and workload scope.\",\n  \"illustrative_read_operations\": [\n    \"Read workload status and rollout observations.\",\n    \"Read bounded related Kubernetes Events.\",\n    \"Read approved workload configuration.\"\n  ],\n  \"tool_names\": \"Resolve actual names from the installed MCP discovery response. These are operation intents, not asserted deployed tool names.\",\n  \"authorization\": [\n    \"Lens-to-specialist delegation must be permitted.\",\n    \"Specialist-to-MCP tool use must be permitted.\",\n    \"Backend service-account RBAC must independently allow the read.\"\n  ],\n  \"exclusions\": [\n    \"No apply or delete tools.\",\n    \"No arbitrary kubectl command.\",\n    \"No remediation authority from chat access.\"\n  ],\n  \"provenance\": \"showcase.html#lens describes the illustrative Kubernetes lane. The exact A2A YAML names kubernetes-triage but is not a tool-integration proof.\"\n}"
+    },
+    "gitlab": {
+      "title": "GitLab specialist and approved project reads",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"agent_role\": \"Connect an operational question with related engineering work in an approved project.\",\n  \"illustrative_read_operations\": [\n    \"Read related issues and merge requests.\",\n    \"Read scoped repository files and change metadata.\",\n    \"Read relevant pipeline status.\"\n  ],\n  \"tool_names\": \"Use actual deployed MCP discovery names. These operation descriptions do not assert a live inventory.\",\n  \"backend_authorization\": \"Use a separate read credential and approved project permissions. Chat and delegation grants do not grant GitLab access.\",\n  \"exclusions\": [\n    \"No branch creation, file writes, issue creation or merge.\",\n    \"No reuse of delivery credentials for read-only investigation.\"\n  ],\n  \"provenance\": \"showcase.html#lens describes the GitLab lane. The exact native orchestrator YAML uses Grafana rather than GitLab.\"\n}"
+    },
+    "data": {
+      "title": "Data specialist and bounded approved reads",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"agent_role\": \"Interpret approved, bounded observations from the configured data adapter.\",\n  \"illustrative_read_operations\": [\n    \"Call a fixed typed operation over an approved data source.\",\n    \"Return bounded rows or aggregates with truncation metadata.\",\n    \"Identify unavailable and denied data explicitly.\"\n  ],\n  \"inventory_boundary\": \"Existing catalog material names Denodo. PostgreSQL has a separate typed read-only adapter. Neither is inferred to be installed for this Lens illustration.\",\n  \"name_boundary\": \"The Node.js MCP name is unconfirmed. A runtime language does not identify the backend.\",\n  \"postgres_reference_only\": {\n    \"defaults\": {\n      \"rows\": 50,\n      \"result_bytes\": 32768,\n      \"cell_characters\": 512,\n      \"statement_timeout_seconds\": 5\n    },\n    \"controls\": [\n      \"fetchmany(max_rows + 1)\",\n      \"Read-only transaction\",\n      \"Bounded statement timeout\",\n      \"Explicit truncation metadata\"\n    ],\n    \"exclusions\": [\n      \"No generic arbitrary SQL or result dump.\",\n      \"No automatic paging to reconstruct an export.\"\n    ]\n  },\n  \"backend_authorization\": \"Separate principal, approved views and least-privilege grants remain required. The password and Workload Identity/UAMI variants are separate deployment paths.\",\n  \"provenance\": \"showcase.html#lens and work-agent-bundles/postgres-fastmcp-entra-uami/WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md. Transport limits do not prove workplace token savings.\"\n}"
+    },
+    "backend-auth": {
+      "title": "Tool access and backend resource authorization",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "Each lane has two distinct permission checks after Agent delegation.\n\n1. Specialist -> MCP. Permit only the named tools for that specialist and intended scope.\n2. MCP -> backend. Use the backend identity and least-privilege resource grants for that operation.\n\nKubernetes requires the correct service-account/RBAC and namespace/workload restrictions. GitLab requires an approved project read identity. Data requires the configured data principal, views and grants.\n\nFor the separate PostgreSQL UAMI option, the reference chain is AKS Workload Identity -> UAMI -> Entra token -> azure-postgresql-auth/psycopg3 -> TLS PostgreSQL. The matching PostgreSQL Entra principal and read grants are required. This is a reference option, not a claim that this deck installs it.\n\nCaller-to-Lens, Lens-to-specialist, specialist-to-MCP and backend resource rights remain distinct. A successful API call does not prove backend authorization. Never assume the same JWT is passed between audiences.\n\nNo authorization check runs from this HTML."
+    },
+    "permissions": {
+      "title": "Caller and specialist permissions stay separate",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "Caller -> Lens\nAuthenticate the caller and authorize invocation of the intended Lens Agent.\n\nLens -> specialist\nAllow only intended Agent references. The inspected YAML demonstrates Agent-type tools and destination allowedNamespaces namespace-label opt-in. This is not end-user Entra authorization or a blanket tool grant.\n\nSpecialist -> MCP -> backend\nRequire separate permitted operations and backend grants. Inspect the backend authorization source for each lane.\n\nRouting boundary\nNative A2A delegation alone does not prove that every hop passes through agentgateway. Verify the installed routing and observed spans before making that claim.\n\nChange boundary\nDiagnosis returns observations and a proposed next read. A separate reviewed, human-approved workflow owns any resource-changing action."
+    },
+    "receipt-kubernetes": {
+      "title": "Synthetic Kubernetes receipts by scenario",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"source\": \"Kubernetes MCP\",\n  \"operation\": \"Read scoped workload status and bounded related Events\",\n  \"scope\": \"{{APPROVED_NAMESPACE}}/{{WORKLOAD}}\",\n  \"scenarios\": {\n    \"complete\": {\n      \"receipt_id\": \"synthetic-k8s-complete\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative new rollout reports errors; an older replica still serves.\",\n      \"limits\": \"Synthetic observation only. No live workload or availability measurement.\"\n    },\n    \"partial\": {\n      \"receipt_id\": \"synthetic-k8s-partial\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative new rollout reports errors; an older replica still serves.\",\n      \"limits\": \"Synthetic observation only. No live workload or availability measurement.\"\n    },\n    \"denied\": {\n      \"receipt_id\": \"synthetic-k8s-denied\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative new rollout reports errors; an older replica still serves.\",\n      \"limits\": \"Synthetic observation only. No live workload or availability measurement.\"\n    }\n  }\n}"
+    },
+    "receipt-gitlab": {
+      "title": "Synthetic GitLab receipts by scenario",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"source\": \"GitLab MCP\",\n  \"operation\": \"Read related change and pipeline status\",\n  \"scope\": \"{{APPROVED_PROJECT}}\",\n  \"scenarios\": {\n    \"complete\": {\n      \"receipt_id\": \"synthetic-gitlab-complete\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative related configuration change has a failed pipeline.\",\n      \"limits\": \"Correlation does not prove that the change caused the workload errors.\"\n    },\n    \"partial\": {\n      \"receipt_id\": \"synthetic-gitlab-partial\",\n      \"status\": \"unavailable\",\n      \"observation\": null,\n      \"unknown\": \"Related changes and pipeline state.\",\n      \"next_read\": \"Request the missing approved GitLab evidence. No automatic retry.\"\n    },\n    \"denied\": {\n      \"receipt_id\": \"synthetic-gitlab-denied\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative related configuration change has a failed pipeline.\",\n      \"limits\": \"Correlation only. Data evidence is still denied.\"\n    }\n  }\n}"
+    },
+    "receipt-data": {
+      "title": "Synthetic Data receipts by scenario",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"source\": \"Configured Data MCP\",\n  \"operation\": \"Read one approved bounded observation\",\n  \"scope\": \"{{APPROVED_DATA_OPERATION}}\",\n  \"scenarios\": {\n    \"complete\": {\n      \"receipt_id\": \"synthetic-data-complete\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative approved aggregate reports no matching data anomaly.\",\n      \"limits\": \"Only the bounded approved observation is covered.\"\n    },\n    \"partial\": {\n      \"receipt_id\": \"synthetic-data-partial\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative approved aggregate reports no matching data anomaly.\",\n      \"limits\": \"GitLab is unavailable; change context remains unknown.\"\n    },\n    \"denied\": {\n      \"receipt_id\": \"synthetic-data-denied\",\n      \"status\": \"denied\",\n      \"observation\": null,\n      \"unknown\": \"All requested data evidence.\",\n      \"next_read\": \"Ask the data owner to review the intended read scope. No alternate identity or fallback.\"\n    }\n  }\n}"
+    },
+    "aggregate": {
+      "title": "Aggregate source receipts without hiding gaps",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"all_ids\": \"Invented for this offline illustration. No task, trace, tool or backend receipt was collected.\",\n  \"scenario_rules\": {\n    \"complete\": {\n      \"source_status\": {\n        \"Kubernetes\": \"returned\",\n        \"GitLab\": \"returned\",\n        \"Data\": \"returned\"\n      },\n      \"answer_status\": \"complete source coverage; cause remains unproven\"\n    },\n    \"partial\": {\n      \"source_status\": {\n        \"Kubernetes\": \"returned\",\n        \"GitLab\": \"unavailable\",\n        \"Data\": \"returned\"\n      },\n      \"answer_status\": \"partial; related work unknown\"\n    },\n    \"denied\": {\n      \"source_status\": {\n        \"Kubernetes\": \"returned\",\n        \"GitLab\": \"returned\",\n        \"Data\": \"denied\"\n      },\n      \"answer_status\": \"partial with explicit denied source; data evidence unknown\"\n    }\n  },\n  \"answer_contract\": [\n    \"Keep source IDs with each observation.\",\n    \"Distinguish observations, hypotheses and unknowns.\",\n    \"Record a source status even when no evidence is returned.\",\n    \"Preserve truncation and freshness limits from real receipts.\",\n    \"Propose a next read; require a separate human-approved workflow for changes.\"\n  ],\n  \"rendering\": \"All source-status paths remain active. Cards are neutral. The selected scenario status explicitly names returned, unavailable and denied sources.\"\n}"
+    },
+    "answer": {
+      "title": "One synthetic answer with citations and uncertainty",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"complete\": {\n    \"observations\": [\n      \"The illustrative rollout reports errors [synthetic-k8s-complete].\",\n      \"A related change has a failed pipeline [synthetic-gitlab-complete].\",\n      \"The approved bounded aggregate reports no matching data anomaly [synthetic-data-complete].\"\n    ],\n    \"hypothesis\": \"The change may be related; causation is unproven.\",\n    \"unknowns\": [\n      \"Root cause and any recovery outcome.\"\n    ],\n    \"next_read\": \"Compare the approved change diff with the scoped workload configuration.\"\n  },\n  \"partial\": {\n    \"observations\": [\n      \"The illustrative rollout reports errors [synthetic-k8s-partial].\",\n      \"The approved bounded aggregate reports no matching data anomaly [synthetic-data-partial].\"\n    ],\n    \"unknowns\": [\n      \"GitLab is unavailable [synthetic-gitlab-partial]. Related changes and pipeline status remain unknown.\",\n      \"Root cause and any recovery outcome.\"\n    ],\n    \"next_read\": \"Obtain the missing approved GitLab evidence before attributing the incident to a change.\"\n  },\n  \"denied\": {\n    \"observations\": [\n      \"The illustrative rollout reports errors [synthetic-k8s-denied].\",\n      \"A related change has a failed pipeline [synthetic-gitlab-denied].\"\n    ],\n    \"unknowns\": [\n      \"Data access is denied [synthetic-data-denied]. The requested data evidence remains unknown.\",\n      \"Root cause and any recovery outcome.\"\n    ],\n    \"next_read\": \"Ask the data owner to review the intended read scope. Continue only within existing permissions.\"\n  },\n  \"routing_slide\": \"Only findings from selected specialists belong in that response. Unselected inventory contributes no evidence.\",\n  \"action_boundary\": \"No automatic fix, merge, deployment, credential switch or retry. Any change uses a separate reviewed human-approved workflow.\"\n}"
+    },
+    "api": {
+      "title": "Documented A2A text request envelope",
+      "type": "Inspected local helper envelope; displayed request is synthetic",
+      "text": "ILLUSTRATIVE CONSUMPTION\nAn SRE app or workflow can call the same Lens Agent API. An application input may start as text or a bounded payload. The currently documented runtime envelope carries kind=text. This is not proof of an implemented typed-payload endpoint or SDK.\n\nINSPECTED LOCAL HELPER\nscripts/kagent-a2a-invoke.sh builds JSON-RPC message/send with message.kind=message, role=user and a parts entry carrying kind=text. It invokes /api/a2a/{namespace}/{agent}/ with the required trailing slash for the inspected kagent runtime. Verify the receiving version and API before live use.\n\nSYNTHETIC REQUEST BODY\n{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"synthetic-lens-request\",\n  \"method\": \"message/send\",\n  \"params\": {\n    \"message\": {\n      \"kind\": \"message\",\n      \"messageId\": \"synthetic-lens-request\",\n      \"contextId\": \"synthetic-lens-context\",\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"kind\": \"text\",\n          \"text\": \"Compare the workload symptoms with related engineering work.\"\n        }\n      ]\n    }\n  }\n}\n\nThis body is displayed only. Nothing sends it. The illustrative Lens name and topology require actual receiving-system configuration. API access does not grant specialist, MCP or backend authority."
+    },
+    "observability": {
+      "title": "Trace and usage evidence to collect in a real walkthrough",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"current_state\": \"No trace, provider usage, counter, latency, cost or live receipt is collected by this HTML.\",\n  \"real_walkthrough_evidence\": [\n    \"Actual caller-to-Lens request and terminal response.\",\n    \"Actual selected specialist delegation receipts and explicit denied delegation.\",\n    \"Actual permitted MCP operation and backend result or denial.\",\n    \"Observed trace spans correlated by real request/task IDs.\",\n    \"Actual per-call and cumulative usage where the deployed telemetry records them.\"\n  ],\n  \"proof_boundaries\": [\n    \"An animated route is not a network span.\",\n    \"Native Agent delegation alone does not prove every hop passes through agentgateway.\",\n    \"A Ready route is not provider-backed caller success.\",\n    \"Missing spans and missing usage remain unknown, never zero.\",\n    \"Do not infer live token savings or costs from bounded synthetic results.\",\n    \"Historical evidence in the bundle remains historical.\"\n  ],\n  \"source_context\": \"showcase.html#lens requests actual delegation, tool, trace and usage receipts. This deck demonstrates the explanation only.\"\n}"
+    }
+  },
+  "deckLinks": [
+    {
+      "label": "Demo home",
+      "href": "START-HERE.html"
+    },
+    {
+      "label": "Journey",
+      "href": "journey.html"
+    },
+    {
+      "label": "SRE Lens",
+      "href": "sre-lens.html"
+    },
+    {
+      "label": "Triage",
+      "href": "triage.html"
+    },
+    {
+      "label": "SDLC",
+      "href": "sdlc.html"
+    },
+    {
+      "label": "Review",
+      "href": "showcase.html"
+    }
+  ]
+}</script>
+<script>
+'use strict';
+const data=JSON.parse(document.getElementById('deckData').textContent);
+const $=id=>document.getElementById(id);
+const svgNS='http://www.w3.org/2000/svg';
+const mobile=matchMedia('(max-width:899px)');
+const reduced=matchMedia('(prefers-reduced-motion:reduce)');
+const state={index:0,scenario:new Map(),raf:null,generation:0,effects:[],markers:[],sourceOpener:null,notesOpener:null,printing:false,printScroll:[],repeatMs:0,repeatTimer:null};
+const elements=new Map();
+function element(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
+function svg(tag,attrs){const e=document.createElementNS(svgNS,tag);for(const [k,v]of Object.entries(attrs))e.setAttribute(k,v);return e}
+function color(path){return path.tone==='red'?'var(--accent)':path.reference?'var(--reference)':'var(--link)'}
+function buildSlide(slide,index){
+ const article=element('article','slide');article.id=slide.id;article.hidden=true;article.inert=true;article.setAttribute('aria-labelledby',slide.id+'-title');article.setAttribute('aria-hidden','true');
+ article.append(element('div','accent-rule'),element('div','eyebrow',slide.label));
+ const topline=element('div','slide-topline');topline.append(element('span','version','Native kagent · KRO · agentgateway'),element('span','illustration-label','Illustration / synthetic examples'));article.append(topline);
+ const heading=element('h1','',slide.title);heading.id=slide.id+'-title';heading.tabIndex=-1;article.append(heading,element('p','intro',slide.intro));
+ const content=element('div','content');const interaction=element('div','interaction-row');const scenarioGroup=element('div','scenario-group');scenarioGroup.setAttribute('role','group');scenarioGroup.setAttribute('aria-label','Illustrated scenarios');
+ for(const option of slide.scenarios||[]){const button=element('button','scenario','Illustration: '+option.label);button.dataset.scenario=option.id;button.addEventListener('click',()=>{state.scenario.set(slide.id,option.id);applyScenario(slide);play()});scenarioGroup.append(button)}
+ interaction.append(scenarioGroup,element('div','diagram-hint','Click a component for source / details'),element('div','print-note','Illustrative architecture. Solid = main flow; dashed = reference or optional path.'));
+ content.append(interaction,element('p','mobile-hint','Scroll diagram sideways to explore all components.'));
+ const scroller=element('div','diagram-scroll');scroller.tabIndex=0;scroller.setAttribute('role','region');scroller.setAttribute('aria-label',slide.title+' diagram; scroll horizontally on narrow screens');
+ const diagram=element('div','diagram');diagram.setAttribute('role','group');diagram.setAttribute('aria-label','Interactive components and labelled connection paths');
+ const lines=svg('svg',{class:'connections',viewBox:'0 0 1488 450','aria-hidden':'true'});const defs=svg('defs',{});for(const [tone,fill]of [['blue','var(--link)'],['reference','var(--reference)'],['red','var(--accent)']]){const arrow=svg('marker',{id:slide.id+'-arrow-'+tone,viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:6,markerHeight:6,orient:'auto'});arrow.append(svg('path',{d:'M1 1L7 4L1 7Z',fill}));defs.append(arrow)}lines.append(defs);const pathMap=new Map();
+ for(const p of slide.paths){const line=svg('path',{d:p.d,class:'route'+(p.reference?' reference':'')+(p.tone==='red'?' red':''),'data-path':p.id,'marker-end':'url(#'+slide.id+'-arrow-'+(p.tone==='red'?'red':p.reference?'reference':'blue')+')'});lines.append(line);pathMap.set(p.id,line);if(p.label){const label=svg('text',{x:p.lx,y:p.ly,class:'edge-label'+(p.reference?' reference':'')+(p.tone==='red'?' red':''),'data-label-path':p.id});label.textContent=p.label;lines.append(label)}}
+ for(const stop of slide.stops||[]){const g=svg('g',{class:'stop-mark','data-stop-scenario':stop.scenario});g.append(svg('path',{d:`M${stop.x-6} ${stop.y-6}L${stop.x+6} ${stop.y+6}M${stop.x+6} ${stop.y-6}L${stop.x-6} ${stop.y+6}`}));lines.append(g)}
+ diagram.append(lines);
+ for(const n of slide.nodes){const button=element('button','node '+n.tone+(n.code?' code-node':'')+(n.h<=100?' compact':''));button.dataset.node=n.id;Object.assign(button.style,{left:n.x+'px',top:n.y+'px',width:n.w+'px',height:n.h+'px'});button.setAttribute('aria-label','Inspect '+n.title);const top=element('div','node-top');const icon=svg('svg',{'aria-hidden':'true',viewBox:'0 0 32 32'});icon.append(svg('use',{href:'#icon-'+n.icon}));top.append(icon,element('h2','',n.title));button.append(top,element('p','',n.detail));if(n.code){button.append(element('pre','inline-code',n.code),element('span','inspect-hint','Click to inspect the full synthetic example'))}button.addEventListener('click',()=>openSource(n.source,button));diagram.append(button)}
+ if(slide.strips){const strips=element('div','strips');for(const item of slide.strips){const strip=element('div','strip');strip.append(element('strong','',item.title),element('p','',item.text));strips.append(strip)}diagram.append(strips)}
+ scroller.append(diagram);content.append(scroller);const legendRow=element('div','legend-row');const legend=element('div','legend');for(const [name,style]of [['Main illustrated flow',''],['Reference / optional','dashed']]){const span=element('span','');span.append(element('i',style),document.createTextNode(name));legend.append(span)}const status=element('div','status','Illustration only. No backend calls or tests run in this deck.');status.setAttribute('aria-live','polite');legendRow.append(legend,status);content.append(legendRow);article.append(content);
+ const takeaway=element('div','takeaway');takeaway.append(element('strong','','Takeaway'),element('span','',slide.takeaway));article.append(takeaway);const footer=element('footer','slide-footer');const chapters=element('span','');chapters.append(document.createTextNode('Synthetic architecture · '));for(const chapter of data.deckLinks||[]){const a=element('a','deck-link',chapter.label);a.href=chapter.href;chapters.append(a,document.createTextNode(' · '))}if(!data.deckLinks)chapters.append(document.createTextNode('Native runtime, no Substrate'));footer.append(chapters,element('span','',String(index+1).padStart(2,'0')+' / '+String(data.slides.length).padStart(2,'0')));article.append(footer);$('canvas').append(article);elements.set(slide.id,{article,heading,diagram,lines,pathMap,scenarioGroup,status,scroller});
+ if(slide.scenarios)state.scenario.set(slide.id,slide.scenarios[0].id);
+}
+data.slides.forEach(buildSlide);
+for(const [id,source]of Object.entries(data.sources)){const option=element('option','',source.title);option.value=id;$('sourceSelect').append(option)}
+function current(){return data.slides[state.index]}
+function isActivePath(slide,path){return !path.scenarios||path.scenarios.includes(state.scenario.get(slide.id))}
+function applyScenario(slide){const e=elements.get(slide.id);const id=state.scenario.get(slide.id);for(const b of e.scenarioGroup.children)b.setAttribute('aria-pressed',String(b.dataset.scenario===id));for(const path of slide.paths){const active=isActivePath(slide,path);e.pathMap.get(path.id).classList.toggle('inactive',!active);const label=e.lines.querySelector('[data-label-path="'+path.id+'"]');if(label)label.classList.toggle('inactive',!active)}for(const g of e.lines.querySelectorAll('[data-stop-scenario]'))g.classList.toggle('inactive',g.dataset.stopScenario!==id);const scenario=slide.scenarios?.find(s=>s.id===id);e.status.textContent=scenario?scenario.status:'Illustration only. No backend calls or tests run in this deck.'}
+function cancelMotion(){clearTimeout(state.repeatTimer);state.repeatTimer=null;state.generation++;if(state.raf!==null)cancelAnimationFrame(state.raf);state.raf=null;for(const effect of state.effects)effect.cancel();state.effects=[];for(const marker of state.markers)marker.remove();state.markers=[];for(const path of document.querySelectorAll('.route')){path.style.strokeDasharray='';path.style.strokeDashoffset=''}}
+function canAnimate(){return !reduced.matches&&!document.hidden&&!state.printing&&!$('sourceDialog').open&&!$('notesDialog').open}
+function scheduleRepeat(){clearTimeout(state.repeatTimer);state.repeatTimer=null;if(state.repeatMs&&canAnimate())state.repeatTimer=setTimeout(play,state.repeatMs)}
+function updateRepeatControl(){$('repeat').disabled=reduced.matches;$('repeat').title=reduced.matches?'Automatic motion is paused by your reduced-motion preference.':'Pause after each flow completes. Repeats the current slide.'}
+function duration(token,fallback){const raw=getComputedStyle(document.documentElement).getPropertyValue(token).trim();return raw.endsWith('ms')?Number.parseFloat(raw):raw.endsWith('s')?Number.parseFloat(raw)*1000:fallback}
+function play(){cancelMotion();const slide=current();const e=elements.get(slide.id);applyScenario(slide);if(!canAnimate())return;const generation=state.generation;const enter=duration('--enter-duration',450);const packet=duration('--packet-duration',850);const paths=slide.paths.filter(p=>isActivePath(slide,p));for(const [i,node]of Array.from(e.diagram.querySelectorAll('.node')).entries()){state.effects.push(node.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'translateY(0)'}],{duration:enter,delay:i*90,easing:'cubic-bezier(.2,.65,.3,1)',fill:'backwards'}))}
+ const travels=paths.map((path,i)=>{const line=e.pathMap.get(path.id);const length=line.getTotalLength();const marker=svg('circle',{r:6,fill:color(path),class:'packet',opacity:0,'data-reference':String(path.reference)});e.lines.append(marker);state.markers.push(marker);return {path,line,length,marker,start:330+i*170}});const start=performance.now();const end=Math.max(enter+slide.nodes.length*90,...travels.map(t=>t.start+packet))+80;
+ function tick(now){if(generation!==state.generation)return;const elapsed=now-start;for(const t of travels){const p=Math.max(0,Math.min(1,(elapsed-t.start)/packet));if(!t.path.reference){t.line.style.strokeDasharray=t.length+' '+t.length;t.line.style.strokeDashoffset=String(t.length*(1-p))}t.marker.setAttribute('opacity',elapsed>=t.start&&p<1?'1':'0');const point=t.line.getPointAtLength(t.length*p);t.marker.setAttribute('cx',point.x);t.marker.setAttribute('cy',point.y)}if(elapsed<end)state.raf=requestAnimationFrame(tick);else{cancelMotion();e.status.textContent=(slide.scenarios?.find(s=>s.id===state.scenario.get(slide.id))?.status||'Illustration complete. Inspect a component or replay the flow.')+' No live result is represented.';scheduleRepeat()}}
+ state.raf=requestAnimationFrame(tick);
+}
+function fit(){if(mobile.matches){$('stage').style.width='';$('stage').style.height='';document.documentElement.style.setProperty('--scale','1');return}const scale=Math.min((innerWidth-48)/1600,(innerHeight-118)/900);document.documentElement.style.setProperty('--scale',String(scale));$('stage').style.width=1600*scale+'px';$('stage').style.height=900*scale+'px'}
+function showSlide(index,{animate=true,hash=true,focus=false}={}){cancelMotion();state.index=Math.max(0,Math.min(data.slides.length-1,index));const slide=current();for(const entry of data.slides){const active=entry.id===slide.id;const article=elements.get(entry.id).article;article.hidden=!active;article.inert=!active;article.setAttribute('aria-hidden',String(!active))}applyScenario(slide);$('previous').disabled=state.index===0;$('next').disabled=state.index===data.slides.length-1;$('slideCounter').textContent=(state.index+1)+' / '+data.slides.length;$('slideAnnouncement').textContent='Slide '+(state.index+1)+' of '+data.slides.length+'. '+slide.title;if(hash&&location.hash!=='#'+slide.id)location.hash=slide.id;if(focus)elements.get(slide.id).heading.focus({preventScroll:true});if(mobile.matches)window.scrollTo({top:0,behavior:'instant'});fit();if(animate)play();else scheduleRepeat()}
+function sourceText(){const source=data.sources[$('sourceSelect').value];$('sourceCode').textContent=source.text;$('sourceMeta').textContent=source.type+' · Illustration only';$('sourceCode').scrollTop=0;$('sourceCode').scrollLeft=0;$('copyStatus').textContent=''}
+function openSource(id,opener){cancelMotion();state.sourceOpener=opener||document.activeElement;$('sourceSelect').value=id;sourceText();$('sourceDialog').showModal();$('sourceSelect').focus()}
+function openNotes(opener){cancelMotion();state.notesOpener=opener||document.activeElement;$('notesTitle').textContent='Slide '+(state.index+1)+' / Presenter notes';$('notesText').textContent=current().notes;$('notesDialog').showModal();$('closeNotes').focus()}
+$('sourceSelect').addEventListener('change',sourceText);$('sourceDialog').addEventListener('close',()=>{if(state.sourceOpener?.isConnected)state.sourceOpener.focus({preventScroll:true});scheduleRepeat()});$('notesDialog').addEventListener('close',()=>{if(state.notesOpener?.isConnected)state.notesOpener.focus({preventScroll:true});scheduleRepeat()});$('closeSource').addEventListener('click',()=>$('sourceDialog').close());$('closeNotes').addEventListener('click',()=>$('notesDialog').close());
+$('copySource').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('sourceCode').textContent);$('copyStatus').textContent='Copied source text.'}catch{const range=document.createRange();range.selectNodeContents($('sourceCode'));const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);$('sourceCode').focus();$('copyStatus').textContent='Clipboard unavailable. Text selected; press Cmd+C or Ctrl+C to copy manually.'}});
+$('repeat').addEventListener('change',()=>{state.repeatMs=Number($('repeat').value);cancelMotion();if(state.repeatMs)play()});
+$('previous').addEventListener('click',()=>showSlide(state.index-1));$('next').addEventListener('click',()=>showSlide(state.index+1));$('replay').addEventListener('click',play);$('notes').addEventListener('click',event=>openNotes(event.currentTarget));$('details').addEventListener('click',event=>openSource(current().nodes[0].source,event.currentTarget));$('print').addEventListener('click',()=>{cancelMotion();window.print()});
+document.addEventListener('keydown',event=>{if(event.ctrlKey||event.metaKey||event.altKey||event.target.closest('input,textarea,select,[contenteditable],dialog')||$('sourceDialog').open||$('notesDialog').open||window.getSelection()?.toString())return;const key=event.key.toLowerCase();if(event.shiftKey&&key.startsWith('arrow'))return;let target=null;if(['arrowright','pagedown'].includes(key))target=state.index+1;if(['arrowleft','pageup'].includes(key))target=state.index-1;if(key==='home')target=0;if(key==='end')target=data.slides.length-1;if(target!==null){event.preventDefault();showSlide(target,{focus:true})}else if(key==='r'){event.preventDefault();play()}else if(key==='n'){event.preventDefault();openNotes(event.target)}});
+window.addEventListener('hashchange',()=>{const index=data.slides.findIndex(s=>'#'+s.id===location.hash);if(index>=0&&index!==state.index)showSlide(index,{hash:false})});window.addEventListener('resize',()=>{cancelMotion();fit();scheduleRepeat()});document.addEventListener('visibilitychange',()=>{cancelMotion();scheduleRepeat()});reduced.addEventListener('change',()=>{cancelMotion();updateRepeatControl();scheduleRepeat()});
+window.addEventListener('beforeprint',()=>{cancelMotion();state.printing=true;state.printScroll=Array.from(document.querySelectorAll('.diagram-scroll,.source-code'),e=>({e,left:e.scrollLeft,top:e.scrollTop}));for(const item of state.printScroll){item.e.scrollLeft=0;item.e.scrollTop=0}for(const entry of elements.values()){entry.article.hidden=false;entry.article.inert=true}});
+window.addEventListener('afterprint',()=>{state.printing=false;showSlide(state.index,{animate:false,hash:false});for(const item of state.printScroll){item.e.scrollLeft=item.left;item.e.scrollTop=item.top}state.printScroll=[]});
+updateRepeatControl();
+const initial=data.slides.findIndex(s=>'#'+s.id===location.hash);showSlide(initial>=0?initial:0,{animate:false});
+</script>
+</body>
+</html>

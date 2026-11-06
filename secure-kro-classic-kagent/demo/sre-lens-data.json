@@ -1,0 +1,808 @@
+{
+  "slides": [
+    {
+      "id": "route",
+      "label": "01 / SRE Lens",
+      "title": "SRE Lens asks the right specialists.",
+      "intro": "One request goes to Lens. It asks only the permitted specialists needed for the question.",
+      "takeaway": "Delegate by the question and permission. Return one answer with its sources.",
+      "scenarios": [
+        {
+          "id": "workload",
+          "label": "Workload incident",
+          "status": "Workload incident selects Kubernetes + GitLab. Data remains available but is not called. All paths and results are synthetic."
+        },
+        {
+          "id": "data",
+          "label": "Data question",
+          "status": "Data question selects Data only. Kubernetes and GitLab remain available but are not called. All paths and results are synthetic."
+        },
+        {
+          "id": "cross",
+          "label": "Cross-system",
+          "status": "Cross-system selects Kubernetes + GitLab + Data. Selection still requires separate delegation and tool permissions. All paths and results are synthetic."
+        }
+      ],
+      "nodes": [
+        {
+          "id": "caller",
+          "title": "SRE or app",
+          "detail": "One operational question",
+          "source": "question",
+          "x": 20,
+          "y": 155,
+          "w": 230,
+          "h": 145,
+          "tone": "neutral",
+          "icon": "identity"
+        },
+        {
+          "id": "lens",
+          "title": "SRE Lens",
+          "detail": "Choose permitted specialists",
+          "source": "routing",
+          "x": 335,
+          "y": 155,
+          "w": 250,
+          "h": 145,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "kubernetes",
+          "title": "Kubernetes Agent",
+          "detail": "Available · workload evidence",
+          "source": "kubernetes",
+          "x": 740,
+          "y": 20,
+          "w": 300,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "gitlab",
+          "title": "GitLab Agent",
+          "detail": "Available · related work",
+          "source": "gitlab",
+          "x": 740,
+          "y": 175,
+          "w": 300,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "data",
+          "title": "Data Agent",
+          "detail": "Available · approved data",
+          "source": "data",
+          "x": 740,
+          "y": 330,
+          "w": 300,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "answer",
+          "title": "One answer",
+          "detail": "Citations, gaps and next read",
+          "source": "answer",
+          "x": 1190,
+          "y": 155,
+          "w": 280,
+          "h": 145,
+          "tone": "neutral",
+          "icon": "file"
+        }
+      ],
+      "paths": [
+        {
+          "id": "question",
+          "d": "M250 225H335",
+          "label": "ask",
+          "lx": 292,
+          "ly": 214,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "delegate-kubernetes",
+          "d": "M585 190H655V70H740",
+          "label": "delegate",
+          "lx": 684,
+          "ly": 58,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "workload",
+            "cross"
+          ]
+        },
+        {
+          "id": "delegate-gitlab",
+          "d": "M585 225H740",
+          "label": "delegate",
+          "lx": 661,
+          "ly": 214,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "workload",
+            "cross"
+          ]
+        },
+        {
+          "id": "delegate-data",
+          "d": "M585 260H655V380H740",
+          "label": "delegate",
+          "lx": 684,
+          "ly": 368,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "data",
+            "cross"
+          ]
+        },
+        {
+          "id": "return-kubernetes",
+          "d": "M1040 70H1140V190H1190",
+          "label": "findings",
+          "lx": 1090,
+          "ly": 58,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "workload",
+            "cross"
+          ]
+        },
+        {
+          "id": "return-gitlab",
+          "d": "M1040 225H1190",
+          "label": "findings",
+          "lx": 1114,
+          "ly": 214,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "workload",
+            "cross"
+          ]
+        },
+        {
+          "id": "return-data",
+          "d": "M1040 380H1140V260H1190",
+          "label": "findings",
+          "lx": 1090,
+          "ly": 368,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": [
+            "data",
+            "cross"
+          ]
+        }
+      ],
+      "notes": "Start with Workload incident. Follow the single question into Lens, then the two selected delegations and their return findings. Select Data question and both directions switch to Data only. Cross-system selects all three. The unselected routes fade; the cards remain visible as available inventory, never completed work. The combined answer is returned to the original caller. This is an offline explanation, not a routing decision or execution receipt. The GitLab/Kubernetes/Data topology is the user-described illustration in showcase.html#lens. The inspected native A2A YAML instead names Grafana, data-compliance and Kubernetes specialists. Open the Lens source to inspect that exact illustrative YAML. It does not install this full topology. No component is identified as Node.js because that name remains unconfirmed."
+    },
+    {
+      "id": "reads",
+      "label": "02 / Scoped evidence",
+      "title": "An Agent reasons. Its MCP reads.",
+      "intro": "Each specialist uses its own scoped tool adapter. Backend access belongs to a separate identity and grant.",
+      "takeaway": "Agent delegation, MCP tool permission and backend read access are separate checks.",
+      "nodes": [
+        {
+          "id": "k-agent",
+          "title": "Kubernetes Agent",
+          "detail": "Investigate the permitted workload",
+          "source": "kubernetes",
+          "x": 20,
+          "y": 20,
+          "w": 300,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "k-mcp",
+          "title": "Kubernetes MCP",
+          "detail": "Scoped read operations",
+          "source": "kubernetes",
+          "x": 535,
+          "y": 20,
+          "w": 310,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "tools"
+        },
+        {
+          "id": "k-backend",
+          "title": "Kubernetes API",
+          "detail": "Namespace + RBAC scope",
+          "source": "backend-auth",
+          "x": 1120,
+          "y": 20,
+          "w": 350,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "shield"
+        },
+        {
+          "id": "g-agent",
+          "title": "GitLab Agent",
+          "detail": "Connect symptoms to related work",
+          "source": "gitlab",
+          "x": 20,
+          "y": 175,
+          "w": 300,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "g-mcp",
+          "title": "GitLab MCP",
+          "detail": "Approved project reads",
+          "source": "gitlab",
+          "x": 535,
+          "y": 175,
+          "w": 310,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "tools"
+        },
+        {
+          "id": "g-backend",
+          "title": "GitLab project",
+          "detail": "Separate read credential",
+          "source": "backend-auth",
+          "x": 1120,
+          "y": 175,
+          "w": 350,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "key"
+        },
+        {
+          "id": "d-agent",
+          "title": "Data Agent",
+          "detail": "Ask an approved data question",
+          "source": "data",
+          "x": 20,
+          "y": 330,
+          "w": 300,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "agent"
+        },
+        {
+          "id": "d-mcp",
+          "title": "Data MCP",
+          "detail": "Typed, bounded read operations",
+          "source": "data",
+          "x": 535,
+          "y": 330,
+          "w": 310,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "tools"
+        },
+        {
+          "id": "d-backend",
+          "title": "Approved data backend",
+          "detail": "Separate principal + grants",
+          "source": "backend-auth",
+          "x": 1120,
+          "y": 330,
+          "w": 350,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "key"
+        }
+      ],
+      "paths": [
+        {
+          "id": "k-tools",
+          "d": "M320 55H535",
+          "label": "tool read",
+          "lx": 426,
+          "ly": 44,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "k-result",
+          "d": "M535 90H320",
+          "label": "bounded result",
+          "lx": 426,
+          "ly": 112,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "k-auth",
+          "d": "M845 55H1120",
+          "label": "backend identity",
+          "lx": 981,
+          "ly": 44,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "k-return",
+          "d": "M1120 90H845",
+          "label": "read result",
+          "lx": 981,
+          "ly": 112,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "g-tools",
+          "d": "M320 210H535",
+          "label": "tool read",
+          "lx": 426,
+          "ly": 199,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "g-result",
+          "d": "M535 245H320",
+          "label": "bounded result",
+          "lx": 426,
+          "ly": 267,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "g-auth",
+          "d": "M845 210H1120",
+          "label": "backend identity",
+          "lx": 981,
+          "ly": 199,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "g-return",
+          "d": "M1120 245H845",
+          "label": "read result",
+          "lx": 981,
+          "ly": 267,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d-tools",
+          "d": "M320 365H535",
+          "label": "tool read",
+          "lx": 426,
+          "ly": 354,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d-result",
+          "d": "M535 400H320",
+          "label": "bounded result",
+          "lx": 426,
+          "ly": 422,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d-auth",
+          "d": "M845 365H1120",
+          "label": "backend identity",
+          "lx": 981,
+          "ly": 354,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d-return",
+          "d": "M1120 400H845",
+          "label": "read result",
+          "lx": 981,
+          "ly": 422,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "These are three illustrative read lanes. The Agent is the specialist that plans and interprets. MCP is its tool interface, not another reasoning agent. Tool names and availability must come from the receiving server discovery response. The source popups list operations by intent rather than inventing deployed tool names. Kubernetes reads remain inside allowed namespaces and RBAC. GitLab reads remain inside approved projects. Data reads use an approved adapter and backend grants. Existing catalog material names Denodo; the PostgreSQL typed adapter is a separate option with explicit limits. Do not treat the two as one installation. The user-described Data specialist does not confirm a Node.js server or a specific backend. No apply, delete, arbitrary SQL, write or remediation action runs here. Return arrows depict bounded source results, not observed live responses."
+    },
+    {
+      "id": "receipts",
+      "label": "03 / One evidence-backed answer",
+      "title": "Combine evidence. Keep the gaps visible.",
+      "intro": "Each claim keeps its source. Missing or denied evidence stays visible.",
+      "takeaway": "Unavailable and denied evidence stays unknown. A human chooses the next action.",
+      "scenarios": [
+        {
+          "id": "complete",
+          "label": "Complete",
+          "status": "Complete · Kubernetes, GitLab and Data returned synthetic observations. Correlation only; no root cause proven."
+        },
+        {
+          "id": "partial",
+          "label": "Partial",
+          "status": "Partial · Kubernetes + Data returned. GitLab is unavailable, so related changes remain unknown. No silent retry."
+        },
+        {
+          "id": "denied",
+          "label": "Denied",
+          "status": "Denied · Kubernetes + GitLab returned. Data access is denied, so data evidence remains unknown. No fallback."
+        }
+      ],
+      "nodes": [
+        {
+          "id": "k-receipt",
+          "title": "Kubernetes receipt",
+          "detail": "Synthetic · inspect scenario status",
+          "source": "receipt-kubernetes",
+          "x": 20,
+          "y": 20,
+          "w": 350,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "g-receipt",
+          "title": "GitLab receipt",
+          "detail": "Synthetic · inspect scenario status",
+          "source": "receipt-gitlab",
+          "x": 20,
+          "y": 175,
+          "w": 350,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "d-receipt",
+          "title": "Data receipt",
+          "detail": "Synthetic · inspect scenario status",
+          "source": "receipt-data",
+          "x": 20,
+          "y": 330,
+          "w": 350,
+          "h": 100,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "aggregate",
+          "title": "SRE Lens",
+          "detail": "Keep source IDs and uncertainty",
+          "source": "aggregate",
+          "x": 620,
+          "y": 150,
+          "w": 300,
+          "h": 150,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "combined",
+          "title": "One cited answer",
+          "detail": "Knowns, gaps and a next read",
+          "source": "answer",
+          "x": 1140,
+          "y": 150,
+          "w": 330,
+          "h": 150,
+          "tone": "neutral",
+          "icon": "file"
+        }
+      ],
+      "paths": [
+        {
+          "id": "k-status",
+          "d": "M370 70H490V185H620",
+          "label": "source status",
+          "lx": 442,
+          "ly": 58,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "g-status",
+          "d": "M370 225H620",
+          "label": "source status",
+          "lx": 494,
+          "ly": 214,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "d-status",
+          "d": "M370 380H490V265H620",
+          "label": "source status",
+          "lx": 442,
+          "ly": 368,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "compose",
+          "d": "M920 225H1140",
+          "label": "cite + qualify",
+          "lx": 1030,
+          "ly": 214,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        }
+      ],
+      "notes": "The scenario status below the diagram explicitly names each source outcome. Source receipt cards are neutral because the existing renderer changes paths and scenario text, not node content. Every source-status path remains active in every scenario. An unavailable or denied receipt still needs to reach Lens as an explicit status. An inactive line cannot stand in for a failure result. Complete means all three illustrative required sources returned, not that the diagnosis is correct or a cause is proven. Partial keeps Kubernetes and Data observations while GitLab-related change information remains unknown. Denied keeps Kubernetes and GitLab observations while Data evidence remains unknown. Each receipt popup includes every scenario with synthetic IDs and provenance. The answer popup shows the different claims and next reads. Never infer an automatic fix, retry, alternate credential or provider switch. Any change belongs to a separate reviewed, human-approved workflow."
+    },
+    {
+      "id": "consume",
+      "label": "04 / DICE as a product",
+      "title": "Embed the same Lens conversation.",
+      "intro": "An application can consume DICE through the agent API. Each permission boundary still applies.",
+      "takeaway": "API access opens the conversation. Separate grants control delegation, tools and resources.",
+      "nodes": [
+        {
+          "id": "caller-grant",
+          "title": "Caller permission",
+          "detail": "May this caller invoke Lens?",
+          "source": "permissions",
+          "x": 20,
+          "y": 10,
+          "w": 430,
+          "h": 85,
+          "tone": "neutral",
+          "icon": "identity"
+        },
+        {
+          "id": "agent-grant",
+          "title": "Specialist permission",
+          "detail": "May Lens delegate to this Agent?",
+          "source": "permissions",
+          "x": 525,
+          "y": 10,
+          "w": 430,
+          "h": 85,
+          "tone": "neutral",
+          "icon": "shield"
+        },
+        {
+          "id": "tool-grant",
+          "title": "MCP + backend permission",
+          "detail": "Which reads and resource scope?",
+          "source": "backend-auth",
+          "x": 1030,
+          "y": 10,
+          "w": 440,
+          "h": 85,
+          "tone": "neutral",
+          "icon": "key"
+        },
+        {
+          "id": "consumer",
+          "title": "SRE app",
+          "detail": "Text or bounded input",
+          "source": "api",
+          "x": 20,
+          "y": 135,
+          "w": 250,
+          "h": 145,
+          "tone": "neutral",
+          "icon": "box"
+        },
+        {
+          "id": "api",
+          "title": "DICE agent API",
+          "detail": "Documented A2A text envelope",
+          "source": "api",
+          "x": 365,
+          "y": 135,
+          "w": 270,
+          "h": 145,
+          "tone": "neutral",
+          "icon": "network"
+        },
+        {
+          "id": "orchestrator",
+          "title": "SRE Lens",
+          "detail": "Permitted specialist routes",
+          "source": "routing",
+          "x": 750,
+          "y": 135,
+          "w": 250,
+          "h": 145,
+          "tone": "dark",
+          "icon": "agent"
+        },
+        {
+          "id": "response",
+          "title": "One response",
+          "detail": "Cited findings + explicit gaps",
+          "source": "answer",
+          "x": 1190,
+          "y": 135,
+          "w": 280,
+          "h": 145,
+          "tone": "neutral",
+          "icon": "file"
+        },
+        {
+          "id": "observability",
+          "title": "Traces + usage receipts",
+          "detail": "Correlate actual hops. Missing spans or usage remain unknown.",
+          "source": "observability",
+          "x": 365,
+          "y": 335,
+          "w": 780,
+          "h": 95,
+          "tone": "neutral",
+          "icon": "eye"
+        }
+      ],
+      "paths": [
+        {
+          "id": "invoke",
+          "d": "M270 207H365",
+          "label": "invoke",
+          "lx": 316,
+          "ly": 196,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "api-route",
+          "d": "M635 207H750",
+          "label": "request",
+          "lx": 692,
+          "ly": 196,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "api-response",
+          "d": "M1000 207H1190",
+          "label": "response",
+          "lx": 1095,
+          "ly": 196,
+          "tone": "blue",
+          "reference": false,
+          "scenarios": null
+        },
+        {
+          "id": "record",
+          "d": "M875 280V310H755V335",
+          "label": "correlate",
+          "lx": 978,
+          "ly": 315,
+          "tone": "reference",
+          "reference": true,
+          "scenarios": null
+        }
+      ],
+      "notes": "DICE can be consumed by an SRE interface or another application/workflow. Input may originate as text or a bounded application payload, but the currently documented runtime example serializes the request in an A2A message part with kind=text. The source popup shows that envelope. This does not claim an implemented typed-payload API or new SDK. API invocation is separate from permission to use a specialist, call an MCP tool or read the backend resource. The reference YAML demonstrates Agent-type delegation and allowedNamespaces namespace opt-in. Namespace selection is not Entra user authorization. Tokens must have the correct audience at each boundary; there is no pass-through JWT assumption. Native delegation alone does not establish that every hop traverses agentgateway. For a real demonstration collect actual invocation, delegation, tool and backend results and correlate observed trace spans. Use actual usage telemetry where present; absent usage, spans or provider receipts remain unknown. All IDs and outputs here are synthetic, with no live counters, latency or cost claims."
+    }
+  ],
+  "sources": {
+    "question": {
+      "title": "Example questions and specialist selection",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"topology\": \"User-described GitLab, Kubernetes and Data specialists. Illustrative inventory only.\",\n  \"workload_incident\": {\n    \"question\": \"What explains this workload's errors, and is there related engineering work?\",\n    \"selected\": [\n      \"Kubernetes\",\n      \"GitLab\"\n    ],\n    \"unselected\": [\n      \"Data\"\n    ]\n  },\n  \"data_question\": {\n    \"question\": \"What do the approved data observations say about this incident?\",\n    \"selected\": [\n      \"Data\"\n    ],\n    \"unselected\": [\n      \"Kubernetes\",\n      \"GitLab\"\n    ]\n  },\n  \"cross_system\": {\n    \"question\": \"Compare the workload symptoms, related change and approved data observations.\",\n    \"selected\": [\n      \"Kubernetes\",\n      \"GitLab\",\n      \"Data\"\n    ],\n    \"unselected\": []\n  },\n  \"rules\": [\n    \"Select only relevant and permitted specialists.\",\n    \"Return selected specialists' findings into one response.\",\n    \"An unselected specialist is available inventory, not a completed call.\",\n    \"No live execution, model or backend request occurs.\"\n  ]\n}"
+    },
+    "routing": {
+      "title": "Lens routing and exact native A2A reference",
+      "type": "Inspected local illustrative YAML and explicit topology difference",
+      "text": "ILLUSTRATIVE TOPOLOGY\nThe deck follows showcase.html#lens and the user-described GitLab, Kubernetes and Data inventory. Those integrations are not claimed as installed or current.\n\nINSPECTED SOURCE\ndocs/demos/microsoft-2026-10-15/yaml-walkthrough/04-a2a-orchestrator.yaml names Grafana, data-compliance and Kubernetes specialists, not the complete GitLab/Lens illustration. Agent-type tools demonstrate native delegation. Destination allowedNamespaces is namespace opt-in, separate from caller authentication and backend tool grants. The YAML does not install every tool integration. No live model-backed result is proven by this example.\n\nEXACT REFERENCE YAML\n# STEP 04 - Attach specialist agents with A2A\n\napiVersion: kagent.dev/v1alpha2\nkind: Agent  # This is a separate orchestration Agent for the SRE conversation.\nmetadata:\n  name: sre-chat  # SRE talks to this single chatbot rather than opening every specialist separately.\n  namespace: team-sre\nspec:\n  type: Declarative\n  description: SRE chatbot delegates investigations to permitted specialists.\n  declarative:\n    modelConfig: model-garden  # The chatbot uses the same model-garden connection pattern as the triage agent.\n    # We instruct it to delegate investigations and combine the cited findings.\n    systemMessage: Delegate questions to the relevant permitted specialist. Return one\n      cited answer.\n    tools:  # These tools are named specialist agents; their own tool permissions remain separate.\n    - type: Agent  # An Agent-type tool lets the chatbot delegate a task over A2A.\n      agent:\n        apiGroup: kagent.dev\n        kind: Agent\n        name: grafana-evidence  # This specialist supplies Grafana metrics and application telemetry when configured.\n        namespace: specialists  # The destination lives in the specialist namespace and must allow the caller.\n    - type: Agent\n      agent:\n        apiGroup: kagent.dev\n        kind: Agent\n        name: data-compliance  # This specialist supplies approved data, incident or compliance context.\n        namespace: specialists\n    - type: Agent\n      agent:\n        apiGroup: kagent.dev\n        kind: Agent\n        name: kubernetes-triage  # This specialist supplies Kubernetes runtime evidence for the same investigation.\n        namespace: specialists\n---\n# Minimal destination Agent: illustrates namespace opt-in.\n# ModelConfig/model-garden in specialists and approved Grafana tools are separate\n# prerequisites; this object does not pretend to install that tool integration.\napiVersion: kagent.dev/v1alpha2\nkind: Agent  # The second document defines a minimal destination agent, not another chatbot.\nmetadata:\n  name: grafana-evidence  # This name matches the Grafana specialist reference in the first document.\n  namespace: specialists\nspec:\n  type: Declarative\n  description: Grafana evidence specialist with explicit caller namespace opt-in.\n  allowedNamespaces:  # The destination opts in to permitted cross-namespace Agent references.\n    from: Selector  # We choose caller namespaces by a platform-controlled label.\n    selector:\n      matchLabels:\n        team: sre  # The SRE namespace must carry this label; this is separate from Entra authorization.\n  declarative:\n    modelConfig: model-garden  # This ModelConfig must also exist in the specialists namespace.\n    systemMessage: |  # Actual Grafana tools are a prerequisite; this example must report missing evidence honestly.\n      Return cited observations from approved evidence.\n      Report missing access instead of inventing metrics.\n"
+    },
+    "kubernetes": {
+      "title": "Kubernetes specialist and scoped MCP reads",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"agent_role\": \"Corroborate workload observations inside the approved namespace and workload scope.\",\n  \"illustrative_read_operations\": [\n    \"Read workload status and rollout observations.\",\n    \"Read bounded related Kubernetes Events.\",\n    \"Read approved workload configuration.\"\n  ],\n  \"tool_names\": \"Resolve actual names from the installed MCP discovery response. These are operation intents, not asserted deployed tool names.\",\n  \"authorization\": [\n    \"Lens-to-specialist delegation must be permitted.\",\n    \"Specialist-to-MCP tool use must be permitted.\",\n    \"Backend service-account RBAC must independently allow the read.\"\n  ],\n  \"exclusions\": [\n    \"No apply or delete tools.\",\n    \"No arbitrary kubectl command.\",\n    \"No remediation authority from chat access.\"\n  ],\n  \"provenance\": \"showcase.html#lens describes the illustrative Kubernetes lane. The exact A2A YAML names kubernetes-triage but is not a tool-integration proof.\"\n}"
+    },
+    "gitlab": {
+      "title": "GitLab specialist and approved project reads",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"agent_role\": \"Connect an operational question with related engineering work in an approved project.\",\n  \"illustrative_read_operations\": [\n    \"Read related issues and merge requests.\",\n    \"Read scoped repository files and change metadata.\",\n    \"Read relevant pipeline status.\"\n  ],\n  \"tool_names\": \"Use actual deployed MCP discovery names. These operation descriptions do not assert a live inventory.\",\n  \"backend_authorization\": \"Use a separate read credential and approved project permissions. Chat and delegation grants do not grant GitLab access.\",\n  \"exclusions\": [\n    \"No branch creation, file writes, issue creation or merge.\",\n    \"No reuse of delivery credentials for read-only investigation.\"\n  ],\n  \"provenance\": \"showcase.html#lens describes the GitLab lane. The exact native orchestrator YAML uses Grafana rather than GitLab.\"\n}"
+    },
+    "data": {
+      "title": "Data specialist and bounded approved reads",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"agent_role\": \"Interpret approved, bounded observations from the configured data adapter.\",\n  \"illustrative_read_operations\": [\n    \"Call a fixed typed operation over an approved data source.\",\n    \"Return bounded rows or aggregates with truncation metadata.\",\n    \"Identify unavailable and denied data explicitly.\"\n  ],\n  \"inventory_boundary\": \"Existing catalog material names Denodo. PostgreSQL has a separate typed read-only adapter. Neither is inferred to be installed for this Lens illustration.\",\n  \"name_boundary\": \"The Node.js MCP name is unconfirmed. A runtime language does not identify the backend.\",\n  \"postgres_reference_only\": {\n    \"defaults\": {\n      \"rows\": 50,\n      \"result_bytes\": 32768,\n      \"cell_characters\": 512,\n      \"statement_timeout_seconds\": 5\n    },\n    \"controls\": [\n      \"fetchmany(max_rows + 1)\",\n      \"Read-only transaction\",\n      \"Bounded statement timeout\",\n      \"Explicit truncation metadata\"\n    ],\n    \"exclusions\": [\n      \"No generic arbitrary SQL or result dump.\",\n      \"No automatic paging to reconstruct an export.\"\n    ]\n  },\n  \"backend_authorization\": \"Separate principal, approved views and least-privilege grants remain required. The password and Workload Identity/UAMI variants are separate deployment paths.\",\n  \"provenance\": \"showcase.html#lens and work-agent-bundles/postgres-fastmcp-entra-uami/WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md. Transport limits do not prove workplace token savings.\"\n}"
+    },
+    "backend-auth": {
+      "title": "Tool access and backend resource authorization",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "Each lane has two distinct permission checks after Agent delegation.\n\n1. Specialist -> MCP. Permit only the named tools for that specialist and intended scope.\n2. MCP -> backend. Use the backend identity and least-privilege resource grants for that operation.\n\nKubernetes requires the correct service-account/RBAC and namespace/workload restrictions. GitLab requires an approved project read identity. Data requires the configured data principal, views and grants.\n\nFor the separate PostgreSQL UAMI option, the reference chain is AKS Workload Identity -> UAMI -> Entra token -> azure-postgresql-auth/psycopg3 -> TLS PostgreSQL. The matching PostgreSQL Entra principal and read grants are required. This is a reference option, not a claim that this deck installs it.\n\nCaller-to-Lens, Lens-to-specialist, specialist-to-MCP and backend resource rights remain distinct. A successful API call does not prove backend authorization. Never assume the same JWT is passed between audiences.\n\nNo authorization check runs from this HTML."
+    },
+    "permissions": {
+      "title": "Caller and specialist permissions stay separate",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "Caller -> Lens\nAuthenticate the caller and authorize invocation of the intended Lens Agent.\n\nLens -> specialist\nAllow only intended Agent references. The inspected YAML demonstrates Agent-type tools and destination allowedNamespaces namespace-label opt-in. This is not end-user Entra authorization or a blanket tool grant.\n\nSpecialist -> MCP -> backend\nRequire separate permitted operations and backend grants. Inspect the backend authorization source for each lane.\n\nRouting boundary\nNative A2A delegation alone does not prove that every hop passes through agentgateway. Verify the installed routing and observed spans before making that claim.\n\nChange boundary\nDiagnosis returns observations and a proposed next read. A separate reviewed, human-approved workflow owns any resource-changing action."
+    },
+    "receipt-kubernetes": {
+      "title": "Synthetic Kubernetes receipts by scenario",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"source\": \"Kubernetes MCP\",\n  \"operation\": \"Read scoped workload status and bounded related Events\",\n  \"scope\": \"{{APPROVED_NAMESPACE}}/{{WORKLOAD}}\",\n  \"scenarios\": {\n    \"complete\": {\n      \"receipt_id\": \"synthetic-k8s-complete\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative new rollout reports errors; an older replica still serves.\",\n      \"limits\": \"Synthetic observation only. No live workload or availability measurement.\"\n    },\n    \"partial\": {\n      \"receipt_id\": \"synthetic-k8s-partial\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative new rollout reports errors; an older replica still serves.\",\n      \"limits\": \"Synthetic observation only. No live workload or availability measurement.\"\n    },\n    \"denied\": {\n      \"receipt_id\": \"synthetic-k8s-denied\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative new rollout reports errors; an older replica still serves.\",\n      \"limits\": \"Synthetic observation only. No live workload or availability measurement.\"\n    }\n  }\n}"
+    },
+    "receipt-gitlab": {
+      "title": "Synthetic GitLab receipts by scenario",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"source\": \"GitLab MCP\",\n  \"operation\": \"Read related change and pipeline status\",\n  \"scope\": \"{{APPROVED_PROJECT}}\",\n  \"scenarios\": {\n    \"complete\": {\n      \"receipt_id\": \"synthetic-gitlab-complete\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative related configuration change has a failed pipeline.\",\n      \"limits\": \"Correlation does not prove that the change caused the workload errors.\"\n    },\n    \"partial\": {\n      \"receipt_id\": \"synthetic-gitlab-partial\",\n      \"status\": \"unavailable\",\n      \"observation\": null,\n      \"unknown\": \"Related changes and pipeline state.\",\n      \"next_read\": \"Request the missing approved GitLab evidence. No automatic retry.\"\n    },\n    \"denied\": {\n      \"receipt_id\": \"synthetic-gitlab-denied\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative related configuration change has a failed pipeline.\",\n      \"limits\": \"Correlation only. Data evidence is still denied.\"\n    }\n  }\n}"
+    },
+    "receipt-data": {
+      "title": "Synthetic Data receipts by scenario",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"source\": \"Configured Data MCP\",\n  \"operation\": \"Read one approved bounded observation\",\n  \"scope\": \"{{APPROVED_DATA_OPERATION}}\",\n  \"scenarios\": {\n    \"complete\": {\n      \"receipt_id\": \"synthetic-data-complete\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative approved aggregate reports no matching data anomaly.\",\n      \"limits\": \"Only the bounded approved observation is covered.\"\n    },\n    \"partial\": {\n      \"receipt_id\": \"synthetic-data-partial\",\n      \"status\": \"returned\",\n      \"observation\": \"Illustrative approved aggregate reports no matching data anomaly.\",\n      \"limits\": \"GitLab is unavailable; change context remains unknown.\"\n    },\n    \"denied\": {\n      \"receipt_id\": \"synthetic-data-denied\",\n      \"status\": \"denied\",\n      \"observation\": null,\n      \"unknown\": \"All requested data evidence.\",\n      \"next_read\": \"Ask the data owner to review the intended read scope. No alternate identity or fallback.\"\n    }\n  }\n}"
+    },
+    "aggregate": {
+      "title": "Aggregate source receipts without hiding gaps",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"all_ids\": \"Invented for this offline illustration. No task, trace, tool or backend receipt was collected.\",\n  \"scenario_rules\": {\n    \"complete\": {\n      \"source_status\": {\n        \"Kubernetes\": \"returned\",\n        \"GitLab\": \"returned\",\n        \"Data\": \"returned\"\n      },\n      \"answer_status\": \"complete source coverage; cause remains unproven\"\n    },\n    \"partial\": {\n      \"source_status\": {\n        \"Kubernetes\": \"returned\",\n        \"GitLab\": \"unavailable\",\n        \"Data\": \"returned\"\n      },\n      \"answer_status\": \"partial; related work unknown\"\n    },\n    \"denied\": {\n      \"source_status\": {\n        \"Kubernetes\": \"returned\",\n        \"GitLab\": \"returned\",\n        \"Data\": \"denied\"\n      },\n      \"answer_status\": \"partial with explicit denied source; data evidence unknown\"\n    }\n  },\n  \"answer_contract\": [\n    \"Keep source IDs with each observation.\",\n    \"Distinguish observations, hypotheses and unknowns.\",\n    \"Record a source status even when no evidence is returned.\",\n    \"Preserve truncation and freshness limits from real receipts.\",\n    \"Propose a next read; require a separate human-approved workflow for changes.\"\n  ],\n  \"rendering\": \"All source-status paths remain active. Cards are neutral. The selected scenario status explicitly names returned, unavailable and denied sources.\"\n}"
+    },
+    "answer": {
+      "title": "One synthetic answer with citations and uncertainty",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"complete\": {\n    \"observations\": [\n      \"The illustrative rollout reports errors [synthetic-k8s-complete].\",\n      \"A related change has a failed pipeline [synthetic-gitlab-complete].\",\n      \"The approved bounded aggregate reports no matching data anomaly [synthetic-data-complete].\"\n    ],\n    \"hypothesis\": \"The change may be related; causation is unproven.\",\n    \"unknowns\": [\n      \"Root cause and any recovery outcome.\"\n    ],\n    \"next_read\": \"Compare the approved change diff with the scoped workload configuration.\"\n  },\n  \"partial\": {\n    \"observations\": [\n      \"The illustrative rollout reports errors [synthetic-k8s-partial].\",\n      \"The approved bounded aggregate reports no matching data anomaly [synthetic-data-partial].\"\n    ],\n    \"unknowns\": [\n      \"GitLab is unavailable [synthetic-gitlab-partial]. Related changes and pipeline status remain unknown.\",\n      \"Root cause and any recovery outcome.\"\n    ],\n    \"next_read\": \"Obtain the missing approved GitLab evidence before attributing the incident to a change.\"\n  },\n  \"denied\": {\n    \"observations\": [\n      \"The illustrative rollout reports errors [synthetic-k8s-denied].\",\n      \"A related change has a failed pipeline [synthetic-gitlab-denied].\"\n    ],\n    \"unknowns\": [\n      \"Data access is denied [synthetic-data-denied]. The requested data evidence remains unknown.\",\n      \"Root cause and any recovery outcome.\"\n    ],\n    \"next_read\": \"Ask the data owner to review the intended read scope. Continue only within existing permissions.\"\n  },\n  \"routing_slide\": \"Only findings from selected specialists belong in that response. Unselected inventory contributes no evidence.\",\n  \"action_boundary\": \"No automatic fix, merge, deployment, credential switch or retry. Any change uses a separate reviewed human-approved workflow.\"\n}"
+    },
+    "api": {
+      "title": "Documented A2A text request envelope",
+      "type": "Inspected local helper envelope; displayed request is synthetic",
+      "text": "ILLUSTRATIVE CONSUMPTION\nAn SRE app or workflow can call the same Lens Agent API. An application input may start as text or a bounded payload. The currently documented runtime envelope carries kind=text. This is not proof of an implemented typed-payload endpoint or SDK.\n\nINSPECTED LOCAL HELPER\nscripts/kagent-a2a-invoke.sh builds JSON-RPC message/send with message.kind=message, role=user and a parts entry carrying kind=text. It invokes /api/a2a/{namespace}/{agent}/ with the required trailing slash for the inspected kagent runtime. Verify the receiving version and API before live use.\n\nSYNTHETIC REQUEST BODY\n{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"synthetic-lens-request\",\n  \"method\": \"message/send\",\n  \"params\": {\n    \"message\": {\n      \"kind\": \"message\",\n      \"messageId\": \"synthetic-lens-request\",\n      \"contextId\": \"synthetic-lens-context\",\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"kind\": \"text\",\n          \"text\": \"Compare the workload symptoms with related engineering work.\"\n        }\n      ]\n    }\n  }\n}\n\nThis body is displayed only. Nothing sends it. The illustrative Lens name and topology require actual receiving-system configuration. API access does not grant specialist, MCP or backend authority."
+    },
+    "observability": {
+      "title": "Trace and usage evidence to collect in a real walkthrough",
+      "type": "Illustrative design; offline and synthetic",
+      "text": "{\n  \"synthetic\": true,\n  \"current_state\": \"No trace, provider usage, counter, latency, cost or live receipt is collected by this HTML.\",\n  \"real_walkthrough_evidence\": [\n    \"Actual caller-to-Lens request and terminal response.\",\n    \"Actual selected specialist delegation receipts and explicit denied delegation.\",\n    \"Actual permitted MCP operation and backend result or denial.\",\n    \"Observed trace spans correlated by real request/task IDs.\",\n    \"Actual per-call and cumulative usage where the deployed telemetry records them.\"\n  ],\n  \"proof_boundaries\": [\n    \"An animated route is not a network span.\",\n    \"Native Agent delegation alone does not prove every hop passes through agentgateway.\",\n    \"A Ready route is not provider-backed caller success.\",\n    \"Missing spans and missing usage remain unknown, never zero.\",\n    \"Do not infer live token savings or costs from bounded synthetic results.\",\n    \"Historical evidence in the bundle remains historical.\"\n  ],\n  \"source_context\": \"showcase.html#lens requests actual delegation, tool, trace and usage receipts. This deck demonstrates the explanation only.\"\n}"
+    }
+  },
+  "deckLinks": [
+    {
+      "label": "Demo home",
+      "href": "START-HERE.html"
+    },
+    {
+      "label": "Journey",
+      "href": "journey.html"
+    },
+    {
+      "label": "SRE Lens",
+      "href": "sre-lens.html"
+    },
+    {
+      "label": "Triage",
+      "href": "triage.html"
+    },
+    {
+      "label": "SDLC",
+      "href": "sdlc.html"
+    },
+    {
+      "label": "Review",
+      "href": "showcase.html"
+    }
+  ]
+}

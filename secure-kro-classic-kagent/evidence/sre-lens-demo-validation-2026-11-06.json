@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-11-06",
+  "scope": "Synthetic SRE Lens demo; no live model, MCP, cluster or GitLab requests",
+  "slides": 4,
+  "sourcePopups": 14,
+  "topology": "Illustrative GitLab, Kubernetes and Data specialists from the user brief. Inspected native YAML uses Grafana, data-compliance and Kubernetes; the distinction is stated in notes and source details.",
+  "checks": [
+    "Workload selects Kubernetes and GitLab in both directions",
+    "Data question selects Data in both directions",
+    "Cross-system selects all three",
+    "Unselected routes remain faded available inventory",
+    "Complete/partial/denied receipts and uncertainty visible",
+    "All node popups and presenter notes checked",
+    "No text overflow at presentation size",
+    "390px page has no horizontal overflow",
+    "Four print slides visible",
+    "Observed moving packet positions on Replay",
+    "Offline interactions make zero network requests",
+    "No browser errors or warnings",
+    "Same unchanged renderer as Triage",
+    "Matching red-white-black theme and green takeaways",
+    "No secrets found by Gitleaks"
+  ],
+  "sourceData": "demo/sre-lens-data.json",
+  "entrypoint": "sre-lens.html"
+}

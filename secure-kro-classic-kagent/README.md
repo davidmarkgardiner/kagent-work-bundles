@@ -31,6 +31,11 @@ observability, and SDLC use cases, with dedicated current-security, planned-Entr
 and Gateway-control sheets. Yesterday's animated decks and YAML explorer are
 linked from that entry point. See [PRESENTATIONS.md](PRESENTATIONS.md) for scope.
 
+For Story 2, [SRE Lens asks the right specialists](sre-lens.html) adds a four-slide
+walkthrough of selective delegation, scoped MCP reads, evidence synthesis and
+API consumption. Switch question types to see which specialists are selected.
+All routing and source receipts in that demo are synthetic.
+
 For Story 1, start with [resources and hardening](resources.html).
 Two sheets explain every kind in the 14-resource KRO composition, why it exists,
 and how the agent is hardened. The full before/after YAML inspector is optional
@@ -65,7 +70,7 @@ inspection, presenter notes and complete landscape printing. It opens offline
 as one file. Use that deck for the architecture story and the existing detailed
 YAML explorer/terminal walkthrough for the actual configuration and live proof.
 
-The [three-chapter presentation guide](PRESENTATIONS.md) adds separate
+The [presentation guide](PRESENTATIONS.md) adds separate
 [secure-agent journey](journey.html), [SRE triage/application recovery](triage.html)
 and [SDLC delivery](sdlc.html) decks. Journey has nine slides. Its DICE / UK8S cover introduces the no-code agent platform with an animated
 agent connecting to icon-only capabilities. Comparison and lifecycle/API handoff

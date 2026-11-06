@@ -84,7 +84,7 @@ proposed measures; the sheets contain no fabricated savings or recovery results.
 records document/browser checks, the original explainer links, and the boundary
 between current proof, historical experiments, and the proposed service.
 
-For the animated walkthrough, open `journey.html` first. All three decks work offline as standalone HTML files.
+For the animated walkthrough, open `journey.html` first. All four decks work offline as standalone HTML files.
 Keep them in the same folder to use the Journey / Triage / SDLC links in each
 slide footer. `index.html` remains the earlier architecture deep dive;
 `presentation.html` remains the actual YAML explorer with dated receipts.
@@ -92,10 +92,11 @@ slide footer. `index.html` remains the earlier architecture deep dive;
 | Chapter | Presentation | Main message |
 | --- | --- | --- |
 | 1 | [Secure agent journey](journey.html) | Compare an ordinary native Agent with the KRO security composition, then explain tool selection, native skills, Gateway policies, OTel/LGTM and the lifecycle. |
-| 2 | [SRE triage and application recovery](triage.html) | Explain the original Kafka evidence path and the newer application-owned specialist, bounded classification, reviewable MR, human approval and measured recovery. |
-| 3 | [Agent-assisted SDLC](sdlc.html) | Follow an approved task through PM, builder, tester and reviewer roles, artifact-backed checkpoints, bounded rework and human merge. |
+| 2 | [SRE Lens asks the right specialists](sre-lens.html) | Select permitted specialists by the question, gather scoped MCP evidence, and return one answer with sources and uncertainty. |
+| 3 | [SRE triage and application recovery](triage.html) | Explain the original Kafka evidence path and the newer application-owned specialist, bounded classification, reviewable MR, human approval and measured recovery. |
+| 4 | [Agent-assisted SDLC](sdlc.html) | Follow an approved task through PM, builder, tester and reviewer roles, artifact-backed checkpoints, bounded rework and human merge. |
 
-Journey has nine slides; Triage and SDLC each have six. They include clickable
+Journey has nine slides, SRE Lens has four, and Triage and SDLC each have six. They include clickable
 source/details, presenter notes and landscape printing. All diagram states and
 examples are **illustrations**.
 No presentation invokes a model, sends Kafka messages, creates an MR, approves a
@@ -178,3 +179,7 @@ The current Journey order is cover, comparison, lifecycle/API handoff, resource 
 ## Work bundle
 
 Open `START-HERE.html` after extracting the complete folder. No server or install is needed. All primary pages use the inline `demo-theme.css` palette. Re-run `prepare_demo_bundle.py` after regenerating the mock IDP or resource sheet. The `references/` snapshots are offline support material, and external upstream links are optional online reading.
+
+## SRE Lens
+
+Open `sre-lens.html`. The first slide selects Kubernetes and GitLab for a workload incident, Data for a data question, or all three for a cross-system question. Later slides show scoped MCP reads, evidence synthesis with missing/denied-source cases, and consumption through the DICE API. These are synthetic routing examples. The older native A2A YAML uses Grafana/data/Kubernetes references and does not install every integration shown by the product illustration. Rebuild with `python3 build_sre_lens.py`, then `python3 prepare_demo_bundle.py`.
