@@ -122,7 +122,9 @@ change the shared listener policy to make another name work.
 
 Example questions are visible before deployment, with buttons disabled until the
 agent passes its checks. Clicking one then sends the selected question and shows
-the returned answer and native task receipt.
+the returned answer. Answers use larger text, short paragraphs and formatted
+bullets; technical task details stay collapsed under **Response receipt**. The
+message requests at most 80 words and preserves unproven security limits.
 
 Use **Try a curveball** for the nightclub-bouncer explanation, a request for keys,
 a question about extra tools/another namespace, or the emergency shortcut. These
