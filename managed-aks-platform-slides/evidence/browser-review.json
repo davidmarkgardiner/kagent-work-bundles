@@ -1,7 +1,7 @@
 {
   "checkedAt": "2026-11-10T11:47:50.954289+00:00",
   "artifact": "index.html",
-  "sha256": "a37a7ed0159a3b6e76ce3761485a2027203beea3a7e001e77f92e3cbc91f1b1a",
+  "sha256": "b24cb80785745949e4306f41e9dca1365e77f7fe85d3e54f7ea249f1a0b24356",
   "formatReference": {
     "repository": "https://github.com/davidmarkgardiner/kagent-work-bundles",
     "commit": "b8a4be748f19c916ebd601bd9045371a40e72e50",
@@ -72,5 +72,18 @@
   "officialReferences": [
     "https://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning",
     "https://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning-disruption"
-  ]
+  ],
+  "latestRevisionCheck": {
+    "checkedAt": "2026-11-10T11:51:57.396655+00:00",
+    "previousReviewedSha256": "a37a7ed0159a3b6e76ce3761485a2027203beea3a7e001e77f92e3cbc91f1b1a",
+    "change": "Replace KAITO with Kyverno, including description, icon, component details and presenter notes.",
+    "checks": [
+      "No KAITO references remain",
+      "Seven slides retained",
+      "Kyverno node text fits",
+      "Kyverno component details open correctly",
+      "Public-safety scan clean"
+    ],
+    "scope": "Targeted content correction. Existing runtime and slide geometry are unchanged; earlier full-deck checks are retained above."
+  }
 }

@@ -392,15 +392,15 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
           "tone": "neutral"
         },
         {
-          "id": "kaito",
-          "title": "KAITO",
-          "detail": "Kubernetes AI toolchain capabilities.",
-          "source": "gitops",
+          "id": "kyverno",
+          "title": "Kyverno",
+          "detail": "Admission policy and security enforcement.",
+          "source": "hardening",
           "x": 780,
           "y": 250,
           "w": 310,
           "h": 170,
-          "icon": "model",
+          "icon": "shield",
           "tone": "neutral"
         },
         {
@@ -438,7 +438,7 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
           "reference": false
         },
         {
-          "id": "kaito",
+          "id": "kyverno",
           "d": "M305 215H350V225H935V250",
           "reference": false
         },
@@ -448,7 +448,7 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
           "reference": false
         }
       ],
-      "notes": "The shared services are another major part of the platform value. cert-manager and ExternalDNS handle certificates and DNS. External Secrets is provided for secret management, so the team connects its approved store using the platform templates. LGTM is also provided. The team adds the documented annotation to its application and receives the standard metrics, alerting and observability integration. The platform runs the shared stack. KAITO and the security baseline are further services teams can reuse. Application-specific store permissions and telemetry configuration still follow the user guides. Do not invent the annotation key or present this diagram as live telemetry proof."
+      "notes": "The shared services are another major part of the platform value. cert-manager and ExternalDNS handle certificates and DNS. External Secrets is provided for secret management, so the team connects its approved store using the platform templates. LGTM is also provided. The team adds the documented annotation to its application and receives the standard metrics, alerting and observability integration. The platform runs the shared stack. Kyverno and the security baseline are further services teams can reuse. Application-specific store permissions and telemetry configuration still follow the user guides. Do not invent the annotation key or present this diagram as live telemetry proof."
     },
     {
       "id": "namespace",
@@ -739,7 +739,7 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
     "gitops": {
       "title": "GitOps and platform services",
       "type": "Delivered capability reported by the project owner",
-      "text": "GitOps connects as part of cluster creation and pulls the shared platform applications and configuration.\n\ncert-manager handles certificate issuance and renewal.\nExternalDNS manages DNS records.\nThe managed Istio add-on supplies the service mesh and application traffic capabilities.\nKAITO provides the Kubernetes AI toolchain.\nThe shared stack also supplies security policies and operational services.\n\nThe platform team maintains the shared services. Application routing and certificate configuration still belong in the application deployment manifests.\n\nExternal Secrets and LGTM observability are also provided as shared services. Teams connect their approved secret store and add the documented observability annotation. The platform maintains the shared operators and standard metrics and alerting integration."
+      "text": "GitOps connects as part of cluster creation and pulls the shared platform applications and configuration.\n\ncert-manager handles certificate issuance and renewal.\nExternalDNS manages DNS records.\nThe managed Istio add-on supplies the service mesh and application traffic capabilities.\nKyverno enforces Kubernetes admission and security policies.\nThe shared stack also supplies security policies and operational services.\n\nThe platform team maintains the shared services. Application routing and certificate configuration still belong in the application deployment manifests.\n\nExternal Secrets and LGTM observability are also provided as shared services. Teams connect their approved secret store and add the documented observability annotation. The platform maintains the shared operators and standard metrics and alerting integration."
     },
     "rbac": {
       "title": "RBAC role binding is an onboarding prerequisite",

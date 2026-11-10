@@ -9,7 +9,7 @@ The deck follows the white-and-red DICE / UK8S secure-agent presentation format.
 1. The delivered platform. The managed foundations and the application-team value.
 2. Ongoing platform work. Application and AKS upgrade operations, patching, node recycling, NAP capacity management, policies, encryption, and service-mesh lifecycle.
 3. ARM automation. AKS, Azure CNI Overlay, managed Istio, encryption settings, and GitOps bootstrap.
-4. GitOps services. cert-manager, ExternalDNS, External Secrets, LGTM observability, KAITO, and the security baseline. Teams connect an approved secret store and add the documented observability annotation for the standard metrics and alerting integration.
+4. GitOps services. cert-manager, ExternalDNS, External Secrets, LGTM observability, Kyverno, and the security baseline. Teams connect an approved secret store and add the documented observability annotation for the standard metrics and alerting integration.
 5. RBAC onboarding. Controllers bind the namespace to its approved group or access bucket and establish observability-only or namespace-admin access.
 6. Application deployment. Apply the application YAML and use the managed HTTPS path for an API or UI. RBAC, certificates, DNS, and mesh traffic have distinct controllers.
 7. Existing resources. PVCs, storage, Key Vault through UAMI, databases, and other services use connection templates, guides, and owner-approved permissions.
