@@ -226,9 +226,9 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
         },
         {
           "id": "access",
-          "title": "Access and shared services",
-          "detail": "Automated namespace RBAC, certificates and external DNS.",
-          "source": "rbac",
+          "title": "Access and observability",
+          "detail": "Namespace RBAC, managed secrets and LGTM observability.",
+          "source": "gitops",
           "x": 1040,
           "y": 245,
           "w": 415,
@@ -238,7 +238,7 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
         }
       ],
       "paths": [],
-      "notes": "This slide is the value of the service after the cluster is created. We handle application upgrade operations, AKS upgrades, patching, maintenance and node recycling. We operate the shared platform applications and service mesh. We own Azure Policy, Kyverno and Istio policies, the encryption baseline, default mesh onboarding and pod security. NAP selects capacity for the workload requirements and consolidates underused nodes to reduce waste. Rescheduling follows the configured disruption rules. Application teams still own their code, workload requirements and release choices. We are taking the infrastructure and operational setup work off their hands.\n\nNAP references: https://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning and https://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning-disruption. Deployment use comes from the project owner account, not the public KRO example."
+      "notes": "This slide is the value of the service after the cluster is created. We handle application upgrade operations, AKS upgrades, patching, maintenance and node recycling. We operate the shared platform applications and service mesh. We own Azure Policy, Kyverno and Istio policies, the encryption baseline, default mesh onboarding and pod security. NAP selects capacity for the workload requirements and consolidates underused nodes to reduce waste. Rescheduling follows the configured disruption rules. Application teams still own their code, workload requirements and release choices. We are taking the infrastructure and operational setup work off their hands.\n\nNAP references: https://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning and https://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning-disruption. Deployment use comes from the project owner account, not the public KRO example.\n\nThe platform also operates External Secrets and LGTM. Secret-store connection and annotation-based observability replace another set of tools that each team would otherwise need to install and maintain."
     },
     {
       "id": "cluster",
@@ -328,18 +328,18 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
       "id": "services",
       "label": "04 / GitOps platform",
       "title": "The shared services come with the cluster",
-      "intro": "GitOps installs and maintains the platform applications and security configuration.",
-      "takeaway": "Teams reuse the operators and security baseline. They do not install or maintain the shared stack.",
+      "intro": "GitOps installs the shared services, including secret management and application observability.",
+      "takeaway": "Connect your secrets and add the observability annotation. The platform runs the shared operators and LGTM stack.",
       "nodes": [
         {
           "id": "gitops",
           "title": "GitOps",
-          "detail": "Pull the shared stack and its approved configuration.",
+          "detail": "Install and maintain the approved platform stack.",
           "source": "gitops",
-          "x": 30,
-          "y": 105,
-          "w": 290,
-          "h": 180,
+          "x": 25,
+          "y": 130,
+          "w": 280,
+          "h": 170,
           "icon": "graph",
           "tone": "dark"
         },
@@ -349,9 +349,9 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
           "detail": "Certificate issuance and renewal.",
           "source": "gitops",
           "x": 410,
-          "y": 35,
-          "w": 300,
-          "h": 150,
+          "y": 30,
+          "w": 310,
+          "h": 170,
           "icon": "key",
           "tone": "neutral"
         },
@@ -360,11 +360,35 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
           "title": "ExternalDNS",
           "detail": "DNS record management.",
           "source": "gitops",
-          "x": 790,
-          "y": 35,
-          "w": 300,
-          "h": 150,
+          "x": 780,
+          "y": 30,
+          "w": 310,
+          "h": 170,
           "icon": "network",
+          "tone": "neutral"
+        },
+        {
+          "id": "external-secrets",
+          "title": "External Secrets",
+          "detail": "Connect an approved secret store for application secrets.",
+          "source": "external-secrets",
+          "x": 1150,
+          "y": 30,
+          "w": 310,
+          "h": 170,
+          "icon": "key",
+          "tone": "neutral"
+        },
+        {
+          "id": "observability",
+          "title": "LGTM observability",
+          "detail": "Add the platform annotation for metrics and alerting.",
+          "source": "observability",
+          "x": 410,
+          "y": 250,
+          "w": 310,
+          "h": 170,
+          "icon": "eye",
           "tone": "neutral"
         },
         {
@@ -372,89 +396,59 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
           "title": "KAITO",
           "detail": "Kubernetes AI toolchain capabilities.",
           "source": "gitops",
-          "x": 410,
-          "y": 245,
-          "w": 300,
-          "h": 150,
+          "x": 780,
+          "y": 250,
+          "w": 310,
+          "h": 170,
           "icon": "model",
           "tone": "neutral"
         },
         {
           "id": "security",
-          "title": "Security and operations",
-          "detail": "Admission controls, platform hardening and operational services.",
+          "title": "Security baseline",
+          "detail": "Admission policies and platform hardening.",
           "source": "hardening",
-          "x": 790,
-          "y": 245,
-          "w": 300,
-          "h": 150,
+          "x": 1150,
+          "y": 250,
+          "w": 310,
+          "h": 170,
           "icon": "shield",
-          "tone": "neutral"
-        },
-        {
-          "id": "team",
-          "title": "Application team",
-          "detail": "Use the platform services in application manifests.",
-          "source": "https",
-          "x": 1170,
-          "y": 105,
-          "w": 290,
-          "h": 180,
-          "icon": "box",
           "tone": "neutral"
         }
       ],
       "paths": [
         {
-          "id": "sync-certs",
-          "d": "M320 195H360V110H410",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
+          "id": "certificates",
+          "d": "M305 215H350V225H565V200",
           "reference": false
         },
         {
-          "id": "sync-kaito",
-          "d": "M320 195H360V320H410",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
+          "id": "dns",
+          "d": "M305 215H350V225H935V200",
           "reference": false
         },
         {
-          "id": "certs-dns",
-          "d": "M710 110H790",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
+          "id": "external-secrets",
+          "d": "M305 215H350V225H1305V200",
           "reference": false
         },
         {
-          "id": "kaito-security",
-          "d": "M710 320H790",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
+          "id": "observability",
+          "d": "M305 215H350V225H565V250",
           "reference": false
         },
         {
-          "id": "dns-team",
-          "d": "M1090 110H1130V195H1170",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
+          "id": "kaito",
+          "d": "M305 215H350V225H935V250",
           "reference": false
         },
         {
-          "id": "security-team",
-          "d": "M1090 320H1130V195H1170",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
+          "id": "security",
+          "d": "M305 215H350V225H1305V250",
           "reference": false
         }
       ],
-      "notes": "The GitOps stack is the second part of the service. cert-manager and ExternalDNS handle the supporting certificate and DNS work. KAITO is another example of a shared platform application. Security and operational configuration come through the same managed stack. Application teams still declare their desired routing and certificate resources according to the supplied guides. They do not need to set up the operators themselves."
+      "notes": "The shared services are another major part of the platform value. cert-manager and ExternalDNS handle certificates and DNS. External Secrets is provided for secret management, so the team connects its approved store using the platform templates. LGTM is also provided. The team adds the documented annotation to its application and receives the standard metrics, alerting and observability integration. The platform runs the shared stack. KAITO and the security baseline are further services teams can reuse. Application-specific store permissions and telemetry configuration still follow the user guides. Do not invent the annotation key or present this diagram as live telemetry proof."
     },
     {
       "id": "namespace",
@@ -564,7 +558,7 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
         {
           "id": "app",
           "title": "kubectl apply",
-          "detail": "Apply the application YAML that references your container image.",
+          "detail": "Apply the container YAML and platform observability annotation.",
           "source": "namespace",
           "x": 25,
           "y": 95,
@@ -576,7 +570,7 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
         {
           "id": "routing",
           "title": "Platform controllers",
-          "detail": "Access controllers, cert-manager and ExternalDNS handle the setup.",
+          "detail": "Access, certificates, DNS, secrets and telemetry are platform services.",
           "source": "https",
           "x": 410,
           "y": 95,
@@ -636,7 +630,7 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
           "reference": false
         }
       ],
-      "notes": "The normal team action is kubectl apply -f application.yaml in its approved context and namespace. The YAML references the container image and uses the supplied workload, Service, VirtualService and certificate conventions. The access controllers keep RBAC in place, cert-manager manages certificates and ExternalDNS manages DNS. These are separate controllers with separate responsibilities. Istio handles the configured application traffic path and the namespace joins the mesh by default. Once the workload is ready and DNS and certificates are available, the API or UI serves over HTTPS. Teams do not implement a new access, DNS, certificate or service-mesh platform for each application."
+      "notes": "The normal team action is kubectl apply -f application.yaml in its approved context and namespace. The YAML references the container image and uses the supplied workload, Service, VirtualService and certificate conventions. The access controllers keep RBAC in place, cert-manager manages certificates and ExternalDNS manages DNS. These are separate controllers with separate responsibilities. Istio handles the configured application traffic path and the namespace joins the mesh by default. Once the workload is ready and DNS and certificates are available, the API or UI serves over HTTPS. Teams do not implement a new access, DNS, certificate or service-mesh platform for each application.\n\nInclude the documented observability annotation for the standard LGTM metrics and alerting setup. Use External Secrets for application secrets and follow the store connection guide."
     },
     {
       "id": "integrations",
@@ -684,7 +678,7 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
         {
           "id": "vault",
           "title": "Your Key Vault and UAMI",
-          "detail": "Connect through Workload Identity and owner-approved vault access.",
+          "detail": "Use External Secrets with the approved UAMI and vault access.",
           "source": "keyvault",
           "x": 450,
           "y": 235,
@@ -728,7 +722,7 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
           "reference": true
         }
       ],
-      "notes": "Teams can bring an existing PVC in the same namespace, their own supported storage, a Key Vault connected through UAMI, databases and other services. We supply connection templates and user guides. The team and resource owner still provide the required identity grants, network access and application settings. These are supported, guided integrations. Do not present them as automatic provisioning or lifecycle management of every external component. The platform has already done the common cluster, access, security, traffic and operator work, which lets the application team get to work much sooner."
+      "notes": "Teams can bring an existing PVC in the same namespace, their own supported storage, a Key Vault connected through UAMI, databases and other services. We supply connection templates and user guides. The team and resource owner still provide the required identity grants, network access and application settings. These are supported, guided integrations. Do not present them as automatic provisioning or lifecycle management of every external component. The platform has already done the common cluster, access, security, traffic and operator work, which lets the application team get to work much sooner.\n\nExternal Secrets is already installed. The team connects its supported store using the platform templates and required identity grants, rather than operating another secrets controller."
     }
   ],
   "sources": {
@@ -745,7 +739,7 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
     "gitops": {
       "title": "GitOps and platform services",
       "type": "Delivered capability reported by the project owner",
-      "text": "GitOps connects as part of cluster creation and pulls the shared platform applications and configuration.\n\ncert-manager handles certificate issuance and renewal.\nExternalDNS manages DNS records.\nThe managed Istio add-on supplies the service mesh and application traffic capabilities.\nKAITO provides the Kubernetes AI toolchain.\nThe shared stack also supplies security policies and operational services.\n\nThe platform team maintains the shared services. Application routing and certificate configuration still belong in the application deployment manifests."
+      "text": "GitOps connects as part of cluster creation and pulls the shared platform applications and configuration.\n\ncert-manager handles certificate issuance and renewal.\nExternalDNS manages DNS records.\nThe managed Istio add-on supplies the service mesh and application traffic capabilities.\nKAITO provides the Kubernetes AI toolchain.\nThe shared stack also supplies security policies and operational services.\n\nThe platform team maintains the shared services. Application routing and certificate configuration still belong in the application deployment manifests.\n\nExternal Secrets and LGTM observability are also provided as shared services. Teams connect their approved secret store and add the documented observability annotation. The platform maintains the shared operators and standard metrics and alerting integration."
     },
     "rbac": {
       "title": "RBAC role binding is an onboarding prerequisite",
@@ -760,12 +754,12 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
     "namespace": {
       "title": "Namespace ready means ready to deploy",
       "type": "Application team onboarding experience",
-      "text": "The platform completes the namespace request, RBAC group binding, role selection and security baseline before the team deploys.\n\nThe team supplies its container image and application YAML using the platform templates. Its normal deployment command is:\n\nkubectl apply -f application.yaml\n\nThis is an example for the team's approved context and namespace, not a command executed by the presentation. The manifests include the application workload, Service, VirtualService and certificate requirements according to platform conventions.\n\nAccess controllers handle the namespace permissions. cert-manager and ExternalDNS handle the supporting certificate and DNS work. The application must start successfully, pass its readiness checks and have its dependencies available before it serves traffic."
+      "text": "The platform completes the namespace request, RBAC group binding, role selection and security baseline before the team deploys.\n\nThe team supplies its container image and application YAML using the platform templates. Its normal deployment command is:\n\nkubectl apply -f application.yaml\n\nThis is an example for the team's approved context and namespace, not a command executed by the presentation. The manifests include the application workload, Service, VirtualService and certificate requirements according to platform conventions.\n\nAccess controllers handle the namespace permissions. cert-manager and ExternalDNS handle the supporting certificate and DNS work. The application must start successfully, pass its readiness checks and have its dependencies available before it serves traffic.\n\nThe application manifest can include the documented platform observability annotation to use the standard LGTM metrics and alerting path. Teams can also reference secrets reconciled through the provided External Secrets integration."
     },
     "https": {
       "title": "Application deployment and HTTPS",
       "type": "Supported application deployment path",
-      "text": "After namespace onboarding, the team can apply its application YAML and use the managed HTTPS path for an API, UI or another supported application endpoint.\n\nThe platform templates carry the required workload, Service, VirtualService, host and certificate configuration. Access controllers reconcile RBAC, cert-manager handles certificate issuance and renewal, and ExternalDNS manages DNS records. These controllers have separate jobs. Istio provides the configured mesh and ingress traffic path.\n\nThe intended user experience is an application that starts and serves traffic without a separate cluster, RBAC, DNS or certificate setup project. Workload readiness, DNS availability, certificate issuance and application-specific dependencies still need to complete normally. This deck is not a live HTTPS probe."
+      "text": "After namespace onboarding, the team can apply its application YAML and use the managed HTTPS path for an API, UI or another supported application endpoint.\n\nThe platform templates carry the required workload, Service, VirtualService, host and certificate configuration. Access controllers reconcile RBAC, cert-manager handles certificate issuance and renewal, and ExternalDNS manages DNS records. These controllers have separate jobs. Istio provides the configured mesh and ingress traffic path.\n\nThe intended user experience is an application that starts and serves traffic without a separate cluster, RBAC, DNS or certificate setup project. Workload readiness, DNS availability, certificate issuance and application-specific dependencies still need to complete normally. This deck is not a live HTTPS probe.\n\nThe same application deployment can use the platform External Secrets integration and the annotation-based LGTM observability setup. Application-specific configuration follows the platform guides."
     },
     "pvc": {
       "title": "Existing persistent volume claims",
@@ -780,12 +774,12 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
     "keyvault": {
       "title": "Bring your own Key Vault through UAMI",
       "type": "Supported integration and guide topics",
-      "text": "Teams can connect their own Azure Key Vault using a user-assigned managed identity through AKS Workload Identity and the supported platform integration.\n\nThe connection includes the Kubernetes ServiceAccount, the matching federated identity credential, the UAMI and least-privilege Key Vault permissions. Confirm the permitted namespace and ServiceAccount subject and the required network path.\n\nThe platform guides explain the connection pattern. Reusing the platform does not automatically grant access to an existing vault. The vault owner must grant the identity the required access.\n\nThis deck does not mandate a CSI driver or External Secrets implementation where the deployed integration was not specified."
+      "text": "Teams can connect their own Azure Key Vault using a user-assigned managed identity through AKS Workload Identity and the supported platform integration.\n\nThe connection includes the Kubernetes ServiceAccount, the matching federated identity credential, the UAMI and least-privilege Key Vault permissions. Confirm the permitted namespace and ServiceAccount subject and the required network path.\n\nThe platform guides explain the connection pattern. Reusing the platform does not automatically grant access to an existing vault. The vault owner must grant the identity the required access.\n\nThis deck does not mandate a CSI driver or External Secrets implementation where the deployed integration was not specified.\n\nExternal Secrets is available out of the box as a supported secret-management integration. Use its platform connection templates for the Key Vault store, workload identity and application secret mapping."
     },
     "guides": {
       "title": "Guides and the value to application teams",
       "type": "Project owner account and planning estimate",
-      "text": "The platform provides user guides and templates for application deployment, routing and certificates, PVCs, bring-your-own storage, Key Vault through UAMI, databases and other supported services. Use the current internal guide set for environment-specific steps. Internal URLs are intentionally absent.\n\nCommon cluster and namespace foundations are automated. Bring-your-own services use the supported guides and templates, with the resource owner granting the required permissions. Fully automating every external component is outside this claim.\n\nThe project owner estimates that building equivalent cluster and platform foundations independently takes one to two weeks, assuming the required skills and access. This is an estimate, not a measured benchmark or an SLA."
+      "text": "The platform provides user guides and templates for application deployment, routing and certificates, PVCs, bring-your-own storage, Key Vault through UAMI, databases and other supported services. Use the current internal guide set for environment-specific steps. Internal URLs are intentionally absent.\n\nCommon cluster and namespace foundations are automated. Bring-your-own services use the supported guides and templates, with the resource owner granting the required permissions. Fully automating every external component is outside this claim.\n\nThe project owner estimates that building equivalent cluster and platform foundations independently takes one to two weeks, assuming the required skills and access. This is an estimate, not a measured benchmark or an SLA.\n\nThe guides also cover External Secrets connections and the exact annotation for application onboarding to LGTM metrics and alerting."
     },
     "operations": {
       "title": "The platform runs the operational lifecycle",
@@ -801,6 +795,16 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
       "title": "Bring databases and other services",
       "type": "Supported integration and guide topics supplied by the project owner",
       "text": "Teams can connect existing databases and other Azure or external services through the supported platform integration patterns.\n\nTemplates and user guides cover the connection configuration, workload identity where supported, resource-owner grants, network access, secrets and application settings.\n\nThese integrations are guided and template-assisted. This deck does not claim that the platform automatically provisions, migrates or administers every database or external service. The resource owner and application team still approve and supply the required access and configuration."
+    },
+    "external-secrets": {
+      "title": "External Secrets is provided by the platform",
+      "type": "Project owner delivery account, 10 November 2026",
+      "text": "External Secrets is installed as part of the shared platform. Application teams use the supported connection templates and guides to connect their approved external secret store, including the supported Key Vault and UAMI pattern.\n\nThe platform operates the shared controller and integration baseline. The team and secret-store owner still provide the required store reference, identity permissions and application secret mappings. The controller reconciles the configured external secrets for the workload.\n\nNo secret values, real store names or credentials are embedded in this deck. Access to a namespace does not itself grant access to every external secret store."
+    },
+    "observability": {
+      "title": "LGTM observability is ready to use",
+      "type": "Project owner delivery account, 10 November 2026",
+      "text": "LGTM observability is provided out of the box. The project owner describes application onboarding through the documented platform annotation, with the standard metrics, alerting and observability integration handled by the platform.\n\nLGTM denotes Loki, Grafana, Tempo and Mimir. The application team does not deploy or operate its own shared observability stack.\n\nUse the exact annotation and conventions in the current platform user guide. The annotation key was not supplied and is intentionally not invented here. Application-specific metrics endpoints, instrumentation, alert thresholds and any tracing configuration still follow the supported application contract. An annotation alone cannot create telemetry that the application does not emit.\n\nThe existing public LGTM integration proposal is background material, not independent proof of this workplace implementation. The delivered annotation-based experience comes from the project owner account. This presentation makes no telemetry or alerting calls."
     }
   },
   "deckLinks": []
