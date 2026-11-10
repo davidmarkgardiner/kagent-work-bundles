@@ -149,7 +149,7 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
         },
         {
           "title": "Operated for the teams",
-          "text": "The platform team maintains the platform and manages upgrades."
+          "text": "Upgrades, node lifecycle, capacity and security policy are managed centrally."
         },
         {
           "title": "1 to 2 weeks of setup avoided",
@@ -158,8 +158,91 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
       ]
     },
     {
+      "id": "operations",
+      "label": "02 / Ongoing platform ownership",
+      "title": "The platform does the operational work",
+      "intro": "The application team gets a managed service, with the ongoing engineering already covered.",
+      "takeaway": "Teams deploy and evolve their applications. The platform runs the shared foundations and their lifecycle.",
+      "nodes": [
+        {
+          "id": "upgrades",
+          "title": "Upgrades and maintenance",
+          "detail": "Application and AKS upgrades, patching and node recycling.",
+          "source": "operations",
+          "x": 30,
+          "y": 25,
+          "w": 415,
+          "h": 175,
+          "icon": "check",
+          "tone": "dark"
+        },
+        {
+          "id": "capacity",
+          "title": "Capacity and cost",
+          "detail": "Node auto-provisioning aligns capacity and consolidates workloads.",
+          "source": "capacity",
+          "x": 535,
+          "y": 25,
+          "w": 415,
+          "h": 175,
+          "icon": "graph",
+          "tone": "neutral"
+        },
+        {
+          "id": "policies",
+          "title": "Security posture",
+          "detail": "Azure Policy, Kyverno and Istio policies maintain the baseline.",
+          "source": "hardening",
+          "x": 1040,
+          "y": 25,
+          "w": 415,
+          "h": 175,
+          "icon": "shield",
+          "tone": "neutral"
+        },
+        {
+          "id": "data",
+          "title": "Data and traffic protection",
+          "detail": "Encryption defaults and service-mesh onboarding out of the box.",
+          "source": "hardening",
+          "x": 30,
+          "y": 245,
+          "w": 415,
+          "h": 175,
+          "icon": "key",
+          "tone": "neutral"
+        },
+        {
+          "id": "mesh",
+          "title": "Service mesh lifecycle",
+          "detail": "Mesh upgrades, maintenance, traffic standards and pod security.",
+          "source": "operations",
+          "x": 535,
+          "y": 245,
+          "w": 415,
+          "h": 175,
+          "icon": "network",
+          "tone": "neutral"
+        },
+        {
+          "id": "access",
+          "title": "Access and shared services",
+          "detail": "Automated namespace RBAC, certificates and external DNS.",
+          "source": "rbac",
+          "x": 1040,
+          "y": 245,
+          "w": 415,
+          "h": 175,
+          "icon": "identity",
+          "tone": "neutral"
+        }
+      ],
+      "paths": [],
+      "notes": "This slide is the value of the service after the cluster is created. We handle application upgrade operations, AKS upgrades, patching, maintenance and node recycling. We operate the shared platform applications and service mesh. We own Azure Policy, Kyverno and Istio policies, the encryption baseline, default mesh onboarding and pod security. NAP selects capacity for the workload requirements and consolidates underused nodes to reduce waste. Rescheduling follows the configured disruption rules. Application teams still own their code, workload requirements and release choices. We are taking the infrastructure and operational setup work off their hands.\n\nNAP references: https://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning and https://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning-disruption. Deployment use comes from the project owner account, not the public KRO example."
+    },
+    {
       "id": "cluster",
-      "label": "02 / ARM automation",
+      "label": "03 / ARM automation",
       "title": "The cluster arrives with its baseline",
       "intro": "Cluster-level configuration is fully automated through ARM today.",
       "takeaway": "A new cluster connects to GitOps out of the box. The platform team owns AKS and Istio maintenance.",
@@ -243,7 +326,7 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
     },
     {
       "id": "services",
-      "label": "03 / GitOps platform",
+      "label": "04 / GitOps platform",
       "title": "The shared services come with the cluster",
       "intro": "GitOps installs and maintains the platform applications and security configuration.",
       "takeaway": "Teams reuse the operators and security baseline. They do not install or maintain the shared stack.",
@@ -375,15 +458,15 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
     },
     {
       "id": "namespace",
-      "label": "04 / Namespace as a Service",
-      "title": "RBAC is part of onboarding",
-      "intro": "The platform creates the access binding before the team starts deploying.",
-      "takeaway": "Once namespace onboarding completes, the team has access, security defaults and a ready deployment target.",
+      "label": "05 / Namespace as a Service",
+      "title": "Complex RBAC. A simple team experience.",
+      "intro": "Controllers bind each namespace to its approved access bucket and the right team permissions.",
+      "takeaway": "Access is ready before deployment. Team permissions and network access stay within the approved namespace.",
       "nodes": [
         {
           "id": "request",
-          "title": "Namespace request",
-          "detail": "The team requests its application namespace and access group.",
+          "title": "Namespace and role request",
+          "detail": "Choose observability-only or namespace-admin access for the team group.",
           "source": "namespace",
           "x": 25,
           "y": 95,
@@ -394,8 +477,8 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
         },
         {
           "id": "binding",
-          "title": "RBAC role binding",
-          "detail": "Bind the approved Microsoft Entra group to namespace-scoped access.",
+          "title": "RBAC controllers",
+          "detail": "Map the namespace to its approved access bucket and role.",
           "source": "rbac",
           "x": 405,
           "y": 95,
@@ -406,8 +489,8 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
         },
         {
           "id": "baseline",
-          "title": "Security by default",
-          "detail": "Network policy, pod security controls and Istio STRICT mTLS.",
+          "title": "Namespace boundary",
+          "detail": "Namespace-only permissions and network isolation.",
           "source": "hardening",
           "x": 815,
           "y": 95,
@@ -418,8 +501,8 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
         },
         {
           "id": "ready",
-          "title": "Ready to deploy",
-          "detail": "The application team can deploy immediately after onboarding.",
+          "title": "Ready to apply",
+          "detail": "Run kubectl apply with the application YAML.",
           "source": "namespace",
           "x": 1195,
           "y": 95,
@@ -455,33 +538,33 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
           "reference": false
         }
       ],
-      "notes": "Be explicit that the platform handles the RBAC role binding. It is a prerequisite, not a task left for the application team. The approved Entra group receives namespace-scoped access through the existing onboarding process. The workflow also applies the network policy, pod security and admission controls, and Istio STRICT mTLS baseline. These controls restrict dangerous pod configurations and reduce escape and lateral movement risk. They do not make a namespace an absolute security boundary. The team can deploy as soon as onboarding is complete.",
+      "notes": "Describe the work hidden behind the onboarding request. Several platform processes map the namespace to the organisation's RBAC bucket or approved group. Controllers establish and maintain the selected role. A team can have observability-only access or namespace-admin access according to the approved request. These team roles do not confer access to administer other namespaces or the cluster. Network policy is a separate enforced baseline. The team does not create its own binding chain. Once onboarding completes it can run kubectl apply with its application YAML. Platform-wide controls and administrators retain their own permissions.",
       "strips": [
         {
-          "title": "Access",
-          "text": "Only the approved team group receives its assigned namespace access."
+          "title": "Observability access",
+          "text": "Scoped operational visibility for the approved namespace."
         },
         {
-          "title": "Isolation",
-          "text": "Policy restricts host access and unwanted workload connectivity."
+          "title": "Namespace admin",
+          "text": "Approved administration within the team namespace."
         },
         {
-          "title": "Mesh hardening",
-          "text": "STRICT mTLS supplies the required in-mesh transport baseline."
+          "title": "Cluster stays protected",
+          "text": "Team roles do not grant cross-namespace or cluster administration."
         }
       ]
     },
     {
       "id": "application",
-      "label": "05 / Application delivery",
-      "title": "Deploy the application. Get HTTPS.",
-      "intro": "After namespace onboarding, teams can deploy using the supplied platform conventions.",
-      "takeaway": "The application comes up on the managed HTTPS path without a separate cluster, DNS or certificate setup phase.",
+      "label": "06 / Application delivery",
+      "title": "Apply your YAML. Serve your application.",
+      "intro": "Point the manifest at your container image. The platform handles the surrounding setup.",
+      "takeaway": "Apply the application manifests and use the managed HTTPS path for your API, UI or application endpoint.",
       "nodes": [
         {
           "id": "app",
-          "title": "Application manifests",
-          "detail": "Deploy the working image and its application configuration.",
+          "title": "kubectl apply",
+          "detail": "Apply the application YAML that references your container image.",
           "source": "namespace",
           "x": 25,
           "y": 95,
@@ -492,8 +575,8 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
         },
         {
           "id": "routing",
-          "title": "Service and VirtualService",
-          "detail": "Declare the application route and certificate requirements.",
+          "title": "Platform controllers",
+          "detail": "Access controllers, cert-manager and ExternalDNS handle the setup.",
           "source": "https",
           "x": 410,
           "y": 95,
@@ -504,9 +587,9 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
         },
         {
           "id": "operators",
-          "title": "DNS and certificates",
-          "detail": "ExternalDNS and cert-manager handle the supporting work.",
-          "source": "gitops",
+          "title": "Mesh and application routing",
+          "detail": "Istio supplies the configured traffic path and mesh baseline.",
+          "source": "hardening",
           "x": 820,
           "y": 95,
           "w": 300,
@@ -516,8 +599,8 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
         },
         {
           "id": "https",
-          "title": "Application over HTTPS",
-          "detail": "The configured ingress serves the ready application securely.",
+          "title": "API or UI over HTTPS",
+          "detail": "Traffic reaches your ready application through the managed endpoint.",
           "source": "https",
           "x": 1200,
           "y": 95,
@@ -553,130 +636,106 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
           "reference": false
         }
       ],
-      "notes": "The value for the end user is immediate readiness to deploy. Namespace onboarding does not itself install an arbitrary application. The team deploys its application, Service, VirtualService and required certificate configuration using the platform conventions. The shared operators manage DNS and certificates. When the workload is ready and DNS and certificate issuance have completed, the ingress serves the application over HTTPS. This is the supported deployment path, not a guarantee that incorrect manifests or missing application dependencies work. Guides explain the configuration."
+      "notes": "The normal team action is kubectl apply -f application.yaml in its approved context and namespace. The YAML references the container image and uses the supplied workload, Service, VirtualService and certificate conventions. The access controllers keep RBAC in place, cert-manager manages certificates and ExternalDNS manages DNS. These are separate controllers with separate responsibilities. Istio handles the configured application traffic path and the namespace joins the mesh by default. Once the workload is ready and DNS and certificates are available, the API or UI serves over HTTPS. Teams do not implement a new access, DNS, certificate or service-mesh platform for each application."
     },
     {
       "id": "integrations",
-      "label": "06 / Reuse existing resources",
+      "label": "07 / Reuse existing resources",
       "title": "Bring the resources your application needs",
-      "intro": "Use existing PVCs, connect your storage, or connect Key Vault through a UAMI.",
-      "takeaway": "The platform supplies the foundations and guides. Teams add their application and the resources it needs.",
+      "intro": "Templates and user guides cover storage, Key Vault, databases and other services.",
+      "takeaway": "Reuse the automated foundations. Bring your own components with connection templates, guides and approved access.",
       "nodes": [
         {
           "id": "workload",
           "title": "Your application",
-          "detail": "Run in the onboarded namespace with the platform baseline.",
-          "source": "namespace",
-          "x": 30,
-          "y": 105,
-          "w": 320,
-          "h": 200,
+          "detail": "Follow the platform templates and guides to connect your resources.",
+          "source": "guides",
+          "x": 25,
+          "y": 115,
+          "w": 300,
+          "h": 180,
           "icon": "box",
           "tone": "dark"
         },
         {
           "id": "pvc",
           "title": "Existing PVC",
-          "detail": "Mount a provisioned claim available in the application namespace.",
+          "detail": "Mount a provisioned claim in the application namespace.",
           "source": "pvc",
-          "x": 500,
+          "x": 450,
           "y": 20,
-          "w": 415,
-          "h": 115,
+          "w": 440,
+          "h": 140,
           "icon": "box",
           "tone": "neutral"
         },
         {
           "id": "storage",
-          "title": "Bring your own storage",
-          "detail": "Use a supported storage and volume integration.",
+          "title": "Your storage",
+          "detail": "Connect storage through a supported driver and volume pattern.",
           "source": "storage",
-          "x": 500,
-          "y": 167,
-          "w": 415,
-          "h": 115,
+          "x": 980,
+          "y": 20,
+          "w": 480,
+          "h": 140,
           "icon": "network",
           "tone": "neutral"
         },
         {
-          "id": "identity",
-          "title": "Workload Identity and UAMI",
-          "detail": "Use the application ServiceAccount and federated identity.",
-          "source": "keyvault",
-          "x": 500,
-          "y": 314,
-          "w": 415,
-          "h": 115,
-          "icon": "identity",
-          "tone": "neutral"
-        },
-        {
-          "id": "guides",
-          "title": "Platform guides",
-          "detail": "Deployment, HTTPS, PVCs, storage and identity connection patterns.",
-          "source": "guides",
-          "x": 1080,
-          "y": 50,
-          "w": 380,
-          "h": 160,
-          "icon": "file",
-          "tone": "neutral"
-        },
-        {
           "id": "vault",
-          "title": "Your Key Vault",
-          "detail": "Grant the identity the required vault access.",
+          "title": "Your Key Vault and UAMI",
+          "detail": "Connect through Workload Identity and owner-approved vault access.",
           "source": "keyvault",
-          "x": 1080,
-          "y": 290,
-          "w": 380,
-          "h": 130,
+          "x": 450,
+          "y": 235,
+          "w": 440,
+          "h": 150,
           "icon": "key",
+          "tone": "neutral"
+        },
+        {
+          "id": "database",
+          "title": "Databases and other services",
+          "detail": "Use connection templates, network access and resource-owner grants.",
+          "source": "databases",
+          "x": 980,
+          "y": 235,
+          "w": 480,
+          "h": 150,
+          "icon": "tools",
           "tone": "neutral"
         }
       ],
       "paths": [
         {
           "id": "app-pvc",
-          "d": "M350 205H420V77H500",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
+          "d": "M325 205H390V90H450",
+          "reference": true
+        },
+        {
+          "id": "app-vault",
+          "d": "M325 205H390V310H450",
           "reference": true
         },
         {
           "id": "app-storage",
-          "d": "M350 205H420V224H500",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
+          "d": "M325 205H940V90H980",
           "reference": true
         },
         {
-          "id": "app-identity",
-          "d": "M350 205H420V371H500",
-          "label": "",
-          "lx": 0,
-          "ly": 0,
+          "id": "app-database",
+          "d": "M325 205H940V310H980",
           "reference": true
-        },
-        {
-          "id": "identity-vault",
-          "d": "M915 371H995V355H1080",
-          "label": "Scoped access",
-          "lx": 995,
-          "ly": 338,
-          "reference": false
         }
       ],
-      "notes": "Existing provisioned PVCs can be referenced by workloads in the same namespace. Teams can also bring their own storage through supported driver and volume patterns. They can bring their own Key Vault and use a UAMI through AKS Workload Identity. That connection requires the ServiceAccount federation, the vault permissions and the allowed network path. We have platform guides for these tasks, so teams follow an established path instead of building the cluster and integrations themselves. Application-level permissions and the resource owner's grants remain necessary. Finish with the value: the platform provides the foundations that let teams get to work quickly."
+      "notes": "Teams can bring an existing PVC in the same namespace, their own supported storage, a Key Vault connected through UAMI, databases and other services. We supply connection templates and user guides. The team and resource owner still provide the required identity grants, network access and application settings. These are supported, guided integrations. Do not present them as automatic provisioning or lifecycle management of every external component. The platform has already done the common cluster, access, security, traffic and operator work, which lets the application team get to work much sooner."
     }
   ],
   "sources": {
     "delivery": {
       "title": "Delivered platform and ownership",
       "type": "Project owner delivery account, 10 November 2026",
-      "text": "The delivered service has three parts.\n\n1. Automated AKS cluster provisioning through ARM, including Azure CNI Overlay, managed Istio, encryption configuration and GitOps bootstrap.\n2. Shared security and operational services installed through GitOps.\n3. Namespace as a Service with group-based namespace access, network policy and Istio hardening.\n\nThe platform team owns routine platform maintenance and AKS and Istio upgrades. Application teams own their code, application configuration, dependencies and releases.\n\nThis deck describes the delivered service reported by the project owner. The animations explain architecture and do not query Azure or Kubernetes. No exact provisioning duration or measured productivity improvement is claimed."
+      "text": "The delivered service has three parts.\n\n1. Automated AKS cluster provisioning through ARM, including Azure CNI Overlay, managed Istio, encryption configuration and GitOps bootstrap.\n2. Shared security and operational services installed through GitOps.\n3. Namespace as a Service with group-based namespace access, network policy and Istio hardening.\n\nThe platform team owns routine platform maintenance and AKS and Istio upgrades. Application teams own their code, application configuration, dependencies and releases.\n\nThis deck describes the delivered service reported by the project owner. The animations explain architecture and do not query Azure or Kubernetes. No exact provisioning duration or measured productivity improvement is claimed.\n\nThe operational service also includes application upgrade operations, patching, node recycling, capacity management through NAP and ongoing policy and mesh maintenance. Details are in the operational lifecycle and capacity component notes."
     },
     "arm": {
       "title": "ARM cluster foundation",
@@ -691,22 +750,22 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
     "rbac": {
       "title": "RBAC role binding is an onboarding prerequisite",
       "type": "Delivered namespace access contract",
-      "text": "The platform creates the namespace access bindings for the application team. This is a prerequisite for the team to deploy.\n\nThe onboarding process maps the approved Microsoft Entra group to its namespace-scoped Kubernetes access role. Group membership determines the team users who receive that access.\n\nNamespace selection in a kubeconfig is not an access restriction. The role binding and the assigned role enforce access. Platform administrators retain their approved administrative permissions.\n\nThis deck does not prescribe an unverified Azure RBAC versus Kubernetes authorization implementation or publish a real group object ID. Use the existing platform onboarding process."
+      "text": "RBAC onboarding is a platform service, not a prerequisite that the application team must implement.\n\nThe platform runs the request, group mapping and reconciliation processes. The controllers bind the specific namespace to the approved RBAC group or access bucket and establish the selected namespace-scoped role.\n\nThe access paths include observability-only access and namespace-admin access. Each role is scoped to the approved namespace and operational visibility. These team roles do not grant administration of other namespaces or cluster resources. Platform administrators retain their approved administrative access.\n\nNetwork policy supplies a separate namespace connectivity baseline. Protected platform policies must remain outside the team's ability to bypass.\n\nThe exact group identifiers and organisation-specific binding implementation are intentionally absent. The term access bucket describes the organisation's access grouping, not an Azure Blob storage bucket.\n\nAccess controllers reconcile RBAC. cert-manager manages certificates and ExternalDNS manages DNS. A role binding does not issue a certificate."
     },
     "hardening": {
       "title": "Security by default",
       "type": "Delivered baseline and control boundaries",
-      "text": "Namespace onboarding includes network policy, pod security and admission controls, and Istio STRICT mTLS.\n\nAdmission policies restrict dangerous pod configurations, privilege escalation and host access. Network policy controls permitted connectivity. Istio STRICT mTLS requires mutual TLS for traffic governed by the mesh policy.\n\nThese controls reduce the risk of pod-to-node escape and lateral movement. A namespace is not an absolute compute-security boundary and no policy can guarantee that every possible vulnerability is blocked.\n\nThe application team remains responsible for application authorization, safe code and dependencies. STRICT mTLS inside the mesh and HTTPS for the application endpoint are separate layers."
+      "text": "The platform maintains Azure Policy, Kyverno policies and Istio policies as part of the security posture. Namespace onboarding includes network policy, pod security and admission controls, default service-mesh onboarding, and Istio STRICT mTLS.\n\nThe platform configures the required encryption baseline for managed data and application traffic. External storage, databases and other services brought by teams still need the resource owner to configure their appropriate encryption and access settings. This deck does not assert a particular disk or host encryption implementation.\n\nAdmission controls restrict dangerous Pod settings, privilege escalation and host access. Network policy restricts workload connectivity. Istio policies govern the relevant mesh traffic.\n\nThese are layered controls. Namespace-scoped RBAC and network policy do not guarantee absolute containment against every vulnerability. Application authorization, safe code and dependencies remain application-team responsibilities."
     },
     "namespace": {
       "title": "Namespace ready means ready to deploy",
       "type": "Application team onboarding experience",
-      "text": "The request process creates the namespace, establishes the required RBAC role binding, and applies the platform baseline.\n\nOnce onboarding is complete, the team can immediately deploy its application. It does not first build a cluster or install the shared DNS, certificate or mesh operators.\n\nThe team supplies a working application image and the application manifests, including its Service, Istio VirtualService and certificate configuration using the platform conventions. The application still needs any application-specific dependencies and resource access.\n\nThe platform guides explain the supported deployment path."
+      "text": "The platform completes the namespace request, RBAC group binding, role selection and security baseline before the team deploys.\n\nThe team supplies its container image and application YAML using the platform templates. Its normal deployment command is:\n\nkubectl apply -f application.yaml\n\nThis is an example for the team's approved context and namespace, not a command executed by the presentation. The manifests include the application workload, Service, VirtualService and certificate requirements according to platform conventions.\n\nAccess controllers handle the namespace permissions. cert-manager and ExternalDNS handle the supporting certificate and DNS work. The application must start successfully, pass its readiness checks and have its dependencies available before it serves traffic."
     },
     "https": {
       "title": "Application deployment and HTTPS",
       "type": "Supported application deployment path",
-      "text": "After namespace onboarding, the application team deploys its application using the supplied platform conventions.\n\nThe deployment defines the workload, Service, Istio VirtualService and required certificate configuration. ExternalDNS and cert-manager perform the DNS and certificate work. The configured ingress path serves the application over HTTPS.\n\nReady to deploy does not mean an application is already installed by namespace creation. The application must start successfully and pass its readiness checks. DNS propagation and certificate issuance must complete. There is no additional cluster setup phase for the team.\n\nThe HTTPS path is an architectural illustration, not a live endpoint check."
+      "text": "After namespace onboarding, the team can apply its application YAML and use the managed HTTPS path for an API, UI or another supported application endpoint.\n\nThe platform templates carry the required workload, Service, VirtualService, host and certificate configuration. Access controllers reconcile RBAC, cert-manager handles certificate issuance and renewal, and ExternalDNS manages DNS records. These controllers have separate jobs. Istio provides the configured mesh and ingress traffic path.\n\nThe intended user experience is an application that starts and serves traffic without a separate cluster, RBAC, DNS or certificate setup project. Workload readiness, DNS availability, certificate issuance and application-specific dependencies still need to complete normally. This deck is not a live HTTPS probe."
     },
     "pvc": {
       "title": "Existing persistent volume claims",
@@ -726,7 +785,22 @@ body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Ne
     "guides": {
       "title": "Guides and the value to application teams",
       "type": "Project owner account and planning estimate",
-      "text": "The platform includes guides for application deployment, routing and certificates, existing PVCs, bring-your-own storage, and Key Vault connections through UAMI. Use the current internal platform guide set for environment-specific steps. Internal guide URLs are intentionally not published.\n\nThe project owner estimates that a team starting from its own cluster would need approximately one to two weeks to build and configure equivalent foundations, assuming the required skills and access. This is an estimate, not a measured before-and-after benchmark or a service-level guarantee.\n\nThe delivered service removes that cluster setup and shared-service installation work from the application team. Application delivery and application-specific integrations remain with the team."
+      "text": "The platform provides user guides and templates for application deployment, routing and certificates, PVCs, bring-your-own storage, Key Vault through UAMI, databases and other supported services. Use the current internal guide set for environment-specific steps. Internal URLs are intentionally absent.\n\nCommon cluster and namespace foundations are automated. Bring-your-own services use the supported guides and templates, with the resource owner granting the required permissions. Fully automating every external component is outside this claim.\n\nThe project owner estimates that building equivalent cluster and platform foundations independently takes one to two weeks, assuming the required skills and access. This is an estimate, not a measured benchmark or an SLA."
+    },
+    "operations": {
+      "title": "The platform runs the operational lifecycle",
+      "type": "Project owner delivery account, 10 November 2026",
+      "text": "The platform handles application upgrade operations, AKS upgrades, maintenance, patching and node recycling. It also maintains the shared platform applications. Application teams continue to own their code, image, configuration and release requirements.\n\nThe platform manages service-mesh upgrades, maintenance and best practices for application traffic and pod security. It supplies the namespace access baseline, policy enforcement, encryption configuration and default mesh onboarding.\n\nThese are the responsibilities reported by the project owner. This deck does not claim a particular upgrade cadence, zero downtime, a recovery SLA or a fresh runtime check."
+    },
+    "capacity": {
+      "title": "Node auto-provisioning and capacity efficiency",
+      "type": "Project owner deployment account and Microsoft Learn",
+      "text": "The project owner reports using AKS node auto-provisioning to align capacity to workload requirements, consolidate workloads and reduce avoidable compute cost.\n\nNAP uses pending Pod resource requirements to select suitable VM capacity. Consolidation can remove or replace underused nodes and reschedule workloads under the configured disruption rules. It does not automatically rewrite application CPU or memory requests and it is not live migration of running Pods. Applications need suitable requests, replicas and disruption budgets. No percentage saving or downtime guarantee is claimed.\n\nThe public KRO exploration keeps NAP disabled in its example template. It is not the deployed ARM environment described by the project owner.\n\nOfficial references checked on 10 November 2026:\nhttps://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning\nhttps://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning-disruption"
+    },
+    "databases": {
+      "title": "Bring databases and other services",
+      "type": "Supported integration and guide topics supplied by the project owner",
+      "text": "Teams can connect existing databases and other Azure or external services through the supported platform integration patterns.\n\nTemplates and user guides cover the connection configuration, workload identity where supported, resource-owner grants, network access, secrets and application settings.\n\nThese integrations are guided and template-assisted. This deck does not claim that the platform automatically provisions, migrates or administers every database or external service. The resource owner and application team still approve and supply the required access and configuration."
     }
   },
   "deckLinks": []

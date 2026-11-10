@@ -1,15 +1,15 @@
 {
-  "checkedAt": "2026-11-10T11:37:48.965908+00:00",
+  "checkedAt": "2026-11-10T11:44:57.340371+00:00",
   "artifact": "index.html",
-  "sha256": "d261e31437b51d38e746098949ce27d3296bae2b62295d4668693d318f2152ed",
+  "sha256": "3cb648ec513c5aa0906d3b2a5cdf44d027f96cdc37744948aaca346764703658",
   "formatReference": {
     "repository": "https://github.com/davidmarkgardiner/kagent-work-bundles",
     "commit": "b8a4be748f19c916ebd601bd9045371a40e72e50",
     "path": "secure-kro-classic-kagent/journey.html",
     "sha256": "50b128b3ab2c7a0dadda9ee6f43ac75ad79fe6bccdb52e806e814077fd52d3ee"
   },
-  "slideCount": 6,
-  "componentDetailCount": 11,
+  "slideCount": 7,
+  "componentDetailCount": 14,
   "browser": {
     "engine": "Chromium",
     "viewports": [
@@ -26,7 +26,7 @@
         844
       ]
     ],
-    "slidesCheckedAtEachViewport": 6,
+    "slidesCheckedAtEachViewport": 7,
     "componentTextOverflow": 0,
     "componentOverlaps": 0,
     "scriptErrors": [],
@@ -39,22 +39,27 @@
     "offline": {
       "method": "Load the served standalone HTML into a fresh blank browser document with networking disabled. Navigate to the final slide.",
       "finalSlide": "integrations"
-    }
+    },
+    "operationAnimationsObserved": 6
   },
   "print": {
-    "pages": 6,
+    "pages": 7,
     "orientation": "landscape",
     "allTitlesIntrosTakeawaysAndComponentTextPresent": true,
-    "allSixPagesVisuallyReviewed": true,
-    "scope": "Chromium PDF export. No physical printer check."
+    "scope": "Chromium PDF export. No physical printer check.",
+    "allSevenPagesVisuallyReviewed": true
   },
   "publicSafety": {
     "strictScanHits": 0,
     "gitleaks": "No leaks found"
   },
-  "contentBasis": "Project owner delivery account supplied on 10 November 2026. One to two weeks is the project owner estimate, not a measured benchmark.",
+  "contentBasis": "Project owner delivery account supplied on 10 November 2026, including operational ownership, NAP, RBAC roles, default mesh onboarding and guided external integrations. One to two weeks is a project owner estimate, not a measured benchmark.",
   "limits": [
     "No Azure, Kubernetes, Entra, UAMI, storage, DNS, certificate or HTTPS live checks.",
     "The browser checks establish presentation behaviour, not receiving-platform health or security enforcement."
+  ],
+  "officialReferences": [
+    "https://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning",
+    "https://learn.microsoft.com/en-us/azure/aks/node-auto-provisioning-disruption"
   ]
 }
