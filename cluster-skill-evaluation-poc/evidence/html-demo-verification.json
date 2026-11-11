@@ -1,0 +1,155 @@
+{
+  "recordedAt": "2026-11-11T11:45:36.837936+00:00",
+  "kind": "offline HTML browser interaction verification; not cluster execution or GitLab integration",
+  "artifact": "DEMO.html",
+  "artifactSha256": "f3da8d343baae22fb23a2704253f45f0cd7f495c105c3a94ca856333fde69527",
+  "browser": "Chromium through Playwright CLI",
+  "preview": "loopback static server; file-protocol navigation restricted by automation harness",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 1200,
+      "height": 900
+    },
+    {
+      "width": 390,
+      "height": 1000
+    },
+    {
+      "width": 360,
+      "height": 1000
+    }
+  ],
+  "visualPasses": 2,
+  "checks": [
+    {
+      "name": "Initial handoff blocked",
+      "passed": true
+    },
+    {
+      "name": "Next explains next stage",
+      "passed": true
+    },
+    {
+      "name": "Navigation creates no receipt",
+      "passed": true
+    },
+    {
+      "name": "Mid-run push keeps original test identity",
+      "passed": true
+    },
+    {
+      "name": "Old run completes already stale",
+      "passed": true
+    },
+    {
+      "name": "Stale pass cannot prepare MR",
+      "passed": true
+    },
+    {
+      "name": "Retest restores current pass",
+      "passed": true
+    },
+    {
+      "name": "Fresh pass prepares review only",
+      "passed": true
+    },
+    {
+      "name": "Push invalidates prepared handoff",
+      "passed": true
+    },
+    {
+      "name": "Immutable old receipts retained",
+      "passed": true
+    },
+    {
+      "name": "Issue Failed creates no MR",
+      "passed": true
+    },
+    {
+      "name": "Error is distinct and blocked",
+      "passed": true
+    },
+    {
+      "name": "Route change resets simulation",
+      "passed": true
+    },
+    {
+      "name": "Failed attaches to same draft",
+      "passed": true
+    },
+    {
+      "name": "Error appends to same draft",
+      "passed": true
+    },
+    {
+      "name": "Keyboard advances focused stage",
+      "passed": true
+    },
+    {
+      "name": "Home returns first stage",
+      "passed": true
+    },
+    {
+      "name": "Denied clipboard exposes selectable fallback",
+      "passed": true
+    },
+    {
+      "name": "Route change clears stale exported fallback",
+      "passed": true
+    },
+    {
+      "name": "Late clipboard rejection cannot restore superseded brief",
+      "passed": true
+    },
+    {
+      "name": "Markdown download works",
+      "passed": true
+    },
+    {
+      "name": "No document overflow at 1440",
+      "passed": true
+    },
+    {
+      "name": "No document overflow at 1200",
+      "passed": true
+    },
+    {
+      "name": "No document overflow at 390",
+      "passed": true
+    },
+    {
+      "name": "No document overflow at 360",
+      "passed": true
+    },
+    {
+      "name": "Mobile map starts compact",
+      "passed": true
+    },
+    {
+      "name": "Mobile map expands all connections",
+      "passed": true
+    },
+    {
+      "name": "Print includes all nine stage narratives",
+      "passed": true
+    },
+    {
+      "name": "Reduced motion preference respected",
+      "passed": true
+    },
+    {
+      "name": "No JavaScript runtime errors",
+      "passed": true
+    },
+    {
+      "name": "No external API or asset requests",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "foreignRequests": []
+}
