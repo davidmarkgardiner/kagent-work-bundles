@@ -1,0 +1,13 @@
+evaluationNamespace: skill-eval-poc
+targetNamespace: skills-demo
+controllerURL: http://kagent-controller.kagent.svc.cluster.local:8083
+scenarioNames:
+  - aks-known-issues-exact-signature-v1
+targetPodName: replace-with-reviewed-agent-pod
+targetPodUID: '{{TARGET_POD_UID}}'
+image: registry.example.invalid/skill-evaluation@sha256:0000000000000000000000000000000000000000000000000000000000000000
+labLocalImage: false
+# Optional lab-only scheduling, absent by default:
+# nodeSelector: {kubernetes.io/hostname: reviewed-lab-node}
+# tolerations:
+#   - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}

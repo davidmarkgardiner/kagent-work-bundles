@@ -1,0 +1,12 @@
+{
+  "apiVersion": "evaluation.platform.kagent.dev/v1alpha1",
+  "kind": "SkillEvaluation",
+  "metadata": {"name": "example-evaluation", "namespace": "skill-eval-poc"},
+  "spec": {
+    "scenarioRef": {
+      "name": "aks-oras-212-v1",
+      "uid": "{{ACTUAL_GOLDENSCENARIO_UID}}",
+      "specSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  }
+}

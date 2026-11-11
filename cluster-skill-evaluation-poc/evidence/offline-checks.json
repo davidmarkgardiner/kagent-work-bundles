@@ -1,0 +1,8 @@
+{
+  "behavioralTests": 24,
+  "result": "Passed",
+  "vendorIntegrity": "Passed",
+  "renderer": "Passed",
+  "publicSafetyScan": "Passed",
+  "kind": "offline; not model or cluster execution"
+}

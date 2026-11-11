@@ -1,0 +1,8 @@
+{
+  "vendor/platform/skills-registry/controller.py": "492d45df5e9bd83e43cdad1bf20af724ebf8f5a07504ac748bf44ebb483247a4",
+  "vendor/platform/skills-registry/golden/checks.py": "6b695c7770bb38d99db5626ae5045250bbebf39bc72068de42f13a9ad57eb55b",
+  "vendor/platform/skills-registry/golden/run.py": "51064ee4d8834c4dd811df1a00e18ef4abb9c566029600e2c7fba71e327a1807",
+  "vendor/platform/skills-registry/golden/schema.py": "a61f34ddfea978fce9fa712fa17de4c63d71e61706e26d2fc098d7251d036631",
+  "vendor/scripts/kagent-a2a-invoke.sh": "baf0b389980b1cf074ff11418fa8265fff0855f655f9ea9e87b4eeefbea607b5",
+  "vendor/scripts/public-safe-scan.sh": "a35093cc379e9e7781d3441b444a31c8910f5da9ea8b374b9d0fd391524677b8"
+}

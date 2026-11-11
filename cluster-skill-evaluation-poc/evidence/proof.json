@@ -1,0 +1,176 @@
+{
+  "recordedAt": "2026-11-11T10:57:23.108489+00:00",
+  "runtime": "legacy kagent 0.7.13",
+  "kubernetes": "1.31.14",
+  "model": "MiniMax-M2.7 via existing agentgateway route",
+  "caseOrigin": "synthetic documentation case; actual model/runtime/tool execution",
+  "image": "skill-evaluation:sha-8cfb185064c5fd93",
+  "codeSha256": "8cfb185064c5fd9309e9f9e0ba5cdc0170c62119a2ce4e55b1d7d0c57715d190",
+  "outcomes": [
+    {
+      "request": "positive-final",
+      "requestUID": "90d9f421-3408-4c9a-8f17-a0417a42a372",
+      "phase": "Passed",
+      "reason": "ChecksCompleted",
+      "detail": null,
+      "jobCount": 1,
+      "jobUID": "3681874c-6d55-412c-8840-f6e0222d5529",
+      "executorPodUID": "50008c47-f3d9-4cd6-9428-aa7336199c36",
+      "executorImageID": "sha256:f383242f528effd4b8280a49cfc476c79b0622d1fe4c7a4c88f08eeaddeccc6a",
+      "codeSha256": "8cfb185064c5fd9309e9f9e0ba5cdc0170c62119a2ce4e55b1d7d0c57715d190",
+      "sourceCommit": "9c5802410f9409d8258571b1cace18392ace8c4b",
+      "skillContentSha256": "1906dd0e228bcbc5d08d792d318917f0f9a6e1f663fc3ee0075df68dda2bb07e",
+      "evidenceSha256": "0153849f468d380d4fed2b2679160299f82b6a7e3969c11c7301386c261abe47",
+      "contextID": "se-90d9f421-3408-4c9a-8f17-a0417a42a372",
+      "taskID": "1cef086e-5aa6-46ca-bfa5-f9efb1664af3",
+      "tools": [
+        "skills",
+        "read_file"
+      ],
+      "missingAnswerTerms": [],
+      "independentReadBackRejudge": "Passed",
+      "captureImmutable": true,
+      "receiptImmutable": true
+    },
+    {
+      "request": "negative-final",
+      "requestUID": "9f92a694-ef1a-4c0f-840b-906c86429cbf",
+      "phase": "Failed",
+      "reason": "ChecksCompleted",
+      "detail": null,
+      "jobCount": 1,
+      "jobUID": "f2a05ea2-1607-4abc-894f-1819656e548b",
+      "executorPodUID": "57f9388c-8f2c-4b5b-8494-05e2887839f2",
+      "executorImageID": "sha256:f383242f528effd4b8280a49cfc476c79b0622d1fe4c7a4c88f08eeaddeccc6a",
+      "codeSha256": "8cfb185064c5fd9309e9f9e0ba5cdc0170c62119a2ce4e55b1d7d0c57715d190",
+      "sourceCommit": "9c5802410f9409d8258571b1cace18392ace8c4b",
+      "skillContentSha256": "1906dd0e228bcbc5d08d792d318917f0f9a6e1f663fc3ee0075df68dda2bb07e",
+      "evidenceSha256": "b04e501699e02642312b03bdaedf4f0ad97e99884406d903e63ea887d66b3f71",
+      "contextID": "se-9f92a694-ef1a-4c0f-840b-906c86429cbf",
+      "taskID": "41231a6b-e1f1-4c98-a07b-940e71b96a12",
+      "tools": [
+        "skills",
+        "read_file"
+      ],
+      "missingAnswerTerms": [
+        "EVAL_MISSING_938c4e1526d44e1baff869449853dc0b"
+      ],
+      "independentReadBackRejudge": "Passed",
+      "captureImmutable": true,
+      "receiptImmutable": true
+    },
+    {
+      "request": "wrong-pin-final",
+      "requestUID": "673da46d-7583-4e01-a0c5-b01c518d0afa",
+      "phase": "Error",
+      "reason": "RunRejected",
+      "detail": "ScenarioPinMismatch",
+      "jobCount": 0
+    }
+  ],
+  "controllerRestart": {
+    "request": "negative-final",
+    "beforePhase": "Running",
+    "whileControllerStoppedPhase": "Running",
+    "afterPhase": "Failed",
+    "jobUIDBefore": "f2a05ea2-1607-4abc-894f-1819656e548b",
+    "jobUIDAfter": "f2a05ea2-1607-4abc-894f-1819656e548b",
+    "replacementJobCreated": false
+  },
+  "rbac": [
+    {
+      "check": "submitter_create",
+      "expected": true,
+      "actual": "yes",
+      "passed": true
+    },
+    {
+      "check": "submitter_status",
+      "expected": false,
+      "actual": "no",
+      "passed": true
+    },
+    {
+      "check": "submitter_jobs",
+      "expected": false,
+      "actual": "no",
+      "passed": true
+    },
+    {
+      "check": "worker_secrets",
+      "expected": false,
+      "actual": "no",
+      "passed": true
+    },
+    {
+      "check": "worker_exact_exec",
+      "expected": true,
+      "actual": "yes",
+      "passed": true
+    },
+    {
+      "check": "worker_other_exec",
+      "expected": false,
+      "actual": "no",
+      "passed": true
+    },
+    {
+      "check": "controller_exec",
+      "expected": false,
+      "actual": "no",
+      "passed": true
+    },
+    {
+      "check": "controller_secrets",
+      "expected": false,
+      "actual": "no",
+      "passed": true
+    }
+  ],
+  "admission": [
+    {
+      "check": "unknown_field",
+      "passed": true,
+      "exitCode": 1
+    },
+    {
+      "check": "immutable_spec",
+      "passed": true,
+      "exitCode": 1
+    }
+  ],
+  "baselineAttempts": {
+    "baseline-live": {
+      "phase": "Rejected",
+      "reason": "A2ATaskNotCompleted",
+      "taskID": null,
+      "invocationAttempted": true,
+      "cause": "provider_weekly_quota_exceeded_429"
+    },
+    "alternate-baseline-live": {
+      "phase": "Rejected",
+      "reason": "A2ATransportOrTaskFailure",
+      "taskID": null,
+      "invocationAttempted": true,
+      "cause": "new_agent_missing_front_door_ingress_policy"
+    },
+    "alternate-baseline-after-ingress": {
+      "phase": "Passed",
+      "reason": null,
+      "taskID": "d1527de3-a43a-4f19-980f-5502b0a78789",
+      "invocationAttempted": true,
+      "cause": "live_native_tool_evidence_accepted"
+    }
+  },
+  "semanticQuality": "not_scored",
+  "deepEval": "not_used",
+  "gitlabWrites": "not_exercised",
+  "limits": [
+    "One legacy skill policy and one reviewed skill release; not general skill coverage.",
+    "Source commit belongs to the lab Git fixture, not a proved GitLab repository.",
+    "Worker has real exec authority into one pinned lab Agent Pod.",
+    "No network, sandbox, hostile-tenant, exactly-once process or provider-call-count proof.",
+    "No new model credential was created or changed.",
+    "Raw captures remain private; public summary records hashes and identities."
+  ]
+}

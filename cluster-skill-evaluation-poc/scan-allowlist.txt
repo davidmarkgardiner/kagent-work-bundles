@@ -1,0 +1,6 @@
+# Installed dependencies are local build tools, not shipped bundle source.
+.venv/**
+__pycache__/**
+# The reviewed upstream native trace is synthetic and public-safe; no exclusion.
+# Scanner's literal detection patterns match themselves; vendor-lock verifies bytes.
+vendor/scripts/public-safe-scan.sh

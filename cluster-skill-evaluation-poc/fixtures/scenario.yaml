@@ -1,0 +1,27 @@
+apiVersion: skills.platform.kagent.dev/v1alpha1
+kind: GoldenScenario
+metadata:
+  name: aks-oras-212-v1
+  namespace: skills-demo
+spec:
+  mode: liveNativeSkill
+  inputOrigin: synthetic
+  policy: aks-known-issues-native-v1
+  agentRef:
+    name: skills-demo-agent
+  agentSpecSha256: 4a43cf79c42a506e9778ac62339c6720c9d527e8fea559c4777712325e88da14
+  skillRef:
+    name: aks-known-issues-v1
+  skillContentSha256: 1906dd0e228bcbc5d08d792d318917f0f9a6e1f663fc3ee0075df68dda2bb07e
+  prompt: Synthetic AKS case only. During node provisioning, vmssCSE failed with OrasPullUnauthorizedVMExtensionError,
+    exit 212, Bootstrap Container Registry authorization failed, on a network-isolated
+    cluster. Load aks-known-issues and use read_file to consult /skills/aks-known-issues/references/error-code-map.md.
+    Explain the documented cause, first checks, and exact Microsoft Learn reference.
+    Do not execute any commands or perform remediation.
+  referenceFile: references/error-code-map.md
+  answerTerms:
+  - OrasPullUnauthorizedVMExtensionError
+  - '212'
+  - kubelet
+  - bootstrap
+  citation: https://learn.microsoft.com/troubleshoot/azure/azure-kubernetes/error-codes/vmextensionerror-oraspullunauthorized
