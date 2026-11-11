@@ -1,0 +1,86 @@
+# Apply after replacing placeholders in the matching Entra policy files.
+# These rules expose the MCP endpoint plus the two discovery paths required by
+# agentgateway's native Entra bridge. Keep each route on its existing listener.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: event-mcp
+  namespace: tenant-gateway-system
+spec:
+  parentRefs:
+    - name: tenant-gateway
+      sectionName: event-mcp
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /mcp
+        - path:
+            type: PathPrefix
+            value: /.well-known/oauth-protected-resource/mcp
+        - path:
+            type: PathPrefix
+            value: /.well-known/oauth-authorization-server/mcp
+      filters:
+        - type: CORS
+          cors:
+            allowCredentials: true
+            allowHeaders:
+              - Origin
+              - Authorization
+              - Content-Type
+            allowMethods:
+              - "*"
+            allowOrigins:
+              - "*"
+            exposeHeaders:
+              - Origin
+              - WWW-Authenticate
+            maxAge: 86400
+      backendRefs:
+        - group: agentgateway.dev
+          kind: AgentgatewayBackend
+          name: event-mcp
+          namespace: team-event
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: chat-mcp
+  namespace: tenant-gateway-system
+spec:
+  parentRefs:
+    - name: tenant-gateway
+      sectionName: chat-mcp
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /mcp
+        - path:
+            type: PathPrefix
+            value: /.well-known/oauth-protected-resource/mcp
+        - path:
+            type: PathPrefix
+            value: /.well-known/oauth-authorization-server/mcp
+      filters:
+        - type: CORS
+          cors:
+            allowCredentials: true
+            allowHeaders:
+              - Origin
+              - Authorization
+              - Content-Type
+            allowMethods:
+              - "*"
+            allowOrigins:
+              - "*"
+            exposeHeaders:
+              - Origin
+              - WWW-Authenticate
+            maxAge: 86400
+      backendRefs:
+        - group: agentgateway.dev
+          kind: AgentgatewayBackend
+          name: chat-mcp
+          namespace: team-chat

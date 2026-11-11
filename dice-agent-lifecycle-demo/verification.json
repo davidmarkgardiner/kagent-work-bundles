@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "dice-demo-bundle/v1",
+  "preparedDate": "2026-11-11",
+  "offlineTests": {
+    "passed": 27,
+    "failed": 0,
+    "liveProviderRequests": 0,
+    "scope": "Protected caller, local HTTPS trust, shell portability and native receipt/trace filters"
+  },
+  "storedRecordingCompatibility": {
+    "nativeExpectedCalls": 4,
+    "traceMatches": 1,
+    "scope": "Stored 11 November capture. No new invocation."
+  },
+  "assets": {
+    "htmlFiles": 48,
+    "copiedPresentationFiles": 88,
+    "mainPresentationEntries": 15,
+    "missingLocalReferences": 0,
+    "originalMediaSourceFiles": 35,
+    "originalVideoBytes": 79051896,
+    "originalVideoExactSourceMatch": true
+  },
+  "architecture": {
+    "status": "proposed",
+    "svgViews": 3,
+    "browserViewsReviewed": 3,
+    "cardTextOverflowFindings": 0,
+    "printExportPages": 3
+  },
+  "publicScans": {
+    "gitleaks": "No credential findings after exact verified public Git SHA allowlist",
+    "detectSecretsInitialFindings": 93,
+    "trufflehog": "Unavailable; not run",
+    "entropyScanReview": "127 provenance/content/response hashes and one public checkout path. No credential identified.",
+    "entropyFinalFindings": 128
+  },
+  "workplaceAcceptance": "Not run. Resolve and complete the private rehearsal record."
+}

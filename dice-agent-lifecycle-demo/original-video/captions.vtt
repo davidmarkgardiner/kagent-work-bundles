@@ -1,0 +1,265 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:02.577
+This is a working tour of the DICE agent
+
+2
+00:00:02.624 --> 00:00:06.490
+platform. We will follow the running agent, inspect its
+
+3
+00:00:06.536 --> 00:00:10.809
+gateway, load a reviewed skill, execute a tool, and
+
+4
+00:00:10.890 --> 00:00:16.091
+find the resulting activity in OpenTelemetry. The delivery contract
+
+5
+00:00:16.266 --> 00:00:21.316
+starts in Git. An agent definition selects its instructions
+
+6
+00:00:21.629 --> 00:00:26.900
+and approved capabilities, while platform policies define its boundaries.
+
+7
+00:00:27.492 --> 00:00:31.416
+In the GitOps path, Flux reconciles the reviewed revision
+
+8
+00:00:31.788 --> 00:00:37.337
+and KRO composes the runtime resources. The dedicated recording
+
+9
+00:00:37.384 --> 00:00:40.321
+instance you see here was started directly for this
+
+10
+00:00:40.402 --> 00:00:44.686
+walkthrough. Its running state is evidence of the runtime,
+
+11
+00:00:45.011 --> 00:00:48.924
+rather than a new GitOps deployment recording. Here is
+
+12
+00:00:48.982 --> 00:00:53.673
+the live agentgateway dashboard. Its configuration comes from an
+
+13
+00:00:53.719 --> 00:00:58.723
+external controller, so the browser cannot edit it. The
+
+14
+00:00:58.804 --> 00:01:03.286
+routes connect requests to approved model and service backends.
+
+15
+00:01:03.727 --> 00:01:07.117
+This is where routing and the applicable authentication and
+
+16
+00:01:07.175 --> 00:01:11.692
+authorization policies meet. A route being present does not,
+
+17
+00:01:11.715 --> 00:01:15.662
+by itself, prove that every security control has been
+
+18
+00:01:15.709 --> 00:01:20.922
+enforced. Now open the agent interface. This recording agent
+
+19
+00:01:21.049 --> 00:01:24.962
+uses the existing approved MiniMax model route. It has
+
+20
+00:01:25.008 --> 00:01:29.280
+a reviewed AKS skill, a mounted knowledge document, and
+
+21
+00:01:29.385 --> 00:01:35.503
+one fixed read-only MCP operation. The original hosted agent
+
+22
+00:01:35.805 --> 00:01:39.927
+remains unchanged. We can inspect the agent, see its
+
+23
+00:01:39.962 --> 00:01:43.526
+attached tool, and open the conversation created through its
+
+24
+00:01:43.596 --> 00:01:47.079
+API. The request asks the agent to load the
+
+25
+00:01:47.137 --> 00:01:51.398
+AKS known-issues skill, read the error-code catalog and the
+
+26
+00:01:51.444 --> 00:01:55.798
+bootstrap runbook, and call get demo status once. These
+
+27
+00:01:55.833 --> 00:01:59.931
+are actual tool calls. The conversation records the skill
+
+28
+00:02:00.024 --> 00:02:05.074
+load, both document reads, and the MCP result. The
+
+29
+00:02:05.144 --> 00:02:08.674
+answer includes the runbook evidence code and the code
+
+30
+00:02:08.720 --> 00:02:13.062
+returned by the tool. The status record is synthetic
+
+31
+00:02:13.120 --> 00:02:17.683
+demonstration data. The execution is real, but this is
+
+32
+00:02:17.753 --> 00:02:22.129
+not a live Azure incident investigation. The skills are
+
+33
+00:02:22.164 --> 00:02:26.832
+versioned guidance. In the workplace design, their source is
+
+34
+00:02:26.901 --> 00:02:32.277
+GitLab, and the runtime consumes the approved release. This
+
+35
+00:02:32.346 --> 00:02:36.944
+home-lab content source is separate. Guidance explains how to
+
+36
+00:02:37.025 --> 00:02:41.576
+work; the tool binding and backend permissions determine what
+
+37
+00:02:41.634 --> 00:02:45.802
+the agent can actually access. The MCP service runs
+
+38
+00:02:45.872 --> 00:02:49.402
+in Kubernetes, and this agent exposes only its selected
+
+39
+00:02:49.436 --> 00:02:55.184
+operation. Next, open the OpenTelemetry workflow view. Select the
+
+40
+00:02:55.242 --> 00:02:59.665
+recorded request and follow the runtime, model, skill and
+
+41
+00:02:59.711 --> 00:03:04.878
+MCP activity. The runtime reports three model calls and
+
+42
+00:03:04.924 --> 00:03:10.068
+their token usage. Transaction cost remains not reported. The
+
+43
+00:03:10.114 --> 00:03:13.655
+completed native task and its tool results provide the
+
+44
+00:03:13.725 --> 00:03:19.855
+outcome; the trace provides the observed operations. Two HTTP
+
+45
+00:03:20.168 --> 00:03:24.812
+discovery requests returned 404, so the viewer marks the
+
+46
+00:03:24.858 --> 00:03:29.154
+trace with errors even though the task completed. That
+
+47
+00:03:29.224 --> 00:03:34.286
+distinction matters during diagnosis. For the security boundary, an
+
+48
+00:03:34.367 --> 00:03:38.895
+unauthenticated request to the separate protected MCP route returns
+
+49
+00:03:38.976 --> 00:03:44.770
+HTTP 401. That proves this route rejects the request.
+
+50
+00:03:45.350 --> 00:03:48.346
+It does not prove Entra identity enforcement for our
+
+51
+00:03:48.392 --> 00:03:53.745
+recording agent, or every network-isolation boundary. Finally, open the
+
+52
+00:03:53.814 --> 00:03:58.795
+Entra administration pages for agent blueprints and agent identities.
+
+53
+00:03:59.399 --> 00:04:03.660
+The intended identity design separates the calling application's access
+
+54
+00:04:03.706 --> 00:04:06.504
+to the agent from the agent's own access to
+
+55
+00:04:06.585 --> 00:04:12.332
+an MCP API. The target audience, approved identity and
+
+56
+00:04:12.402 --> 00:04:17.406
+required permissions must match the destination. This runtime recording
+
+57
+00:04:17.789 --> 00:04:20.482
+does not claim that an Entra token exchange took
+
+58
+00:04:20.540 --> 00:04:26.067
+place. The central registry brings ownership, reviewed versions, approved
+
+59
+00:04:26.137 --> 00:04:32.325
+connections and acceptance evidence together. Registration supports governance; the
+
+60
+00:04:32.383 --> 00:04:36.922
+evidence establishes which checks passed. That is the agent
+
+61
+00:04:36.980 --> 00:04:42.390
+journey we are making consumable: declare an approved agent,
+
+62
+00:04:42.716 --> 00:04:47.000
+run it behind explicit boundaries, call its API, and
+
+63
+00:04:47.058 --> 00:04:51.853
+inspect what it actually did. The reusable delivery contract,
+
+64
+00:04:52.166 --> 00:04:56.624
+running interface, skill and tool records, gateway and observability
+
+65
+00:04:56.682 --> 00:05:00.978
+views give the technical team concrete places to inspect
+
+66
+00:05:01.094 --> 00:05:02.046
+each part.

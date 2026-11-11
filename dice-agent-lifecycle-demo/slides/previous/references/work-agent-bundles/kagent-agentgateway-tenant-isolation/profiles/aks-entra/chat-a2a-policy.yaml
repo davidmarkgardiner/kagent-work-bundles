@@ -1,0 +1,32 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: chat-a2a-auth
+  namespace: tenant-gateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: chat-a2a
+  traffic:
+    jwtAuthentication:
+      mode: Strict
+      preserveToken: true
+      providers:
+        - issuer: https://login.microsoftonline.com/{{TEAM_CHAT_ENTRA_TENANT_ID}}/v2.0
+          audiences:
+            - api://{{TEAM_CHAT_A2A_CLIENT_ID}}
+            - "{{TEAM_CHAT_A2A_CLIENT_ID}}"
+          jwks:
+            remote:
+              backendRef:
+                name: entra-jwks
+                kind: AgentgatewayBackend
+                group: agentgateway.dev
+                port: 443
+              jwksPath: /{{TEAM_CHAT_ENTRA_TENANT_ID}}/discovery/v2.0/keys
+    authorization:
+      action: Allow
+      policy:
+        matchExpressions:
+          - '"team-chat.a2a.invoke" in jwt.roles'

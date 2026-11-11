@@ -1,0 +1,19 @@
+This is a working tour of the DICE agent platform. We will follow the running agent, inspect its gateway, load a reviewed skill, execute a tool, and find the resulting activity in OpenTelemetry.
+
+The delivery contract starts in Git. An agent definition selects its instructions and approved capabilities, while platform policies define its boundaries. In the GitOps path, Flux reconciles the reviewed revision and KRO composes the runtime resources. The dedicated recording instance you see here was started directly for this walkthrough. Its running state is evidence of the runtime, rather than a new GitOps deployment recording.
+
+Here is the live agentgateway dashboard. Its configuration comes from an external controller, so the browser cannot edit it. The routes connect requests to approved model and service backends. This is where routing and the applicable authentication and authorization policies meet. A route being present does not, by itself, prove that every security control has been enforced.
+
+Now open the agent interface. This recording agent uses the existing approved MiniMax model route. It has a reviewed AKS skill, a mounted knowledge document, and one fixed read-only MCP operation. The original hosted agent remains unchanged. We can inspect the agent, see its attached tool, and open the conversation created through its API.
+
+The request asks the agent to load the AKS known-issues skill, read the error-code catalog and the bootstrap runbook, and call get demo status once. These are actual tool calls. The conversation records the skill load, both document reads, and the MCP result. The answer includes the runbook evidence code and the code returned by the tool. The status record is synthetic demonstration data. The execution is real, but this is not a live Azure incident investigation.
+
+The skills are versioned guidance. In the workplace design, their source is GitLab, and the runtime consumes the approved release. This home-lab content source is separate. Guidance explains how to work; the tool binding and backend permissions determine what the agent can actually access. The MCP service runs in Kubernetes, and this agent exposes only its selected operation.
+
+Next, open the OpenTelemetry workflow view. Select the recorded request and follow the runtime, model, skill and MCP activity. The runtime reports three model calls and their token usage. Transaction cost remains not reported. The completed native task and its tool results provide the outcome; the trace provides the observed operations. Two HTTP discovery requests returned 404, so the viewer marks the trace with errors even though the task completed. That distinction matters during diagnosis.
+
+For the security boundary, an unauthenticated request to the separate protected MCP route returns HTTP 401. That proves this route rejects the request. It does not prove Entra identity enforcement for our recording agent, or every network-isolation boundary.
+
+Finally, open the Entra administration pages for agent blueprints and agent identities. The intended identity design separates the calling application's access to the agent from the agent's own access to an MCP API. The target audience, approved identity and required permissions must match the destination. This runtime recording does not claim that an Entra token exchange took place. The central registry brings ownership, reviewed versions, approved connections and acceptance evidence together. Registration supports governance; the evidence establishes which checks passed.
+
+That is the agent journey we are making consumable: declare an approved agent, run it behind explicit boundaries, call its API, and inspect what it actually did. The reusable delivery contract, running interface, skill and tool records, gateway and observability views give the technical team concrete places to inspect each part.

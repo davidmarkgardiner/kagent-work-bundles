@@ -1,0 +1,451 @@
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: classic-secure-agent
+spec:
+  schema:
+    apiVersion: v1alpha1
+    group: demo.kagent.dev
+    kind: ClassicSecureAgent
+    types: {}
+    spec:
+      modelConfig: string | required=true enum=approved-model immutable=true
+      systemPrompt: string | required=true minLength=1 maxLength=4096 immutable=true
+      skills: '[]string | default=[] maxItems=0 immutable=true'
+      tools: '[]string | default=[] maxItems=0 immutable=true'
+    status:
+      goldenSucceeded: ${golden.status.succeeded}
+      agentName: ${agent.metadata.name}
+  resources:
+  - id: runtimeAccount
+    template:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: ${schema.metadata.name}-runtime
+        namespace: ${schema.metadata.namespace}
+      automountServiceAccountToken: false
+  - id: verifierAccount
+    template:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: ${schema.metadata.name}-verifier
+        namespace: ${schema.metadata.namespace}
+      automountServiceAccountToken: false
+  - id: callerAccount
+    template:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: ${schema.metadata.name}-caller
+        namespace: ${schema.metadata.namespace}
+      automountServiceAccountToken: false
+  - id: agent
+    template:
+      apiVersion: kagent.dev/v1alpha2
+      kind: Agent
+      metadata:
+        name: ${schema.metadata.name}
+        namespace: ${schema.metadata.namespace}
+      spec:
+        type: Declarative
+        description: KRO-composed native agent without Substrate
+        declarative:
+          runtime: go
+          modelConfig: ${schema.spec.modelConfig}
+          systemMessage: ${schema.spec.systemPrompt}
+          stream: false
+          tools: []
+          deployment:
+            serviceAccountName: ${runtimeAccount.metadata.name}
+            resources:
+              requests:
+                cpu: 25m
+                memory: 64Mi
+              limits:
+                cpu: 1000m
+                memory: 256Mi
+            env:
+            - name: HOME
+              value: /tmp
+            podSecurityContext:
+              runAsNonRoot: true
+              runAsUser: 1000
+              fsGroup: 1000
+              seccompProfile:
+                type: RuntimeDefault
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                - ALL
+            volumes:
+            - name: writable-tmp
+              emptyDir:
+                sizeLimit: 64Mi
+            volumeMounts:
+            - name: writable-tmp
+              mountPath: /tmp
+    readyWhen:
+    - ${agent.status.conditions.exists(c, c.type == "Accepted" && c.status == "True" && c.observedGeneration
+      == agent.metadata.generation)}
+    - ${agent.status.conditions.exists(c, c.type == "Ready" && c.status == "True" && c.observedGeneration
+      == agent.metadata.generation)}
+  - id: network
+    template:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: ${schema.metadata.name}-boundary
+        namespace: ${schema.metadata.namespace}
+      spec:
+        podSelector:
+          matchLabels:
+            app: kagent
+            kagent: ${schema.metadata.name}
+        policyTypes:
+        - Ingress
+        - Egress
+        ingress:
+        - from:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: classic-agents
+            podSelector:
+              matchLabels:
+                gateway.networking.k8s.io/gateway-name: classic-demo
+          ports:
+          - protocol: TCP
+            port: 8080
+        egress:
+        - to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: kube-system
+          ports:
+          - protocol: UDP
+            port: 53
+          - protocol: TCP
+            port: 53
+        - to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: '{{MODEL_GATEWAY_NAMESPACE}}'
+            podSelector:
+              matchLabels:
+                app: '{{MODEL_GATEWAY_POD_LABEL}}'
+          ports:
+          - protocol: TCP
+            port: 8081
+        - to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: '{{KAGENT_CONTROLLER_NAMESPACE}}'
+            podSelector:
+              matchLabels:
+                app.kubernetes.io/name: '{{KAGENT_CONTROLLER_LABEL}}'
+          ports:
+          - protocol: TCP
+            port: 8083
+  - id: verifierPolicy
+    template:
+      apiVersion: agentgateway.dev/v1alpha1
+      kind: AgentgatewayPolicy
+      metadata:
+        name: ${schema.metadata.name}-verify
+        namespace: ${schema.metadata.namespace}
+      spec:
+        targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: ${schema.metadata.name}-verify
+        traffic:
+          jwtAuthentication:
+            mode: Strict
+            preserveToken: false
+            providers:
+            - issuer: '{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}'
+              audiences:
+              - secure-agent-classic
+              jwks:
+                inline: '{{KUBERNETES_JWKS_JSON}}'
+          authorization:
+            action: Require
+            policy:
+              matchExpressions:
+              - jwt.sub == "system:serviceaccount:classic-agents:${schema.metadata.name}-verifier"
+  - id: cardPolicy
+    template:
+      apiVersion: agentgateway.dev/v1alpha1
+      kind: AgentgatewayPolicy
+      metadata:
+        name: ${schema.metadata.name}-card
+        namespace: ${schema.metadata.namespace}
+      spec:
+        targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: ${schema.metadata.name}-card
+        traffic:
+          jwtAuthentication:
+            mode: Strict
+            preserveToken: false
+            providers:
+            - issuer: '{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}'
+              audiences:
+              - secure-agent-classic
+              jwks:
+                inline: '{{KUBERNETES_JWKS_JSON}}'
+          authorization:
+            action: Require
+            policy:
+              matchExpressions:
+              - jwt.sub == "system:serviceaccount:classic-agents:${schema.metadata.name}-verifier"
+  - id: callerPolicy
+    template:
+      apiVersion: agentgateway.dev/v1alpha1
+      kind: AgentgatewayPolicy
+      metadata:
+        name: ${schema.metadata.name}-invoke
+        namespace: ${schema.metadata.namespace}
+      spec:
+        targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: ${schema.metadata.name}-invoke
+        traffic:
+          jwtAuthentication:
+            mode: Strict
+            preserveToken: false
+            providers:
+            - issuer: '{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}'
+              audiences:
+              - secure-agent-classic
+              jwks:
+                inline: '{{KUBERNETES_JWKS_JSON}}'
+          authorization:
+            action: Require
+            policy:
+              matchExpressions:
+              - jwt.sub == "system:serviceaccount:classic-agents:${schema.metadata.name}-caller"
+  - id: verifyRoute
+    template:
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: HTTPRoute
+      metadata:
+        name: ${schema.metadata.name}-verify
+        namespace: ${schema.metadata.namespace}
+        annotations:
+          classic.kagent.dev/policy: ${verifierPolicy.metadata.name}
+      spec:
+        parentRefs:
+        - name: classic-demo
+          namespace: classic-agents
+          sectionName: verify
+        rules:
+        - matches:
+          - path:
+              type: Exact
+              value: /classic/classic-agents/${schema.metadata.name}/verify
+          filters:
+          - type: URLRewrite
+            urlRewrite:
+              path:
+                type: ReplaceFullPath
+                replaceFullPath: /
+          backendRefs:
+          - name: ${agent.metadata.name}
+            namespace: ${agent.metadata.namespace}
+            port: 8080
+    readyWhen:
+    - ${verifyRoute.status.parents.exists(p, p.conditions.exists(c, c.type == "Accepted" && c.status ==
+      "True" && c.observedGeneration == verifyRoute.metadata.generation) && p.conditions.exists(c, c.type
+      == "ResolvedRefs" && c.status == "True" && c.observedGeneration == verifyRoute.metadata.generation))}
+  - id: cardRoute
+    template:
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: HTTPRoute
+      metadata:
+        name: ${schema.metadata.name}-card
+        namespace: ${schema.metadata.namespace}
+        annotations:
+          classic.kagent.dev/policy: ${cardPolicy.metadata.name}
+      spec:
+        parentRefs:
+        - name: classic-demo
+          namespace: classic-agents
+          sectionName: verify
+        rules:
+        - matches:
+          - path:
+              type: Exact
+              value: /classic/classic-agents/${schema.metadata.name}/card
+          filters:
+          - type: URLRewrite
+            urlRewrite:
+              path:
+                type: ReplaceFullPath
+                replaceFullPath: /.well-known/agent-card.json
+          backendRefs:
+          - name: ${agent.metadata.name}
+            namespace: ${agent.metadata.namespace}
+            port: 8080
+    readyWhen:
+    - ${cardRoute.status.parents.exists(p, p.conditions.exists(c, c.type == "Accepted" && c.status ==
+      "True" && c.observedGeneration == cardRoute.metadata.generation) && p.conditions.exists(c, c.type
+      == "ResolvedRefs" && c.status == "True" && c.observedGeneration == cardRoute.metadata.generation))}
+  - id: goldenConfig
+    template:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: ${schema.metadata.name}-golden
+        namespace: ${schema.metadata.namespace}
+      data:
+        config.json: '{"invokeURL": "http://classic-demo.classic-agents.svc.cluster.local:8081/classic/classic-agents/${schema.metadata.name}/verify",
+          "cardURL": "http://classic-demo.classic-agents.svc.cluster.local:8081/classic/classic-agents/${schema.metadata.name}/card",
+          "callerURL": "http://classic-demo.classic-agents.svc.cluster.local:8080/classic/classic-agents/${schema.metadata.name}/invoke",
+          "expectedAgent": "${schema.metadata.name}", "requestUID": "${schema.metadata.uid}", "tokenFile":
+          "/var/run/golden/token", "timeoutSeconds": 480}'
+  - id: verifierNetwork
+    template:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: ${schema.metadata.name}-verifier
+        namespace: ${schema.metadata.namespace}
+      spec:
+        podSelector:
+          matchLabels:
+            classic.kagent.dev/verifier: ${schema.metadata.name}
+        policyTypes:
+        - Ingress
+        - Egress
+        egress:
+        - to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: kube-system
+          ports:
+          - protocol: UDP
+            port: 53
+          - protocol: TCP
+            port: 53
+        - to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: classic-agents
+            podSelector:
+              matchLabels:
+                gateway.networking.k8s.io/gateway-name: classic-demo
+          ports:
+          - protocol: TCP
+            port: 8080
+          - protocol: TCP
+            port: 8081
+  - id: golden
+    template:
+      apiVersion: batch/v1
+      kind: Job
+      metadata:
+        name: ${schema.metadata.name}-golden
+        namespace: ${schema.metadata.namespace}
+        annotations:
+          classic.kagent.dev/agent: ${agent.metadata.name}
+          classic.kagent.dev/route: ${verifyRoute.metadata.name}
+          classic.kagent.dev/card-route: ${cardRoute.metadata.name}
+      spec:
+        backoffLimit: 0
+        activeDeadlineSeconds: 600
+        template:
+          metadata:
+            labels:
+              classic.kagent.dev/verifier: ${schema.metadata.name}
+              classic.kagent.dev/request-uid: ${schema.metadata.uid}
+          spec:
+            serviceAccountName: ${verifierAccount.metadata.name}
+            automountServiceAccountToken: false
+            restartPolicy: Never
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 65532
+              seccompProfile:
+                type: RuntimeDefault
+            containers:
+            - name: golden
+              image: '{{APPROVED_GOLDEN_IMAGE_AT_DIGEST}}'
+              command:
+              - python3
+              - -B
+              - /app/golden.py
+              - --config
+              - /golden/config.json
+              securityContext:
+                readOnlyRootFilesystem: true
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                  - ALL
+              resources:
+                requests:
+                  cpu: 25m
+                  memory: 32Mi
+                limits:
+                  cpu: 500m
+                  memory: 128Mi
+              volumeMounts:
+              - name: config
+                mountPath: /golden
+                readOnly: true
+              - name: jwt
+                mountPath: /var/run/golden
+                readOnly: true
+            volumes:
+            - name: config
+              configMap:
+                name: ${goldenConfig.metadata.name}
+            - name: jwt
+              projected:
+                sources:
+                - serviceAccountToken:
+                    audience: secure-agent-classic
+                    expirationSeconds: 600
+                    path: token
+    readyWhen:
+    - ${golden.status.succeeded == 1}
+  - id: callerRoute
+    template:
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: HTTPRoute
+      metadata:
+        name: ${schema.metadata.name}-invoke
+        namespace: ${schema.metadata.namespace}
+        annotations:
+          classic.kagent.dev/policy: ${callerPolicy.metadata.name}
+          classic.kagent.dev/verified-job: ${golden.metadata.name}
+      spec:
+        parentRefs:
+        - name: classic-demo
+          namespace: classic-agents
+          sectionName: caller
+        rules:
+        - matches:
+          - path:
+              type: Exact
+              value: /classic/classic-agents/${schema.metadata.name}/invoke
+          filters:
+          - type: URLRewrite
+            urlRewrite:
+              path:
+                type: ReplaceFullPath
+                replaceFullPath: /
+          backendRefs:
+          - name: ${agent.metadata.name}
+            namespace: ${agent.metadata.namespace}
+            port: 8080
+    readyWhen:
+    - ${callerRoute.status.parents.exists(p, p.conditions.exists(c, c.type == "Accepted" && c.status ==
+      "True" && c.observedGeneration == callerRoute.metadata.generation) && p.conditions.exists(c, c.type
+      == "ResolvedRefs" && c.status == "True" && c.observedGeneration == callerRoute.metadata.generation))}

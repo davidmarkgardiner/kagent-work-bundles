@@ -1,0 +1,6 @@
+[
+  {"label":"Load the reviewed skill","name":"skills","args":{"command":"{{APPROVED_SKILL_NAME}}"}},
+  {"label":"Read the approved skill reference","name":"read_file","args":{"file_path":"/skills/{{APPROVED_SKILL_NAME}}/{{APPROVED_REFERENCE_PATH}}"}},
+  {"label":"Read the approved knowledge document","name":"read_file","args":{"file_path":"/knowledge/{{APPROVED_KNOWLEDGE_PATH}}"}},
+  {"label":"Run the selected read-only MCP operation","name":"{{ACTUAL_READ_ONLY_MCP_OPERATION}}","args":{}}
+]

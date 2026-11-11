@@ -1,0 +1,449 @@
+{
+  "sourceRepository": "https://github.com/davidmarkgardiner/kagent-work-bundles",
+  "sourceCommit": "b4a041d7439002a366330eba15d084872ea5f6dd",
+  "scope": "Copied previously published presentation pages and their local HTML reference closure. Historical and illustrative labels retained.",
+  "mainPresentations": 15,
+  "copiedFiles": 88,
+  "files": [
+    {
+      "path": "slides/platform/managed-aks-platform-slides/index.html",
+      "sourcePath": "managed-aks-platform-slides/index.html",
+      "sha256": "b24cb80785745949e4306f41e9dca1365e77f7fe85d3e54f7ea249f1a0b24356"
+    },
+    {
+      "path": "slides/platform/managed-aks-two-slide-overview/managed-aks-two-slides.html",
+      "sourcePath": "managed-aks-two-slide-overview/managed-aks-two-slides.html",
+      "sha256": "4a42e590918367b4d5410857a5d7dafb0b9b36a442c1459d2c0c951ea1c4b994"
+    },
+    {
+      "path": "slides/previous/DEMO-QUICKSTART.md",
+      "sourcePath": "secure-kro-classic-kagent/DEMO-QUICKSTART.md",
+      "sha256": "0d95286a9f90bdee7a71be747191a4201015299a35950cb58a1026107d5fa674"
+    },
+    {
+      "path": "slides/previous/DEMO-WALKTHROUGH.md",
+      "sourcePath": "secure-kro-classic-kagent/DEMO-WALKTHROUGH.md",
+      "sha256": "87dd176702999dfa6ffd2f651648d1a6d5256536af3794aa8ee0be52e25bc3b0"
+    },
+    {
+      "path": "slides/previous/MONDAY-COMPONENTS-AND-POLICIES.md",
+      "sourcePath": "secure-kro-classic-kagent/MONDAY-COMPONENTS-AND-POLICIES.md",
+      "sha256": "152a3a84978ec44f28602017862569f2b908274257b09107e5a63d0d2dcff6cf"
+    },
+    {
+      "path": "slides/previous/NEXT-STEPS.md",
+      "sourcePath": "secure-kro-classic-kagent/NEXT-STEPS.md",
+      "sha256": "c044a2b02fcef81f734959fac090c3740dd6f477068d43bc81a33044586da8cc"
+    },
+    {
+      "path": "slides/previous/README.md",
+      "sourcePath": "secure-kro-classic-kagent/README.md",
+      "sha256": "18c758f8f8bda753f214a1e215cb8526588e3f5f81f20867dca878adc07a146f"
+    },
+    {
+      "path": "slides/previous/START-HERE.html",
+      "sourcePath": "secure-kro-classic-kagent/START-HERE.html",
+      "sha256": "612ddf48ec61299b7b79a452939e2349d2acc46981712d2379a076cc66eeced4"
+    },
+    {
+      "path": "slides/previous/TERMINAL-DEMO.md",
+      "sourcePath": "secure-kro-classic-kagent/TERMINAL-DEMO.md",
+      "sha256": "eac66ec7c034a99586e16c67565a88824b37509da4743e224c829f6edb6053d9"
+    },
+    {
+      "path": "slides/previous/demo/yaml/catalog/08-callerPolicy.yaml",
+      "sourcePath": "secure-kro-classic-kagent/demo/yaml/catalog/08-callerPolicy.yaml",
+      "sha256": "e73e4636419331fe8a45bf736f594723806944466255406085b1601f4033b448"
+    },
+    {
+      "path": "slides/previous/demo/yaml/catalog/14-callerRoute.yaml",
+      "sourcePath": "secure-kro-classic-kagent/demo/yaml/catalog/14-callerRoute.yaml",
+      "sha256": "3ee9c8bab2c5a28c84cb93665d31ae992c0e018753a051137b9ef827948a280d"
+    },
+    {
+      "path": "slides/previous/demo/yaml/model/resourcegraphdefinition.yaml",
+      "sourcePath": "secure-kro-classic-kagent/demo/yaml/model/resourcegraphdefinition.yaml",
+      "sha256": "58f4124688a0e598f1d294d278b10debb1fcec82961ede328003642e4162bc86"
+    },
+    {
+      "path": "slides/previous/demo/yaml/referenceGrant.yaml",
+      "sourcePath": "secure-kro-classic-kagent/demo/yaml/referenceGrant.yaml",
+      "sha256": "84ca35ddbc50e35a83d95250f458004750ee00f874a3a152f95a7605c03dfff3"
+    },
+    {
+      "path": "slides/previous/evidence/live-classic-0.10.4-2026-11-04.json",
+      "sourcePath": "secure-kro-classic-kagent/evidence/live-classic-0.10.4-2026-11-04.json",
+      "sha256": "7e03f577e66af418440e3b990ff0ef678fde085bacece8815339c32b6e0fda64"
+    },
+    {
+      "path": "slides/previous/examples/agent.yaml",
+      "sourcePath": "secure-kro-classic-kagent/examples/agent.yaml",
+      "sha256": "c07e6b8626600392dc8b983e8b73f4d75cf30a89f774fc4da39602f1f778f394"
+    },
+    {
+      "path": "slides/previous/hosted/README.md",
+      "sourcePath": "secure-kro-classic-kagent/hosted/README.md",
+      "sha256": "fe51d90279cd86f8cd45e3938b6db9eff5d466b9f89883ecc1fcf5181f88b905"
+    },
+    {
+      "path": "slides/previous/index.html",
+      "sourcePath": "secure-kro-classic-kagent/index.html",
+      "sha256": "89d24ec66803963959a9b47ed0e034bec817990cb7e5e4667d4712dd59d1370a"
+    },
+    {
+      "path": "slides/previous/journey.html",
+      "sourcePath": "secure-kro-classic-kagent/journey.html",
+      "sha256": "50b128b3ab2c7a0dadda9ee6f43ac75ad79fe6bccdb52e806e814077fd52d3ee"
+    },
+    {
+      "path": "slides/previous/live-onboarding.html",
+      "sourcePath": "secure-kro-classic-kagent/live-onboarding.html",
+      "sha256": "5e26b221dc4137cd0d721cdc6d939652d45ff8c6c82b4e46227c31faaae12884"
+    },
+    {
+      "path": "slides/previous/onboarding-dashboard.html",
+      "sourcePath": "secure-kro-classic-kagent/onboarding-dashboard.html",
+      "sha256": "e0fad8b03af985490d0fdec1161f06a3474ef0e084f78313770e5326c03cd709"
+    },
+    {
+      "path": "slides/previous/presentation.html",
+      "sourcePath": "secure-kro-classic-kagent/presentation.html",
+      "sha256": "d429d72ec24151ae3501f86165843fbd1c8aa0d54f78f7d629861333f751ea45"
+    },
+    {
+      "path": "slides/previous/references/ai-platform/kagent-knowledge-base/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/ai-platform/kagent-knowledge-base/README.md",
+      "sha256": "9b671ab55c40869459ef8a721eb42c31816d50a4cf4f7c376104edc9bb168261"
+    },
+    {
+      "path": "slides/previous/references/docs/agent-isolation-slides/index.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/agent-isolation-slides/index.html",
+      "sha256": "3af3179681eb2b4cbce52c977a25cde860b096771137bb546e1c025fae29ab52"
+    },
+    {
+      "path": "slides/previous/references/docs/agent-substrate-business-brief.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/agent-substrate-business-brief.md",
+      "sha256": "ac94078932781e07eb1c1b98c27c411ec0c3fd18598cfef1a5abdd60da9d5de1"
+    },
+    {
+      "path": "slides/previous/references/docs/agentic-delivery-factory/pi-durable-comparison/SCORECARD.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/agentic-delivery-factory/pi-durable-comparison/SCORECARD.md",
+      "sha256": "59599e17ba976de99f2586613fef78d8ed9787554f8da70cc2a751da36ca7415"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/01-connected-triage.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/01-connected-triage.md",
+      "sha256": "b69c98e8fa8bc391c718f68032cb08c8df9c75615e36f82032bbe5fea5b39941"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/03-data-and-evaluation.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/03-data-and-evaluation.md",
+      "sha256": "19fad310a2eafabffcfe47f50c886052e65c35eca835eb24c6a9d3998a803004"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/EVIDENCE.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/EVIDENCE.md",
+      "sha256": "97f22ce979c012853971bb2da51838f7b8a8ab2f6abf7d375600ccb701fabd6b"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/01-kafka-triage.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/01-kafka-triage.html",
+      "sha256": "3115e2c7479176556bbf0da857e8a2280923ec8213f10fbb3d11da336f452846"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/02-data-agents.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/02-data-agents.html",
+      "sha256": "797af3f3fafd5798fdb136719ef2d80ee98bf11ddc72f33a3b212bf2a620be03"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/03-knowledge-base.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/03-knowledge-base.html",
+      "sha256": "4b1ec0c64f0fcb4c2ff5920a6d6008a9aeee96b73f74c35cda994608ab916e44"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/04-gitlab-sdlc.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/04-gitlab-sdlc.html",
+      "sha256": "8539f67862bdd7a409033e63af5efafcb096694a1000a6e3493751d2912ab848"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/05-kubernetes-fleet.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/05-kubernetes-fleet.html",
+      "sha256": "8a0029d57ed93e368ffba632c35baaa9296d6c496850561fe9286e66b52a7ccf"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/06-sre-lens.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/06-sre-lens.html",
+      "sha256": "38987756cc65b9eae15fa99d5bca8f8408cb2f4997f837aadd55f2b4bd4f3071"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/07-durable-classification.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/07-durable-classification.html",
+      "sha256": "4ddb8448045b7bf4c369845dc7ba1f46aba3797a074377da9163a70df639c355"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/08-gateway-demo.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/08-gateway-demo.html",
+      "sha256": "8305017139ea7e2d076a54f98b8032aa306d9791ce90f0b046254a5911581562"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/index.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/index.html",
+      "sha256": "1a033b16309f789bcc6f7a6f0379d8a781c912728a1f516a0d6d7b4239363b72"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/sources.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/sources.html",
+      "sha256": "f40666f52900f2dc56ced95c9dd8e545001d1a198d241e3c5a091ab28f90f4c4"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/speaker-notes.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/speaker-notes.md",
+      "sha256": "0da89df2c7be96882744fbdc9eceb458674b90a9cf001a2ad0eec4c22e22df90"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/vscode-presentation/PRESENTATION.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/vscode-presentation/PRESENTATION.md",
+      "sha256": "9d89eeb05c5f8c620a8c93001341fb457105a7acb21ee73971645f96dae62d5e"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/vscode-presentation/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/vscode-presentation/README.md",
+      "sha256": "ce258d4d4c21942dca75d36a05ff5a671015c860a4767f0097b10bb52d2260ab"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/yaml.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/yaml.html",
+      "sha256": "fc3d769fe153e61a72634b528f325818c56da3b89d3575adc44ac4b34400f0be"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/yaml/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/meeting-walkthrough/yaml/README.md",
+      "sha256": "f7c8e1873870fe07325ebb66a573d8900a1a57f8d27f46d5078d8b29022b0065"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/showcase/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/showcase/README.md",
+      "sha256": "9e8471598527d45bcf2f0a7d026f81f0811a0ee2685fa4272e25c01127fb08e3"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/slideshow.html",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/slideshow.html",
+      "sha256": "5e3ca046d9a085cc49cf84cf63ac7099f822b12ba5ae6c95780a950f13be6b74"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/yaml-walkthrough/guides/02-gateway-security-monitoring-evaluation.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/yaml-walkthrough/guides/02-gateway-security-monitoring-evaluation.md",
+      "sha256": "375e1f256fb0a9201bf8793284c1c71bbb03c86d49ccd308a3b110e167aeaae1"
+    },
+    {
+      "path": "slides/previous/references/docs/demos/microsoft-2026-10-15/yaml-walkthrough/guides/03-sre-orchestration-demo.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/demos/microsoft-2026-10-15/yaml-walkthrough/guides/03-sre-orchestration-demo.md",
+      "sha256": "04321ad11940ffcf4cdce1f3dacf114406e968d400999b2cbbf56afdaf1ba62d"
+    },
+    {
+      "path": "slides/previous/references/docs/entra-agent-id-comparison/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/entra-agent-id-comparison/README.md",
+      "sha256": "bf6d8afe684f19997e91d8df9457bb90fa22c57cc8c28fa28e0d5aefce4d488f"
+    },
+    {
+      "path": "slides/previous/references/docs/kagent-memory/production-target/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/kagent-memory/production-target/README.md",
+      "sha256": "d63fb74fe7109bd05eedbca1bae3ac30ab1256d1521bb29e3a2f89829a8d0ce3"
+    },
+    {
+      "path": "slides/previous/references/docs/observability/dual-source-kafka-triage-routing.md",
+      "sourcePath": "secure-kro-classic-kagent/references/docs/observability/dual-source-kafka-triage-routing.md",
+      "sha256": "c22a1313f6f975cd62e26883f70216eec681c2288976df7a3ed9b306b60481d4"
+    },
+    {
+      "path": "slides/previous/references/infra/byo-kagent/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/infra/byo-kagent/README.md",
+      "sha256": "2897fb6a3c47123e041c7be20ae22ee98fb9a7fcd89e64da070de13b060ab8f6"
+    },
+    {
+      "path": "slides/previous/references/observability/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/observability/README.md",
+      "sha256": "bf7b65f8c47e9050099ccf06c3b3a2b50dfaceb593ac7447d084bab9d01238e3"
+    },
+    {
+      "path": "slides/previous/references/platform/agentgateway/APPLICATION-TEAM-ONBOARDING-FRONT-SHEET.md",
+      "sourcePath": "secure-kro-classic-kagent/references/platform/agentgateway/APPLICATION-TEAM-ONBOARDING-FRONT-SHEET.md",
+      "sha256": "7dd65be5301bde97af262b7711f8bed3f72429ab663dae7e6e037f86dfbd2ed2"
+    },
+    {
+      "path": "slides/previous/references/platform/agentgateway/APPLICATION-TEAM-ONBOARDING-PLAN.md",
+      "sourcePath": "secure-kro-classic-kagent/references/platform/agentgateway/APPLICATION-TEAM-ONBOARDING-PLAN.md",
+      "sha256": "fbab43573a6906d703bde9b1b634c8c7ccc98ae866156afb228a28f1ac74189c"
+    },
+    {
+      "path": "slides/previous/references/platform/agentgateway/CLAVES-ADR-MEETING-BRIEF.html",
+      "sourcePath": "secure-kro-classic-kagent/references/platform/agentgateway/CLAVES-ADR-MEETING-BRIEF.html",
+      "sha256": "c1020ea0bf6625ad6edc6e2bb8c1d1441eb9cf9a5d01b016e49236eb724562b2"
+    },
+    {
+      "path": "slides/previous/references/platform/agentgateway/CLAVES-ADR-MEETING-BRIEF.md",
+      "sourcePath": "secure-kro-classic-kagent/references/platform/agentgateway/CLAVES-ADR-MEETING-BRIEF.md",
+      "sha256": "489af3dad0f98f6a7329e5b7c193cec75df4b7fde3672ec225a18a7712f5ee41"
+    },
+    {
+      "path": "slides/previous/references/platform/agentgateway/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/platform/agentgateway/README.md",
+      "sha256": "7c15e92465298edd820435b2a50c2fd081fbe5ebad936725d667848badfb983d"
+    },
+    {
+      "path": "slides/previous/references/platform/agentgateway/gateway-resources.yaml",
+      "sourcePath": "secure-kro-classic-kagent/references/platform/agentgateway/gateway-resources.yaml",
+      "sha256": "bd9520a3979bb874ee6825e7aee503bdd08b02c196eb769cff05636dc0a8aaee"
+    },
+    {
+      "path": "slides/previous/references/platform/agentgateway/policy-a2a-fleet-agent.yaml",
+      "sourcePath": "secure-kro-classic-kagent/references/platform/agentgateway/policy-a2a-fleet-agent.yaml",
+      "sha256": "23c9c3a8dcb36ee18fb00a0f412f6154c4444cc21217f41e51b04665a7d4e2a8"
+    },
+    {
+      "path": "slides/previous/references/platform/agentgateway/route-a2a-fleet-agent.yaml",
+      "sourcePath": "secure-kro-classic-kagent/references/platform/agentgateway/route-a2a-fleet-agent.yaml",
+      "sha256": "fbf6928ba3ec00d590c0b78101cc2c0134459696e8afa3e950f3cc1bb9ae8d89"
+    },
+    {
+      "path": "slides/previous/references/platform/agentgateway/service-a2a-fleet-agent.yaml",
+      "sourcePath": "secure-kro-classic-kagent/references/platform/agentgateway/service-a2a-fleet-agent.yaml",
+      "sha256": "0d2099a73452993881dea5b59a213daac1e19c17bc742d00b9e866617f0e2675"
+    },
+    {
+      "path": "slides/previous/references/platform/aks-mcp/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/platform/aks-mcp/README.md",
+      "sha256": "e8ed29def5e6a0186b5f2b99f5c8a18cbaf27b7a0b572e0089bbc075ad0699ba"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/agent-substrate/AKS-EVAL-WORK-AGENT-HANDOFF.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/agent-substrate/AKS-EVAL-WORK-AGENT-HANDOFF.md",
+      "sha256": "3b364845318fcaa5f2ec89f6b2551a0e0917a743370b32af708549ac67eadfaa"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/evidence-first-worker-triage/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/evidence-first-worker-triage/README.md",
+      "sha256": "004b4f90caebc0a30ef98cc4e53f259f752baf35aa7a4f89da79827daf591a3f"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/evidence-first-worker-triage/next-phase-end-to-end/evidence/phase5-value.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/evidence-first-worker-triage/next-phase-end-to-end/evidence/phase5-value.md",
+      "sha256": "280b854174e2c5a070011c45395121255de9a952ac10fbe83ca4920c4c613374"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/health-triage-sdlc-handoff/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/health-triage-sdlc-handoff/README.md",
+      "sha256": "9655dbd6d784660b4efb51a658a55009c83f513c083f587236232fcf26783cef"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/infinity-runtime-demo/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/infinity-runtime-demo/README.md",
+      "sha256": "953846767597f7ad7a75a9afa98a7f7db28ed53febea45b1defec9a4dfa33d77"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/AGENT-ISOLATION-EXPLAINER.html",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/AGENT-ISOLATION-EXPLAINER.html",
+      "sha256": "f6d9168e66debd74d2844094f44675269dfa81914b0ab2fc0c3c5175c56fc4e9"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/ARCHITECTURE.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/ARCHITECTURE.md",
+      "sha256": "d9768bcd2fe29d287e92de1e23cb7a3cc4a4976249edfd6d260ee27601a5b264"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/ENTRA-AGENT-ID-REQUEST-OWNERSHIP.html",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/ENTRA-AGENT-ID-REQUEST-OWNERSHIP.html",
+      "sha256": "3d56db5cbaa304cd7c75eed6bd9cd34a3db9e8a5ed976748b257129d852da269"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/profiles/aks-entra/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/profiles/aks-entra/README.md",
+      "sha256": "2280d369379916d4ef0c692e1756acc36eed7f097381ece4669297df389f338c"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/profiles/aks-entra/chat-a2a-policy.yaml",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/profiles/aks-entra/chat-a2a-policy.yaml",
+      "sha256": "f9ea14e903e3e2a9940747ba99ca683240bc1875805b5e1aca2c6719b5faf076"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/profiles/aks-entra/chat-mcp-policy.yaml",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/profiles/aks-entra/chat-mcp-policy.yaml",
+      "sha256": "acc587c4d219db7ffd0104ef733c2d2bd94da3a90195e30b9038d45c30043127"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/profiles/aks-entra/mcp-route-patches.yaml",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/kagent-agentgateway-tenant-isolation/profiles/aks-entra/mcp-route-patches.yaml",
+      "sha256": "1ee63ceb7e078d2edb10f00257d4f5b6e5c161efab0e53d613e5cd94a09f9e01"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/kind-kagent-sdlc-rig/BOARD-POLLING-PRESENTATION.html",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/kind-kagent-sdlc-rig/BOARD-POLLING-PRESENTATION.html",
+      "sha256": "ed831be4d81a7b7cc967dbd08633c329bad751c52bb19a6e14dfb2dae46d9056"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/kind-kagent-sdlc-rig/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/kind-kagent-sdlc-rig/README.md",
+      "sha256": "c6195f4d22fe2e7f2e02933f50142865ecfdc349406961315f8bf146bfefe679"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/kind-kagent-sdlc-rig/evidence/2026-09-27-board-polling.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/kind-kagent-sdlc-rig/evidence/2026-09-27-board-polling.md",
+      "sha256": "88d3f1c1a77205dc9015c4bd40a32880c723b3ae4aaeaa1c9ec6d08a33af8866"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/kyverno-application-specialist/live/CLASSIFIER.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/kyverno-application-specialist/live/CLASSIFIER.md",
+      "sha256": "193f6c341f5cc89033bfa25dd75f53516264857cb4a22398b6b744202d8e75a8"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/kyverno-application-specialist/live/DASHBOARD-FLOW.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/kyverno-application-specialist/live/DASHBOARD-FLOW.md",
+      "sha256": "3b545c43d5d26774d04687381ce5078c32fbf10979e2d268ef62574470e5e495"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/memory-mcp-shared-context/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/memory-mcp-shared-context/README.md",
+      "sha256": "c67c6eb53d99104e293061605722894b6e67e0a210e568148b3b9b3b5e7bf7f0"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/postgres-fastmcp-entra-uami/README.md",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/postgres-fastmcp-entra-uami/README.md",
+      "sha256": "5b40b68ac779745b50ab5b0c33a6fba5ef7525a963a5d31fe68480aeddfe6cad"
+    },
+    {
+      "path": "slides/previous/references/work-agent-bundles/postgres-fastmcp-entra-uami/adapter/server.py",
+      "sourcePath": "secure-kro-classic-kagent/references/work-agent-bundles/postgres-fastmcp-entra-uami/adapter/server.py",
+      "sha256": "7be13dab1de6f32b0ebe72ae3512cf13fa7f24feb220125ec7e776435881edeb"
+    },
+    {
+      "path": "slides/previous/resources.html",
+      "sourcePath": "secure-kro-classic-kagent/resources.html",
+      "sha256": "96c687b7515b75601397a63a14945d207ac326b2a32e005bae5dabe6e160df05"
+    },
+    {
+      "path": "slides/previous/sdlc.html",
+      "sourcePath": "secure-kro-classic-kagent/sdlc.html",
+      "sha256": "28cf505882b2efe347674035f4dccb5da775453cd4df55d2d111769d6287bc81"
+    },
+    {
+      "path": "slides/previous/showcase.html",
+      "sourcePath": "secure-kro-classic-kagent/showcase.html",
+      "sha256": "aa3af37a945fec57bf9894c7e054ecf79eabe14ad6b5d1a8ed9e3ce2dae62d64"
+    },
+    {
+      "path": "slides/previous/sre-lens.html",
+      "sourcePath": "secure-kro-classic-kagent/sre-lens.html",
+      "sha256": "1e818de8e500e570cb79584ea721e398151fdc0ffddd2b61a8ab3e7cf78e4567"
+    },
+    {
+      "path": "slides/previous/tomorrow.html",
+      "sourcePath": "secure-kro-classic-kagent/tomorrow.html",
+      "sha256": "475a13b885de703d8f853c6fbcbea5011de57e2cc4f0dedbcc1295a1f3f81ecb"
+    },
+    {
+      "path": "slides/previous/triage.html",
+      "sourcePath": "secure-kro-classic-kagent/triage.html",
+      "sha256": "06065dd2acdd182e47f079764444161605a5220de392103c30af9f666a0b0fc7"
+    }
+  ]
+}

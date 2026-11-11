@@ -1,0 +1,181 @@
+<!doctype html><html lang="en-GB"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DICE recording script</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#F4F3EE;color:#1C1C1C;font:18px/1.65 Arial,Helvetica,sans-serif}main{max-width:1040px;margin:auto;padding:36px 32px 100px}nav{display:flex;gap:24px;flex-wrap:wrap}a{color:#A90000;text-underline-offset:4px}h1{font-size:48px;line-height:1.12;font-weight:400;margin:50px 0 30px}h2{font-size:30px;font-weight:400;line-height:1.3;border-top:2px solid #E60000;padding-top:24px;margin:72px 0 24px;scroll-margin-top:24px}blockquote{margin:24px 0;padding:24px 28px;background:white;border-left:4px solid #E60000;font-size:21px}.command{position:relative;background:#fff;border:1px solid #CCCABC;margin:24px 0;padding-top:48px}pre{margin:0;padding:20px;overflow:auto;font:15px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}p code{font-size:.9em;background:#eae8e1;padding:2px 4px;overflow-wrap:anywhere}button{position:absolute;right:12px;top:12px;background:#1C1C1C;color:white;border:0;border-radius:3px;padding:8px 14px;font:14px Arial;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #E60000;outline-offset:4px}.intro{padding:20px 24px;background:#fff;border-top:3px solid #E60000}.click{padding-left:18px;border-left:2px solid #CCCABC}@media print{body{font-size:11pt}main{padding:0}button,nav{display:none}pre{white-space:pre-wrap;font-size:9pt}blockquote{break-inside:avoid}h2{break-after:avoid}}
+</style><main><nav><a href="START-HERE.html">Start here</a><a href="RECORDING-WALKTHROUGH.md">Markdown source</a><a href="WORK-AGENT-PROMPT.md">Work-agent handoff</a></nav><p class="intro">Read the quoted text aloud. Paste each command block at its numbered step. The workplace agent first resolves and rehearses your private copy; this public template contains environment placeholders.</p><h1>Record the complete DICE demonstration</h1>
+<p>This is the primary recording script. Use one terminal and the browser. Every numbered section gives the screen, words to read, commands to paste and an observation to check. Allow 20 to 25 minutes. The optional scenes add time.</p>
+<p>The workplace agent first produces your private, fully resolved <code>RECORD-ME.md</code> and <code>recording.env</code> from this guide. It supplies the actual approved deployment/policy actions and safe probes. No placeholder, TODO or untested dashboard path remains in your private recording copy. The public guide cannot contain your workplace endpoints, identities or delivery credentials.</p>
+<h2 id="step-1">0. Prepare before recording</h2>
+<p>Have the original video, slide library and architecture views available from <code>START-HERE.html</code>. Open a terminal at a readable font size. Open browser tabs for the actual gateway UI, Grafana and OTel observer. Put this guide on a second screen. Close unrelated tabs and notifications.</p>
+<p>The private recording environment contains the base demo variables and the values from <code>config/recording-actions.env.example</code>. The action files use the workplace&#x27;s existing delivery and identity processes. The preferred policy case tightens one dedicated demo route by excluding an existing approved test caller while preserving the main caller. The work agent can substitute another scoped, rehearsed policy case and update the narration and expected decisions accordingly.</p>
+<p>Run this setup before sharing the screen:</p>
+<div class="command"><button type="button">Copy commands</button><pre><code>set -o pipefail
+source &#x27;{{PRIVATE_RESOLVED_RECORDING_ENV_FILE}}&#x27;
+source &quot;$DICE_DEMO_BUNDLE/scripts/ask-agent.sh&quot;
+python3 - &lt;&lt;&#x27;PY&#x27;
+import os
+from pathlib import Path
+keys = [&#x27;DICE_DEMO_BUNDLE&#x27;,&#x27;DEMO_CONTEXT&#x27;,&#x27;DEMO_NAMESPACE&#x27;,&#x27;DEMO_OWNER_RESOURCE&#x27;,
+        &#x27;DEMO_OWNER_NAME&#x27;,&#x27;DEMO_AGENT_NAME&#x27;,&#x27;DEMO_DEPLOYMENT&#x27;,&#x27;DEMO_AGENT_URL&#x27;,
+        &#x27;DEMO_CALLER_TOKEN_FILE&#x27;,&#x27;DEMO_EVIDENCE_DIR&#x27;,&#x27;DEMO_EXPECTED_CALLS&#x27;,&#x27;DEMO_PROMPT_FILE&#x27;,
+        &#x27;DEMO_GIT_REPO&#x27;,&#x27;DEMO_GITOPS_PATH&#x27;,&#x27;DEMO_OWNER_FILE&#x27;,&#x27;DEMO_COMMIT&#x27;,
+        &#x27;DEMO_FLUX_NAMESPACE&#x27;,&#x27;DEMO_FLUX_SOURCE&#x27;,&#x27;DEMO_FLUX_KUSTOMIZATION&#x27;,
+        &#x27;DEMO_POLICY_COMMIT&#x27;,&#x27;DEMO_POLICY_NAMESPACE&#x27;,&#x27;DEMO_POLICY_RESOURCE&#x27;,&#x27;DEMO_POLICY_NAME&#x27;,
+        &#x27;DEMO_DEPLOY_ACTION&#x27;,&#x27;DEMO_POLICY_ACTION&#x27;,&#x27;DEMO_GATEWAY_EFFECTIVE_CHECK&#x27;,
+        &#x27;DEMO_POLICY_PROBE_BEFORE&#x27;,&#x27;DEMO_POLICY_PROBE_AFTER&#x27;,&#x27;DEMO_MCP_READBACK_ACTION&#x27;,
+        &#x27;DEMO_GATEWAY_UI_URL&#x27;,&#x27;DEMO_GRAFANA_URL&#x27;,&#x27;DEMO_OTEL_VIEWER_URL&#x27;,&#x27;DEMO_OTEL_CURL_CONFIG&#x27;]
+bad = [k for k in keys if not os.environ.get(k) or &#x27;{{&#x27; in os.environ[k]]
+hooks = [&#x27;DEMO_DEPLOY_ACTION&#x27;,&#x27;DEMO_POLICY_ACTION&#x27;,&#x27;DEMO_GATEWAY_EFFECTIVE_CHECK&#x27;,
+         &#x27;DEMO_POLICY_PROBE_BEFORE&#x27;,&#x27;DEMO_POLICY_PROBE_AFTER&#x27;,&#x27;DEMO_MCP_READBACK_ACTION&#x27;]
+bad += [k for k in hooks if os.environ.get(k) and not Path(os.environ[k]).is_file()]
+if bad:
+    raise SystemExit(&#x27;Recording is not prepared. Resolve: &#x27; + &#x27;, &#x27;.join(sorted(set(bad))))
+print(&#x27;Recording configuration and action files are resolved. Use the completed private rehearsal record.&#x27;)
+PY</code></pre></div>
+<p>Acquire/refresh the approved short-lived caller credential off screen. Keep it in its private token file with mode 0600. Do not enable shell tracing or display tokens, a full environment, Secret data or raw kubeconfig.</p>
+<p>The main script plans three caller agent invocations: one semantic PONG, one skill/MCP request before the policy change, and one after. Provider model-call count can be higher, and platform Golden/evaluation jobs can add requests. The workplace agent records that budget during rehearsal. Probe actions use the rehearsed non-inference endpoint. They do not create extra model/tool invocations.</p>
+<p>Start Teams recording through the meeting&#x27;s recording controls and share the chosen presentation screen. Confirm screen and microphone capture using your normal workplace process.</p>
+<h2 id="step-2">1. Introduce the journey</h2>
+<p><strong>Screen:</strong> lifecycle slide 1 or the architecture overview.</p>
+<blockquote>DICE gives a team a repeatable way to declare an agent and consume its API. I will deploy one reviewed request, watch the agent come online, and call it from the terminal. Then I will change a scoped gateway policy and inspect the agent&#x27;s skill, tool and telemetry evidence.</blockquote>
+<p>Use the architecture&#x27;s authentication sheet if needed. Keep it brief. Entra supplies destination tokens; the receiving API and Gateway enforce their configured contracts. The application/UAMI path and agent-to-MCP identity path are separate.</p>
+<h2 id="step-3">2. Show and deploy the reviewed request</h2>
+<p><strong>Screen:</strong> terminal and the approved GitOps diff.</p>
+<blockquote>This is the agent request in Git. It selects approved instructions and capabilities. The platform policies are versioned too. I am using the existing delivery process to release this scoped change, and Flux will reconcile it onto the cluster.</blockquote>
+<div class="command"><button type="button">Copy commands</button><pre><code>git -C &quot;$DEMO_GIT_REPO&quot; show &quot;$DEMO_COMMIT:$DEMO_GITOPS_PATH/$DEMO_OWNER_FILE&quot;
+bash &quot;$DEMO_DEPLOY_ACTION&quot;
+flux --context &quot;$DEMO_CONTEXT&quot; reconcile kustomization &quot;$DEMO_FLUX_KUSTOMIZATION&quot; \
+  -n &quot;$DEMO_FLUX_NAMESPACE&quot; --with-source
+flux --context &quot;$DEMO_CONTEXT&quot; get source git &quot;$DEMO_FLUX_SOURCE&quot; -n &quot;$DEMO_FLUX_NAMESPACE&quot;
+flux --context &quot;$DEMO_CONTEXT&quot; get kustomization &quot;$DEMO_FLUX_KUSTOMIZATION&quot; -n &quot;$DEMO_FLUX_NAMESPACE&quot;</code></pre></div>
+<p>The deployment action performs the actual approved promotion/merge/release for this demo. It is not a fake success script or a direct-apply substitute. If the receiving workflow does not permit a manual reconcile, the private guide replaces that line with the normal wait/readback. The deployment revision must be available before this step; the policy-change revision is promoted later, not already active at the start.</p>
+<p>Check the applied revision and current conditions:</p>
+<div class="command"><button type="button">Copy commands</button><pre><code>kubectl --context &quot;$DEMO_CONTEXT&quot; -n &quot;$DEMO_FLUX_NAMESPACE&quot; \
+  get kustomization.kustomize.toolkit.fluxcd.io &quot;$DEMO_FLUX_KUSTOMIZATION&quot; -o json \
+  | jq -e --arg revision &quot;$DEMO_COMMIT&quot; &#x27;. as $k | {
+      applied:.status.lastAppliedRevision, expected:$revision,
+      revisionMatches:((.status.lastAppliedRevision // &quot;&quot;) | endswith($revision)),
+      currentReady:any(.status.conditions[]?; .type==&quot;Ready&quot; and .status==&quot;True&quot; and
+        (.observedGeneration // $k.status.observedGeneration)==$k.metadata.generation)
+    } | if .revisionMatches and .currentReady then . else ., error(&quot;Intended revision is not currently applied&quot;) end&#x27;</code></pre></div>
+<p><strong>Check:</strong> the intended revision is applied successfully. If the agent already existed, describe it as an existing deployment instead of claiming a new rollout. If a block fails, stop the sequence and inspect the cause.</p>
+<h2 id="step-4">3. Watch the agent come online</h2>
+<p><strong>Screen:</strong> terminal.</p>
+<blockquote>KRO composes the resources from the installed graph. Here is the owner, then the generated Agent and workload. I check the current generation, rather than relying on an old Ready status.</blockquote>
+<div class="command"><button type="button">Copy commands</button><pre><code>kubectl --context &quot;$DEMO_CONTEXT&quot; -n &quot;$DEMO_NAMESPACE&quot; \
+  get &quot;$DEMO_OWNER_RESOURCE&quot; &quot;$DEMO_OWNER_NAME&quot; -o json \
+  | jq &#x27;{kind,name:.metadata.name,uid:.metadata.uid,generation:.metadata.generation,status}&#x27;
+kubectl --context &quot;$DEMO_CONTEXT&quot; -n &quot;$DEMO_NAMESPACE&quot; get agent &quot;$DEMO_AGENT_NAME&quot; -w</code></pre></div>
+<p>Stop the watcher with Ctrl-C once the expected conditions appear. Then paste:</p>
+<div class="command"><button type="button">Copy commands</button><pre><code>kubectl --context &quot;$DEMO_CONTEXT&quot; -n &quot;$DEMO_NAMESPACE&quot; \
+  get agent &quot;$DEMO_AGENT_NAME&quot; -o json \
+  | jq -e &#x27;. as $a | {name:.metadata.name,generation:.metadata.generation,
+      conditions:.status.conditions,
+      accepted:any(.status.conditions[]?; .type==&quot;Accepted&quot; and .status==&quot;True&quot; and
+        (.observedGeneration // $a.status.observedGeneration)==$a.metadata.generation),
+      ready:any(.status.conditions[]?; .type==&quot;Ready&quot; and .status==&quot;True&quot; and
+        (.observedGeneration // $a.status.observedGeneration)==$a.metadata.generation)
+    } | if .accepted and .ready then . else ., error(&quot;Current Agent generation is not ready&quot;) end&#x27;
+kubectl --context &quot;$DEMO_CONTEXT&quot; -n &quot;$DEMO_NAMESPACE&quot; \
+  rollout status deployment/&quot;$DEMO_DEPLOYMENT&quot; --timeout=120s</code></pre></div>
+<p><strong>Check:</strong> current-generation Accepted/Ready and a completed rollout. The private guide also includes the exact ownership and route/policy attachment readback for the installed graph.</p>
+<h2 id="step-5">4. Make one semantic API check</h2>
+<p><strong>Screen:</strong> terminal.</p>
+<blockquote>This is the API an application can consume. The function calls the protected HTTPS endpoint using our approved caller credential. It makes one request and checks the native task and the exact answer.</blockquote>
+<div class="command"><button type="button">Copy commands</button><pre><code>ask_agent &#x27;Reply with exactly PONG. Do not call tools.&#x27; PONG</code></pre></div>
+<p><strong>Check:</strong> exact PONG, completed native task ID, context ID and response digest. This checks the selected caller/model path. It does not establish skill use or MCP execution.</p>
+<h2 id="step-6">5. Show the skill and use the MCP tool</h2>
+<p><strong>Screen:</strong> the reviewed GitLab skill revision, then terminal.</p>
+<blockquote>Skills are versioned guidance. This is the reviewed skill and reference content consumed by the runtime. The MCP binding is a separate permission boundary. I will ask the agent to use that guidance and run one approved read-only operation.</blockquote>
+<div class="command"><button type="button">Copy commands</button><pre><code>ask_agent &quot;$(cat &quot;$DEMO_PROMPT_FILE&quot;)&quot;
+export DICE_BASELINE_RECEIPT=&quot;$DICE_LAST_RECEIPT&quot;
+export DICE_BASELINE_ANSWER=&quot;$DICE_LAST_ANSWER&quot;
+jq --slurpfile expected &quot;$DEMO_EXPECTED_CALLS&quot; \
+  -f &quot;$DICE_DEMO_BUNDLE/evidence/tool-calls.jq&quot; &quot;$DICE_BASELINE_RECEIPT&quot;
+bash &quot;$DEMO_MCP_READBACK_ACTION&quot; &quot;$DICE_BASELINE_RECEIPT&quot;</code></pre></div>
+<p><strong>Check:</strong> exact skill/reference/MCP call arguments, matching call/result IDs, bounded returned result and separate server completion/read-back evidence. The readback action is display-safe and uses the recorded execution/request identity. It does not print a whole log stream or infer execution from answer text. If native history or backend completion is unavailable, show the available evidence and retain the gap.</p>
+<h2 id="step-7">6. Show the baseline gateway policy</h2>
+<p><strong>Screen:</strong> gateway UI, then terminal.</p>
+<blockquote>This route connects our approved caller to the agent. These are the policies attached to it. I will now tighten one dedicated demo policy while preserving the main caller&#x27;s access.</blockquote>
+<div class="command"><button type="button">Copy commands</button><pre><code>kubectl --context &quot;$DEMO_CONTEXT&quot; -n &quot;$DEMO_POLICY_NAMESPACE&quot; \
+  get &quot;$DEMO_POLICY_RESOURCE&quot; &quot;$DEMO_POLICY_NAME&quot; -o json \
+  | jq &#x27;{kind,name:.metadata.name,uid:.metadata.uid,generation:.metadata.generation,
+      targets:.spec.targetRefs,status}&#x27;
+bash &quot;$DEMO_GATEWAY_EFFECTIVE_CHECK&quot;
+bash &quot;$DEMO_POLICY_PROBE_BEFORE&quot;</code></pre></div>
+<p><strong>Check:</strong> the baseline attachment and effective runtime policy match the reviewed baseline. The approved test caller has the rehearsed baseline decision on a safe non-inference endpoint. The work agent supplies the exact UI tab/route and tested policy projection. Do not show credentials from a full configuration dump.</p>
+<h2 id="step-8">7. Apply the scoped policy change through GitOps</h2>
+<p><strong>Screen:</strong> approved policy diff, terminal, then the gateway UI.</p>
+<blockquote>Here is the policy change in Git. It affects only the named demo route and test case. The existing delivery process applies it, and I will check both the Kubernetes object and the gateway&#x27;s effective configuration before testing the decision.</blockquote>
+<div class="command"><button type="button">Copy commands</button><pre><code>git -C &quot;$DEMO_GIT_REPO&quot; show --stat &quot;$DEMO_POLICY_COMMIT&quot;
+bash &quot;$DEMO_POLICY_ACTION&quot;
+flux --context &quot;$DEMO_CONTEXT&quot; reconcile kustomization &quot;$DEMO_FLUX_KUSTOMIZATION&quot; \
+  -n &quot;$DEMO_FLUX_NAMESPACE&quot; --with-source
+kubectl --context &quot;$DEMO_CONTEXT&quot; -n &quot;$DEMO_FLUX_NAMESPACE&quot; \
+  get kustomization.kustomize.toolkit.fluxcd.io &quot;$DEMO_FLUX_KUSTOMIZATION&quot; -o json \
+  | jq -e --arg revision &quot;$DEMO_POLICY_COMMIT&quot; &#x27;. as $k | {
+      applied:.status.lastAppliedRevision,expected:$revision,
+      revisionMatches:((.status.lastAppliedRevision // &quot;&quot;) | endswith($revision)),
+      currentReady:any(.status.conditions[]?; .type==&quot;Ready&quot; and .status==&quot;True&quot; and
+        (.observedGeneration // $k.status.observedGeneration)==$k.metadata.generation)
+    } | if .revisionMatches and .currentReady then . else ., error(&quot;Policy revision is not currently applied&quot;) end&#x27;
+kubectl --context &quot;$DEMO_CONTEXT&quot; -n &quot;$DEMO_POLICY_NAMESPACE&quot; \
+  get &quot;$DEMO_POLICY_RESOURCE&quot; &quot;$DEMO_POLICY_NAME&quot; -o json \
+  | jq &#x27;{kind,name:.metadata.name,generation:.metadata.generation,targets:.spec.targetRefs,status}&#x27;
+bash &quot;$DEMO_GATEWAY_EFFECTIVE_CHECK&quot;</code></pre></div>
+<p>Refresh the gateway&#x27;s rehearsed route/configuration view. Some externally managed gateway UIs show compiled route/filter configuration rather than a list of Kubernetes policy objects. Use the actual effective view and decision evidence for that version. A zero policy-object counter is not evidence that an attached compiled rule is absent, and it is not a reason to claim a policy is visible when it is not.</p>
+<p><strong>Check:</strong> the intended policy revision was applied, the policy&#x27;s current attachment/status is accepted where reported, and its effective runtime rule changed. If the UI cannot expose that policy family, the private script names the supported safe runtime readback and the narration says exactly what is visible.</p>
+<h2 id="step-9">8. Test the policy decision and keep the approved agent working</h2>
+<p><strong>Screen:</strong> terminal beside the gateway decision view.</p>
+<blockquote>The test request now receives the expected denial. This is an actual receiving-endpoint decision. We retain the gateway&#x27;s reason and correlation, and check for backend execution before claiming the request was stopped before execution. The main approved caller can still use the agent.</blockquote>
+<div class="command"><button type="button">Copy commands</button><pre><code>bash &quot;$DEMO_POLICY_PROBE_AFTER&quot;
+ask_agent &quot;$(cat &quot;$DEMO_PROMPT_FILE&quot;)&quot;
+export DICE_POST_POLICY_RECEIPT=&quot;$DICE_LAST_RECEIPT&quot;
+export DICE_POST_POLICY_ANSWER=&quot;$DICE_LAST_ANSWER&quot;
+jq --slurpfile expected &quot;$DEMO_EXPECTED_CALLS&quot; \
+  -f &quot;$DICE_DEMO_BUNDLE/evidence/tool-calls.jq&quot; &quot;$DICE_POST_POLICY_RECEIPT&quot;
+bash &quot;$DEMO_MCP_READBACK_ACTION&quot; &quot;$DICE_POST_POLICY_RECEIPT&quot;</code></pre></div>
+<p><strong>Check:</strong> the private probe asserts the rehearsed allowed/denied semantics, rather than merely printing an HTTP status. HTTP 200 can still contain an MCP/JSON-RPC error. A denial identifies its mechanism and resource; do not call an API-key denial an Entra test. The post-policy agent task completes with the expected skill and MCP results.</p>
+<h2 id="step-10">9. Correlate the post-policy request in OTel</h2>
+<p><strong>Screen:</strong> terminal, then OTel dashboard.</p>
+<blockquote>This is the request we just made. I use its native task and context identifiers to select the observed trace. The diagram and timeline show the operations that the collector actually received.</blockquote>
+<div class="command"><button type="button">Copy commands</button><pre><code>export TASK_ID=&quot;$(jq -r &#x27;.result.id&#x27; &quot;$DICE_POST_POLICY_RECEIPT&quot;)&quot;
+export CONTEXT_ID=&quot;$(jq -r &#x27;.result.contextId&#x27; &quot;$DICE_POST_POLICY_RECEIPT&quot;)&quot;
+curl --config &quot;$DEMO_OTEL_CURL_CONFIG&quot; --fail --silent --show-error --max-time 20 \
+  &quot;$DEMO_OTEL_VIEWER_URL/api/state&quot; &gt; &quot;$DEMO_EVIDENCE_DIR/post-policy-otel.json&quot;
+jq --arg task &quot;$TASK_ID&quot; --arg context &quot;$CONTEXT_ID&quot; \
+  -f &quot;$DICE_DEMO_BUNDLE/evidence/request-trace.jq&quot; &quot;$DEMO_EVIDENCE_DIR/post-policy-otel.json&quot; \
+  &gt; &quot;$DEMO_EVIDENCE_DIR/post-policy-trace.json&quot;
+export TRACE_ID=&quot;$(jq -r &#x27;.traceId&#x27; &quot;$DEMO_EVIDENCE_DIR/post-policy-trace.json&quot;)&quot;
+jq &#x27;{traceId,status,errorSpanCount,spanCount,modelCalls,inputTokens,outputTokens,costUsd,costSource,components}&#x27; \
+  &quot;$DEMO_EVIDENCE_DIR/post-policy-trace.json&quot;
+printf &#x27;Open observed trace %s in the OTel viewer and Grafana.\n&#x27; &quot;$TRACE_ID&quot;</code></pre></div>
+<p>Select that trace in the OTel view. Expand skill/reference and MCP entries, then the model timeline and usage. Separate client attempts from backend completion. Missing or multiple matches stop this selection; do not choose the latest unrelated trace.</p>
+<h2 id="step-11">10. Show the same request in LGTM/Grafana</h2>
+<p><strong>Screen:</strong> Grafana Explore.</p>
+<blockquote>Grafana gives us the trace, available correlated logs and the relevant metrics. These are the same request identifiers. I keep individual-request usage separate from aggregate metric windows, and show cost only where it is reported.</blockquote>
+<p class="click">1. Open the resolved Grafana URL and the actual Tempo data source.</p>
+<p class="click">2. Use <strong>Trace ID</strong>, paste <code>TRACE_ID</code>, and expand the runtime/model/tool spans.</p>
+<p class="click">3. Follow the configured trace-to-logs link, or run the private rehearsed Loki selector with that identifier.</p>
+<p class="click">4. Open the prepared model/gateway usage panel. State its time window and actual labels.</p>
+<p class="click">5. Show any error spans alongside the native task outcome. Keep missing spans and <strong>Not reported</strong> cost visible.</p>
+<p>The private <code>RECORD-ME.md</code> contains the actual data-source names, saved query text, time range and click path. Use the existing approved dashboards. The observer is not a second agent invocation endpoint.</p>
+<h2 id="step-12">11. Close on the API result</h2>
+<p><strong>Screen:</strong> terminal and lifecycle closing slide.</p>
+<div class="command"><button type="button">Copy commands</button><pre><code>cat &quot;$DICE_POST_POLICY_ANSWER&quot;</code></pre></div>
+<blockquote>We deployed an approved agent request, observed it online, consumed its protected API, inspected native skill and MCP records, changed a scoped policy, and followed the resulting activity through our observability systems. These are the receipts the team can inspect and repeat.</blockquote>
+<p>Read that closing only for the observations that passed. The final command re-displays the already captured answer; it does not make a fourth agent request. Stop Teams recording through the meeting&#x27;s recording controls. Keep or retire the scoped resources according to the agreed GitOps runbook.</p>
+<h2 id="step-13">Optional scene A. Show evaluation beside observability</h2>
+<p><strong>Screen:</strong> architecture evaluation view and the actual evaluation result.</p>
+<div class="command"><button type="button">Copy commands</button><pre><code>bash &quot;$DEMO_EVALUATION_READBACK_ACTION&quot;</code></pre></div>
+<blockquote>Observability shows the operations we received. Evaluation checks the required behavior and policies against the exact agent, skill, tool, model and policy versions. Here is the native evaluation verdict and its evidence. The existing release process uses that result before promotion.</blockquote>
+<p>Use an actual version-bound agent evaluation receipt. The bundle&#x27;s helper unit tests are not an agent-quality evaluation. If the evaluation integration is not yet deployed, show the proposed design and retain the implementation gap. Do not run a new paid evaluation implicitly.</p>
+<h2 id="step-14">Optional scene B. Show registry and model garden</h2>
+<p><strong>Screen:</strong> registry record, reviewed GitLab release and model garden/Gateway binding.</p>
+<blockquote>The registry records owners, versions and approved connections. This agent references this skill release, MCP contract and model binding. Model requests pass through the approved gateway route to the model garden&#x27;s selected LLM endpoint.</blockquote>
+<p>Show actual records and immutable versions. Do not switch providers, grant permissions or expose keys while presenting.</p>
+<h2 id="step-15">Optional scene C. Roll back the scoped policy</h2>
+<p><strong>Screen:</strong> approved rollback diff, terminal, gateway view.</p>
+<div class="command"><button type="button">Copy commands</button><pre><code>bash &quot;$DEMO_POLICY_ROLLBACK_ACTION&quot;
+flux --context &quot;$DEMO_CONTEXT&quot; reconcile kustomization &quot;$DEMO_FLUX_KUSTOMIZATION&quot; \
+  -n &quot;$DEMO_FLUX_NAMESPACE&quot; --with-source
+bash &quot;$DEMO_GATEWAY_EFFECTIVE_CHECK&quot;</code></pre></div>
+<p>The private guide includes the exact approved rollback revision check and expected decision. Do not use a namespace delete or shared policy reset. Re-enable a caller only through the reviewed baseline restoration. This optional action is not a cleanup command for shared platform services.</p></main><script>document.querySelectorAll('.command button').forEach(button=>button.addEventListener('click',async()=>{const code=button.parentElement.querySelector('code');try{await navigator.clipboard.writeText(code.textContent);button.textContent='Copied';setTimeout(()=>button.textContent='Copy commands',1800)}catch(error){const selection=window.getSelection();const range=document.createRange();range.selectNodeContents(code);selection.removeAllRanges();selection.addRange(range);button.textContent='Selected — copy with keyboard'}}));</script></html>

@@ -1,0 +1,42 @@
+# ReferenceGrant — let agentgateway-system HTTPRoutes reach the kagent
+# controller Service in the `kagent` namespace.
+#
+# DEPLOY ON: management cluster
+#
+# Plan-B variant. PR 0 against `proxmox-k8s` (2026-05-14) confirmed that
+# the installed agentgateway CRD does **not** support
+# `AgentgatewayBackend.spec.a2a` or `Service.spec.ports[].appProtocol:
+# agentgateway.dev/a2a` as a routing primitive. Per the PR 4 fallback
+# in A2A-FLEET-DEMO.md §"Plan B — plain HTTP through the gateway":
+#
+#   - No facade Service. The HTTPRoute backendRef points directly at
+#     `kagent-controller.kagent.svc:8083` via this ReferenceGrant.
+#   - No `appProtocol: agentgateway.dev/a2a` — JSON-RPC over HTTP.
+#   - Gateway-side identity check (`AgentgatewayPolicy.spec.backend.a2a`)
+#     is unavailable. Worker-cluster identity is enforced upstream at
+#     the Istio AuthorizationPolicy layer (source IP / mTLS / future JWT
+#     — see `istio-authorization-policy.yaml`).
+#
+# If a future agentgateway CRD release ships either A2A shape, replace
+# this ReferenceGrant with the facade Service + appProtocol manifest and
+# add `backend.a2a.authorization` to `policy-a2a-fleet-agent.yaml`.
+#
+# Apply:
+#   kubectl apply --dry-run=server -f service-a2a-fleet-agent.yaml
+#   kubectl apply -f service-a2a-fleet-agent.yaml
+# ---
+
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-agentgateway-to-kagent-controller
+  namespace: kagent
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: agentgateway-system
+  to:
+    - group: ""
+      kind: Service
+      name: kagent-controller

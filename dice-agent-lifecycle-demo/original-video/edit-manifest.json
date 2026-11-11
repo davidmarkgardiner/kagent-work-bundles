@@ -1,0 +1,76 @@
+{
+  "duration": 302.05,
+  "fps": 24,
+  "scenes": [
+    {
+      "id": "01",
+      "title": "The running agent",
+      "start": 0,
+      "end": 14.954,
+      "kind": "intro"
+    },
+    {
+      "id": "02",
+      "title": "The delivery contract",
+      "start": 14.954,
+      "end": 48.39,
+      "kind": "delivery"
+    },
+    {
+      "id": "03",
+      "title": "Open the live gateway",
+      "start": 48.39,
+      "end": 77.206,
+      "kind": "gateway"
+    },
+    {
+      "id": "04",
+      "title": "Open the agent interface",
+      "start": 77.206,
+      "end": 105.036,
+      "kind": "runtime"
+    },
+    {
+      "id": "05",
+      "title": "Watch the skill and tool calls",
+      "start": 105.036,
+      "end": 141.305,
+      "kind": "tools"
+    },
+    {
+      "id": "06",
+      "title": "Versioned guidance. Explicit tools.",
+      "start": 141.305,
+      "end": 170.888,
+      "kind": "skills"
+    },
+    {
+      "id": "07",
+      "title": "Inspect the observed runtime",
+      "start": 170.888,
+      "end": 212.498,
+      "kind": "otel"
+    },
+    {
+      "id": "08",
+      "title": "Test the protected route",
+      "start": 212.498,
+      "end": 232.444,
+      "kind": "security"
+    },
+    {
+      "id": "09",
+      "title": "Inspect Entra Agent ID",
+      "start": 232.444,
+      "end": 275.808,
+      "kind": "identity"
+    },
+    {
+      "id": "10",
+      "title": "An API teams can consume",
+      "start": 275.808,
+      "end": 302.05,
+      "kind": "close"
+    }
+  ]
+}

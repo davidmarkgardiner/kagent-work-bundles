@@ -1,0 +1,6 @@
+original-video/**/*.mp4 -filter -diff -merge -text
+original-video/**/*.m4a -filter -diff -merge -text
+original-video/**/*.mp3 -filter -diff -merge -text
+original-video/**/*.png -filter -diff -merge -text
+# Preserve the original third-party source bytes, including its license comment.
+original-video/assets/gsap.min.js -whitespace

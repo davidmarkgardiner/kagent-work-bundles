@@ -1,0 +1,59 @@
+# HTTPRoute — `/a2a/fleet/` on the agentgateway → kagent controller A2A
+# endpoint for the chosen fleet/incident agent.
+#
+# DEPLOY ON: management cluster
+#
+# Plan-B variant (see service-a2a-fleet-agent.yaml header for why). The
+# route is a plain HTTP route with a URL rewrite; agentgateway provides
+# rate limiting and observability, and the kagent controller handles
+# JSON-RPC A2A as usual.
+#
+# Worker-cluster agents call:
+#   https://agentgateway.<wildcard-domain>/a2a/fleet/
+# This route rewrites the path to:
+#   /api/a2a/kagent/<fleet-agent-name>/
+# preserving the trailing slash (kagent A2A URLs require it).
+#
+# Pre-reqs:
+#   - service-a2a-fleet-agent.yaml (ReferenceGrant) applied.
+#   - The chosen fleet/incident agent exists in `kagent` namespace.
+#     On proxmox-k8s (2026-05-14), real candidates are
+#     `sre-triage-agent` and `sre-remediation-agent`.
+#   - parentRefs.name matches the actual Gateway in
+#     `agentgateway-system`. On proxmox-k8s this is `agent-gw`, not
+#     `ai-gateway` — see DEMO-SCHEMA-GATE.md Inventory caveat 1.
+#
+# Apply:
+#   kubectl apply --dry-run=server -f route-a2a-fleet-agent.yaml
+#   kubectl apply -f route-a2a-fleet-agent.yaml
+# ---
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: a2a-fleet-route
+  namespace: agentgateway-system
+  labels:
+    app.kubernetes.io/part-of: agentgateway
+    demo: a2a-fleet
+spec:
+  parentRefs:
+    - name: ai-gateway          # OVERRIDE to `agent-gw` on proxmox-k8s
+      namespace: agentgateway-system
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /a2a/fleet/
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              # Incoming /a2a/fleet/ → /api/a2a/kagent/<fleet-agent-name>/
+              # Incoming /a2a/fleet/foo → /api/a2a/kagent/<fleet-agent-name>/foo
+              replacePrefixMatch: /api/a2a/kagent/REPLACE_WITH_FLEET_AGENT_NAME/
+      backendRefs:
+        - name: kagent-controller
+          namespace: kagent
+          port: 8083

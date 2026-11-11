@@ -197,3 +197,9 @@ Use [secure-kro-standalone-agentgateway](secure-kro-standalone-agentgateway/READ
 Start at its [work-agent prompt](secure-kro-standalone-agentgateway/WORK-AGENT-PROMPT.md), [human prerequisites](secure-kro-standalone-agentgateway/HUMAN-PREREQUISITES.md), [runbook](secure-kro-standalone-agentgateway/RUNBOOK.md) and [lab results](secure-kro-standalone-agentgateway/LAB-RESULTS.md). The [HostedAgent/KRO comparison](secure-kro-standalone-agentgateway/docs/COMPARISON.md) explains the tradeoffs. Existing native/four-CRD and office integrations keep their recorded proof boundaries.
 
 The current standalone lab model gate is blocked by provider HTTP 429. Composition/security checks are recorded; a complete successful Golden demonstration is not yet verified.
+
+## DICE agent lifecycle recording and design
+
+Use [dice-agent-lifecycle-demo](dice-agent-lifecycle-demo/README.md) for a terminal-first workplace demonstration. It includes a protected `ask_agent` helper, a read-aloud script, deployment and native tool-verification commands, Grafana/OTel guidance, copied DICE slide decks, a Solution Concept Design, an ADR and printable authentication/evaluation diagrams.
+
+Start the workplace agent with [WORK-AGENT-PROMPT.md](dice-agent-lifecycle-demo/WORK-AGENT-PROMPT.md). The bundle keeps proposed architecture and receiving-system acceptance separate.

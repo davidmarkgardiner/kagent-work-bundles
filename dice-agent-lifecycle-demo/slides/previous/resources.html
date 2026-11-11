@@ -1,0 +1,1272 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'"><link rel="icon" href="data:,"><title>DICE | What we deploy and how we harden it</title><style>
+:root{--ink:#191919;--paper:#f4f3ee;--red:#e60000;--line:#d7d5ce;--blue:#245a8b;--muted:#575752}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}a{color:var(--blue);text-underline-offset:4px}header{padding:17px 4vw;border-bottom:1px solid var(--line);display:flex;gap:24px;align-items:center}header strong{color:var(--red);font-size:24px;letter-spacing:-1px}header nav{display:flex;gap:20px;font-size:13px;flex-wrap:wrap}main{max-width:1500px;margin:auto;padding:22px 32px 35px}.eyebrow{font-weight:750;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}.eyebrow:before{content:"";display:inline-block;width:32px;height:4px;background:var(--red);margin-right:12px}h1{font-size:40px;line-height:1.1;letter-spacing:-.04em;margin:0 0 16px}h2{font-size:29px;line-height:1.15;letter-spacing:-.03em;margin:0 0 13px}h3{font-size:21px;line-height:1.2;margin:0 0 10px}p{margin:0 0 14px}.lead{font-size:20px;color:#3e3e39;max-width:1100px}.modes{border:0;padding:0;margin:20px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:0;min-width:0}.sr,.choice{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.mode-label{padding:17px 24px;background:#e5e4df;border:1px solid var(--line);font-size:19px;font-weight:700;cursor:pointer}.mode-panel{display:none;grid-column:1/-1;background:white;border:1px solid var(--line);border-top:0;padding:24px;min-width:0}#initial:checked~label[for=initial],#secure:checked~label[for=secure]{background:var(--ink);border-color:var(--ink);color:white;box-shadow:inset 0 -4px var(--red)}#initial:checked~#initial-panel,#secure:checked~#secure-panel{display:block}.choice:focus-visible~label.mode-label{outline-offset:-5px}#initial:focus-visible~label[for=initial],#secure:focus-visible~label[for=secure]{outline:3px solid var(--blue)}.flow{display:flex;align-items:stretch;margin:17px 0}.step{flex:1;min-width:0;border:1px solid var(--line);background:var(--paper);padding:15px;font-size:14px}.step b{display:block;font-size:17px;margin-bottom:5px}.arrow{align-self:center;padding:0 9px;color:var(--red);font-weight:800}.boundary{border-left:4px solid var(--red);padding:12px 17px;background:var(--paper);font-size:15px;margin:20px 0}.counts{display:flex;gap:8px;flex-wrap:wrap;margin:17px 0}.counts span{font-size:12px;border:1px solid var(--line);padding:5px 9px;background:#fafaf7}.resources{position:relative;display:grid;grid-template-columns:285px minmax(0,1fr);gap:24px;margin-top:23px;align-items:start;min-width:0}.resource-nav{max-height:690px;overflow-y:auto;border:1px solid var(--line);background:#fafaf7}.group{padding:15px 14px 6px;color:var(--muted);font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:750;margin:0}.resource-label{display:block;cursor:pointer;margin:4px 7px;padding:10px 12px;border:1px solid transparent;border-radius:4px;font-size:14px;line-height:1.3}.resource-label small{display:block;color:var(--muted);font-size:11px;margin-top:4px}.resource-label:hover{border-color:var(--line);background:white}.resource-panel{display:none;min-width:0}.tag{display:inline-block;border:1px solid var(--blue);color:var(--blue);padding:4px 7px;font-size:11px;margin-bottom:12px}.change{border-left:3px solid var(--red);padding:8px 13px;background:var(--paper);font-size:14px}.origin{font-size:12px;color:var(--muted);margin:14px 0 7px}.source{font:12px/1.5 ui-monospace,Consolas,monospace;overflow-wrap:anywhere}pre{background:#f4f3ee;border:1px solid var(--line);padding:20px;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;overflow:auto;max-height:430px;margin:12px 0 0;tab-size:2}pre:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:3px}.footer{border-top:1px solid var(--line);margin:25px 0 0;padding-top:15px;font-size:12px;color:var(--muted)}.print-note{display:none}
+.resource-panel{grid-template-columns:minmax(200px,.7fr) minmax(0,1.3fr);gap:20px}.resource-panel pre{margin-top:0;max-height:500px}.resource-nav{max-height:500px}
+@media(max-width:800px){.resource-panel{grid-template-columns:1fr}header{display:block;padding:14px 17px}header nav{margin-top:9px;gap:13px}main{padding:23px 12px}h1{font-size:35px}.lead{font-size:18px}.mode-label{padding:13px;font-size:16px}.mode-panel{padding:23px 18px}.flow{flex-direction:column}.arrow{transform:rotate(90deg);padding:4px}.resources{grid-template-columns:1fr;gap:20px}.resource-nav{max-height:230px}.resource-label{padding:9px 11px}pre{font-size:12px;max-height:430px}.counts{gap:5px}}
+@media print{header,.mode-label,.resource-nav,.counts,.screen-note{display:none}body{background:white}main{padding:0;max-width:none}h1{font-size:30px}.lead{font-size:15px}.modes{display:block;margin-top:15px}.mode-panel{display:block!important;border:0;padding:15px 0;break-before:page}.flow{flex-direction:row}.arrow{transform:none;padding:0 6px}.step{font-size:11px;padding:10px}.step b{font-size:14px}.resources{display:block;margin-top:15px}.resource-panel{display:none!important}#initial-agent-panel,#secure-golden-panel{display:block!important}pre{font-size:10px;max-height:none;overflow:visible;white-space:pre-wrap}.print-note{display:block;font-size:12px}.boundary{font-size:12px}.origin,.source{font-size:10px}.footer{font-size:10px}h2{font-size:25px}}
+#initial-agent-choice:checked~#initial-agent-panel{display:grid}#initial-agent-choice:checked~.resource-nav label[for="initial-agent-choice"]{background:#191919;color:white;border-color:#191919}#initial-agent-choice:checked~.resource-nav label[for="initial-agent-choice"] small{color:#deded9}#initial-agent-choice:focus-visible~.resource-nav label[for="initial-agent-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#initial-deployment-choice:checked~#initial-deployment-panel{display:grid}#initial-deployment-choice:checked~.resource-nav label[for="initial-deployment-choice"]{background:#191919;color:white;border-color:#191919}#initial-deployment-choice:checked~.resource-nav label[for="initial-deployment-choice"] small{color:#deded9}#initial-deployment-choice:focus-visible~.resource-nav label[for="initial-deployment-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#initial-service-choice:checked~#initial-service-panel{display:grid}#initial-service-choice:checked~.resource-nav label[for="initial-service-choice"]{background:#191919;color:white;border-color:#191919}#initial-service-choice:checked~.resource-nav label[for="initial-service-choice"] small{color:#deded9}#initial-service-choice:focus-visible~.resource-nav label[for="initial-service-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#initial-model-choice:checked~#initial-model-panel{display:grid}#initial-model-choice:checked~.resource-nav label[for="initial-model-choice"]{background:#191919;color:white;border-color:#191919}#initial-model-choice:checked~.resource-nav label[for="initial-model-choice"] small{color:#deded9}#initial-model-choice:focus-visible~.resource-nav label[for="initial-model-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#initial-mcp-choice:checked~#initial-mcp-panel{display:grid}#initial-mcp-choice:checked~.resource-nav label[for="initial-mcp-choice"]{background:#191919;color:white;border-color:#191919}#initial-mcp-choice:checked~.resource-nav label[for="initial-mcp-choice"] small{color:#deded9}#initial-mcp-choice:focus-visible~.resource-nav label[for="initial-mcp-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-runtimeAccount-choice:checked~#secure-runtimeAccount-panel{display:grid}#secure-runtimeAccount-choice:checked~.resource-nav label[for="secure-runtimeAccount-choice"]{background:#191919;color:white;border-color:#191919}#secure-runtimeAccount-choice:checked~.resource-nav label[for="secure-runtimeAccount-choice"] small{color:#deded9}#secure-runtimeAccount-choice:focus-visible~.resource-nav label[for="secure-runtimeAccount-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-verifierAccount-choice:checked~#secure-verifierAccount-panel{display:grid}#secure-verifierAccount-choice:checked~.resource-nav label[for="secure-verifierAccount-choice"]{background:#191919;color:white;border-color:#191919}#secure-verifierAccount-choice:checked~.resource-nav label[for="secure-verifierAccount-choice"] small{color:#deded9}#secure-verifierAccount-choice:focus-visible~.resource-nav label[for="secure-verifierAccount-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-callerAccount-choice:checked~#secure-callerAccount-panel{display:grid}#secure-callerAccount-choice:checked~.resource-nav label[for="secure-callerAccount-choice"]{background:#191919;color:white;border-color:#191919}#secure-callerAccount-choice:checked~.resource-nav label[for="secure-callerAccount-choice"] small{color:#deded9}#secure-callerAccount-choice:focus-visible~.resource-nav label[for="secure-callerAccount-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-agent-choice:checked~#secure-agent-panel{display:grid}#secure-agent-choice:checked~.resource-nav label[for="secure-agent-choice"]{background:#191919;color:white;border-color:#191919}#secure-agent-choice:checked~.resource-nav label[for="secure-agent-choice"] small{color:#deded9}#secure-agent-choice:focus-visible~.resource-nav label[for="secure-agent-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-network-choice:checked~#secure-network-panel{display:grid}#secure-network-choice:checked~.resource-nav label[for="secure-network-choice"]{background:#191919;color:white;border-color:#191919}#secure-network-choice:checked~.resource-nav label[for="secure-network-choice"] small{color:#deded9}#secure-network-choice:focus-visible~.resource-nav label[for="secure-network-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-verifierPolicy-choice:checked~#secure-verifierPolicy-panel{display:grid}#secure-verifierPolicy-choice:checked~.resource-nav label[for="secure-verifierPolicy-choice"]{background:#191919;color:white;border-color:#191919}#secure-verifierPolicy-choice:checked~.resource-nav label[for="secure-verifierPolicy-choice"] small{color:#deded9}#secure-verifierPolicy-choice:focus-visible~.resource-nav label[for="secure-verifierPolicy-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-cardPolicy-choice:checked~#secure-cardPolicy-panel{display:grid}#secure-cardPolicy-choice:checked~.resource-nav label[for="secure-cardPolicy-choice"]{background:#191919;color:white;border-color:#191919}#secure-cardPolicy-choice:checked~.resource-nav label[for="secure-cardPolicy-choice"] small{color:#deded9}#secure-cardPolicy-choice:focus-visible~.resource-nav label[for="secure-cardPolicy-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-callerPolicy-choice:checked~#secure-callerPolicy-panel{display:grid}#secure-callerPolicy-choice:checked~.resource-nav label[for="secure-callerPolicy-choice"]{background:#191919;color:white;border-color:#191919}#secure-callerPolicy-choice:checked~.resource-nav label[for="secure-callerPolicy-choice"] small{color:#deded9}#secure-callerPolicy-choice:focus-visible~.resource-nav label[for="secure-callerPolicy-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-verifyRoute-choice:checked~#secure-verifyRoute-panel{display:grid}#secure-verifyRoute-choice:checked~.resource-nav label[for="secure-verifyRoute-choice"]{background:#191919;color:white;border-color:#191919}#secure-verifyRoute-choice:checked~.resource-nav label[for="secure-verifyRoute-choice"] small{color:#deded9}#secure-verifyRoute-choice:focus-visible~.resource-nav label[for="secure-verifyRoute-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-cardRoute-choice:checked~#secure-cardRoute-panel{display:grid}#secure-cardRoute-choice:checked~.resource-nav label[for="secure-cardRoute-choice"]{background:#191919;color:white;border-color:#191919}#secure-cardRoute-choice:checked~.resource-nav label[for="secure-cardRoute-choice"] small{color:#deded9}#secure-cardRoute-choice:focus-visible~.resource-nav label[for="secure-cardRoute-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-goldenConfig-choice:checked~#secure-goldenConfig-panel{display:grid}#secure-goldenConfig-choice:checked~.resource-nav label[for="secure-goldenConfig-choice"]{background:#191919;color:white;border-color:#191919}#secure-goldenConfig-choice:checked~.resource-nav label[for="secure-goldenConfig-choice"] small{color:#deded9}#secure-goldenConfig-choice:focus-visible~.resource-nav label[for="secure-goldenConfig-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-verifierNetwork-choice:checked~#secure-verifierNetwork-panel{display:grid}#secure-verifierNetwork-choice:checked~.resource-nav label[for="secure-verifierNetwork-choice"]{background:#191919;color:white;border-color:#191919}#secure-verifierNetwork-choice:checked~.resource-nav label[for="secure-verifierNetwork-choice"] small{color:#deded9}#secure-verifierNetwork-choice:focus-visible~.resource-nav label[for="secure-verifierNetwork-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-golden-choice:checked~#secure-golden-panel{display:grid}#secure-golden-choice:checked~.resource-nav label[for="secure-golden-choice"]{background:#191919;color:white;border-color:#191919}#secure-golden-choice:checked~.resource-nav label[for="secure-golden-choice"] small{color:#deded9}#secure-golden-choice:focus-visible~.resource-nav label[for="secure-golden-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-callerRoute-choice:checked~#secure-callerRoute-panel{display:grid}#secure-callerRoute-choice:checked~.resource-nav label[for="secure-callerRoute-choice"]{background:#191919;color:white;border-color:#191919}#secure-callerRoute-choice:checked~.resource-nav label[for="secure-callerRoute-choice"] small{color:#deded9}#secure-callerRoute-choice:focus-visible~.resource-nav label[for="secure-callerRoute-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-graph-choice:checked~#secure-graph-panel{display:grid}#secure-graph-choice:checked~.resource-nav label[for="secure-graph-choice"]{background:#191919;color:white;border-color:#191919}#secure-graph-choice:checked~.resource-nav label[for="secure-graph-choice"] small{color:#deded9}#secure-graph-choice:focus-visible~.resource-nav label[for="secure-graph-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-gateway-choice:checked~#secure-gateway-panel{display:grid}#secure-gateway-choice:checked~.resource-nav label[for="secure-gateway-choice"]{background:#191919;color:white;border-color:#191919}#secure-gateway-choice:checked~.resource-nav label[for="secure-gateway-choice"] small{color:#deded9}#secure-gateway-choice:focus-visible~.resource-nav label[for="secure-gateway-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-callerListener-choice:checked~#secure-callerListener-panel{display:grid}#secure-callerListener-choice:checked~.resource-nav label[for="secure-callerListener-choice"]{background:#191919;color:white;border-color:#191919}#secure-callerListener-choice:checked~.resource-nav label[for="secure-callerListener-choice"] small{color:#deded9}#secure-callerListener-choice:focus-visible~.resource-nav label[for="secure-callerListener-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-verifierListener-choice:checked~#secure-verifierListener-panel{display:grid}#secure-verifierListener-choice:checked~.resource-nav label[for="secure-verifierListener-choice"]{background:#191919;color:white;border-color:#191919}#secure-verifierListener-choice:checked~.resource-nav label[for="secure-verifierListener-choice"] small{color:#deded9}#secure-verifierListener-choice:focus-visible~.resource-nav label[for="secure-verifierListener-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-model-choice:checked~#secure-model-panel{display:grid}#secure-model-choice:checked~.resource-nav label[for="secure-model-choice"]{background:#191919;color:white;border-color:#191919}#secure-model-choice:checked~.resource-nav label[for="secure-model-choice"] small{color:#deded9}#secure-model-choice:focus-visible~.resource-nav label[for="secure-model-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-mcp-choice:checked~#secure-mcp-panel{display:grid}#secure-mcp-choice:checked~.resource-nav label[for="secure-mcp-choice"]{background:#191919;color:white;border-color:#191919}#secure-mcp-choice:checked~.resource-nav label[for="secure-mcp-choice"] small{color:#deded9}#secure-mcp-choice:focus-visible~.resource-nav label[for="secure-mcp-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-deployment-choice:checked~#secure-deployment-panel{display:grid}#secure-deployment-choice:checked~.resource-nav label[for="secure-deployment-choice"]{background:#191919;color:white;border-color:#191919}#secure-deployment-choice:checked~.resource-nav label[for="secure-deployment-choice"] small{color:#deded9}#secure-deployment-choice:focus-visible~.resource-nav label[for="secure-deployment-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-service-choice:checked~#secure-service-panel{display:grid}#secure-service-choice:checked~.resource-nav label[for="secure-service-choice"]{background:#191919;color:white;border-color:#191919}#secure-service-choice:checked~.resource-nav label[for="secure-service-choice"] small{color:#deded9}#secure-service-choice:focus-visible~.resource-nav label[for="secure-service-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+#secure-referenceGrant-choice:checked~#secure-referenceGrant-panel{display:grid}#secure-referenceGrant-choice:checked~.resource-nav label[for="secure-referenceGrant-choice"]{background:#191919;color:white;border-color:#191919}#secure-referenceGrant-choice:checked~.resource-nav label[for="secure-referenceGrant-choice"] small{color:#deded9}#secure-referenceGrant-choice:focus-visible~.resource-nav label[for="secure-referenceGrant-choice"]{outline:3px solid #245a8b;outline-offset:1px}
+
+html{scroll-padding-top:20px}.summary-sheet{background:white;border:1px solid var(--line);padding:34px 38px;margin:0 0 24px;scroll-margin-top:18px}.summary-sheet h1{font-size:39px}.summary-sheet h2{font-size:36px}.summary-sheet .lead{font-size:19px;margin-bottom:19px}.inventory-table{width:100%;border-collapse:collapse;font-size:15px;margin:18px 0 19px}.inventory-table th,.inventory-table td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:12px 13px}.inventory-table thead th{background:var(--paper);font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}.inventory-table tbody th{width:25%;font-weight:650}.inventory-table td:nth-child(2){width:29%}.inventory-table code{font:14px/1.5 ui-monospace,Consolas,monospace;overflow-wrap:anywhere}.kind-count{display:inline-block;margin-left:10px;color:var(--red);font-weight:800}.ownership{display:grid;grid-template-columns:.75fr 1.5fr 1fr;gap:13px}.ownership p{margin:0;background:var(--paper);border:1px solid var(--line);padding:13px;font-size:12px}.ownership strong{display:block;font-size:14px;margin-bottom:5px}.simple-note{font-size:12px;color:var(--muted);margin:15px 0 0}.hardening-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:17px 0}.hardening-card{border:1px solid var(--line);background:#fafaf7;padding:17px;min-width:0}.hardening-card h3{font-size:17px;margin-bottom:8px}.hardening-card p{font-size:14px;margin:0}.card-number{display:block;color:var(--red);font-weight:800;font-size:12px;margin-bottom:7px}.simple-flow{display:flex;gap:11px;align-items:center;margin:18px 0}.simple-flow div{flex:1;min-width:0;background:var(--paper);border:1px solid var(--line);padding:14px 17px;font-size:15px}.simple-flow div strong{display:block;font-size:16px;margin-bottom:4px}.simple-flow span{color:var(--red);font-weight:800}.route-reasons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;padding-top:14px;border-top:1px solid var(--line)}.route-reasons p{font-size:13px;margin:0}.route-reasons strong{display:block;font-size:14px;margin-bottom:4px}.technical-details{border:1px solid var(--line);padding:18px 22px;background:white}.technical-details>summary{cursor:pointer;color:var(--blue);font-size:16px;font-weight:700}.technical-intro{font-size:14px;color:var(--muted);margin:15px 0}.secondary-links{font-size:13px;margin:20px 0 0}.secondary-links a{margin-right:15px}a,summary{overflow-wrap:anywhere}summary:focus-visible{outline:3px solid var(--blue);outline-offset:5px}
+@media(max-width:800px){header nav{gap:14px}.summary-sheet{padding:25px 19px}.summary-sheet h1,.summary-sheet h2{font-size:31px}.summary-sheet .lead{font-size:17px}.inventory-table{font-size:13px}.inventory-table th,.inventory-table td{padding:11px 7px}.inventory-table code{font-size:12px}.inventory-table tbody th{width:30%}.inventory-table td:nth-child(2){width:27%}.kind-count{display:block;margin:3px 0 0}.ownership,.hardening-grid,.route-reasons{grid-template-columns:1fr}.simple-flow{flex-direction:column;align-items:stretch}.simple-flow span{align-self:center;transform:rotate(90deg)}.technical-details{padding:18px 12px}}
+@page{size:A3 landscape;margin:12mm}
+@media print{header,.technical-details,.secondary-links{display:none!important}body{font-size:13px}main{padding:0;max-width:none}.summary-sheet{border:0;padding:9mm 11mm;margin:0;min-height:245mm;break-after:page;break-inside:avoid}.summary-sheet:nth-of-type(2){break-after:auto}.summary-sheet h1,.summary-sheet h2{font-size:34px}.summary-sheet .lead{font-size:17px}.inventory-table{font-size:13px}.inventory-table th,.inventory-table td{padding:10px 12px}.inventory-table code{font-size:13px}.kind-count{display:inline-block;margin-left:10px}.ownership{grid-template-columns:.75fr 1.5fr 1fr}.ownership p{font-size:11px}.hardening-grid,.route-reasons{grid-template-columns:repeat(3,minmax(0,1fr))}.hardening-card{padding:15px}.hardening-card p{font-size:13px}.simple-flow{flex-direction:row;align-items:center}.simple-flow span{transform:none}.simple-note{font-size:11px}.summary-sheet,.ownership p,.hardening-card,.simple-flow div{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style><style id="dice-bundle-theme">
+:root{--surface:#ffffff;--backdrop:#f2f2f2;--text:#141414;--body-text:#383838;--muted:#626262;--border:#dedede;--panel:#f6f6f6;--accent:#e60000;--link:#c90000;--link-tint:#fff0f0;--positive:#141414;--positive-tint:#f0f0f0;--reference:#626262;--reference-tint:#f3f3f3;--font:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif;--code-font:ui-monospace,Consolas,monospace;--ink:#141414;--paper:#f6f6f6;--red:#e60000;--line:#dedede;--blue:#c90000;--amber:#555555;--bg:#ffffff;--green:#c90000;--soft:#fff0f0;--purple:#c90000;--mono:ui-monospace,Consolas,monospace}
+body,button,input,select,textarea{font-family:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif}h1,h2,h3{font-family:system-ui,"Segoe UI","Helvetica Neue",Arial,sans-serif}a{color:var(--link);text-underline-offset:3px}button:focus-visible,a:focus-visible,summary:focus-visible{outline-color:#e60000}.sheet,.panel,.summary-sheet,.hardening-card,.simple-flow div,.card,.step{border-radius:12px}.sheet,.summary-sheet{background:#ffffff}.panel,.hardening-card,.step{background:#f6f6f6}.takeaway,.notice,.review{background:#fff0f0;border-left-color:#e60000}.code{background:#141414;color:#ffffff}pre,code{font-family:ui-monospace,Consolas,monospace}.bundle-home{display:block;padding:10px 4vw;font-size:13px;background:white;border-bottom:1px solid #dedede}.reference-banner{font-size:13px;padding:12px 4vw;background:#f6f6f6;border-bottom:1px solid #dedede}.reference-banner a{margin-right:18px}@media print{.bundle-home,.reference-banner{display:none!important}}
+
+.takeaway{background:#eef7ef;border-left-color:#9bc8a2;color:#1c3525}.takeaway strong{color:#356a43}
+
+</style>
+</head><body><header><strong>DICE</strong><nav aria-label="Two-sheet walkthrough"><a href="START-HERE.html">Demo home</a><a href="#inventory">1. What gets deployed</a><a href="#hardening">2. How it is hardened</a><a href="showcase.html">Review sheets</a></nav></header><main><section class="summary-sheet" id="inventory" aria-labelledby="inventory-heading"><p class="eyebrow">Story 1 · 01 / 02</p><h1 id="inventory-heading">What gets deployed, and why?</h1><p class="lead">KRO uses a ResourceGraphDefinition to reconcile these 14 per-agent resources. Native kagent runs the agent.</p><table class="inventory-table"><thead><tr><th scope="col">Resource kind / count</th><th scope="col">Which instances?</th><th scope="col">Why deploy it?</th></tr></thead><tbody><tr><th scope="row"><code>Agent</code><span class="kind-count">1</span></th><td>The agent definition</td><td>Connects the system prompt, model, skills, and selected MCP tools.</td></tr><tr><th scope="row"><code>ServiceAccount</code><span class="kind-count">3</span></th><td>Runtime, verifier, caller</td><td>Gives the agent, its test, and its caller separate identities.</td></tr><tr><th scope="row"><code>NetworkPolicy</code><span class="kind-count">2</span></th><td>Agent and verifier boundaries</td><td>Restricts which network paths each workload may use.</td></tr><tr><th scope="row"><code>AgentgatewayPolicy</code><span class="kind-count">3</span></th><td>Verification, card, caller checks</td><td>Validates JWTs and authorizes the intended identity on each route.</td></tr><tr><th scope="row"><code>HTTPRoute</code><span class="kind-count">3</span></th><td>AgentCard, verification, invocation</td><td>Sends each request to the correct agent endpoint.</td></tr><tr><th scope="row"><code>ConfigMap</code><span class="kind-count">1</span></th><td>Golden test configuration</td><td>Fixes the expected agent, endpoints, and verification settings.</td></tr><tr><th scope="row"><code>Job</code><span class="kind-count">1</span></th><td>Golden verification</td><td>Checks the agent before KRO creates the caller route.</td></tr></tbody></table><div class="ownership" aria-label="Outside the 14 per-agent resources"><p><strong>The team submits</strong>One ClassicSecureAgent request.</p><p><strong>The platform provides</strong>ResourceGraphDefinition, Namespace, Gateway, and two listener policies. Reused: GatewayClass, ModelConfig, RemoteMCPServer, and credentials.</p><p><strong>kagent generates</strong>Deployment, then ReplicaSet/Pods; Service; configuration Secret.</p></div><p class="simple-note">Those supporting objects are outside the 14. A ReferenceGrant is needed only for a cross-namespace backend reference; this same-namespace demo does not install one.</p></section>
+<section class="summary-sheet" id="hardening" aria-labelledby="hardening-heading"><p class="eyebrow">Story 1 · 02 / 02</p><h2 id="hardening-heading">How the agent is hardened</h2><p class="lead">Routes choose the destination. Policies decide who may use it. Workload controls constrain execution.</p><div class="simple-flow" aria-label="Protected request path"><div><strong>Caller JWT</strong>Identity for this API.</div><span aria-hidden="true">→</span><div><strong>HTTPRoute + JWT policy</strong>Route and authorize.</div><span aria-hidden="true">→</span><div><strong>Agent Service</strong>Reach the native runtime.</div></div><div class="hardening-grid"><article class="hardening-card"><span class="card-number">1</span><h3>Check the caller</h3><p>Require the expected JWT issuer, audience, expiry, and exact caller identity.</p></article><article class="hardening-card"><span class="card-number">2</span><h3>Separate identities</h3><p>Keep runtime, verifier, and caller distinct. Golden has no Kubernetes API Role or RoleBinding.</p></article><article class="hardening-card"><span class="card-number">3</span><h3>Restrict network paths</h3><p>Allow approved Gateway ingress and bounded egress. Enforcement needs the receiving cluster&#x27;s CNI.</p></article><article class="hardening-card"><span class="card-number">4</span><h3>Restrict the process</h3><p>Use non-root, no privilege escalation, read-only root, dropped capabilities, and seccomp. Bound temporary storage, CPU, and memory.</p></article><article class="hardening-card"><span class="card-number">5</span><h3>Limit capabilities</h3><p>Select approved models and explicit MCP tool names. Backend permissions remain a separate check.</p></article><article class="hardening-card"><span class="card-number">6</span><h3>Verify before exposure</h3><p>Create the caller route only after Golden succeeds. A past pass is not continuous revocation.</p></article></div><div class="route-reasons" aria-label="Why there are three HTTPRoutes"><p><strong>AgentCard route</strong>Lets the verifier discover the agent interface.</p><p><strong>Verification route</strong>Lets Golden test the agent separately from callers.</p><p><strong>Caller route</strong>The approved invocation endpoint, created after Golden passes.</p></div><p class="simple-note">4 November proof covers model/caller PONG and JWT denials. Network enforcement, MCP access, and telemetry need separate proof. These sheets explain templates, not a new deployment.</p></section><details class="technical-details" id="yaml-details"><summary>Optional resource-by-resource YAML</summary><p class="technical-intro">Compare the initial and secure definitions, then inspect each resource. These controls change the view only.</p><fieldset class="modes"><legend class="sr">Deployment comparison</legend><input class="choice" type="radio" name="deployment-mode" id="initial" aria-controls="initial-panel" checked><label class="mode-label" for="initial">1. Initial deployment</label><input class="choice" type="radio" name="deployment-mode" id="secure" aria-controls="secure-panel"><label class="mode-label" for="secure">2. Secure agent with KRO</label><section class="mode-panel" id="initial-panel" aria-labelledby="initial-heading"><h2 id="initial-heading">The agent already has useful capabilities.</h2><p>A native kagent Agent connects its system prompt, approved model, selected skill, and MCP tools. kagent runs it behind a cluster-internal Service.</p><div class="flow" aria-label="Initial deployment request path"><div class="step"><b>Cluster workload</b>A caller with network reachability.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><b>Service API</b>The native A2A endpoint on port 8080.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><b>Agent runtime</b>Prompt + skills + selected MCP tools.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><b>Approved backends</b>The model endpoint and read-only MCP.</div></div><p class="boundary">In this illustrated starting point, callers that can reach the Service can invoke the API. There is no composed Gateway JWT protection or dedicated ingress policy. A native kagent installation can also be secured separately.</p><p class="screen-note">Choose a resource to see its purpose, owner, and YAML. Use the arrow keys when a resource selector has keyboard focus. YAML is selectable text.</p><p class="print-note">The printed view shows one representative YAML resource per mode. Open this HTML to inspect every resource.</p><div class="resources" role="group" aria-label="Initial deployment resource selector"><input class="choice" type="radio" name="initial-resource" id="initial-agent-choice" aria-controls="initial-agent-panel" checked><input class="choice" type="radio" name="initial-resource" id="initial-deployment-choice" aria-controls="initial-deployment-panel"><input class="choice" type="radio" name="initial-resource" id="initial-service-choice" aria-controls="initial-service-panel"><input class="choice" type="radio" name="initial-resource" id="initial-model-choice" aria-controls="initial-model-panel"><input class="choice" type="radio" name="initial-resource" id="initial-mcp-choice" aria-controls="initial-mcp-panel"><aside class="resource-nav" aria-label="Resource choices"><p class="group">Agent definition</p><label class="resource-label" for="initial-agent-choice">Agent<small>Agent</small></label><p class="group">kagent runtime output</p><label class="resource-label" for="initial-deployment-choice">Deployment<small>Deployment</small></label><label class="resource-label" for="initial-service-choice">Service<small>Service</small></label><p class="group">Existing platform references</p><label class="resource-label" for="initial-model-choice">ModelConfig<small>ModelConfig</small></label><label class="resource-label" for="initial-mcp-choice">RemoteMCPServer<small>RemoteMCPServer</small></label></aside><article class="resource-panel" id="initial-agent-panel" aria-labelledby="initial-agent-heading"><div class="resource-info"><span class="tag">Team supplies; kagent reconciles</span><h3 id="initial-agent-heading">Agent</h3><p>The system prompt, approved model, selected skill, and named MCP tools define the useful agent.</p><p class="change">The initial example has no composed Gateway JWT front door or dedicated ingress NetworkPolicy. Tool permissions still come from the MCP adapter and backend.</p><p class="origin">Illustrative native Agent, derived from the catalog bindings. Not a historical live snapshot.</p><p class="source">Source · demo/yaml/catalog/04-agent.yaml</p></div><pre tabindex="0" aria-label="Agent YAML"># Initial comparison example only. Not a historical deployment receipt.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  type: Declarative
+  declarative:
+    runtime: go
+    modelConfig: approved-model
+    systemMessage: Read approved Kubernetes information. Return bounded evidence.
+      Do not change resources.
+    tools:
+    - type: McpServer
+      mcpServer:
+        apiGroup: kagent.dev
+        kind: RemoteMCPServer
+        name: approved-kubernetes-mcp
+        toolNames:
+        - k8s_get_resources
+        - k8s_get_events
+  skills:
+    gitRefs:
+    - url: &#x27;{{APPROVED_GITLAB_SKILLS_REPOSITORY_URL}}&#x27;
+      ref: &#x27;{{APPROVED_FULL_COMMIT_ID}}&#x27;
+      path: skills/work-guidance
+      name: work-guidance
+    gitAuthSecretRef:
+      name: approved-git-credentials
+</pre></article><article class="resource-panel" id="initial-deployment-panel" aria-labelledby="initial-deployment-heading"><div class="resource-info"><span class="tag">kagent controller</span><h3 id="initial-deployment-heading">Deployment</h3><p>Runs the agent API process. kagent generates the runtime Deployment from the Agent.</p><p class="change">The composition in the next tab adds a dedicated runtime identity, restricted pod settings, and network intent around this same native runtime.</p><p class="origin">Illustrative, abbreviated controller-output shape. The controller also generates its configuration Secret; no Secret contents are shown.</p><p class="source">Source · demo/recorded-native-deployment.yaml</p></div><pre tabindex="0" aria-label="Deployment YAML"># Illustrative runtime shape, abbreviated for comparison. Not an apply file.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kagent
+      kagent: demo
+  template:
+    metadata:
+      labels:
+        app: kagent
+        kagent: demo
+    spec:
+      containers:
+      - name: agent
+        image: &#x27;{{APPROVED_NATIVE_KAGENT_RUNTIME_IMAGE}}&#x27;
+        args:
+        - --host
+        - 0.0.0.0
+        - --port
+        - &#x27;8080&#x27;
+        - --filepath
+        - /config
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: config
+          mountPath: /config
+      volumes:
+      - name: config
+        secret:
+          secretName: demo
+</pre></article><article class="resource-panel" id="initial-service-panel" aria-labelledby="initial-service-heading"><div class="resource-info"><span class="tag">kagent controller</span><h3 id="initial-service-heading">Service</h3><p>Gives the runtime a cluster-internal API address on port 8080.</p><p class="change">In this initial comparison, a workload with network reachability can invoke that API without the Gateway JWT controls added in the secure tab.</p><p class="origin">Existing illustrative Service shape. ClusterIP is routing, not caller authentication.</p><p class="source">Source · demo/yaml/nativeService.yaml</p></div><pre tabindex="0" aria-label="Service YAML"># Reference example only. Read its explanation before using it.
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  type: ClusterIP
+  selector:
+    app: kagent
+    kagent: demo
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+</pre></article><article class="resource-panel" id="initial-model-panel" aria-labelledby="initial-model-heading"><div class="resource-info"><span class="tag">Platform</span><h3 id="initial-model-heading">ModelConfig</h3><p>Connects the Agent to the approved model endpoint and an existing credential reference.</p><p class="change">Reused by the secure agent. The team selects its name; a provider key is not placed in the customer request.</p><p class="origin">Existing sanitized reference example, not an installed-model inventory.</p><p class="source">Source · demo/yaml/model.yaml</p></div><pre tabindex="0" aria-label="ModelConfig YAML"># Reference example only. Read its explanation before using it.
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  name: approved-model
+  namespace: classic-agents
+spec:
+  provider: OpenAI
+  model: &#x27;{{APPROVED_MODEL_NAME}}&#x27;
+  apiKeySecret: &#x27;{{EXISTING_PROVIDER_SECRET_NAME}}&#x27;
+  apiKeySecretKey: &#x27;{{EXISTING_PROVIDER_SECRET_KEY}}&#x27;
+  openAI:
+    baseUrl: &#x27;{{APPROVED_MODEL_GATEWAY_BASE_URL}}&#x27;
+</pre></article><article class="resource-panel" id="initial-mcp-panel" aria-labelledby="initial-mcp-heading"><div class="resource-info"><span class="tag">Platform</span><h3 id="initial-mcp-heading">RemoteMCPServer</h3><p>Names the approved Kubernetes MCP endpoint. The Agent exposes only its selected read-only tool names.</p><p class="change">Reused by the secure agent. Model access, tool access, and backend resource permission remain separate.</p><p class="origin">Existing sanitized MCP reference. Real endpoint discovery and permission tests remain separate.</p><p class="source">Source · demo/yaml/remoteMCP.yaml</p></div><pre tabindex="0" aria-label="RemoteMCPServer YAML"># Reference example only. Read its explanation before using it.
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: approved-kubernetes-mcp
+  namespace: classic-agents
+spec:
+  description: Approved read-only Kubernetes MCP server
+  url: &#x27;{{APPROVED_KUBERNETES_MCP_URL}}&#x27;
+  protocol: STREAMABLE_HTTP
+</pre></article></div></section><section class="mode-panel" id="secure-panel" aria-labelledby="secure-heading"><h2 id="secure-heading">KRO adds the repeatable security composition.</h2><p>The useful native agent remains. KRO now assembles its identities, network intent, JWT policies, protected routes, and Golden verification.</p><div class="flow" aria-label="Secure agent with KRO request path"><div class="step"><b>Caller JWT</b>Expected issuer, audience, and caller subject.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><b>Agent Gateway</b>Shared listeners + JWT authorization.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><b>Protected HTTPRoute</b>Caller route appears after Golden succeeds.</div><span class="arrow" aria-hidden="true">→</span><div class="step"><b>Native Agent</b>Same runtime and approved backends.</div></div><p class="boundary">KRO creates 14 per-agent resources. Golden succeeds before the caller HTTPRoute is created. These are dependency groups, not a claim that every object is deployed serially. This page runs no Job, request, or cluster operation.</p><div class="counts" aria-label="The 14 KRO-created resources"><span>3 ServiceAccount</span><span>1 Agent</span><span>2 NetworkPolicy</span><span>3 AgentgatewayPolicy</span><span>3 HTTPRoute</span><span>1 ConfigMap</span><span>1 Job</span></div><p class="screen-note">Choose a resource to see its purpose, owner, and YAML. Use the arrow keys when a resource selector has keyboard focus. YAML is selectable text.</p><p class="print-note">The printed view shows one representative YAML resource per mode. Open this HTML to inspect every resource.</p><div class="resources" role="group" aria-label="Secure agent with KRO resource selector"><input class="choice" type="radio" name="secure-resource" id="secure-runtimeAccount-choice" aria-controls="secure-runtimeAccount-panel"><input class="choice" type="radio" name="secure-resource" id="secure-verifierAccount-choice" aria-controls="secure-verifierAccount-panel"><input class="choice" type="radio" name="secure-resource" id="secure-callerAccount-choice" aria-controls="secure-callerAccount-panel"><input class="choice" type="radio" name="secure-resource" id="secure-agent-choice" aria-controls="secure-agent-panel"><input class="choice" type="radio" name="secure-resource" id="secure-network-choice" aria-controls="secure-network-panel"><input class="choice" type="radio" name="secure-resource" id="secure-verifierPolicy-choice" aria-controls="secure-verifierPolicy-panel"><input class="choice" type="radio" name="secure-resource" id="secure-cardPolicy-choice" aria-controls="secure-cardPolicy-panel"><input class="choice" type="radio" name="secure-resource" id="secure-callerPolicy-choice" aria-controls="secure-callerPolicy-panel"><input class="choice" type="radio" name="secure-resource" id="secure-verifyRoute-choice" aria-controls="secure-verifyRoute-panel"><input class="choice" type="radio" name="secure-resource" id="secure-cardRoute-choice" aria-controls="secure-cardRoute-panel"><input class="choice" type="radio" name="secure-resource" id="secure-goldenConfig-choice" aria-controls="secure-goldenConfig-panel"><input class="choice" type="radio" name="secure-resource" id="secure-verifierNetwork-choice" aria-controls="secure-verifierNetwork-panel"><input class="choice" type="radio" name="secure-resource" id="secure-golden-choice" aria-controls="secure-golden-panel" checked><input class="choice" type="radio" name="secure-resource" id="secure-callerRoute-choice" aria-controls="secure-callerRoute-panel"><input class="choice" type="radio" name="secure-resource" id="secure-graph-choice" aria-controls="secure-graph-panel"><input class="choice" type="radio" name="secure-resource" id="secure-gateway-choice" aria-controls="secure-gateway-panel"><input class="choice" type="radio" name="secure-resource" id="secure-callerListener-choice" aria-controls="secure-callerListener-panel"><input class="choice" type="radio" name="secure-resource" id="secure-verifierListener-choice" aria-controls="secure-verifierListener-panel"><input class="choice" type="radio" name="secure-resource" id="secure-model-choice" aria-controls="secure-model-panel"><input class="choice" type="radio" name="secure-resource" id="secure-mcp-choice" aria-controls="secure-mcp-panel"><input class="choice" type="radio" name="secure-resource" id="secure-deployment-choice" aria-controls="secure-deployment-panel"><input class="choice" type="radio" name="secure-resource" id="secure-service-choice" aria-controls="secure-service-panel"><input class="choice" type="radio" name="secure-resource" id="secure-referenceGrant-choice" aria-controls="secure-referenceGrant-panel"><aside class="resource-nav" aria-label="Resource choices"><p class="group">KRO creates per agent · 14 resources</p><label class="resource-label" for="secure-runtimeAccount-choice">Runtime identity<small>ServiceAccount</small></label><label class="resource-label" for="secure-verifierAccount-choice">Golden identity<small>ServiceAccount</small></label><label class="resource-label" for="secure-callerAccount-choice">Caller identity<small>ServiceAccount</small></label><label class="resource-label" for="secure-agent-choice">Native kagent Agent<small>Agent</small></label><label class="resource-label" for="secure-network-choice">Agent network boundary<small>NetworkPolicy</small></label><label class="resource-label" for="secure-verifierPolicy-choice">Verifier route policy<small>AgentgatewayPolicy</small></label><label class="resource-label" for="secure-cardPolicy-choice">AgentCard policy<small>AgentgatewayPolicy</small></label><label class="resource-label" for="secure-callerPolicy-choice">Caller route policy<small>AgentgatewayPolicy</small></label><label class="resource-label" for="secure-verifyRoute-choice">Golden invocation route<small>HTTPRoute</small></label><label class="resource-label" for="secure-cardRoute-choice">AgentCard route<small>HTTPRoute</small></label><label class="resource-label" for="secure-goldenConfig-choice">Golden ConfigMap<small>ConfigMap</small></label><label class="resource-label" for="secure-verifierNetwork-choice">Verifier network boundary<small>NetworkPolicy</small></label><label class="resource-label" for="secure-golden-choice">Golden verification Job<small>Job</small></label><label class="resource-label" for="secure-callerRoute-choice">Customer invocation route<small>HTTPRoute</small></label><p class="group">Platform provides beforehand · outside the 14</p><label class="resource-label" for="secure-graph-choice">ResourceGraphDefinition<small>ResourceGraphDefinition</small></label><label class="resource-label" for="secure-gateway-choice">Gateway<small>Gateway</small></label><label class="resource-label" for="secure-callerListener-choice">Caller listener policy<small>AgentgatewayPolicy</small></label><label class="resource-label" for="secure-verifierListener-choice">Verifier listener policy<small>AgentgatewayPolicy</small></label><label class="resource-label" for="secure-model-choice">Approved ModelConfig<small>ModelConfig</small></label><label class="resource-label" for="secure-mcp-choice">Approved RemoteMCPServer<small>RemoteMCPServer</small></label><p class="group">kagent generates · outside the 14</p><label class="resource-label" for="secure-deployment-choice">Native runtime Deployment<small>Deployment</small></label><label class="resource-label" for="secure-service-choice">Native runtime Service<small>Service</small></label><p class="group">Optional pattern · not installed here</p><label class="resource-label" for="secure-referenceGrant-choice">Conditional ReferenceGrant<small>ReferenceGrant</small></label></aside><article class="resource-panel" id="secure-runtimeAccount-panel" aria-labelledby="secure-runtimeAccount-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-runtimeAccount-heading">Runtime identity</h3><p>No Kubernetes API token is automounted into the native agent. Backend permissions remain separate from chat access. The native controller separately projects a one-hour JWT with audience kagent for its own API, visible in the recorded Deployment.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/01-runtimeAccount.yaml</p></div><pre tabindex="0" aria-label="Runtime identity YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ${schema.metadata.name}-runtime
+  namespace: ${schema.metadata.namespace}
+automountServiceAccountToken: false
+</pre></article><article class="resource-panel" id="secure-verifierAccount-panel" aria-labelledby="secure-verifierAccount-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-verifierAccount-heading">Golden identity</h3><p>The verifier gets only an audience-specific, short-lived projected JWT. It has no Role or RoleBinding to the Kubernetes API.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/02-verifierAccount.yaml</p></div><pre tabindex="0" aria-label="Golden identity YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ${schema.metadata.name}-verifier
+  namespace: ${schema.metadata.namespace}
+automountServiceAccountToken: false
+</pre></article><article class="resource-panel" id="secure-callerAccount-panel" aria-labelledby="secure-callerAccount-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-callerAccount-heading">Caller identity</h3><p>Only the exact demo-caller subject is accepted on the caller listener. Minting its JWT requires the operator token-request permission.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/03-callerAccount.yaml</p></div><pre tabindex="0" aria-label="Caller identity YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ${schema.metadata.name}-caller
+  namespace: ${schema.metadata.namespace}
+automountServiceAccountToken: false
+</pre></article><article class="resource-panel" id="secure-agent-panel" aria-labelledby="secure-agent-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-agent-heading">Native kagent Agent</h3><p>KRO passes the system prompt, existing ModelConfig name and selected MCP operations to the normal declarative Agent. kagent creates the Deployment, Service and generated configuration Secret.</p><p class="change">This native Agent is now assembled with the prescribed security configuration.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/04-agent.yaml</p></div><pre tabindex="0" aria-label="Native kagent Agent YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: ${schema.metadata.name}
+  namespace: ${schema.metadata.namespace}
+spec:
+  type: Declarative
+  description: KRO-composed native agent without Substrate
+  declarative:
+    runtime: go
+    modelConfig: ${schema.spec.modelConfig}
+    systemMessage: ${schema.spec.systemPrompt}
+    stream: false
+    tools: ${schema.spec.tools.map(id, {&quot;kubernetes-readonly&quot;:dyn({&quot;type&quot;:dyn(&quot;McpServer&quot;),&quot;mcpServer&quot;:dyn({&quot;apiGroup&quot;:dyn(&quot;kagent.dev&quot;),&quot;kind&quot;:dyn(&quot;RemoteMCPServer&quot;),&quot;name&quot;:dyn(&quot;approved-kubernetes-mcp&quot;),&quot;toolNames&quot;:dyn([dyn(&quot;k8s_get_resources&quot;),dyn(&quot;k8s_get_events&quot;)])})}),&quot;gitlab-readonly&quot;:dyn({&quot;type&quot;:dyn(&quot;McpServer&quot;),&quot;mcpServer&quot;:dyn({&quot;apiGroup&quot;:dyn(&quot;kagent.dev&quot;),&quot;kind&quot;:dyn(&quot;RemoteMCPServer&quot;),&quot;name&quot;:dyn(&quot;approved-gitlab-mcp&quot;),&quot;toolNames&quot;:dyn([dyn(&quot;gitlab_get_project&quot;),dyn(&quot;gitlab_get_latest_pipeline&quot;)])})}),&quot;denodo-readonly&quot;:dyn({&quot;type&quot;:dyn(&quot;McpServer&quot;),&quot;mcpServer&quot;:dyn({&quot;apiGroup&quot;:dyn(&quot;kagent.dev&quot;),&quot;kind&quot;:dyn(&quot;RemoteMCPServer&quot;),&quot;name&quot;:dyn(&quot;approved-denodo-mcp&quot;),&quot;toolNames&quot;:dyn([dyn(&quot;get_inventory_data_product_details&quot;),dyn(&quot;get_namespace_count&quot;),dyn(&quot;get_namespace_summary&quot;)])})})}[id])}
+    deployment:
+      serviceAccountName: ${runtimeAccount.metadata.name}
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 1000m
+          memory: 256Mi
+      env:
+      - name: HOME
+        value: /tmp
+      podSecurityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+          - ALL
+      volumes:
+      - name: writable-tmp
+        emptyDir:
+          sizeLimit: 64Mi
+      volumeMounts:
+      - name: writable-tmp
+        mountPath: /tmp
+  skills:
+    gitRefs: ${schema.spec.skills.map(id, {&quot;work-guidance&quot;:dyn({&quot;url&quot;:dyn(&quot;{{APPROVED_GITLAB_SKILLS_REPOSITORY_URL}}&quot;),&quot;ref&quot;:dyn(&quot;{{APPROVED_FULL_COMMIT_ID}}&quot;),&quot;path&quot;:dyn(&quot;skills/work-guidance&quot;),&quot;name&quot;:dyn(&quot;work-guidance&quot;)})}[id])}
+    gitAuthSecretRef:
+      name: approved-git-credentials
+</pre></article><article class="resource-panel" id="secure-network-panel" aria-labelledby="secure-network-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-network-heading">Agent network boundary</h3><p>Ingress is limited to the approved Gateway pods. Egress permits only the resolved DNS, model, controller and reviewed tool paths. DNS and backend permissions are still separate controls. This is policy intent; enforcement requires a supporting CNI and actual denied-traffic tests, which are not part of the recorded PONG proof.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/05-network.yaml</p></div><pre tabindex="0" aria-label="Agent network boundary YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ${schema.metadata.name}-boundary
+  namespace: ${schema.metadata.namespace}
+spec:
+  podSelector:
+    matchLabels:
+      app: kagent
+      kagent: ${schema.metadata.name}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: classic-agents
+      podSelector:
+        matchLabels:
+          gateway.networking.k8s.io/gateway-name: classic-demo
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: &#x27;{{MODEL_GATEWAY_NAMESPACE}}&#x27;
+      podSelector:
+        matchLabels:
+          app: &#x27;{{MODEL_GATEWAY_POD_LABEL}}&#x27;
+    ports:
+    - protocol: TCP
+      port: 8081
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: &#x27;{{KAGENT_CONTROLLER_NAMESPACE}}&#x27;
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: &#x27;{{KAGENT_CONTROLLER_LABEL}}&#x27;
+    ports:
+    - protocol: TCP
+      port: 8083
+</pre></article><article class="resource-panel" id="secure-verifierPolicy-panel" aria-labelledby="secure-verifierPolicy-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-verifierPolicy-heading">Verifier route policy</h3><p>Strict JWT validation checks issuer and audience. Authorization requires the verifier service-account subject.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/06-verifierPolicy.yaml</p></div><pre tabindex="0" aria-label="Verifier route policy YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: ${schema.metadata.name}-verify
+  namespace: ${schema.metadata.namespace}
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: ${schema.metadata.name}-verify
+  traffic:
+    jwtAuthentication:
+      mode: Strict
+      preserveToken: false
+      providers:
+      - issuer: &#x27;{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}&#x27;
+        audiences:
+        - secure-agent-classic
+        jwks:
+          inline: &#x27;{{KUBERNETES_JWKS_JSON}}&#x27;
+    authorization:
+      action: Require
+      policy:
+        matchExpressions:
+        - jwt.sub == &quot;system:serviceaccount:classic-agents:${schema.metadata.name}-verifier&quot;
+</pre></article><article class="resource-panel" id="secure-cardPolicy-panel" aria-labelledby="secure-cardPolicy-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-cardPolicy-heading">AgentCard policy</h3><p>The Golden identity can inspect the native AgentCard. Anonymous callers and malformed tokens are denied.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/07-cardPolicy.yaml</p></div><pre tabindex="0" aria-label="AgentCard policy YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: ${schema.metadata.name}-card
+  namespace: ${schema.metadata.namespace}
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: ${schema.metadata.name}-card
+  traffic:
+    jwtAuthentication:
+      mode: Strict
+      preserveToken: false
+      providers:
+      - issuer: &#x27;{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}&#x27;
+        audiences:
+        - secure-agent-classic
+        jwks:
+          inline: &#x27;{{KUBERNETES_JWKS_JSON}}&#x27;
+    authorization:
+      action: Require
+      policy:
+        matchExpressions:
+        - jwt.sub == &quot;system:serviceaccount:classic-agents:${schema.metadata.name}-verifier&quot;
+</pre></article><article class="resource-panel" id="secure-callerPolicy-panel" aria-labelledby="secure-callerPolicy-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-callerPolicy-heading">Caller route policy</h3><p>Strict JWT validation and exact caller subject protect invocation. This policy does not give the caller Kubernetes or MCP execution permissions.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/08-callerPolicy.yaml</p></div><pre tabindex="0" aria-label="Caller route policy YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: ${schema.metadata.name}-invoke
+  namespace: ${schema.metadata.namespace}
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: ${schema.metadata.name}-invoke
+  traffic:
+    jwtAuthentication:
+      mode: Strict
+      preserveToken: false
+      providers:
+      - issuer: &#x27;{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}&#x27;
+        audiences:
+        - secure-agent-classic
+        jwks:
+          inline: &#x27;{{KUBERNETES_JWKS_JSON}}&#x27;
+    authorization:
+      action: Require
+      policy:
+        matchExpressions:
+        - jwt.sub == &quot;system:serviceaccount:classic-agents:${schema.metadata.name}-caller&quot;
+</pre></article><article class="resource-panel" id="secure-verifyRoute-panel" aria-labelledby="secure-verifyRoute-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-verifyRoute-heading">Golden invocation route</h3><p>The verifier-only listener rewrites the exact verification path to the native A2A endpoint. It is distinct from the customer invocation route.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/09-verifyRoute.yaml</p></div><pre tabindex="0" aria-label="Golden invocation route YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ${schema.metadata.name}-verify
+  namespace: ${schema.metadata.namespace}
+  annotations:
+    classic.kagent.dev/policy: ${verifierPolicy.metadata.name}
+spec:
+  parentRefs:
+  - name: classic-demo
+    namespace: classic-agents
+    sectionName: verify
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /classic/classic-agents/${schema.metadata.name}/verify
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplaceFullPath
+          replaceFullPath: /
+    backendRefs:
+    - name: ${agent.metadata.name}
+      namespace: ${agent.metadata.namespace}
+      port: 8080
+</pre></article><article class="resource-panel" id="secure-cardRoute-panel" aria-labelledby="secure-cardRoute-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-cardRoute-heading">AgentCard route</h3><p>Only the verification listener exposes the exact AgentCard path. Route status must report Accepted and ResolvedRefs.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/10-cardRoute.yaml</p></div><pre tabindex="0" aria-label="AgentCard route YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ${schema.metadata.name}-card
+  namespace: ${schema.metadata.namespace}
+  annotations:
+    classic.kagent.dev/policy: ${cardPolicy.metadata.name}
+spec:
+  parentRefs:
+  - name: classic-demo
+    namespace: classic-agents
+    sectionName: verify
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /classic/classic-agents/${schema.metadata.name}/card
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplaceFullPath
+          replaceFullPath: /.well-known/agent-card.json
+    backendRefs:
+    - name: ${agent.metadata.name}
+      namespace: ${agent.metadata.namespace}
+      port: 8080
+</pre></article><article class="resource-panel" id="secure-goldenConfig-panel" aria-labelledby="secure-goldenConfig-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-goldenConfig-heading">Golden ConfigMap</h3><p>Fixed URLs, expected agent name, owner UID and token file path bind the Job to this instance. It contains no provider key or JWT value. The token is projected at runtime.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/11-goldenConfig.yaml</p></div><pre tabindex="0" aria-label="Golden ConfigMap YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${schema.metadata.name}-golden
+  namespace: ${schema.metadata.namespace}
+data:
+  config.json: &#x27;{&quot;invokeURL&quot;: &quot;http://classic-demo.classic-agents.svc.cluster.local:8081/classic/classic-agents/${schema.metadata.name}/verify&quot;,
+    &quot;cardURL&quot;: &quot;http://classic-demo.classic-agents.svc.cluster.local:8081/classic/classic-agents/${schema.metadata.name}/card&quot;,
+    &quot;callerURL&quot;: &quot;http://classic-demo.classic-agents.svc.cluster.local:8080/classic/classic-agents/${schema.metadata.name}/invoke&quot;,
+    &quot;expectedAgent&quot;: &quot;${schema.metadata.name}&quot;, &quot;requestUID&quot;: &quot;${schema.metadata.uid}&quot;, &quot;tokenFile&quot;: &quot;/var/run/golden/token&quot;,
+    &quot;timeoutSeconds&quot;: 480}&#x27;
+</pre></article><article class="resource-panel" id="secure-verifierNetwork-panel" aria-labelledby="secure-verifierNetwork-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-verifierNetwork-heading">Verifier network boundary</h3><p>All verifier ingress is denied. Its only egress paths are DNS and the two Gateway listeners, including the caller lane used for a negative control.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/12-verifierNetwork.yaml</p></div><pre tabindex="0" aria-label="Verifier network boundary YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ${schema.metadata.name}-verifier
+  namespace: ${schema.metadata.namespace}
+spec:
+  podSelector:
+    matchLabels:
+      classic.kagent.dev/verifier: ${schema.metadata.name}
+  policyTypes:
+  - Ingress
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: classic-agents
+      podSelector:
+        matchLabels:
+          gateway.networking.k8s.io/gateway-name: classic-demo
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8081
+</pre></article><article class="resource-panel" id="secure-golden-panel" aria-labelledby="secure-golden-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-golden-heading">Golden verification Job</h3><p>After the Agent and verifier routes are ready, the Job checks the card and denied requests, then makes one real model request for PONG. It requires completed native assistant output. backoffLimit is zero.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/13-golden.yaml</p></div><pre tabindex="0" aria-label="Golden verification Job YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ${schema.metadata.name}-golden
+  namespace: ${schema.metadata.namespace}
+  annotations:
+    classic.kagent.dev/agent: ${agent.metadata.name}
+    classic.kagent.dev/route: ${verifyRoute.metadata.name}
+    classic.kagent.dev/card-route: ${cardRoute.metadata.name}
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        classic.kagent.dev/verifier: ${schema.metadata.name}
+        classic.kagent.dev/request-uid: ${schema.metadata.uid}
+    spec:
+      serviceAccountName: ${verifierAccount.metadata.name}
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: golden
+        image: &#x27;{{APPROVED_GOLDEN_IMAGE_AT_DIGEST}}&#x27;
+        command:
+        - python3
+        - -B
+        - /app/golden.py
+        - --config
+        - /golden/config.json
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          requests:
+            cpu: 25m
+            memory: 32Mi
+          limits:
+            cpu: 500m
+            memory: 128Mi
+        volumeMounts:
+        - name: config
+          mountPath: /golden
+          readOnly: true
+        - name: jwt
+          mountPath: /var/run/golden
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: ${goldenConfig.metadata.name}
+      - name: jwt
+        projected:
+          sources:
+          - serviceAccountToken:
+              audience: secure-agent-classic
+              expirationSeconds: 600
+              path: token
+</pre></article><article class="resource-panel" id="secure-callerRoute-panel" aria-labelledby="secure-callerRoute-heading"><div class="resource-info"><span class="tag">KRO</span><h3 id="secure-callerRoute-heading">Customer invocation route</h3><p>The annotation references the Golden Job. KRO waits for that Job to succeed before creating the caller route. A successful Job is a recorded gate, not continuous reapproval or revocation.</p><p class="change">Added by the secure KRO composition. The customer does not author or manage this child resource directly.</p><p class="origin">Exact catalog-profile RGD resource template. KRO resolves the ${...} CEL references. No deployment runs here.</p><p class="source">Source · demo/yaml/catalog/14-callerRoute.yaml</p></div><pre tabindex="0" aria-label="Customer invocation route YAML"># KRO template from spec.resources. CEL is resolved by KRO.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ${schema.metadata.name}-invoke
+  namespace: ${schema.metadata.namespace}
+  annotations:
+    classic.kagent.dev/policy: ${callerPolicy.metadata.name}
+    classic.kagent.dev/verified-job: ${golden.metadata.name}
+spec:
+  parentRefs:
+  - name: classic-demo
+    namespace: classic-agents
+    sectionName: caller
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /classic/classic-agents/${schema.metadata.name}/invoke
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplaceFullPath
+          replaceFullPath: /
+    backendRefs:
+    - name: ${agent.metadata.name}
+      namespace: ${agent.metadata.namespace}
+      port: 8080
+</pre></article><article class="resource-panel" id="secure-graph-panel" aria-labelledby="secure-graph-heading"><div class="resource-info"><span class="tag">Platform</span><h3 id="secure-graph-heading">ResourceGraphDefinition</h3><p>Defines the customer schema and the 14-resource dependency graph. The caller route depends on Golden Job success.</p><p class="change">Shared or reused configuration, not another per-agent KRO child.</p><p class="origin">Exact checked graph/baseline or clearly marked reference example. Environment-specific values stay as placeholders.</p><p class="source">Source · demo/yaml/catalog/resourcegraphdefinition.yaml</p></div><pre tabindex="0" aria-label="ResourceGraphDefinition YAML">apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: classic-secure-agent
+spec:
+  schema:
+    apiVersion: v1alpha1
+    group: demo.kagent.dev
+    kind: ClassicSecureAgent
+    types:
+      SkillID: string | enum=work-guidance
+      ToolID: string | enum=kubernetes-readonly,gitlab-readonly,denodo-readonly
+    spec:
+      modelConfig: string | required=true enum=approved-model immutable=true
+      systemPrompt: string | required=true minLength=1 maxLength=4096 immutable=true
+      skills: &#x27;[]SkillID | required=true minItems=1 maxItems=1 uniqueItems=true immutable=true&#x27;
+      tools: &#x27;[]ToolID | default=[] maxItems=3 uniqueItems=true immutable=true&#x27;
+    status:
+      goldenSucceeded: ${golden.status.succeeded}
+      agentName: ${agent.metadata.name}
+  resources:
+  - id: runtimeAccount
+    template:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: ${schema.metadata.name}-runtime
+        namespace: ${schema.metadata.namespace}
+      automountServiceAccountToken: false
+  - id: verifierAccount
+    template:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: ${schema.metadata.name}-verifier
+        namespace: ${schema.metadata.namespace}
+      automountServiceAccountToken: false
+  - id: callerAccount
+    template:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: ${schema.metadata.name}-caller
+        namespace: ${schema.metadata.namespace}
+      automountServiceAccountToken: false
+  - id: agent
+    template:
+      apiVersion: kagent.dev/v1alpha2
+      kind: Agent
+      metadata:
+        name: ${schema.metadata.name}
+        namespace: ${schema.metadata.namespace}
+      spec:
+        type: Declarative
+        description: KRO-composed native agent without Substrate
+        declarative:
+          runtime: go
+          modelConfig: ${schema.spec.modelConfig}
+          systemMessage: ${schema.spec.systemPrompt}
+          stream: false
+          tools: ${schema.spec.tools.map(id, {&quot;kubernetes-readonly&quot;:dyn({&quot;type&quot;:dyn(&quot;McpServer&quot;),&quot;mcpServer&quot;:dyn({&quot;apiGroup&quot;:dyn(&quot;kagent.dev&quot;),&quot;kind&quot;:dyn(&quot;RemoteMCPServer&quot;),&quot;name&quot;:dyn(&quot;approved-kubernetes-mcp&quot;),&quot;toolNames&quot;:dyn([dyn(&quot;k8s_get_resources&quot;),dyn(&quot;k8s_get_events&quot;)])})}),&quot;gitlab-readonly&quot;:dyn({&quot;type&quot;:dyn(&quot;McpServer&quot;),&quot;mcpServer&quot;:dyn({&quot;apiGroup&quot;:dyn(&quot;kagent.dev&quot;),&quot;kind&quot;:dyn(&quot;RemoteMCPServer&quot;),&quot;name&quot;:dyn(&quot;approved-gitlab-mcp&quot;),&quot;toolNames&quot;:dyn([dyn(&quot;gitlab_get_project&quot;),dyn(&quot;gitlab_get_latest_pipeline&quot;)])})}),&quot;denodo-readonly&quot;:dyn({&quot;type&quot;:dyn(&quot;McpServer&quot;),&quot;mcpServer&quot;:dyn({&quot;apiGroup&quot;:dyn(&quot;kagent.dev&quot;),&quot;kind&quot;:dyn(&quot;RemoteMCPServer&quot;),&quot;name&quot;:dyn(&quot;approved-denodo-mcp&quot;),&quot;toolNames&quot;:dyn([dyn(&quot;get_inventory_data_product_details&quot;),dyn(&quot;get_namespace_count&quot;),dyn(&quot;get_namespace_summary&quot;)])})})}[id])}
+          deployment:
+            serviceAccountName: ${runtimeAccount.metadata.name}
+            resources:
+              requests:
+                cpu: 25m
+                memory: 64Mi
+              limits:
+                cpu: 1000m
+                memory: 256Mi
+            env:
+            - name: HOME
+              value: /tmp
+            podSecurityContext:
+              runAsNonRoot: true
+              runAsUser: 1000
+              fsGroup: 1000
+              seccompProfile:
+                type: RuntimeDefault
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                - ALL
+            volumes:
+            - name: writable-tmp
+              emptyDir:
+                sizeLimit: 64Mi
+            volumeMounts:
+            - name: writable-tmp
+              mountPath: /tmp
+        skills:
+          gitRefs: ${schema.spec.skills.map(id, {&quot;work-guidance&quot;:dyn({&quot;url&quot;:dyn(&quot;{{APPROVED_GITLAB_SKILLS_REPOSITORY_URL}}&quot;),&quot;ref&quot;:dyn(&quot;{{APPROVED_FULL_COMMIT_ID}}&quot;),&quot;path&quot;:dyn(&quot;skills/work-guidance&quot;),&quot;name&quot;:dyn(&quot;work-guidance&quot;)})}[id])}
+          gitAuthSecretRef:
+            name: approved-git-credentials
+    readyWhen:
+    - ${agent.status.conditions.exists(c, c.type == &quot;Accepted&quot; &amp;&amp; c.status == &quot;True&quot; &amp;&amp; c.observedGeneration
+      == agent.metadata.generation)}
+    - ${agent.status.conditions.exists(c, c.type == &quot;Ready&quot; &amp;&amp; c.status == &quot;True&quot; &amp;&amp; c.observedGeneration
+      == agent.metadata.generation)}
+  - id: network
+    template:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: ${schema.metadata.name}-boundary
+        namespace: ${schema.metadata.namespace}
+      spec:
+        podSelector:
+          matchLabels:
+            app: kagent
+            kagent: ${schema.metadata.name}
+        policyTypes:
+        - Ingress
+        - Egress
+        ingress:
+        - from:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: classic-agents
+            podSelector:
+              matchLabels:
+                gateway.networking.k8s.io/gateway-name: classic-demo
+          ports:
+          - protocol: TCP
+            port: 8080
+        egress:
+        - to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: kube-system
+          ports:
+          - protocol: UDP
+            port: 53
+          - protocol: TCP
+            port: 53
+        - to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: &#x27;{{MODEL_GATEWAY_NAMESPACE}}&#x27;
+            podSelector:
+              matchLabels:
+                app: &#x27;{{MODEL_GATEWAY_POD_LABEL}}&#x27;
+          ports:
+          - protocol: TCP
+            port: 8081
+        - to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: &#x27;{{KAGENT_CONTROLLER_NAMESPACE}}&#x27;
+            podSelector:
+              matchLabels:
+                app.kubernetes.io/name: &#x27;{{KAGENT_CONTROLLER_LABEL}}&#x27;
+          ports:
+          - protocol: TCP
+            port: 8083
+  - id: verifierPolicy
+    template:
+      apiVersion: agentgateway.dev/v1alpha1
+      kind: AgentgatewayPolicy
+      metadata:
+        name: ${schema.metadata.name}-verify
+        namespace: ${schema.metadata.namespace}
+      spec:
+        targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: ${schema.metadata.name}-verify
+        traffic:
+          jwtAuthentication:
+            mode: Strict
+            preserveToken: false
+            providers:
+            - issuer: &#x27;{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}&#x27;
+              audiences:
+              - secure-agent-classic
+              jwks:
+                inline: &#x27;{{KUBERNETES_JWKS_JSON}}&#x27;
+          authorization:
+            action: Require
+            policy:
+              matchExpressions:
+              - jwt.sub == &quot;system:serviceaccount:classic-agents:${schema.metadata.name}-verifier&quot;
+  - id: cardPolicy
+    template:
+      apiVersion: agentgateway.dev/v1alpha1
+      kind: AgentgatewayPolicy
+      metadata:
+        name: ${schema.metadata.name}-card
+        namespace: ${schema.metadata.namespace}
+      spec:
+        targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: ${schema.metadata.name}-card
+        traffic:
+          jwtAuthentication:
+            mode: Strict
+            preserveToken: false
+            providers:
+            - issuer: &#x27;{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}&#x27;
+              audiences:
+              - secure-agent-classic
+              jwks:
+                inline: &#x27;{{KUBERNETES_JWKS_JSON}}&#x27;
+          authorization:
+            action: Require
+            policy:
+              matchExpressions:
+              - jwt.sub == &quot;system:serviceaccount:classic-agents:${schema.metadata.name}-verifier&quot;
+  - id: callerPolicy
+    template:
+      apiVersion: agentgateway.dev/v1alpha1
+      kind: AgentgatewayPolicy
+      metadata:
+        name: ${schema.metadata.name}-invoke
+        namespace: ${schema.metadata.namespace}
+      spec:
+        targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: ${schema.metadata.name}-invoke
+        traffic:
+          jwtAuthentication:
+            mode: Strict
+            preserveToken: false
+            providers:
+            - issuer: &#x27;{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}&#x27;
+              audiences:
+              - secure-agent-classic
+              jwks:
+                inline: &#x27;{{KUBERNETES_JWKS_JSON}}&#x27;
+          authorization:
+            action: Require
+            policy:
+              matchExpressions:
+              - jwt.sub == &quot;system:serviceaccount:classic-agents:${schema.metadata.name}-caller&quot;
+  - id: verifyRoute
+    template:
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: HTTPRoute
+      metadata:
+        name: ${schema.metadata.name}-verify
+        namespace: ${schema.metadata.namespace}
+        annotations:
+          classic.kagent.dev/policy: ${verifierPolicy.metadata.name}
+      spec:
+        parentRefs:
+        - name: classic-demo
+          namespace: classic-agents
+          sectionName: verify
+        rules:
+        - matches:
+          - path:
+              type: Exact
+              value: /classic/classic-agents/${schema.metadata.name}/verify
+          filters:
+          - type: URLRewrite
+            urlRewrite:
+              path:
+                type: ReplaceFullPath
+                replaceFullPath: /
+          backendRefs:
+          - name: ${agent.metadata.name}
+            namespace: ${agent.metadata.namespace}
+            port: 8080
+    readyWhen:
+    - ${verifyRoute.status.parents.exists(p, p.conditions.exists(c, c.type == &quot;Accepted&quot; &amp;&amp; c.status ==
+      &quot;True&quot; &amp;&amp; c.observedGeneration == verifyRoute.metadata.generation) &amp;&amp; p.conditions.exists(c, c.type
+      == &quot;ResolvedRefs&quot; &amp;&amp; c.status == &quot;True&quot; &amp;&amp; c.observedGeneration == verifyRoute.metadata.generation))}
+  - id: cardRoute
+    template:
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: HTTPRoute
+      metadata:
+        name: ${schema.metadata.name}-card
+        namespace: ${schema.metadata.namespace}
+        annotations:
+          classic.kagent.dev/policy: ${cardPolicy.metadata.name}
+      spec:
+        parentRefs:
+        - name: classic-demo
+          namespace: classic-agents
+          sectionName: verify
+        rules:
+        - matches:
+          - path:
+              type: Exact
+              value: /classic/classic-agents/${schema.metadata.name}/card
+          filters:
+          - type: URLRewrite
+            urlRewrite:
+              path:
+                type: ReplaceFullPath
+                replaceFullPath: /.well-known/agent-card.json
+          backendRefs:
+          - name: ${agent.metadata.name}
+            namespace: ${agent.metadata.namespace}
+            port: 8080
+    readyWhen:
+    - ${cardRoute.status.parents.exists(p, p.conditions.exists(c, c.type == &quot;Accepted&quot; &amp;&amp; c.status ==
+      &quot;True&quot; &amp;&amp; c.observedGeneration == cardRoute.metadata.generation) &amp;&amp; p.conditions.exists(c, c.type
+      == &quot;ResolvedRefs&quot; &amp;&amp; c.status == &quot;True&quot; &amp;&amp; c.observedGeneration == cardRoute.metadata.generation))}
+  - id: goldenConfig
+    template:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: ${schema.metadata.name}-golden
+        namespace: ${schema.metadata.namespace}
+      data:
+        config.json: &#x27;{&quot;invokeURL&quot;: &quot;http://classic-demo.classic-agents.svc.cluster.local:8081/classic/classic-agents/${schema.metadata.name}/verify&quot;,
+          &quot;cardURL&quot;: &quot;http://classic-demo.classic-agents.svc.cluster.local:8081/classic/classic-agents/${schema.metadata.name}/card&quot;,
+          &quot;callerURL&quot;: &quot;http://classic-demo.classic-agents.svc.cluster.local:8080/classic/classic-agents/${schema.metadata.name}/invoke&quot;,
+          &quot;expectedAgent&quot;: &quot;${schema.metadata.name}&quot;, &quot;requestUID&quot;: &quot;${schema.metadata.uid}&quot;, &quot;tokenFile&quot;:
+          &quot;/var/run/golden/token&quot;, &quot;timeoutSeconds&quot;: 480}&#x27;
+  - id: verifierNetwork
+    template:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: ${schema.metadata.name}-verifier
+        namespace: ${schema.metadata.namespace}
+      spec:
+        podSelector:
+          matchLabels:
+            classic.kagent.dev/verifier: ${schema.metadata.name}
+        policyTypes:
+        - Ingress
+        - Egress
+        egress:
+        - to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: kube-system
+          ports:
+          - protocol: UDP
+            port: 53
+          - protocol: TCP
+            port: 53
+        - to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: classic-agents
+            podSelector:
+              matchLabels:
+                gateway.networking.k8s.io/gateway-name: classic-demo
+          ports:
+          - protocol: TCP
+            port: 8080
+          - protocol: TCP
+            port: 8081
+  - id: golden
+    template:
+      apiVersion: batch/v1
+      kind: Job
+      metadata:
+        name: ${schema.metadata.name}-golden
+        namespace: ${schema.metadata.namespace}
+        annotations:
+          classic.kagent.dev/agent: ${agent.metadata.name}
+          classic.kagent.dev/route: ${verifyRoute.metadata.name}
+          classic.kagent.dev/card-route: ${cardRoute.metadata.name}
+      spec:
+        backoffLimit: 0
+        activeDeadlineSeconds: 600
+        template:
+          metadata:
+            labels:
+              classic.kagent.dev/verifier: ${schema.metadata.name}
+              classic.kagent.dev/request-uid: ${schema.metadata.uid}
+          spec:
+            serviceAccountName: ${verifierAccount.metadata.name}
+            automountServiceAccountToken: false
+            restartPolicy: Never
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 65532
+              seccompProfile:
+                type: RuntimeDefault
+            containers:
+            - name: golden
+              image: &#x27;{{APPROVED_GOLDEN_IMAGE_AT_DIGEST}}&#x27;
+              command:
+              - python3
+              - -B
+              - /app/golden.py
+              - --config
+              - /golden/config.json
+              securityContext:
+                readOnlyRootFilesystem: true
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                  - ALL
+              resources:
+                requests:
+                  cpu: 25m
+                  memory: 32Mi
+                limits:
+                  cpu: 500m
+                  memory: 128Mi
+              volumeMounts:
+              - name: config
+                mountPath: /golden
+                readOnly: true
+              - name: jwt
+                mountPath: /var/run/golden
+                readOnly: true
+            volumes:
+            - name: config
+              configMap:
+                name: ${goldenConfig.metadata.name}
+            - name: jwt
+              projected:
+                sources:
+                - serviceAccountToken:
+                    audience: secure-agent-classic
+                    expirationSeconds: 600
+                    path: token
+    readyWhen:
+    - ${golden.status.succeeded == 1}
+  - id: callerRoute
+    template:
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: HTTPRoute
+      metadata:
+        name: ${schema.metadata.name}-invoke
+        namespace: ${schema.metadata.namespace}
+        annotations:
+          classic.kagent.dev/policy: ${callerPolicy.metadata.name}
+          classic.kagent.dev/verified-job: ${golden.metadata.name}
+      spec:
+        parentRefs:
+        - name: classic-demo
+          namespace: classic-agents
+          sectionName: caller
+        rules:
+        - matches:
+          - path:
+              type: Exact
+              value: /classic/classic-agents/${schema.metadata.name}/invoke
+          filters:
+          - type: URLRewrite
+            urlRewrite:
+              path:
+                type: ReplaceFullPath
+                replaceFullPath: /
+          backendRefs:
+          - name: ${agent.metadata.name}
+            namespace: ${agent.metadata.namespace}
+            port: 8080
+    readyWhen:
+    - ${callerRoute.status.parents.exists(p, p.conditions.exists(c, c.type == &quot;Accepted&quot; &amp;&amp; c.status ==
+      &quot;True&quot; &amp;&amp; c.observedGeneration == callerRoute.metadata.generation) &amp;&amp; p.conditions.exists(c, c.type
+      == &quot;ResolvedRefs&quot; &amp;&amp; c.status == &quot;True&quot; &amp;&amp; c.observedGeneration == callerRoute.metadata.generation))}
+</pre></article><article class="resource-panel" id="secure-gateway-panel" aria-labelledby="secure-gateway-heading"><div class="resource-info"><span class="tag">Platform</span><h3 id="secure-gateway-heading">Gateway</h3><p>Provides separate caller and verifier listeners. allowedRoutes controls which namespaces may attach HTTPRoutes; it does not authenticate callers.</p><p class="change">Shared or reused configuration, not another per-agent KRO child.</p><p class="origin">Exact checked graph/baseline or clearly marked reference example. Environment-specific values stay as placeholders.</p><p class="source">Source · demo/yaml/platform-classic-demo.yaml</p></div><pre tabindex="0" aria-label="Gateway YAML"># Platform baseline, installed before any customer instance.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: classic-demo
+  namespace: classic-agents
+spec:
+  gatewayClassName: agentgateway
+  listeners:
+  - name: caller
+    port: 8080
+    protocol: HTTP
+    allowedRoutes:
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            kubernetes.io/metadata.name: classic-agents
+  - name: verify
+    port: 8081
+    protocol: HTTP
+    allowedRoutes:
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            kubernetes.io/metadata.name: classic-agents
+</pre></article><article class="resource-panel" id="secure-callerListener-panel" aria-labelledby="secure-callerListener-heading"><div class="resource-info"><span class="tag">Platform</span><h3 id="secure-callerListener-heading">Caller listener policy</h3><p>Protects the shared caller listener with strict JWT validation and the exact caller identity before customer routes are added.</p><p class="change">Shared or reused configuration, not another per-agent KRO child.</p><p class="origin">Exact checked graph/baseline or clearly marked reference example. Environment-specific values stay as placeholders.</p><p class="source">Source · demo/yaml/platform-classic-listener-caller.yaml</p></div><pre tabindex="0" aria-label="Caller listener policy YAML"># Platform baseline, installed before any customer instance.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: classic-listener-caller
+  namespace: classic-agents
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: classic-demo
+    sectionName: caller
+  traffic:
+    jwtAuthentication:
+      mode: Strict
+      preserveToken: false
+      providers:
+      - issuer: &#x27;{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}&#x27;
+        audiences:
+        - secure-agent-classic
+        jwks:
+          inline: &#x27;{{KUBERNETES_JWKS_JSON}}&#x27;
+    authorization:
+      action: Require
+      policy:
+        matchExpressions:
+        - jwt.sub == &quot;system:serviceaccount:classic-agents:demo-caller&quot;
+</pre></article><article class="resource-panel" id="secure-verifierListener-panel" aria-labelledby="secure-verifierListener-heading"><div class="resource-info"><span class="tag">Platform</span><h3 id="secure-verifierListener-heading">Verifier listener policy</h3><p>Keeps verification traffic on its own listener and verifier identity. It is installed before an agent instance.</p><p class="change">Shared or reused configuration, not another per-agent KRO child.</p><p class="origin">Exact checked graph/baseline or clearly marked reference example. Environment-specific values stay as placeholders.</p><p class="source">Source · demo/yaml/platform-classic-listener-verify.yaml</p></div><pre tabindex="0" aria-label="Verifier listener policy YAML"># Platform baseline, installed before any customer instance.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: classic-listener-verify
+  namespace: classic-agents
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: classic-demo
+    sectionName: verify
+  traffic:
+    jwtAuthentication:
+      mode: Strict
+      preserveToken: false
+      providers:
+      - issuer: &#x27;{{KUBERNETES_SERVICE_ACCOUNT_ISSUER}}&#x27;
+        audiences:
+        - secure-agent-classic
+        jwks:
+          inline: &#x27;{{KUBERNETES_JWKS_JSON}}&#x27;
+    authorization:
+      action: Require
+      policy:
+        matchExpressions:
+        - jwt.sub == &quot;system:serviceaccount:classic-agents:demo-verifier&quot;
+</pre></article><article class="resource-panel" id="secure-model-panel" aria-labelledby="secure-model-heading"><div class="resource-info"><span class="tag">Platform</span><h3 id="secure-model-heading">Approved ModelConfig</h3><p>Reuses the approved native model connection and platform-owned credential reference.</p><p class="change">Shared or reused configuration, not another per-agent KRO child.</p><p class="origin">Exact checked graph/baseline or clearly marked reference example. Environment-specific values stay as placeholders.</p><p class="source">Source · demo/yaml/model.yaml</p></div><pre tabindex="0" aria-label="Approved ModelConfig YAML"># Reference example only. Read its explanation before using it.
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  name: approved-model
+  namespace: classic-agents
+spec:
+  provider: OpenAI
+  model: &#x27;{{APPROVED_MODEL_NAME}}&#x27;
+  apiKeySecret: &#x27;{{EXISTING_PROVIDER_SECRET_NAME}}&#x27;
+  apiKeySecretKey: &#x27;{{EXISTING_PROVIDER_SECRET_KEY}}&#x27;
+  openAI:
+    baseUrl: &#x27;{{APPROVED_MODEL_GATEWAY_BASE_URL}}&#x27;
+</pre></article><article class="resource-panel" id="secure-mcp-panel" aria-labelledby="secure-mcp-heading"><div class="resource-info"><span class="tag">Platform</span><h3 id="secure-mcp-heading">Approved RemoteMCPServer</h3><p>Reuses the approved MCP endpoint. Selected tool names and the adapter backend permissions still constrain real operations.</p><p class="change">Shared or reused configuration, not another per-agent KRO child.</p><p class="origin">Exact checked graph/baseline or clearly marked reference example. Environment-specific values stay as placeholders.</p><p class="source">Source · demo/yaml/remoteMCP.yaml</p></div><pre tabindex="0" aria-label="Approved RemoteMCPServer YAML"># Reference example only. Read its explanation before using it.
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: approved-kubernetes-mcp
+  namespace: classic-agents
+spec:
+  description: Approved read-only Kubernetes MCP server
+  url: &#x27;{{APPROVED_KUBERNETES_MCP_URL}}&#x27;
+  protocol: STREAMABLE_HTTP
+</pre></article><article class="resource-panel" id="secure-deployment-panel" aria-labelledby="secure-deployment-heading"><div class="resource-info"><span class="tag">kagent controller</span><h3 id="secure-deployment-heading">Native runtime Deployment</h3><p>kagent generates the runtime Deployment, Service, and configuration Secret from the native Agent. Secret contents are deliberately omitted.</p><p class="change">KRO owns the Agent definition. kagent owns this generated runtime object.</p><p class="origin">Sanitized controller output recorded on 4 November 2026. Not current live state or an initial-deployment snapshot.</p><p class="source">Source · demo/recorded-native-deployment.yaml</p></div><pre tabindex="0" aria-label="Native runtime Deployment YAML"># Sanitized native controller output recorded 2026-11-04. Not a file to apply.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: kagent
+      kagent: demo
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kagent.dev/config-hash: &#x27;8117045136914952335&#x27;
+      labels:
+        app: kagent
+        app.kubernetes.io/managed-by: kagent
+        app.kubernetes.io/name: demo
+        app.kubernetes.io/part-of: kagent
+        kagent: demo
+    spec:
+      containers:
+      - args:
+        - --host
+        - 0.0.0.0
+        - --port
+        - &#x27;8080&#x27;
+        - --filepath
+        - /config
+        env:
+        - name: HOME
+          value: /tmp
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: api-key
+              name: classic-model-token
+        - name: OTEL_LOGGING_ENABLED
+          value: &#x27;false&#x27;
+        - name: OTEL_TRACING_ENABLED
+          value: &#x27;false&#x27;
+        - name: KAGENT_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: KAGENT_NAME
+          value: demo
+        - name: KAGENT_URL
+          value: http://classic-controller.classic-system:8083
+        image: ghcr.io/kagent-dev/kagent/golang-adk:0.10.4
+        imagePullPolicy: IfNotPresent
+        name: kagent
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /.well-known/agent-card.json
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 1
+          periodSeconds: 1
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: &#x27;1&#x27;
+            memory: 256Mi
+          requests:
+            cpu: 25m
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /tmp
+          name: writable-tmp
+        - mountPath: /var/run/secrets/tokens
+          name: kagent-token
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccount: demo-runtime
+      serviceAccountName: demo-runtime
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: config
+        secret:
+          defaultMode: 420
+          secretName: demo
+      - emptyDir:
+          sizeLimit: 64Mi
+        name: writable-tmp
+      - name: kagent-token
+        projected:
+          defaultMode: 420
+          sources:
+          - serviceAccountToken:
+              audience: kagent
+              expirationSeconds: 3600
+              path: kagent-token
+</pre></article><article class="resource-panel" id="secure-service-panel" aria-labelledby="secure-service-heading"><div class="resource-info"><span class="tag">kagent controller</span><h3 id="secure-service-heading">Native runtime Service</h3><p>kagent generates the runtime Deployment, Service, and configuration Secret from the native Agent. Secret contents are deliberately omitted.</p><p class="change">KRO owns the Agent definition. kagent owns this generated runtime object.</p><p class="origin">Illustrative controller-owned Service shape, not a live Service snapshot.</p><p class="source">Source · demo/yaml/nativeService.yaml</p></div><pre tabindex="0" aria-label="Native runtime Service YAML"># Reference example only. Read its explanation before using it.
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo
+  namespace: classic-agents
+spec:
+  type: ClusterIP
+  selector:
+    app: kagent
+    kagent: demo
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+</pre></article><article class="resource-panel" id="secure-referenceGrant-panel" aria-labelledby="secure-referenceGrant-heading"><div class="resource-info"><span class="tag">Backend namespace owner</span><h3 id="secure-referenceGrant-heading">Conditional ReferenceGrant</h3><p>Permits a specified cross-namespace HTTPRoute-to-Service reference. The checked same-namespace layout needs no ReferenceGrant.</p><p class="change">Use only for a reviewed cross-namespace variant. A grant does not authenticate a caller or grant network/API permission.</p><p class="origin">Existing conditional reference example. Not installed by this graph and not counted among the 14.</p><p class="source">Source · demo/yaml/referenceGrant.yaml</p></div><pre tabindex="0" aria-label="Conditional ReferenceGrant YAML"># Reference example only. Read its explanation before using it.
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-reviewed-route-to-demo
+  namespace: classic-agents
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: &#x27;{{APPROVED_ROUTE_NAMESPACE}}&#x27;
+  to:
+  - group: &#x27;&#x27;
+    kind: Service
+    name: demo
+</pre></article></div></section></fieldset></details><p class="secondary-links"><a href="tomorrow.html">Desired state and Entra</a><a href="presentation.html">Full YAML explorer</a></p></main></body></html>

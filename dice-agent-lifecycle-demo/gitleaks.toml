@@ -1,0 +1,7 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Verified public Git source commit in the slide provenance manifest, not a Sourcegraph credential"
+regexTarget = "secret"
+regexes = ['''b4a041d7439002a366330eba15d084872ea5f6dd''']

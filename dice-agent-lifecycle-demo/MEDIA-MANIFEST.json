@@ -1,0 +1,220 @@
+{
+  "schemaVersion": "dice-original-media/v1",
+  "recordedDate": "2026-11-11",
+  "provenance": "Original DICE runtime recording and editable HyperFrames project. Exact source bytes; master is not re-encoded.",
+  "master": "original-video/renders/dice-runtime-walkthrough-review.mp4",
+  "masterDurationSeconds": 302.092167,
+  "masterResolution": "1920x1080",
+  "files": [
+    {
+      "path": "original-video/NARRATION.md",
+      "bytes": 3875,
+      "sha256": "ea49773effb789f5a72abe62901939e168bbdef23da4d65e30bfcc56e09ea8f0",
+      "mediaType": "text/markdown"
+    },
+    {
+      "path": "original-video/SPEC.md",
+      "bytes": 825,
+      "sha256": "59762c2d079e60569aae76c210ac5f7ed5474bae6ef6dde236c069f907060c3b",
+      "mediaType": "text/markdown"
+    },
+    {
+      "path": "original-video/STORYBOARD.md",
+      "bytes": 2813,
+      "sha256": "cd0011b1053ba4db58e3599adf8cafd37858814ac54d3ce5c7334045590f2f22",
+      "mediaType": "text/markdown"
+    },
+    {
+      "path": "original-video/assets/footage/entra.mp4",
+      "bytes": 739537,
+      "sha256": "cd650a45cea941ce48e1d88257df7a12d47f2b333f80cc6a13b7845ecd8bca49",
+      "mediaType": "video/mp4"
+    },
+    {
+      "path": "original-video/assets/footage/gateway.mp4",
+      "bytes": 988546,
+      "sha256": "454f4c0e288b9b364109853a8b63a0bd286712ba71768a27793bd47e2b7b924b",
+      "mediaType": "video/mp4"
+    },
+    {
+      "path": "original-video/assets/footage/otel.mp4",
+      "bytes": 1111075,
+      "sha256": "176c59e21e040d14fe532b31594af6a813b5b6575924f4a59bcc76f15bf4c4b1",
+      "mediaType": "video/mp4"
+    },
+    {
+      "path": "original-video/assets/footage/runtime.mp4",
+      "bytes": 1916021,
+      "sha256": "74f981eee971fd644b72787a0c1d0fdb5638b09b8f1108141481c5f645d4b714",
+      "mediaType": "video/mp4"
+    },
+    {
+      "path": "original-video/assets/footage/terminal.mp4",
+      "bytes": 9327360,
+      "sha256": "54a293fce23939f1e721d5e81dae4a37f414bb9203c0742e0062ca7e22f6e506",
+      "mediaType": "video/mp4"
+    },
+    {
+      "path": "original-video/assets/gsap.min.js",
+      "bytes": 72927,
+      "sha256": "92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb",
+      "mediaType": "text/javascript"
+    },
+    {
+      "path": "original-video/assets/images/gateway-routes.png",
+      "bytes": 87582,
+      "sha256": "08a6905a03a585a5e53fc439d1f00c7fbb5d6b1860264862d408c4cdb55fff7c",
+      "mediaType": "image/png"
+    },
+    {
+      "path": "original-video/assets/images/mcp-result.png",
+      "bytes": 136881,
+      "sha256": "fc4f388f5ab0e68372e0ec61c346e48e15e544d3d87376e5d91e64f266f91c80",
+      "mediaType": "image/png"
+    },
+    {
+      "path": "original-video/assets/images/otel-success.png",
+      "bytes": 130458,
+      "sha256": "342d3c4b98212edc0803e711b0c864a58188ad5e611a8762bafd52916b632ea1",
+      "mediaType": "image/png"
+    },
+    {
+      "path": "original-video/assets/images/otel-trace-detail.png",
+      "bytes": 95786,
+      "sha256": "7031f1f70486635bb77f788cc2ddd6ab9da84e6b2915bd62b689a47c38268e3d",
+      "mediaType": "image/png"
+    },
+    {
+      "path": "original-video/assets/images/runtime-ui.png",
+      "bytes": 95600,
+      "sha256": "a62d9f197be2291c9e24dde823a8142eacb66b4c50f555b4b3c6b8a296f2c7b7",
+      "mediaType": "image/png"
+    },
+    {
+      "path": "original-video/assets/images/skill-result.png",
+      "bytes": 219727,
+      "sha256": "0992327325ff4d37e150cf4382b098dcf27bec45569b480a226cb7749b4b3430",
+      "mediaType": "image/png"
+    },
+    {
+      "path": "original-video/assets/narration-leveled.m4a",
+      "bytes": 7539754,
+      "sha256": "e42ff5d04594f80518867fdb7dbc244a65f56fb170d7bc7e69d40e396ed19e52",
+      "mediaType": "audio/mp4a-latm"
+    },
+    {
+      "path": "original-video/assets/narration.mp3",
+      "bytes": 4850867,
+      "sha256": "92be68bd8376b032830c855cf195fe8937b05b74fc68968a2cce5a8985c95077",
+      "mediaType": "audio/mpeg"
+    },
+    {
+      "path": "original-video/build-film.py",
+      "bytes": 14316,
+      "sha256": "1c8e6e43daacca46890e0c0dec052744360361b856337a6be1938ddab556fa23",
+      "mediaType": "text/x-python"
+    },
+    {
+      "path": "original-video/captions.srt",
+      "bytes": 6100,
+      "sha256": "0353d9cafdad845910f576b6cb35dfd419c3d8e131bd56352b3629b9019b4a53",
+      "mediaType": "application/x-subrip"
+    },
+    {
+      "path": "original-video/captions.vtt",
+      "bytes": 6108,
+      "sha256": "44a41374de176ed005e1b6571c67ac4b375530306e53f309a259667259025998",
+      "mediaType": "text/vtt"
+    },
+    {
+      "path": "original-video/compositions/scene-01.html",
+      "bytes": 4091,
+      "sha256": "af7bf7fdacaf087cfac3eb3c2cba47b2ccf728eded88b7495eebb2b567d9e3b6",
+      "mediaType": "text/html"
+    },
+    {
+      "path": "original-video/compositions/scene-02.html",
+      "bytes": 4536,
+      "sha256": "7b8e9da7f52f959288688a2442170e6be9df694b2c8c809184a47246ce911c76",
+      "mediaType": "text/html"
+    },
+    {
+      "path": "original-video/compositions/scene-03.html",
+      "bytes": 4115,
+      "sha256": "1437d192b059221078b7306403b280f26243506eb0df2be7baa3acb62284900a",
+      "mediaType": "text/html"
+    },
+    {
+      "path": "original-video/compositions/scene-04.html",
+      "bytes": 3907,
+      "sha256": "3d3780f45501a4ec2b450b847f20d43695487ff669a2645772d54586f0d98136",
+      "mediaType": "text/html"
+    },
+    {
+      "path": "original-video/compositions/scene-05.html",
+      "bytes": 4558,
+      "sha256": "8036262fc16918f39159385d55b01a5b9fd037d78af69519bda976e394f63d0b",
+      "mediaType": "text/html"
+    },
+    {
+      "path": "original-video/compositions/scene-06.html",
+      "bytes": 4521,
+      "sha256": "7d7f3e77bfb19c41744309fb9b6979734bf526cc2331f7185c8f1dcf47764418",
+      "mediaType": "text/html"
+    },
+    {
+      "path": "original-video/compositions/scene-07.html",
+      "bytes": 4173,
+      "sha256": "fe4b8b790aa9fdc930befd165c6b09bc217cf9fce00dfe137191dddc466e9480",
+      "mediaType": "text/html"
+    },
+    {
+      "path": "original-video/compositions/scene-08.html",
+      "bytes": 4398,
+      "sha256": "1a2d3edb16ef1518ad8f23058a780a192425d1c1b03effe4b403ef5bdf5750c2",
+      "mediaType": "text/html"
+    },
+    {
+      "path": "original-video/compositions/scene-09.html",
+      "bytes": 4171,
+      "sha256": "2e6b50bc5de0882213f4848052b6376f8ad0189e41526c37a20ecf7855a8bb96",
+      "mediaType": "text/html"
+    },
+    {
+      "path": "original-video/compositions/scene-10.html",
+      "bytes": 4279,
+      "sha256": "63dc17719a7de138ec8597e6923594d8a50a334486a26c6e6d4f29e89df6c36b",
+      "mediaType": "text/html"
+    },
+    {
+      "path": "original-video/edit-manifest.json",
+      "bytes": 1480,
+      "sha256": "a1c247f288e02c04f881d9f55c95be711bd8cccedd252ba572b9f1ab9d81cf7b",
+      "mediaType": "application/json"
+    },
+    {
+      "path": "original-video/index.html",
+      "bytes": 3171,
+      "sha256": "70e76b21954d75591f3310475975593ed157beca9f03849f565fafe040990d32",
+      "mediaType": "text/html"
+    },
+    {
+      "path": "original-video/renders/dice-runtime-walkthrough-review.mp4",
+      "bytes": 79051896,
+      "sha256": "cbe3e941821e8e5ccc6210723de2656da658376e3b13446163e0e53a64094311",
+      "mediaType": "video/mp4"
+    },
+    {
+      "path": "original-video/thumbnail.png",
+      "bytes": 403567,
+      "sha256": "ca1f5c6b717a052c6d1c28c29887118cc4eac02963b712815887e1de57ca254d",
+      "mediaType": "image/png"
+    },
+    {
+      "path": "original-video/transcript.json",
+      "bytes": 39519,
+      "sha256": "4d974021cffbc995a5d319b0abd49202c57171e4b7f9e978ec3e12fb9156261b",
+      "mediaType": "application/json"
+    }
+  ]
+}
