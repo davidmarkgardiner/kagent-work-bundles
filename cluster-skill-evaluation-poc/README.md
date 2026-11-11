@@ -1,5 +1,7 @@
 # On-cluster skill evaluation PoC
 
+For a plain-English walkthrough, start with [Our skill test, explained simply](EXPLAINED-SIMPLY.md).
+
 A self-contained namespaced request controller runs one fixed evaluation Job against a reviewed **legacy kagent 0.7.13** Agent. It checks actual native `skills` and `read_file` tool traces against immutable mounted skill bytes, then checks configured answer terms and a citation. This is an acceptance policy, not a general semantic grader.
 
 The request contains only a pinned `scenarioRef`; platform configuration fixes the namespace, controller URL, scenario allowlist, Agent Pod name/UID, image, command and service account. The separate replay controller remains unchanged. No production credentials are included.
