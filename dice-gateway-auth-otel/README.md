@@ -2,6 +2,8 @@
 
 This separate work bundle secures a copy of the ordinary Python agent recorded on 11 November. It keeps the recorded runtime and reviewed skill/knowledge mounts, adds two authenticated Agent Gateway hops, and supplies OTel collection and a Grafana dashboard. Start with [the one-sheet](ONE-SHEET.md).
 
+For the workplace main-Go-Agent walkthrough and adaptive-agent registration discussion, give the work agent [WORK-AGENT-README.md](WORK-AGENT-README.md). It sets the missing evidence gates and links the registration proposal and a short Teams message draft.
+
 The original [DICE lifecycle bundle](https://github.com/davidmarkgardiner/kagent-work-bundles/tree/main/dice-agent-lifecycle-demo) and its video remain historical. This bundle does not modify shared agents, MCP servers, gateways, controllers, or their telemetry exports. The secured clone is a distinct deployment in a dedicated namespace. Consumers must use its gateway endpoint. The original recording agent remains in its source namespace.
 
 ## Prepare private inputs
