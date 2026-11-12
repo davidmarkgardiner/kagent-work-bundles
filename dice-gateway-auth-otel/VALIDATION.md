@@ -31,3 +31,7 @@ The lab initially lacked scheduling headroom. Temporary demo workloads on the co
 The caller uses a loopback port-forward to the gateway's authenticated listener. This does not test public HTTPS ingress or workplace CA/authentication. The MCP data is a fixed synthetic record. Its Kubernetes read and protocol execution are real; it is not a live AKS investigation.
 
 Workplace deployment, Entra Agent ID enforcement, production credential refresh, and integration into the existing workplace LGTM ownership remain untested. Preserve the workplace's current names, grants, identity process, exporter destinations, and delivery flow. Adapt the small producer/gateway/dashboard delta and repeat the same acceptance checks there.
+
+## Additional confidential-data scene: not run
+
+[CONFIDENTIAL-DATA-DEMO.md](CONFIDENTIAL-DATA-DEMO.md) is a new work-agent requirement. No restricted fixture, argument-aware Gateway rule, denial-specific telemetry, or dashboard query for that scene has been deployed or tested by this addition. The existing lab routes authenticate identities; they do not classify data or inspect MCP content. A missing/invalid credential denial does not prove a valid identity was denied a confidential read. Keep the historical receipt unchanged and return a separate dated receipt after implementing and rehearsing the scene.

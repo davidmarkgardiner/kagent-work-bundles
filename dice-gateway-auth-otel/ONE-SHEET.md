@@ -32,6 +32,8 @@ The verifier requires a completed native task, matching task/execution identitie
 
 ## Keep the claims bounded
 
+For the main workplace Go Agent, add [the confidential-data denial scene](CONFIDENTIAL-DATA-DEMO.md): the same valid caller/runtime identities can read a public synthetic fixture but the Gateway blocks a restricted fixture request. Show the actual tool attempt, safe policy decision in the received trace or an exactly linked decision record, and independent evidence of no backend read. This additional scene is **PROPOSED / NOT RUN**; the current JWT policy does not provide it.
+
 Dashboard metrics describe a time window, not a single request's bill. The fixed MCP status is synthetic; its execution, backend read, authentication decisions, and telemetry are real when tested. Short-lived MCP credentials expire and require deliberate renewal before rehearsal. The controller uses the same agent credential for tool discovery. This compatibility adapter is not automatic production credential rotation.
 
 At work, merge the gateway, producer, policy, and dashboard delta through the existing delivery flow. Use approved HTTPS ingress and existing authenticated LGTM destinations. Do not install the lab Tempo or change the shared collector merely to match this package. See [VALIDATION.md](VALIDATION.md) for dated lab evidence and remaining workplace gates.

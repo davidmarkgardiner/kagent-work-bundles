@@ -4,6 +4,8 @@ This separate work bundle secures a copy of the ordinary Python agent recorded o
 
 For the workplace main-Go-Agent walkthrough and adaptive-agent registration discussion, give the work agent [WORK-AGENT-README.md](WORK-AGENT-README.md). It sets the missing evidence gates and links the registration proposal and a short Teams message draft.
 
+The additional [confidential-data denial scene](CONFIDENTIAL-DATA-DEMO.md) specifies a synthetic allowed/denied comparison and safe OTel evidence. It is **PROPOSED / NOT RUN**. The current HTTP/JWT routes do not implement data classification or MCP content inspection.
+
 The original [DICE lifecycle bundle](https://github.com/davidmarkgardiner/kagent-work-bundles/tree/main/dice-agent-lifecycle-demo) and its video remain historical. This bundle does not modify shared agents, MCP servers, gateways, controllers, or their telemetry exports. The secured clone is a distinct deployment in a dedicated namespace. Consumers must use its gateway endpoint. The original recording agent remains in its source namespace.
 
 ## Prepare private inputs
