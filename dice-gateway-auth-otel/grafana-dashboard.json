@@ -1,0 +1,337 @@
+{
+  "uid": "dice-agent-flow",
+  "title": "DICE authenticated agent flow",
+  "schemaVersion": 39,
+  "version": 1,
+  "tags": [
+    "dice",
+    "agentgateway",
+    "mcp"
+  ],
+  "refresh": "5s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "templating": {
+    "list": [
+      {
+        "name": "metrics",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {}
+      },
+      {
+        "name": "traces",
+        "type": "datasource",
+        "query": "tempo",
+        "current": {}
+      },
+      {
+        "name": "logs",
+        "type": "datasource",
+        "query": "loki",
+        "current": {}
+      },
+      {
+        "name": "trace_id",
+        "label": "Received trace ID",
+        "type": "textbox",
+        "current": {
+          "text": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "namespace",
+        "label": "Demo namespace",
+        "type": "textbox",
+        "current": {
+          "text": "dice-demo",
+          "value": "dice-demo"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Caller > gateway > agent > gateway > MCP",
+      "type": "text",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Separate short-lived caller and agent JWTs. Tool data is a fixed synthetic record. Metrics show the selected time window. Paste the **received** trace ID below to inspect a single request. Authorization denials are gateway HTTP 401/403 spans. Prometheus counts all observed spans, including discovery."
+      }
+    },
+    {
+      "id": 2,
+      "title": "Completed MCP server calls in window",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(dice_calls_total{service_name=\"dice-status-mcp\",mcp_tool_name=\"get_demo_status\"}[$__range]))",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "MCP error spans in window",
+      "type": "stat",
+      "gridPos": {
+        "x": 6,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(dice_calls_total{service_name=\"dice-status-mcp\",mcp_tool_name=\"get_demo_status\",status_code=\"STATUS_CODE_ERROR\"}[$__range])) or vector(0)",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Gateway auth denials in window",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(dice_calls_total{service_name=\"agentgateway\",http_response_status_code=~\"401|403\"}[$__range])) or vector(0)",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "MCP p95 duration",
+      "type": "stat",
+      "gridPos": {
+        "x": 18,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95,sum by(le)(rate(dice_duration_milliseconds_bucket{service_name=\"dice-status-mcp\",mcp_tool_name=\"get_demo_status\"}[$__rate_interval])))",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Observed spans per service",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 12,
+        "h": 7
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(service_name)(rate(dice_calls_total[$__rate_interval]))",
+          "legendFormat": "{{service_name}}"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "MCP calls by tool",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 7,
+        "w": 12,
+        "h": 7
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(mcp_tool_name)(rate(dice_calls_total{service_name=\"dice-status-mcp\"}[$__rate_interval]))",
+          "legendFormat": "{{mcp_tool_name}}"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Exact received request trace",
+      "type": "traces",
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 24,
+        "h": 12
+      },
+      "datasource": {
+        "type": "tempo",
+        "uid": "${traces}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "traceql",
+          "query": "${trace_id}",
+          "tableType": "traces"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "MCP completion metadata",
+      "type": "logs",
+      "gridPos": {
+        "x": 0,
+        "y": 26,
+        "w": 24,
+        "h": 8
+      },
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending"
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${logs}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service_name=\"dice-status-mcp\",service_namespace=\"${namespace}\"} |= \"${trace_id}\" | json"
+        }
+      ]
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "name": "Demo markers",
+        "type": "dashboard",
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": false,
+        "iconColor": "rgba(237, 46, 46, 1)",
+        "target": {
+          "type": "dashboard",
+          "limit": 100,
+          "tags": []
+        }
+      }
+    ]
+  }
+}

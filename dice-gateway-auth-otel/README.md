@@ -71,6 +71,10 @@ For the combined request, use the recorded bootstrap case and explicitly ask for
 
 ## Provision the Grafana view
 
+For a manual Grafana import, upload [grafana-dashboard.json](grafana-dashboard.json) through **Dashboards → New → Import**. Its title is **DICE authenticated agent flow** and its UID is `dice-agent-flow`. This file is a plain dashboard, without Kubernetes ConfigMaps or datasource provisioning. Select your existing Prometheus/Mimir, Tempo, and Loki sources in the dashboard's dropdowns, then set **Demo namespace** to the deployed namespace. Paste a received trace ID to inspect one request.
+
+Importing the dashboard does not configure telemetry collection. The deployed collector must export the `dice_calls_total` and `dice_duration_milliseconds_*` metrics, traces must reach Tempo, and MCP completion logs must carry the expected service labels in Loki. Adapt the queries if the workplace telemetry uses different names. The ConfigMap provisioning alternative remains below.
+
 ```sh
 python3 dashboard.py --namespace "$DEMO_NAMESPACE" \
   --monitoring-namespace '{{GRAFANA_NAMESPACE}}' \
