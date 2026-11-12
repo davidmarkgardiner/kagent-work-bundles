@@ -1,0 +1,14 @@
+{
+  "namespace": "dice-demo",
+  "agent_name": "dice-lifecycle-recording",
+  "model_name": "{{APPROVED_MODEL_CONFIG}}",
+  "issuer": "https://{{APPROVED_JWT_ISSUER}}",
+  "jwks_file": "{{ABSOLUTE_PRIVATE_JWKS_FILE}}",
+  "api_server_cidr": "{{KUBERNETES_API_ENDPOINT_IP}}/32",
+  "python_image": "{{APPROVED_PYTHON_IMAGE_AT_SHA256_DIGEST}}",
+  "monitoring_namespace": "monitoring",
+  "controller_namespace": "kagent",
+  "model_namespace": "agentgateway-system",
+  "model_app": "agent-gw",
+  "model_port": 8081
+}

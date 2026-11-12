@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-11-12T13:52:40.644515+00:00",
+  "evidenceScope": "live-home-lab",
+  "sourceAgentSpecUnchanged": true,
+  "images": {
+    "dice-agentgateway": "cr.agentgateway.dev/agentgateway@sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b",
+    "dice-collector": "docker.io/otel/opentelemetry-collector-contrib@sha256:9742116fb9441d82900be0f35be168e14714fa64ff1f0f7aa182cfcf676832b1",
+    "kagent": "ghcr.io/kagent-dev/kagent/app@sha256:40bd6430363b33b3ec686621beb5cb8ce915653ba20c8b653e68ac07b42a8c6b",
+    "dice-status-mcp": "docker.io/library/python@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c",
+    "dice-tempo": "docker.io/grafana/tempo@sha256:65a5789759435f1ef696f1953258b9bbdb18eb571d5ce711ff812d2e128288a4"
+  },
+  "offlineTestsPassed": 12,
+  "gatewaySchema": "https://github.com/agentgateway/agentgateway/blob/v1.7.0/schema/config.json",
+  "serverDryRunPassed": true,
+  "authCases": [
+    {
+      "hop": "caller",
+      "case": "missing",
+      "httpStatus": 401,
+      "passed": true
+    },
+    {
+      "hop": "caller",
+      "case": "invalid",
+      "httpStatus": 401,
+      "passed": true
+    },
+    {
+      "hop": "caller",
+      "case": "wrong-audience",
+      "httpStatus": 401,
+      "passed": true
+    },
+    {
+      "hop": "caller",
+      "case": "wrong-subject",
+      "httpStatus": 403,
+      "passed": true
+    },
+    {
+      "hop": "caller",
+      "case": "swapped",
+      "httpStatus": 401,
+      "passed": true
+    },
+    {
+      "hop": "caller",
+      "case": "expired",
+      "httpStatus": 401,
+      "passed": true
+    },
+    {
+      "hop": "agent",
+      "case": "missing",
+      "httpStatus": 401,
+      "passed": true
+    },
+    {
+      "hop": "agent",
+      "case": "invalid",
+      "httpStatus": 401,
+      "passed": true
+    },
+    {
+      "hop": "agent",
+      "case": "wrong-audience",
+      "httpStatus": 401,
+      "passed": true
+    },
+    {
+      "hop": "agent",
+      "case": "wrong-subject",
+      "httpStatus": 403,
+      "passed": true
+    },
+    {
+      "hop": "agent",
+      "case": "swapped",
+      "httpStatus": 401,
+      "passed": true
+    }
+  ],
+  "denialBackendAuditUnchanged": true,
+  "denialTracesHaveNoUpstreamSpans": true,
+  "networkProbes": [
+    {
+      "case": "gateway-connectivity",
+      "connected": true
+    },
+    {
+      "case": "agent-service",
+      "connected": false
+    },
+    {
+      "case": "agent-pod",
+      "connected": false
+    },
+    {
+      "case": "mcp-service",
+      "connected": false
+    },
+    {
+      "case": "mcp-pod",
+      "connected": false
+    },
+    {
+      "case": "gateway-mcp",
+      "connected": false
+    },
+    {
+      "case": "collector",
+      "connected": false
+    },
+    {
+      "case": "agent-direct-mcp",
+      "connected": false
+    }
+  ],
+  "pongExact": true,
+  "consecutiveRequests": [
+    {
+      "verified": true,
+      "taskId": "84acaddc-f95c-496b-9167-135e94f0a475",
+      "contextId": "0d0e7dfc-c084-4168-8458-d2aa685e4537",
+      "traceId": "9929fac4e5e74dbfae35786b1fd5c22b",
+      "executionIds": [
+        "99a5698a8b37408bb10430ecce63acde"
+      ],
+      "services": [
+        "agentgateway",
+        "dice-status-mcp",
+        "dice_lifecycle_recording"
+      ],
+      "spanCount": 118,
+      "gatewayRuntimeMcpParentLinks": true
+    },
+    {
+      "verified": true,
+      "taskId": "172ff917-ab53-43b4-a98f-0b41d1a4c081",
+      "contextId": "e454afc5-bdd2-4bc8-a3e5-c2461237a2d0",
+      "traceId": "aa23b46779cf4ab3954c3a76e0c3a25f",
+      "executionIds": [
+        "028a155ef0224369963c66aac90b1064"
+      ],
+      "services": [
+        "agentgateway",
+        "dice-status-mcp",
+        "dice_lifecycle_recording"
+      ],
+      "spanCount": 109,
+      "gatewayRuntimeMcpParentLinks": true
+    }
+  ],
+  "nativeAndBackendExecutionIdsMatched": true,
+  "independentConfigMapReadBackMatched": true,
+  "backendCompletionCount": 2,
+  "promptNonceAbsentFromReceivedTraces": true,
+  "grafana": {
+    "dashboardUID": "dice-agent-flow",
+    "panelChecks": [
+      {
+        "panel": "Completed MCP server calls in window",
+        "queryPassed": true,
+        "frameCount": 1
+      },
+      {
+        "panel": "MCP error spans in window",
+        "queryPassed": true,
+        "frameCount": 1
+      },
+      {
+        "panel": "Gateway auth denials in window",
+        "queryPassed": true,
+        "frameCount": 1
+      },
+      {
+        "panel": "MCP p95 duration",
+        "queryPassed": true,
+        "frameCount": 1
+      },
+      {
+        "panel": "Observed spans per service",
+        "queryPassed": true,
+        "frameCount": 3
+      },
+      {
+        "panel": "MCP calls by tool",
+        "queryPassed": true,
+        "frameCount": 1
+      },
+      {
+        "panel": "Exact received request trace",
+        "queryPassed": true,
+        "frameCount": 1
+      },
+      {
+        "panel": "MCP completion metadata",
+        "queryPassed": true,
+        "rows": 1
+      }
+    ],
+    "annotationIds": [
+      1,
+      2
+    ],
+    "annotationReadBack": true,
+    "receivedTraceId": "aa23b46779cf4ab3954c3a76e0c3a25f",
+    "browserRendered": "NOT RUN: browser access host unavailable",
+    "traceQuery": "Grafana frontend converts a hex-only TraceQL input to backend queryType traceId, checked against official v12.3.2 source."
+  },
+  "identityProfile": "one-hour Kubernetes ServiceAccount JWTs, separate caller and agent audiences and subjects",
+  "workplaceAcceptance": "NOT RUN",
+  "entraEnforcement": "NOT IMPLEMENTED",
+  "syntheticToolData": true,
+  "labScheduling": "Dedicated worker rehearsal with low scheduling requests and bounded limits. No control-plane workloads retained. Native generated Deployment used a scoped Recreate rollout to avoid a surge on the saturated lab."
+}
