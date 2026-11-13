@@ -35,3 +35,7 @@ Workplace deployment, Entra Agent ID enforcement, production credential refresh,
 ## Additional confidential-data scene: not run
 
 [CONFIDENTIAL-DATA-DEMO.md](CONFIDENTIAL-DATA-DEMO.md) is a new work-agent requirement. No restricted fixture, argument-aware Gateway rule, denial-specific telemetry, or dashboard query for that scene has been deployed or tested by this addition. The existing lab routes authenticate identities; they do not classify data or inspect MCP content. A missing/invalid credential denial does not prove a valid identity was denied a confidential read. Keep the historical receipt unchanged and return a separate dated receipt after implementing and rehearsing the scene.
+
+## Credit-card model prompt guard: prepared, not run
+
+[The policy template](examples/credit-card-prompt-guard.yaml) uses the built-in `CreditCard` request detector on a model/LLM HTTPRoute. Its YAML and spec structure were checked offline against the official agentgateway v1.7.0 CRD. Kubernetes CEL rules, receiving-cluster admission, policy attachment, and runtime enforcement were not tested. No Gateway, Agent, collector, or dashboard deployment was changed. Follow [the demo guide](CREDIT-CARD-PROMPT-GUARD-DEMO.md) for an actual-Agent allowed/denied comparison, independent no-provider-forwarding evidence, and safe OTel/Grafana checks. This does not establish MCP resource-access denial or general DLP coverage.

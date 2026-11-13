@@ -1,0 +1,29 @@
+# Template for the EXISTING model/LLM HTTPRoute, not the Agent A2A or MCP route.
+# Resolve both placeholders privately. Merge with existing policy as needed.
+# Schema checked against agentgateway v1.7.0. Not deployed or live-tested.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: dice-credit-card-prompt-guard
+  namespace: "{{MODEL_ROUTE_NAMESPACE}}"
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: "{{MODEL_HTTPROUTE_NAME}}"
+  backend:
+    ai:
+      promptGuard:
+        request:
+          - scope:
+              - SystemPrompt
+              - Messages
+              - ToolOutput
+              - ToolInput
+            regex:
+              action: Reject
+              builtins:
+                - CreditCard
+            response:
+              statusCode: 403
+              message: "Blocked: payment-card data must not be sent to the model."

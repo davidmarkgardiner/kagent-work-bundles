@@ -2,6 +2,8 @@
 
 **Status: PROPOSED / NOT RUN.** Add this scene to the existing secure kagent Agent walkthrough and return implementation and rehearsal evidence. Preserve its approved runtime. The existing lab receipt proves identity checks, not data classification or this new policy. Use synthetic fixtures only.
 
+For the separate built-in policy that rejects credit-card data before a model request is forwarded, see [the credit-card prompt guard demo](CREDIT-CARD-PROMPT-GUARD-DEMO.md). It has a different enforcement point and does not prove the no-backend-read claim in this scene.
+
 The point to demonstrate: a valid caller can use the Agent, and the Agent can authenticate to the MCP Gateway, but neither fact grants access to every dataset. The Gateway rejects a particular tool request before the MCP handler or backend reads the protected fixture. The Agent reports the denial honestly. Grafana shows where and why the request stopped, without displaying the data.
 
 ```text
