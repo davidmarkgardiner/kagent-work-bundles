@@ -30,6 +30,7 @@ KRO manages resource lifecycle; it is not another request hop. Ordinary kagent s
 4. Keep [the Teams message](TEAMS-MESSAGE.md) as a discussion draft. Do not send it automatically.
 5. Implement and rehearse [the confidential-data denial scene](CONFIDENTIAL-DATA-DEMO.md) with synthetic fixtures. This is an additional, untested capability, not part of the existing JWT proof.
 6. Add [the credit-card prompt guard demo](CREDIT-CARD-PROMPT-GUARD-DEMO.md) using [the model-route policy template](examples/credit-card-prompt-guard.yaml). This blocks matching model requests before provider forwarding. It is prepared, not live-proven.
+7. Use [the Agent Gateway policy guide](AGENT-GATEWAY-POLICIES-README.md) to explain other available controls. The prompt-guard template now rejects all five built-in personal-data types; broader capability listings are not claims of deployed enforcement.
 
 The 12 November lab proved two authenticated Gateway hops and correlated tool execution for its kagent 0.7.13 Python compatibility profile with synthetic data. That is dated evidence for a separate lab configuration. It does not establish the workplace Agent's integration, workplace Entra configuration, KRO/Flux delivery, or production readiness. Keep the existing secure Agent as the demonstration subject; a separate canary or protocol probe cannot replace its evidence.
 

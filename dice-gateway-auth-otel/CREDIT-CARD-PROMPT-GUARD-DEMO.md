@@ -1,4 +1,4 @@
-# Block card data before the model call
+# Block sensitive data before the model call
 
 **Status: PREPARED / NOT RUN.** The [policy template](examples/credit-card-prompt-guard.yaml) passes offline structure checks against the official agentgateway v1.7.0 CRD. This is not receiving-cluster validation or runtime proof. No deployment is performed by adding these files.
 
@@ -6,11 +6,11 @@ Use the existing secure declarative kagent Agent and its approved runtime. No cu
 
 ```text
 Authenticated caller -> caller Gateway -> existing secure kagent Agent
-  -> model Gateway -> CreditCard request guard -> reject with HTTP 403
+  -> model Gateway -> built-in PII request guard -> reject with HTTP 403
   -> no forwarding of that rejected request to the model provider
 ```
 
-The policy uses the built-in `CreditCard` detector and `Reject` action. It scans system prompts, messages, tool results, and tool arguments present in the model request. Its constant error message does not echo matched content. See the [official regex guide](https://agentgateway.dev/docs/kubernetes/latest/documentation/llm/guardrails/regex/) and [exact v1.7.0 CRD](https://github.com/agentgateway/agentgateway/blob/v1.7.0/controller/install/helm/agentgateway-crds/templates/agentgateway.dev_agentgatewaypolicies.yaml).
+The policy enables all five built-in detectors with the `Reject` action: `CreditCard`, `Email`, `PhoneNumber`, `Ssn`, and `CaSin`. They detect card numbers, email addresses, phone numbers, US Social Security numbers, and Canadian Social Insurance Numbers. They match data formats, not the words used to describe them. The guard scans system prompts, messages, tool results, and tool arguments present in the model request. Its constant error message does not echo matched content. See the [official regex guide](https://agentgateway.dev/docs/kubernetes/latest/documentation/llm/guardrails/regex/) and [exact v1.7.0 CRD](https://github.com/agentgateway/agentgateway/blob/v1.7.0/controller/install/helm/agentgateway-crds/templates/agentgateway.dev_agentgatewaypolicies.yaml).
 
 ## Prepare the scoped change
 
@@ -42,6 +42,8 @@ Use the same valid caller, Agent identity, model route, and effective policy thr
 | 5. Still usable | Send another harmless question in a fresh task. | The same guarded route still permits normal model use. |
 
 The number above is a synthetic demo fixture, not a real customer's card. If the Agent refuses before making a model request, record that outcome but leave Gateway enforcement unproven. A direct model-API probe can diagnose the guard but cannot replace the actual Agent demonstration. The outer A2A task may return a handled failure under HTTP 200; inspect the internal model request for the configured 403.
+
+Repeat the blocked step with an approved synthetic fixture for each other detector before claiming all five were demonstrated. For email, use `demo@example.com`. Keep allowed-control tasks free of matching values across the entire scanned context. A card-only run does not prove the other detectors worked.
 
 ## Show safe evidence in Grafana
 

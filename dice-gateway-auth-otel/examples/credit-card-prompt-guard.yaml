@@ -24,6 +24,10 @@ spec:
               action: Reject
               builtins:
                 - CreditCard
+                - Email
+                - PhoneNumber
+                - Ssn
+                - CaSin
             response:
               statusCode: 403
-              message: "Blocked: payment-card data must not be sent to the model."
+              message: "Blocked: sensitive personal data must not be sent to the model."

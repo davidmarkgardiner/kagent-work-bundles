@@ -6,7 +6,9 @@ The implementation below is the dated home-lab reference. It secures a copy of t
 
 The additional [confidential-data denial scene](CONFIDENTIAL-DATA-DEMO.md) specifies a synthetic allowed/denied comparison and safe OTel evidence. It is **PROPOSED / NOT RUN**. The current HTTP/JWT routes do not implement data classification or MCP content inspection.
 
-For a built-in model request guard, use [the credit-card prompt demo](CREDIT-CARD-PROMPT-GUARD-DEMO.md) and [policy template](examples/credit-card-prompt-guard.yaml). Attach it to the existing model/LLM route. The template is schema-checked for v1.7.0 but **not deployed or live-tested**. It requires no custom Agent image and does not replace MCP resource authorisation.
+For a built-in model request guard, use [the personal-data prompt demo](CREDIT-CARD-PROMPT-GUARD-DEMO.md) and [policy template](examples/credit-card-prompt-guard.yaml). The template enables all five built-ins: `CreditCard`, `Email`, `PhoneNumber`, `Ssn`, and `CaSin`. Attach it to the existing model/LLM route. It is schema-checked for v1.7.0 but **not deployed or live-tested**. It requires no custom Agent image and does not replace MCP resource authorisation.
+
+For a discussion of the other controls we can demonstrate, read [Agent Gateway policies](AGENT-GATEWAY-POLICIES-README.md). It maps identity, tool access, content guards, request limits, resilience, backend credentials, and observability to their policy fields and separates available features from current proof.
 
 The original [DICE lifecycle bundle](https://github.com/davidmarkgardiner/kagent-work-bundles/tree/main/dice-agent-lifecycle-demo) and its video remain historical. This bundle does not modify shared agents, MCP servers, gateways, controllers, or their telemetry exports. The secured clone is a distinct deployment in a dedicated namespace. Consumers must use its gateway endpoint. The original recording agent remains in its source namespace.
 
