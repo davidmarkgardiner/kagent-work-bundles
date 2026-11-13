@@ -1,11 +1,11 @@
 # Demo: Gateway blocks a confidential-data request
 
-**Status: PROPOSED / NOT RUN.** Add this scene to the main Go Agent walkthrough and return implementation and rehearsal evidence. The existing lab receipt proves identity checks, not data classification or this new policy. Use synthetic fixtures only.
+**Status: PROPOSED / NOT RUN.** Add this scene to the existing secure kagent Agent walkthrough and return implementation and rehearsal evidence. Preserve its approved runtime. The existing lab receipt proves identity checks, not data classification or this new policy. Use synthetic fixtures only.
 
 The point to demonstrate: a valid caller can use the Agent, and the Agent can authenticate to the MCP Gateway, but neither fact grants access to every dataset. The Gateway rejects a particular tool request before the MCP handler or backend reads the protected fixture. The Agent reports the denial honestly. Grafana shows where and why the request stopped, without displaying the data.
 
 ```text
-Approved caller -> caller Gateway: allow -> main Go Agent
+Approved caller -> caller Gateway: allow -> existing secure kagent Agent
   -> MCP Gateway: deny restricted target -> no MCP handler or backend read
   -> Agent reports access denied to caller
 ```
@@ -35,7 +35,7 @@ Use the same valid caller, runtime identity, deployed revision, and effective po
 | 5. Check the answer | Show the Agent's final response. | It reports the denied access without inventing a result, using a cache, switching identities, or trying another route. No protected value reaches the model or caller. |
 | 6. Confirm permitted access | Start a fresh public-fixture task. | The permitted path still succeeds under the same policy. Retain its separate task and trace identifiers. |
 
-If the model refuses without calling the tool, record that outcome and mark the Gateway-block scene unproven. A separate credential or protocol probe is useful diagnostic evidence but cannot replace the actual Go Agent attempt.
+If the model refuses without calling the tool, record that outcome and mark the Gateway-block scene unproven. A separate credential or protocol probe is useful diagnostic evidence but cannot replace the actual secure Agent's attempt.
 
 The denial can be an HTTP error, JSON-RPC error, or MCP tool error, depending on the mechanism/version. Current [guardrail documentation](https://agentgateway.dev/docs/standalone/latest/documentation/mcp/guardrails/processors/) describes `tools/call` denials using `isError: true` under HTTP 200. Record the actual result. The outer Agent task can also complete successfully while honestly describing denied tool access.
 

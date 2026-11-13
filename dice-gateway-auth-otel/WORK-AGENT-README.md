@@ -1,8 +1,26 @@
 # Complete the main-agent demo and registration proposal
 
-Show the full journey of the main workplace Go Agent, from reviewed intent to an authenticated, observable service that another team can consume. Close the evidence gaps in the current walkthrough. Prepare a registration model that supports adaptive agents within approved permissions.
+Show the full journey of the existing secure kagent Agent, from reviewed intent to an authenticated, observable service that another team can consume. Close the evidence gaps in the current walkthrough. Prepare a registration model that supports adaptive agents within approved permissions.
 
 Use this as the work-agent handoff. The registration model is a proposal for discussion with the platform, identity, data, security, and risk owners. It does not establish a new bank policy or authorise broader access.
+
+## Use the existing secure kagent Agent
+
+The target is an ordinary `kagent.dev/v1alpha2` Agent with `spec.type: Declarative`, managed by the installed kagent controller. In [the existing secure-agent composition](https://github.com/davidmarkgardiner/kagent-work-bundles/blob/main/secure-kro-classic-kagent/examples/resourcegraphdefinition.yaml), KRO creates that native Agent and the surrounding security resources. Kagent creates its normal Deployment and Service. "Secure agent" describes this composition, not a separate agent framework.
+
+That profile selects `spec.declarative.runtime: go`, which is kagent's built-in Go ADK. Earlier wording in this handoff called it a "Go Agent". That meant the standard runtime selection, not an instruction to write a Go program, create a BYO agent, or build a custom runtime. Preserve the receiving Agent's approved runtime and images. The same demo requirements apply when its existing supported runtime is Python.
+
+Start from [the secure-agent bundle](https://github.com/davidmarkgardiner/kagent-work-bundles/blob/main/secure-kro-classic-kagent/README.md), then apply only the missing Gateway, identity, telemetry, and demonstration configuration. Its published classic profile uses kagent 0.10.4; verify the actual workplace version rather than assuming it matches. Use the matching [0.x Agent documentation](https://www.kagent.dev/docs/kagent/0.x/concepts/agents/) for this API. This handoff does not request a migration to AgentTemplate, Harness, or Agent Substrate.
+
+The request path to demonstrate is:
+
+```text
+Caller -> Agent Gateway -> existing secure kagent Agent
+       -> Agent Gateway -> existing MCP server -> approved backend
+Gateway + Agent + MCP telemetry -> existing LGTM -> Grafana
+```
+
+KRO manages resource lifecycle; it is not another request hop. Ordinary kagent supports MCP tools, but authenticated routing, identity renewal, OTel export, trace propagation, and data-access policies still require effective configuration and verification. First use supported configuration and stock runtime images. The confidential-data denial scene is an additional policy requirement, not a feature automatically enabled by choosing Go or by using the secure-agent composition.
 
 ## Read the supplied material
 
@@ -12,7 +30,7 @@ Use this as the work-agent handoff. The registration model is a proposal for dis
 4. Keep [the Teams message](TEAMS-MESSAGE.md) as a discussion draft. Do not send it automatically.
 5. Implement and rehearse [the confidential-data denial scene](CONFIDENTIAL-DATA-DEMO.md) with synthetic fixtures. This is an additional, untested capability, not part of the existing JWT proof.
 
-The 12 November lab proved two authenticated Gateway hops and correlated tool execution for the Python compatibility profile with synthetic data. It did not prove the workplace Go runtime, workplace Entra configuration, KRO/Flux delivery, or production readiness. A separate Python canary remains useful for isolating faults, but its receipt cannot establish those properties for the Go Agent.
+The 12 November lab proved two authenticated Gateway hops and correlated tool execution for its kagent 0.7.13 Python compatibility profile with synthetic data. That is dated evidence for a separate lab configuration. It does not establish the workplace Agent's integration, workplace Entra configuration, KRO/Flux delivery, or production readiness. Keep the existing secure Agent as the demonstration subject; a separate canary or protocol probe cannot replace its evidence.
 
 ## Establish the current workplace baseline
 
@@ -22,11 +40,11 @@ Resolve which identity calls the Agent, which identity the Agent presents to the
 
 Preserve the existing object names, approved grants, authentication, model configuration, delivery process, and telemetry exports. Make the smallest reviewed delta. Do not install the Python lab profile, replace the existing collector, or upgrade the shared platform to make the demonstration fit. Apply changes only within the authority already granted for the receiving environment. This README does not authorise production changes, identity consent, new grants, or publishing information from private evidence.
 
-If the Go instrumentation needs a code or image change, identify that scoped change and its build/provenance requirements explicitly. The Python lab's ConfigMap-based instrumentation does not establish that the Go runtime needs no build. Use an isolated demo identity and route for deny/restore tests. Do not disable a shared identity as a rehearsal shortcut.
+This handoff does not require a new Agent image just because the existing runtime is Go. Check its supported identity and tracing configuration first. If a required capability is absent, record the exact version and gap, then identify the smallest scoped change and any build/provenance requirements. Do not replace the Agent with a custom runtime to make the walkthrough pass. Use an isolated demo identity and route for deny/restore tests. Do not disable a shared identity as a rehearsal shortcut.
 
 ## Rework the walkthrough around the same main Agent
 
-Retain the useful security scenes, but make the main Go Agent the subject of the evidence throughout.
+Retain the useful security scenes, but use the same existing secure Agent throughout. "Main Agent" below means that Agent.
 
 | Scene | Action | Required evidence |
 | --- | --- | --- |
@@ -35,7 +53,7 @@ Retain the useful security scenes, but make the main Go Agent the subject of the
 | 3. Follow the actual request | Find the same main-Agent request in the viewer and Grafana. | Native task/context ID, caller Gateway activity, runtime/model/tool activity, MCP Gateway activity, and backend completion. Resolve the exact trace or explicit links between traces. |
 | 4. Reject caller credentials | Exercise missing, invalid, expired, wrong-audience, wrong-principal, and swapped-hop credentials. Include relevant missing-role or scope cases. | Expected 401 or 403 decisions, the enforcing component, and no upstream Agent execution for the rejected caller request. Never display tokens. |
 | 5. Change caller policy | Deny the valid demo caller through the approved scoped change process, verify the denial, then restore. | Effective policy revision, Gateway 403, and a fresh protected request after restoration. Keep the restore action scoped and prepared before the test. |
-| 6. Prove the runtime MCP identity | Keep the direct credential probes, then make the actual Go Agent execute its tool. | Resolved Gateway URL, expected runtime principal, native tool call/result IDs, Gateway decision, and matching backend execution. A test token returning 200 is insufficient. |
+| 6. Prove the runtime MCP identity | Keep the direct credential probes, then make the main Agent execute its tool. | Resolved Gateway URL, expected runtime principal, native tool call/result IDs, Gateway decision, and matching backend execution. A test token returning 200 is insufficient. |
 | 7. Block bypass and excess capability | Probe direct Agent and MCP Service/Pod-IP access from appropriate test locations. Test Agent-to-MCP direct access from the actual runtime network context. Attempt a safe unapproved operation. | Gateway path works as a positive control. Direct paths are blocked. Server-side policy or backend permissions reject the unapproved operation before any resource-changing action. A model refusal is not the permission check. |
 | 8. Deny the runtime, then restore | Deny the runtime identity at the MCP Gateway. While denied, submit a new main-Agent task that requires that tool. Restore access and submit another fresh task. | Actual runtime tool attempt reaches the Gateway and is denied. Backend execution does not occur. The Agent accurately reports unavailable evidence. The restored request has a new successful backend completion. |
 | 9. Block a confidential-data request | With the same valid identities, allow a public fixture read and reject a restricted fixture request from the actual Agent. Follow [the detailed scene](CONFIDENTIAL-DATA-DEMO.md). | Gateway data-access policy decision linked to the native tool attempt and received trace, independent audit showing no MCP handler/backend read, and an honest Agent denial. No confidential content in telemetry. |
@@ -76,4 +94,4 @@ Return the revised walkthrough and a private resolved command sheet. Include the
 
 Cover consumer onboarding and HTTPS/CA trust, identity renewal and revocation, least-privilege data access, runtime containment, approved model routing, content/image provenance, behaviour and security evaluations, telemetry redaction/retention, timeout and concurrency/cost limits, dependency failure, availability/recovery, rollback, and support ownership. These can be reviewed records rather than live demonstrations, but their status must remain explicit.
 
-The minimum main-Agent demonstration passes only when the same Go Agent has a verified delivery/verification record, a permitted tool request through both authenticated Gateway hops, correlated backend evidence, the runtime deny/restore test, and the synthetic confidential-data denial scene. Mark the new scene unproven until its request policy, received telemetry, and independent no-read evidence pass. Production acceptance also requires the receiving platform's applicable operational, security, data, and risk gates.
+The minimum main-Agent demonstration passes only when the same secure kagent Agent has a verified delivery/verification record, a permitted tool request through both authenticated Gateway hops, correlated backend evidence, the runtime deny/restore test, and the synthetic confidential-data denial scene. Mark the new scene unproven until its request policy, received telemetry, and independent no-read evidence pass. Production acceptance also requires the receiving platform's applicable operational, security, data, and risk gates.

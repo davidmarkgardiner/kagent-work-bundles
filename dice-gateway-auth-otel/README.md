@@ -1,8 +1,8 @@
 # DICE gateway authentication and observability
 
-This separate work bundle secures a copy of the ordinary Python agent recorded on 11 November. It keeps the recorded runtime and reviewed skill/knowledge mounts, adds two authenticated Agent Gateway hops, and supplies OTel collection and a Grafana dashboard. Start with [the one-sheet](ONE-SHEET.md).
+For the workplace walkthrough, start with [WORK-AGENT-README.md](WORK-AGENT-README.md) and use the existing secure declarative kagent Agent. The handoff explains the standard runtime, missing evidence gates, registration proposal, and Teams message draft. The secure profile's built-in Go runtime does not require a custom Go agent or a new Agent image. Preserve the receiving runtime; do not replace it with the older Python lab profile below.
 
-For the workplace main-Go-Agent walkthrough and adaptive-agent registration discussion, give the work agent [WORK-AGENT-README.md](WORK-AGENT-README.md). It sets the missing evidence gates and links the registration proposal and a short Teams message draft.
+The implementation below is the dated home-lab reference. It secures a copy of the ordinary Python agent recorded on 11 November, keeps its runtime and reviewed skill/knowledge mounts, and adds two authenticated Agent Gateway hops, OTel collection, and a Grafana dashboard. [The one-sheet](ONE-SHEET.md) describes that lab rehearsal.
 
 The additional [confidential-data denial scene](CONFIDENTIAL-DATA-DEMO.md) specifies a synthetic allowed/denied comparison and safe OTel evidence. It is **PROPOSED / NOT RUN**. The current HTTP/JWT routes do not implement data classification or MCP content inspection.
 

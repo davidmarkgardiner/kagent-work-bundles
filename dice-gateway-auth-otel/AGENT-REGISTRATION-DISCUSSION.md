@@ -68,7 +68,7 @@ Per-run recording should identify the deployment and policy state, resolved mode
 
 ## Keep the adaptive path testable
 
-The demonstration should show two different problems handled by the same main Go service within its approved profile. Show the separate run records and actual tool execution. Then show an out-of-scope capability denied, and the runtime deny/restore test from [the work-agent README](WORK-AGENT-README.md).
+The demonstration should show two different problems handled by the same existing secure kagent service within its approved profile. Show the separate run records and actual tool execution. Then show an out-of-scope capability denied, and the runtime deny/restore test from [the work-agent README](WORK-AGENT-README.md).
 
 This is a useful test of the proposed operating model. It does not prove that a new registration workflow or a policy engine exists. Where those integrations are absent, show the design and the missing implementation explicitly.
 
