@@ -1,0 +1,20 @@
+# Portable source check; include from the receiving repository's reviewed CI config.
+# Set DOCS_PROJECT_DIR to '.' when this folder is the repository root.
+variables:
+  GIT_DEPTH: '0'
+  DOCS_PROJECT_DIR: 'work-agent-bundles/agent-platform-mkdocs'
+agent-platform-docs:
+  stage: .pre
+  image: python:3.12-slim
+  # Use approved package mirrors or a prebuilt Git-capable image in restricted environments.
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y --no-install-recommends git
+  script:
+    - python -m pip install -r "$DOCS_PROJECT_DIR/requirements.txt"
+    - python "$DOCS_PROJECT_DIR/scripts/check_delivery_impact.py"
+    - python "$DOCS_PROJECT_DIR/scripts/build_docs.py"
+  artifacts:
+    paths:
+      - "$DOCS_PROJECT_DIR/site/"
+    expire_in: 14 days

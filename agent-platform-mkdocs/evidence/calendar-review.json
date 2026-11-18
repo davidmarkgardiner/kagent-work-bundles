@@ -1,0 +1,11 @@
+{
+  "reviewed": "2026-11-18",
+  "surface": "Calendar roadmap and commit-maintenance contract",
+  "finish_disposition": "SHIP after staged-content regression passed",
+  "screenshots": [
+    "desktop 1440px",
+    "mobile 390px"
+  ],
+  "corrected_finding": "Optional hook now validates the exact staged project in a temporary directory, so unstaged regeneration cannot conceal stale staged generated pages.",
+  "evidence_limits": "No receiving runtime, remote CI activation, branch-protection or service acceptance is asserted."
+}

@@ -1,0 +1,240 @@
+{
+  "reviewed_on": "2026-11-18",
+  "window": "2026-10-18 to 2026-11-18; earlier foundational receipts retained",
+  "repository": "https://github.com/davidmarkgardiner/kagent-public",
+  "ref": "cfb3b22950ee7290d1aea4bf125e561cdfaede64",
+  "sources": [
+    {
+      "path": "STATEMENT-OF-WORK.md",
+      "title": "Six-month modernisation draft",
+      "area": "direction",
+      "sha256": "258a204603fbabd757efde10f9ff0c6bc9fd1889fb9bace9d0903c85eda0a64b",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/STATEMENT-OF-WORK.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/ai-platform-pod-direction/README.md",
+      "title": "Pod direction and quarterly outcomes",
+      "area": "direction",
+      "sha256": "ebf5da1b30410e0bc39c97e802e70d3826edb0218dc873015a6248f813f27aad",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/ai-platform-pod-direction/README.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/agent-platform-four-crds/DESIGN.md",
+      "title": "KRO composition and extension design",
+      "area": "architecture",
+      "sha256": "6c8df79f0e2676e11f99f03ad4ff7311ab1f8f7437d813053cf7801581d8ac65",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/agent-platform-four-crds/DESIGN.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "infra/byo-kagent/README.md",
+      "title": "Reviewed BYO onboarding patterns",
+      "area": "architecture",
+      "sha256": "ddbdd8fd26161813d413354aad3388b29015ca80f4981c618359b9fa34382254",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/infra/byo-kagent/README.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/agent-platform-four-crds/README.md",
+      "title": "Experimental four-CRD platform",
+      "area": "knowledge",
+      "sha256": "e43fa35bb998a6bcd9e204d248cdc723e11c0ec456f8cb01604789a03b53d470",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/agent-platform-four-crds/README.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/kagent-agentgateway-tenant-isolation/README.md",
+      "title": "Tenant isolation entrypoint",
+      "area": "isolation",
+      "sha256": "004a3569c9926da4f981d7c421ed25c29380ce6a089b557279d81876690e6879",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/kagent-agentgateway-tenant-isolation/README.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/kagent-agentgateway-tenant-isolation/ARCHITECTURE.md",
+      "title": "Tenant administrative and network boundaries",
+      "area": "isolation",
+      "sha256": "d9768bcd2fe29d287e92de1e23cb7a3cc4a4976249edfd6d260ee27601a5b264",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/kagent-agentgateway-tenant-isolation/ARCHITECTURE.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/kagent-agentgateway-tenant-isolation/TEST-MATRIX.md",
+      "title": "Isolation regression matrix",
+      "area": "labs",
+      "sha256": "0a985b4eb8411d272479575eacabae2a19360ea97452a6e88ce230f17116be52",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/kagent-agentgateway-tenant-isolation/TEST-MATRIX.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/kagent-agentgateway-tenant-isolation/PHASE1-WORK-EVIDENCE.md",
+      "title": "Classic phase-one evidence",
+      "area": "evidence",
+      "sha256": "ea79498e82b821d37508f29ad001bb46c8870b9839f2d0d5c7700758f1ed2936",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/kagent-agentgateway-tenant-isolation/PHASE1-WORK-EVIDENCE.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/kagent-agentgateway-tenant-isolation/AKS-SUBSTRATE-PROMOTION.md",
+      "title": "Workplace runtime promotion gates",
+      "area": "deploy",
+      "sha256": "64ecb8f80ce92c5b98327737d6c2c56badf538f1e2be14446d2975851c39dd34",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/kagent-agentgateway-tenant-isolation/AKS-SUBSTRATE-PROMOTION.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/kagent-agentgateway-tenant-isolation/poc/azure-agent-id/AKS-FULL-E2E-EVIDENCE-2026-09-25.md",
+      "title": "Dated AKS Agent ID test",
+      "area": "identity",
+      "sha256": "3c7e1d9e9847e4fe354fff063494c33639ddaca8b16800b73ad22806142533ce",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/kagent-agentgateway-tenant-isolation/poc/azure-agent-id/AKS-FULL-E2E-EVIDENCE-2026-09-25.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/kagent-agentgateway-tenant-isolation/poc/azure-agent-id/WORK-REQUEST-1-CALLER-UAMI-A2A.md",
+      "title": "Caller-to-agent ownership request",
+      "area": "identity",
+      "sha256": "4c961236f3f9c8285abbe2a28a94da6550b431c98b7474a9f6a19239cdaf5642",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/kagent-agentgateway-tenant-isolation/poc/azure-agent-id/WORK-REQUEST-1-CALLER-UAMI-A2A.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/kagent-agentgateway-tenant-isolation/poc/azure-agent-id/WORK-REQUEST-2-AGENT-BLUEPRINT-MCP.md",
+      "title": "Agent-to-MCP ownership request",
+      "area": "identity",
+      "sha256": "e7a79a24b3b1146ac3c0e5a26ffb6890ae9d43d1eaa2238edd9a0137362fc5b0",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/kagent-agentgateway-tenant-isolation/poc/azure-agent-id/WORK-REQUEST-2-AGENT-BLUEPRINT-MCP.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "docs/entra-agent-id/README.md",
+      "title": "Agent ID and app-only/OBO comparison",
+      "area": "identity",
+      "sha256": "99945ccb9c2f4943a6f6d3641ab68291aeab2ec658e43aab655a7b3a4a544e30",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/docs/entra-agent-id/README.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "docs/security/agent-substrate-sys-admin-security-review.md",
+      "title": "Policy exception and fleet guardrails",
+      "area": "isolation",
+      "sha256": "f45532bbcdbe0bfa195987d61169819438829370e931b496b2c41a9fb00112dc",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/docs/security/agent-substrate-sys-admin-security-review.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "docs/security/agent-substrate-security-context-README.md",
+      "title": "Dated alpha runtime privilege inventory",
+      "area": "isolation",
+      "sha256": "c34c7fb1106a695cc5ee462a3a2517c700c1d9c94c1c7128d9be0720dd1a3b9e",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/docs/security/agent-substrate-security-context-README.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "docs/security/agent-substrate-blast-radius-README.md",
+      "title": "Runtime blast radius",
+      "area": "isolation",
+      "sha256": "bf5ee307a2f8765acba7b5ffc1d76277e116ae0e7592ea7628a3cd7960cca40c",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/docs/security/agent-substrate-blast-radius-README.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/kyverno-runtime-permissions-lab/README.md",
+      "title": "Kyverno admission and report evidence",
+      "area": "labs",
+      "sha256": "455dc5c2a83b90e74c8c654fc34026c43843c3c691fd9b3dabfe6a4a02c5a9c8",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/kyverno-runtime-permissions-lab/README.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/kyverno-runtime-permissions-lab/WORKPLACE-START-HERE.md",
+      "title": "Audit-first workplace policy adaptation",
+      "area": "labs",
+      "sha256": "a9d864b02de0d04b3c7d2faf47aaa1e48fb2aec905bdd44b2c3cdc8dfb47537c",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/kyverno-runtime-permissions-lab/WORKPLACE-START-HERE.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "docs/agent-substrate-business-brief.md",
+      "title": "Runtime stakeholder brief",
+      "area": "architecture",
+      "sha256": "ac94078932781e07eb1c1b98c27c411ec0c3fd18598cfef1a5abdd60da9d5de1",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/docs/agent-substrate-business-brief.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "docs/agent-sandbox-vs-substrate.md",
+      "title": "Runtime comparison",
+      "area": "architecture",
+      "sha256": "c0801d7e53ff3d54023b0a0d6d868d059b0c9148ff0210e92cffdcb0ab138e48",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/docs/agent-sandbox-vs-substrate.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "docs/platform-kb/aks/platform-maturity-independent-review-2026-11-10.md",
+      "title": "Independent maturity review",
+      "area": "direction",
+      "sha256": "023e38003555bebe8703f856435475076c89b52a5b71b49601acb56661f43882",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/docs/platform-kb/aks/platform-maturity-independent-review-2026-11-10.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/agent-substrate/AIRGAPPED-AKS-README.md",
+      "title": "Historical air-gap runtime assets",
+      "area": "deploy",
+      "sha256": "180ada659a24b7dde00cc08154ccce94fa22ae98bf7492360b4dfc05788b81e4",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/agent-substrate/AIRGAPPED-AKS-README.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "work-agent-bundles/postgres-fastmcp-entra-uami/WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md",
+      "title": "Bounded MCP transport and token measurement",
+      "area": "knowledge",
+      "sha256": "198aa4d572a67ba1949516c4b109663bd428ba46fc9f5d5da5683cec8063e22b",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/work-agent-bundles/postgres-fastmcp-entra-uami/WORK-AGENT-TOKEN-EFFICIENCY-HANDOFF.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "docs/observability/dual-source-kafka-triage-routing.md",
+      "title": "Logs/events triage and correlation",
+      "area": "operations",
+      "sha256": "55703eeb3ce1f1836fcc133010dcd847a68569b765fc36c32fd8981e69805248",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/docs/observability/dual-source-kafka-triage-routing.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "platform/agentgateway/servicenow-incident-ingress/README.md",
+      "title": "Incident ingress options and original proof",
+      "area": "servicenow",
+      "sha256": "ba15d08ec61ed5e49194415021549c7682f372f64e7548fc8861419e955f03ef",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/platform/agentgateway/servicenow-incident-ingress/README.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "platform/agentgateway/servicenow-incident-ingress/aks/README.md",
+      "title": "AKS ingress and Entra handoff",
+      "area": "servicenow",
+      "sha256": "0d17838f0af24678940e083c4eb01d0480123f015fb77209980d6466d0c4ebaf",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/platform/agentgateway/servicenow-incident-ingress/aks/README.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "platform/agentgateway/servicenow-incident-ingress/poc/README.md",
+      "title": "Dated transformation proof",
+      "area": "evidence",
+      "sha256": "dcbb009cb884dc8958a51d9777338688e36dbe5587f4043d79c8725a77116037",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/platform/agentgateway/servicenow-incident-ingress/poc/README.md",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    },
+    {
+      "path": "platform/agentgateway/servicenow-incident-ingress/mkdocs/mkdocs.yml",
+      "title": "Existing MkDocs build conventions",
+      "area": "handoff",
+      "sha256": "2702ef81246002d8c2c5a90e42798f9ec84cd765f4b44dbcbc759e293f10bb21",
+      "url": "https://github.com/davidmarkgardiner/kagent-public/blob/cfb3b22950ee7290d1aea4bf125e561cdfaede64/platform/agentgateway/servicenow-incident-ingress/mkdocs/mkdocs.yml",
+      "interpretation": "historical source; current 1.0 guidance is in this handbook"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "reviewed": "2026-11-18",
+  "concept_review": "Claude Opus",
+  "finish_disposition": "SHIP",
+  "corrected_finding": "Local Markdown evidence URLs normalized to built HTML paths with fragment/query preserved.",
+  "screenshots_reviewed": [
+    "desktop 1440px",
+    "mobile 390px"
+  ],
+  "limits": "Documentation and source review only. No receiving-runtime or service acceptance."
+}

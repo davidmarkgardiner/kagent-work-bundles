@@ -1,0 +1,78 @@
+{
+  "impact": [
+    {
+      "case": "new-project baseline with historical evidence",
+      "status": "PASS",
+      "outcome": "accepted"
+    },
+    {
+      "case": "documentation change without roadmap decision",
+      "status": "PASS",
+      "outcome": "rejected"
+    },
+    {
+      "case": "explicit no-delivery-impact classification",
+      "status": "PASS",
+      "outcome": "accepted"
+    },
+    {
+      "case": "unstaged explanation cannot satisfy staged guard",
+      "status": "PASS",
+      "outcome": "rejected"
+    },
+    {
+      "case": "new build without achievement record",
+      "status": "PASS",
+      "outcome": "rejected"
+    },
+    {
+      "case": "dated build plus new achievement and transition",
+      "status": "PASS",
+      "outcome": "accepted"
+    },
+    {
+      "case": "live claim without service acceptance",
+      "status": "PASS",
+      "outcome": "rejected"
+    },
+    {
+      "case": "live with dated service acceptance and update",
+      "status": "PASS",
+      "outcome": "accepted"
+    },
+    {
+      "case": "silent historical snapshot rewrite",
+      "status": "PASS",
+      "outcome": "rejected"
+    },
+    {
+      "case": "committed diff enforcement",
+      "status": "PASS",
+      "outcome": "rejected"
+    }
+  ],
+  "staged": [
+    {
+      "case": "clean staged source builds",
+      "status": "PASS"
+    },
+    {
+      "case": "unstaged generated correction cannot hide stale staged pages",
+      "status": "PASS"
+    },
+    {
+      "case": "same-commit source and generated pages accepted",
+      "status": "PASS"
+    }
+  ],
+  "monorepo": [
+    {
+      "case": "monorepo platform document requires delivery decision",
+      "status": "PASS"
+    },
+    {
+      "case": "monorepo no-impact decision accepted",
+      "status": "PASS"
+    }
+  ]
+}

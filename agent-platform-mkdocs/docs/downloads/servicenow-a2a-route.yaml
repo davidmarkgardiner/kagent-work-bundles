@@ -1,0 +1,23 @@
+# Routing example only: no JWT/authz or incident-body transform is generated.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: incident-canary-a2a
+  namespace: kagent
+spec:
+  parentRefs:
+    - name: "{{GATEWAY_NAME}}"
+  rules:
+    - matches:
+        - path:
+            type: Exact
+            value: /incident-canary
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /agents/kagent/platform-docs-canary
+      backendRefs:
+        - name: kagent-controller
+          port: 8083

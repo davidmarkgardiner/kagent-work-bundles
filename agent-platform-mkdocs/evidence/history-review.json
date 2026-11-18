@@ -1,0 +1,16 @@
+{
+  "reviewed": "2026-11-18",
+  "disposition": "SHIP",
+  "owner_confirmed_completed_capabilities": 10,
+  "approximate_periods": [
+    "Q2 2026",
+    "Q3 2026"
+  ],
+  "current_activity_tracks": 4,
+  "states_and_counts": "13 built, 4 building, 18 next, 2 blocked",
+  "new_precise_historical_dates": false,
+  "independent_historical_runtime_reexecution": false,
+  "source_and_browser_validation": "PASS",
+  "links_checked": 985,
+  "missing_links": 0
+}

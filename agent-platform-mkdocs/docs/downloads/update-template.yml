@@ -1,0 +1,33 @@
+id: replace-with-period-id
+title: Replace with the main outcome of the fortnight
+published: YYYY-MM-DD
+period:
+  label: Fortnight ending YYYY-MM-DD
+  start: YYYY-MM-DD
+  end: YYYY-MM-DD
+reviewer: '{{ACCOUNTABLE_REVIEWER}}'
+summary: State what changed for the stakeholder in one or two sentences.
+achievements:
+- milestone: '{{MILESTONE_ID}}'
+  outcome: Describe an accepted outcome; remove the row if there was no delivery.
+  why_it_matters: Explain the practical improvement for the consumer.
+  evidence:
+  - label: '{{EVIDENCE_TITLE}}'
+    url: '{{APPROVED_EVIDENCE_URL}}'
+    scope: target-runtime
+    reviewed: YYYY-MM-DD
+moved:
+- milestone: '{{MILESTONE_ID}}'
+  from: next
+  to: building
+  reason: Explain the state change; remove if no state changed.
+unchanged:
+- milestone: '{{MILESTONE_ID}}'
+  reason: Record a blocked or unchanged outcome honestly; remove if none.
+next:
+- Name the next small outcome and its acceptance.
+decisions:
+- owner: '{{DECISION_OWNER}}'
+  decision: Name the decision and the delivery it unblocks.
+scope_note: State exactly which environment class and acceptance scope the evidence covers; include no
+  external environment names.

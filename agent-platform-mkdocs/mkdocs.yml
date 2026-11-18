@@ -1,0 +1,46 @@
+site_name: Agent Platform Fieldnotes
+site_description: Deployment, consumption, isolation and delivery of the governed
+  agent platform
+docs_dir: docs
+site_dir: site
+use_directory_urls: false
+theme:
+  name: mkdocs
+  custom_dir: custom_theme
+  highlightjs: false
+nav:
+- Start here: index.md
+- Delivery roadmap: roadmap.md
+- Achievements: achievements.md
+- Historical achievements: historical-achievements.md
+- Fortnightly update template: fortnightly-updates.md
+- North Star and delivery: direction.md
+- Platform and KRO: architecture.md
+- Versions and migration: versions.md
+- Deploy an agent: deploy.md
+- Consume agents and the crew: consume.md
+- Isolation and policy blocker: isolation.md
+- Entra identity: identity.md
+- ServiceNow integration: servicenow.md
+- Knowledge and bounded tools: knowledge.md
+- Operate and evaluate: operations.md
+- Labs and acceptance: labs.md
+- Evidence and recent work: evidence.md
+- Work-agent handoff and hosting: handoff.md
+- Sources and downloads: sources.md
+plugins:
+- search
+markdown_extensions:
+- tables
+- fenced_code
+- admonition
+- toc:
+    permalink: true
+validation:
+  nav:
+    not_found: warn
+    omitted_files: info
+  links:
+    not_found: warn
+    unrecognized_links: warn
+    anchors: warn

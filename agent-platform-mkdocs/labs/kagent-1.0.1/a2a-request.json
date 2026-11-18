@@ -1,0 +1,12 @@
+{
+  "tenant": "kagent/platform-docs-canary",
+  "message": {
+    "messageId": "platform-docs-synthetic-canary",
+    "role": "ROLE_USER",
+    "parts": [
+      {
+        "text": "What is 7 times 6? Answer with just the number."
+      }
+    ]
+  }
+}

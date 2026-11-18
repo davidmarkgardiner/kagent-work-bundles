@@ -1,0 +1,274 @@
+updates:
+- id: q2-q3-achievement-backfill
+  title: 'Historical achievements: AI integrated into operational workflows'
+  published: '2026-11-18'
+  period:
+    label: Historical backfill · Q2/Q3 2026 (approximate)
+    start: '2026-04-01'
+    end: '2026-09-30'
+  reviewer: Completed capabilities confirmed by the pod lead; precise delivery dates and technical links
+    to be added
+  summary: The historical record now includes health checks, ServiceNow, triage, specialist agents, alerting,
+    governed data MCP and OC6 integrations, and self-service agent onboarding. Evaluation and central
+    registry registration are underway.
+  achievements:
+  - milestone: H-HEALTH
+    outcome: Built health checks that support AI-assisted operational investigation.
+    why_it_matters: AI is integrated into focused operational investigation tasks.
+    evidence:
+    - label: Pod lead confirmation
+      url: historical-achievements.md#h-health
+      scope: owner-confirmation
+      reviewed: '2026-11-18'
+  - milestone: H-SN-INSTANCE
+    outcome: Established the ServiceNow instance supporting the operational integration work.
+    why_it_matters: Agents and workflows can use integrated service and data capabilities.
+    evidence:
+    - label: Pod lead confirmation
+      url: historical-achievements.md#h-sn-instance
+      scope: owner-confirmation
+      reviewed: '2026-11-18'
+  - milestone: H-ALERTS
+    outcome: Built the alerting capability used by the operational workflows.
+    why_it_matters: The platform combines reusable delivery with governed operational capabilities.
+    evidence:
+    - label: Pod lead confirmation
+      url: historical-achievements.md#h-alerts
+      scope: owner-confirmation
+      reviewed: '2026-11-18'
+  - milestone: H-TRIAGE
+    outcome: Built the triage system and integrated AI into the investigation workflow.
+    why_it_matters: AI is integrated into focused operational investigation tasks.
+    evidence:
+    - label: Pod lead confirmation
+      url: historical-achievements.md#h-triage
+      scope: owner-confirmation
+      reviewed: '2026-11-18'
+  - milestone: H-SPECIALISTS
+    outcome: Built specialist agents for focused operational and engineering tasks.
+    why_it_matters: AI is integrated into focused operational investigation tasks.
+    evidence:
+    - label: Pod lead confirmation
+      url: historical-achievements.md#h-specialists
+      scope: owner-confirmation
+      reviewed: '2026-11-18'
+  - milestone: H-SN-INTEGRATION
+    outcome: Integrated ServiceNow into the AI-enabled operational workflows.
+    why_it_matters: Agents and workflows can use integrated service and data capabilities.
+    evidence:
+    - label: Pod lead confirmation
+      url: historical-achievements.md#h-sn-integration
+      scope: owner-confirmation
+      reviewed: '2026-11-18'
+  - milestone: H-DATA-MCP
+    outcome: Built custom MCP tools to connect approved data sources with agents and workflows.
+    why_it_matters: Agents and workflows can use integrated service and data capabilities.
+    evidence:
+    - label: Pod lead confirmation
+      url: historical-achievements.md#h-data-mcp
+      scope: owner-confirmation
+      reviewed: '2026-11-18'
+  - milestone: H-DENODO
+    outcome: Completed the security/compliance integration work around the data MCP capability, including
+      Denodo.
+    why_it_matters: The platform combines reusable delivery with governed operational capabilities.
+    evidence:
+    - label: Pod lead confirmation
+      url: historical-achievements.md#h-denodo
+      scope: owner-confirmation
+      reviewed: '2026-11-18'
+  - milestone: H-OC6
+    outcome: Built the OC6 compliance integration into the operational and data workflow.
+    why_it_matters: The platform combines reusable delivery with governed operational capabilities.
+    evidence:
+    - label: Pod lead confirmation
+      url: historical-achievements.md#h-oc6
+      scope: owner-confirmation
+      reviewed: '2026-11-18'
+  - milestone: H-ONBOARD
+    outcome: Provided a service through which teams can onboard their own agents to the shared platform.
+    why_it_matters: The platform combines reusable delivery with governed operational capabilities.
+    evidence:
+    - label: Pod lead confirmation
+      url: historical-achievements.md#h-onboard
+      scope: owner-confirmation
+      reviewed: '2026-11-18'
+  moved:
+  - milestone: H-HEALTH
+    from: unrecorded
+    to: built
+    reason: Historical completed capability recorded from pod lead confirmation; not a new delivery on
+      the reporting date.
+  - milestone: H-SN-INSTANCE
+    from: unrecorded
+    to: built
+    reason: Historical completed capability recorded from pod lead confirmation; not a new delivery on
+      the reporting date.
+  - milestone: H-ALERTS
+    from: unrecorded
+    to: built
+    reason: Historical completed capability recorded from pod lead confirmation; not a new delivery on
+      the reporting date.
+  - milestone: H-TRIAGE
+    from: unrecorded
+    to: built
+    reason: Historical completed capability recorded from pod lead confirmation; not a new delivery on
+      the reporting date.
+  - milestone: H-SPECIALISTS
+    from: unrecorded
+    to: built
+    reason: Historical completed capability recorded from pod lead confirmation; not a new delivery on
+      the reporting date.
+  - milestone: H-SN-INTEGRATION
+    from: unrecorded
+    to: built
+    reason: Historical completed capability recorded from pod lead confirmation; not a new delivery on
+      the reporting date.
+  - milestone: H-DATA-MCP
+    from: unrecorded
+    to: built
+    reason: Historical completed capability recorded from pod lead confirmation; not a new delivery on
+      the reporting date.
+  - milestone: H-DENODO
+    from: unrecorded
+    to: built
+    reason: Historical completed capability recorded from pod lead confirmation; not a new delivery on
+      the reporting date.
+  - milestone: H-OC6
+    from: unrecorded
+    to: built
+    reason: Historical completed capability recorded from pod lead confirmation; not a new delivery on
+      the reporting date.
+  - milestone: H-ONBOARD
+    from: unrecorded
+    to: built
+    reason: Historical completed capability recorded from pod lead confirmation; not a new delivery on
+      the reporting date.
+  - milestone: EVAL
+    from: next
+    to: building
+    reason: Pod lead confirms evaluation work is underway.
+  - milestone: REG-AGENTS
+    from: unrecorded
+    to: building
+    reason: Pod lead confirms central registry registration has started.
+  - milestone: REG-TOOLS
+    from: unrecorded
+    to: building
+    reason: Pod lead confirms central registry registration has started.
+  - milestone: REG-SKILLS
+    from: unrecorded
+    to: building
+    reason: Pod lead confirms central registry registration has started.
+  unchanged:
+  - milestone: RUNTIME
+    reason: New release/runtime acceptance remains separate from the already delivered capabilities.
+  next:
+  - Progress evaluation and register agents, tools and skills for reuse.
+  - Enrich historical records with agreed quarter placement, technical references and known go-live dates.
+  decisions:
+  - owner: Pod lead / capability owners
+    decision: Confirm the indicative Q2/Q3 placement and supply approved delivery/evidence links when
+      available.
+  scope_note: Completed capabilities and current activity are owner-confirmed. Q2/Q3 placement is approximate;
+    the confirmation/reporting date is not the delivery date. This backfill is not a new technical test,
+    a compliance certification or a production go-live assertion.
+- id: calendar-and-commit-checks
+  title: A delivery calendar that stays with the documentation
+  published: '2026-11-18'
+  period:
+    label: Delivery reference update
+    start: null
+    end: '2026-11-18'
+  reviewer: Documentation and offline source checks; receiving CI activation pending
+  summary: The roadmap now reads across Q4 and Q1 with named agent, MCP/skills and governance lanes. A
+    source check requires a delivery-impact decision alongside relevant documentation changes.
+  achievements:
+  - milestone: DOCS
+    outcome: A month-by-month calendar groups Agents, Tools and Governance.
+    why_it_matters: Stakeholders can distinguish accepted builds, service go-lives and proposed next outcomes
+      in one view.
+    evidence:
+    - label: Documentation validation
+      url: downloads/validation.json
+      scope: documentation
+      reviewed: '2026-11-18'
+  - milestone: SDLC
+    outcome: Repository instructions and Git-diff checks keep roadmap updates in the same reviewed change.
+    why_it_matters: Documentation changes cannot silently skip delivery classification; built/live transitions
+      require evidence and a new reporting entry.
+    evidence:
+    - label: Documentation and commit-check receipt
+      url: downloads/validation.json
+      scope: offline
+      reviewed: '2026-11-18'
+  moved:
+  - milestone: SDLC
+    from: next
+    to: built
+    reason: Staged and committed-diff checks passed fixture acceptance scenarios.
+  unchanged:
+  - milestone: POLICY
+    reason: Approval and enforcement evidence remain required.
+  - milestone: RUNTIME
+    reason: Receiving-runtime acceptance remains pending.
+  next:
+  - Confirm owner-approved month placement and active work.
+  - Adopt and run the prepared CI check in the receiving repository.
+  decisions:
+  - owner: Pod lead / delivery owners
+    decision: Review the proposed calendar buckets and milestone ownership.
+  scope_note: This records the calendar and offline check implementation. Remote CI enforcement, service
+    go-lives and runtime acceptance require their own receiving receipts.
+- id: opening-snapshot
+  title: A shared reference for the next delivery
+  published: '2026-11-18'
+  period:
+    label: Opening snapshot
+    start: null
+    end: '2026-11-18'
+  reviewer: Documentation review; receiving owner acceptance pending
+  summary: The platform handbook and versioned reference profile are ready for review. Runtime, identity
+    and service outcomes retain their own acceptance gates.
+  achievements:
+  - milestone: DOCS
+    outcome: A portable handbook and work-agent handoff are available.
+    why_it_matters: Stakeholders and implementers can use the same deployment, ownership and delivery
+      reference.
+    evidence:
+    - label: Handbook validation
+      url: downloads/validation.json
+      scope: documentation
+      reviewed: '2026-11-18'
+  - milestone: PROFILE
+    outcome: Pinned release artifacts and the reference schemas have been checked.
+    why_it_matters: The receiving team has a repeatable baseline and a clear runtime test contract.
+    evidence:
+    - label: Offline verification
+      url: downloads/validation.json
+      scope: offline
+      reviewed: '2026-11-18'
+  moved:
+  - milestone: DOCS
+    from: proposed
+    to: delivered
+    reason: Source, strict build and reading-path checks are available.
+  - milestone: PROFILE
+    from: proposed
+    to: delivered
+    reason: Released charts and schema-check receipts are available.
+  unchanged:
+  - milestone: POLICY
+    reason: Approval and enforcement evidence are still required.
+  - milestone: RUNTIME
+    reason: Receiving-environment runtime evidence remains pending.
+  next:
+  - Confirm the bounded policy route and intended validation target.
+  - Agree the incident pilot contract with SRE and the ServiceNow owner.
+  decisions:
+  - owner: Security / platform owners
+    decision: Confirm the policy acceptance route and validation target.
+  - owner: SRE / ServiceNow owner
+    decision: Nominate one incident queue and the supported patterns.
+  scope_note: This snapshot records documentation and offline validation. Runtime and service delivery
+    require evidence from the intended environment.

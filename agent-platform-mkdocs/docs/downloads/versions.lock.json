@@ -1,0 +1,89 @@
+{
+  "checked_on": "2026-11-18",
+  "latest_releases": {
+    "kagent": "1.0.1",
+    "substrate": "1.0.1",
+    "agentgateway": "1.7.0"
+  },
+  "release_matched_baseline": {
+    "kagent": "1.0.1",
+    "substrate": "1.0.0"
+  },
+  "candidate": {
+    "kagent": "1.0.1",
+    "substrate": "1.0.1",
+    "runtime_compatibility": "NOT RUN"
+  },
+  "pin_sources": [
+    "https://github.com/kagent-dev/kagent/blob/v1.0.1/go/go.mod",
+    "https://github.com/kagent-dev/kagent/blob/v1.0.1/Makefile"
+  ],
+  "charts": [
+    {
+      "name": "kagent",
+      "version": "1.0.1",
+      "repository": "oci://ghcr.io/kagent-dev/kagent/helm",
+      "oci_digest": "sha256:1c491dde742b91acd8056786177279d3ba8d61fc2c314f6dce66d00ea4bfe9c1"
+    },
+    {
+      "name": "kagent-crds",
+      "version": "1.0.1",
+      "repository": "oci://ghcr.io/kagent-dev/kagent/helm",
+      "oci_digest": "sha256:6fda1c3d10ebc67b7e38dc8361700aebbe5ee73fcc205c5fd2cc2de9e1b85eeb"
+    },
+    {
+      "name": "substrate",
+      "version": "1.0.0",
+      "repository": "oci://ghcr.io/kagent-dev/substrate/helm",
+      "oci_digest": "sha256:2098ad8f79e8d00ffe5647286745ed1bf65531ce0b930175d83c8645345ac546"
+    },
+    {
+      "name": "substrate-atelet",
+      "version": "1.0.0",
+      "repository": "oci://ghcr.io/kagent-dev/substrate/helm",
+      "oci_digest": "sha256:d1f92b24afe45c34b87f56446fb450f46c3e13869951df475867c7096ddf403f"
+    },
+    {
+      "name": "substrate",
+      "version": "1.0.1",
+      "repository": "oci://ghcr.io/kagent-dev/substrate/helm",
+      "oci_digest": "sha256:336c12f7f265e1b6400529eb1ef69c8d0765872d810f18f97525c66d2ba90f86"
+    },
+    {
+      "name": "substrate-atelet",
+      "version": "1.0.1",
+      "repository": "oci://ghcr.io/kagent-dev/substrate/helm",
+      "oci_digest": "sha256:233e1ed8f74a202abca851c43adee88849482d8ce37760b8be65f4d96fbc8ca3"
+    },
+    {
+      "name": "agentgateway",
+      "version": "v1.7.0",
+      "repository": "oci://cr.agentgateway.dev/charts",
+      "oci_digest": "sha256:40340d639e35206317c934e9af3e29575cf7c5377b2940679732baac6e108c15"
+    },
+    {
+      "name": "substrate-crds",
+      "version": "1.0.0",
+      "repository": "oci://ghcr.io/kagent-dev/substrate/helm",
+      "oci_digest": "sha256:2d1b331c4774dcb88d2d5ebcb017b294a43b4bfb5abeca719534bbc73c14c8d4"
+    },
+    {
+      "name": "substrate-crds",
+      "version": "1.0.1",
+      "repository": "oci://ghcr.io/kagent-dev/substrate/helm",
+      "oci_digest": "sha256:3ed670bacd5680ecbcafc9d4a6c95ef90a20f96568b1ba621d0c9c7e411eb084"
+    },
+    {
+      "name": "substrate-podcert",
+      "version": "1.0.0",
+      "repository": "oci://ghcr.io/kagent-dev/substrate/helm",
+      "oci_digest": "sha256:b21ec973ad28c9a417ce7167269bdf403a338ce96ff72cd422b5da987f9247cd"
+    },
+    {
+      "name": "substrate-podcert",
+      "version": "1.0.1",
+      "repository": "oci://ghcr.io/kagent-dev/substrate/helm",
+      "oci_digest": "sha256:366b0431ed99cd4ff74f49cb7746329a722c9f8ec9ce0ab4d0670817b34deb80"
+    }
+  ]
+}

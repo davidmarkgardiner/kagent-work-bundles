@@ -1,0 +1,939 @@
+title: The pod’s delivery roadmap
+reviewed_on: '2026-11-18'
+cadence: Every two weeks
+planning_note: Historical Q2/Q3 achievements are owner-confirmed; quarter placement is indicative. Later
+  calendar buckets show current activity and proposed evolution.
+focus:
+  title: Evaluation and central registry
+  state: Owner-confirmed active work
+  detail: Build the evaluation capability and register agents, skills and MCP tools in the central registry
+    so other teams can discover and consume them.
+  milestones:
+  - EVAL
+  - REG-AGENTS
+  - REG-TOOLS
+  - REG-SKILLS
+next:
+  title: Scale the existing AI-enabled workflows
+  detail: Build on delivered health checks, alerting, triage, specialists, ServiceNow/data integrations
+    and agent onboarding through evaluation, shared registration and reviewed runtime evolution.
+  milestones:
+  - EVAL
+  - REG-AGENTS
+  - REG-TOOLS
+  - REG-SKILLS
+  - ONBOARD
+milestones:
+- id: H-HEALTH
+  horizon: history
+  title: Platform health checks
+  outcome: Built health checks that support AI-assisted operational investigation.
+  state: built
+  owner: Capability owner / pod lead
+  acceptance:
+  - Completed capability confirmed by the pod lead.
+  - The record identifies its owner-confirmation basis and approximate quarter without inventing exact
+    delivery or go-live dates.
+  dependencies: []
+  evidence:
+  - label: Pod lead confirmation
+    url: historical-achievements.md#h-health
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Retain the completed capability; enrich this record with its delivery references and confirmed
+    dates.
+  track: agents
+  category: specialists
+  window: 2026-Q2
+  built_on: null
+  live_on: null
+  historical:
+    period: 2026-Q2
+    precision: approximate-quarter
+    confirmed_on: '2026-11-18'
+    confirmed_by: Pod lead
+    basis: Owner-confirmed completed capability; exact quarter placement and technical receipt links are
+      not independently verified.
+- id: H-SN-INSTANCE
+  horizon: history
+  title: ServiceNow instance
+  outcome: Established the ServiceNow instance supporting the operational integration work.
+  state: built
+  owner: Capability owner / pod lead
+  acceptance:
+  - Completed capability confirmed by the pod lead.
+  - The record identifies its owner-confirmation basis and approximate quarter without inventing exact
+    delivery or go-live dates.
+  dependencies: []
+  evidence:
+  - label: Pod lead confirmation
+    url: historical-achievements.md#h-sn-instance
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Retain the completed capability; enrich this record with its delivery references and confirmed
+    dates.
+  track: tools
+  category: mcp
+  window: 2026-Q2
+  built_on: null
+  live_on: null
+  historical:
+    period: 2026-Q2
+    precision: approximate-quarter
+    confirmed_on: '2026-11-18'
+    confirmed_by: Pod lead
+    basis: Owner-confirmed completed capability; exact quarter placement and technical receipt links are
+      not independently verified.
+- id: H-ALERTS
+  horizon: history
+  title: Alerting system
+  outcome: Built the alerting capability used by the operational workflows.
+  state: built
+  owner: Capability owner / pod lead
+  acceptance:
+  - Completed capability confirmed by the pod lead.
+  - The record identifies its owner-confirmation basis and approximate quarter without inventing exact
+    delivery or go-live dates.
+  dependencies: []
+  evidence:
+  - label: Pod lead confirmation
+    url: historical-achievements.md#h-alerts
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Retain the completed capability; enrich this record with its delivery references and confirmed
+    dates.
+  track: governance
+  category: observability
+  window: 2026-Q2
+  built_on: null
+  live_on: null
+  historical:
+    period: 2026-Q2
+    precision: approximate-quarter
+    confirmed_on: '2026-11-18'
+    confirmed_by: Pod lead
+    basis: Owner-confirmed completed capability; exact quarter placement and technical receipt links are
+      not independently verified.
+- id: H-TRIAGE
+  horizon: history
+  title: AI triage system
+  outcome: Built the triage system and integrated AI into the investigation workflow.
+  state: built
+  owner: Capability owner / pod lead
+  acceptance:
+  - Completed capability confirmed by the pod lead.
+  - The record identifies its owner-confirmation basis and approximate quarter without inventing exact
+    delivery or go-live dates.
+  dependencies: []
+  evidence:
+  - label: Pod lead confirmation
+    url: historical-achievements.md#h-triage
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Retain the completed capability; enrich this record with its delivery references and confirmed
+    dates.
+  track: agents
+  category: coordination
+  window: 2026-Q3
+  built_on: null
+  live_on: null
+  historical:
+    period: 2026-Q3
+    precision: approximate-quarter
+    confirmed_on: '2026-11-18'
+    confirmed_by: Pod lead
+    basis: Owner-confirmed completed capability; exact quarter placement and technical receipt links are
+      not independently verified.
+- id: H-SPECIALISTS
+  horizon: history
+  title: Task-specific specialist agents
+  outcome: Built specialist agents for focused operational and engineering tasks.
+  state: built
+  owner: Capability owner / pod lead
+  acceptance:
+  - Completed capability confirmed by the pod lead.
+  - The record identifies its owner-confirmation basis and approximate quarter without inventing exact
+    delivery or go-live dates.
+  dependencies: []
+  evidence:
+  - label: Pod lead confirmation
+    url: historical-achievements.md#h-specialists
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Retain the completed capability; enrich this record with its delivery references and confirmed
+    dates.
+  track: agents
+  category: specialists
+  window: 2026-Q3
+  built_on: null
+  live_on: null
+  historical:
+    period: 2026-Q3
+    precision: approximate-quarter
+    confirmed_on: '2026-11-18'
+    confirmed_by: Pod lead
+    basis: Owner-confirmed completed capability; exact quarter placement and technical receipt links are
+      not independently verified.
+- id: H-SN-INTEGRATION
+  horizon: history
+  title: ServiceNow integrations
+  outcome: Integrated ServiceNow into the AI-enabled operational workflows.
+  state: built
+  owner: Capability owner / pod lead
+  acceptance:
+  - Completed capability confirmed by the pod lead.
+  - The record identifies its owner-confirmation basis and approximate quarter without inventing exact
+    delivery or go-live dates.
+  dependencies: []
+  evidence:
+  - label: Pod lead confirmation
+    url: historical-achievements.md#h-sn-integration
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Retain the completed capability; enrich this record with its delivery references and confirmed
+    dates.
+  track: tools
+  category: mcp
+  window: 2026-Q3
+  built_on: null
+  live_on: null
+  historical:
+    period: 2026-Q3
+    precision: approximate-quarter
+    confirmed_on: '2026-11-18'
+    confirmed_by: Pod lead
+    basis: Owner-confirmed completed capability; exact quarter placement and technical receipt links are
+      not independently verified.
+- id: H-DATA-MCP
+  horizon: history
+  title: Custom MCP data integrations
+  outcome: Built custom MCP tools to connect approved data sources with agents and workflows.
+  state: built
+  owner: Capability owner / pod lead
+  acceptance:
+  - Completed capability confirmed by the pod lead.
+  - The record identifies its owner-confirmation basis and approximate quarter without inventing exact
+    delivery or go-live dates.
+  dependencies: []
+  evidence:
+  - label: Pod lead confirmation
+    url: historical-achievements.md#h-data-mcp
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Retain the completed capability; enrich this record with its delivery references and confirmed
+    dates.
+  track: tools
+  category: mcp
+  window: 2026-Q3
+  built_on: null
+  live_on: null
+  historical:
+    period: 2026-Q3
+    precision: approximate-quarter
+    confirmed_on: '2026-11-18'
+    confirmed_by: Pod lead
+    basis: Owner-confirmed completed capability; exact quarter placement and technical receipt links are
+      not independently verified.
+- id: H-DENODO
+  horizon: history
+  title: Governed Denodo MCP integration
+  outcome: Completed the security/compliance integration work around the data MCP capability, including
+    Denodo.
+  state: built
+  owner: Capability owner / pod lead
+  acceptance:
+  - Completed capability confirmed by the pod lead.
+  - The record identifies its owner-confirmation basis and approximate quarter without inventing exact
+    delivery or go-live dates.
+  dependencies: []
+  evidence:
+  - label: Pod lead confirmation
+    url: historical-achievements.md#h-denodo
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Retain the completed capability; enrich this record with its delivery references and confirmed
+    dates.
+  track: governance
+  category: policy
+  window: 2026-Q3
+  built_on: null
+  live_on: null
+  historical:
+    period: 2026-Q3
+    precision: approximate-quarter
+    confirmed_on: '2026-11-18'
+    confirmed_by: Pod lead
+    basis: Owner-confirmed completed capability; exact quarter placement and technical receipt links are
+      not independently verified.
+- id: H-OC6
+  horizon: history
+  title: OC6 compliance integration
+  outcome: Built the OC6 compliance integration into the operational and data workflow.
+  state: built
+  owner: Capability owner / pod lead
+  acceptance:
+  - Completed capability confirmed by the pod lead.
+  - The record identifies its owner-confirmation basis and approximate quarter without inventing exact
+    delivery or go-live dates.
+  dependencies: []
+  evidence:
+  - label: Pod lead confirmation
+    url: historical-achievements.md#h-oc6
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Retain the completed capability; enrich this record with its delivery references and confirmed
+    dates.
+  track: governance
+  category: policy
+  window: 2026-Q3
+  built_on: null
+  live_on: null
+  historical:
+    period: 2026-Q3
+    precision: approximate-quarter
+    confirmed_on: '2026-11-18'
+    confirmed_by: Pod lead
+    basis: Owner-confirmed completed capability; exact quarter placement and technical receipt links are
+      not independently verified.
+- id: H-ONBOARD
+  horizon: history
+  title: Self-service agent onboarding
+  outcome: Provided a service through which teams can onboard their own agents to the shared platform.
+  state: built
+  owner: Capability owner / pod lead
+  acceptance:
+  - Completed capability confirmed by the pod lead.
+  - The record identifies its owner-confirmation basis and approximate quarter without inventing exact
+    delivery or go-live dates.
+  dependencies: []
+  evidence:
+  - label: Pod lead confirmation
+    url: historical-achievements.md#h-onboard
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Retain the completed capability; enrich this record with its delivery references and confirmed
+    dates.
+  track: governance
+  category: sdlc
+  window: 2026-Q3
+  built_on: null
+  live_on: null
+  historical:
+    period: 2026-Q3
+    precision: approximate-quarter
+    confirmed_on: '2026-11-18'
+    confirmed_by: Pod lead
+    basis: Owner-confirmed completed capability; exact quarter placement and technical receipt links are
+      not independently verified.
+- id: DOCS
+  horizon: immediate
+  title: One platform handbook
+  outcome: A common reference for how teams deploy, consume and govern agents.
+  state: built
+  owner: Documentation owner
+  acceptance:
+  - Portable MkDocs source, navigation and work-agent instructions.
+  - Strict build, link/download and responsive reading checks.
+  dependencies: []
+  evidence:
+  - label: Documentation validation
+    url: downloads/validation.json
+    scope: documentation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Maintain the reviewed source and evidence.
+  track: governance
+  category: sdlc
+  window: 2026-11
+  built_on: '2026-11-18'
+  live_on: null
+- id: PROFILE
+  horizon: immediate
+  title: Versioned reference profile
+  outcome: A repeatable starting point for the approved 1.0 evaluation.
+  state: built
+  owner: Platform engineering
+  acceptance:
+  - Release artifacts pinned and rendered.
+  - Agent and WorkerPool schemas checked; runtime acceptance kept separate.
+  dependencies: []
+  evidence:
+  - label: Artifact and schema receipt
+    url: downloads/validation.json
+    scope: offline
+    reviewed: '2026-11-18'
+  - label: Release matrix
+    url: versions.md
+    scope: documentation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Maintain the reviewed source and evidence.
+  track: governance
+  category: sdlc
+  window: 2026-11
+  built_on: '2026-11-18'
+  live_on: null
+- id: POLICY
+  horizon: immediate
+  title: An approved execution boundary
+  outcome: A reviewed route through the capability and filesystem policy gate.
+  state: blocked
+  owner: Security and platform owners
+  acceptance:
+  - Exact runtime privilege inventory reviewed.
+  - Bounded exception approved with owner and expiry.
+  - Replacement enforcement and bypass denials evidenced across affected scope.
+  dependencies: []
+  evidence: []
+  gate:
+    owner: Security / policy owner
+    decision: Approve a bounded exception and required enforcement evidence.
+    unblocks: Runtime validation and secure onboarding.
+  next_action: Resolve the named dependency and collect receiving-environment evidence.
+  track: governance
+  category: policy
+  window: 2026-11
+  built_on: null
+  live_on: null
+- id: RUNTIME
+  horizon: immediate
+  title: A proven agent runtime
+  outcome: The intended environment can run, suspend and restore an isolated agent.
+  state: blocked
+  owner: Platform engineering
+  acceptance:
+  - Approved environment prerequisites and dependencies confirmed.
+  - L01–L12 run against the matched runtime with retained receipts.
+  - The standalone Substrate candidate passes its own compatibility gate before promotion.
+  dependencies:
+  - POLICY
+  evidence: []
+  gate:
+    owner: Platform owner
+    decision: Nominate an accessible validation target and confirm capacity.
+    unblocks: Runtime and isolation acceptance.
+  next_action: Resolve the named dependency and collect receiving-environment evidence.
+  track: governance
+  category: policy
+  window: 2026-11
+  built_on: null
+  live_on: null
+- id: ONBOARD
+  horizon: q4
+  title: 'Agent onboarding: Entra / 1.0 evolution'
+  outcome: Extend the existing self-service onboarding service with the reviewed Entra and 1.0 runtime
+    contract.
+  state: next
+  owner: Platform / identity engineering
+  acceptance:
+  - Approved caller and downstream grants with owned federation.
+  - Allowed read, wrong-identity/wrong-role denial, refresh and revocation evidenced.
+  - Reviewed KRO/GitOps composition produces the 1.0 resource model.
+  dependencies:
+  - POLICY
+  - RUNTIME
+  evidence: []
+  gate: null
+  next_action: Confirm the owner and acceptance before starting.
+  track: governance
+  category: policy
+  window: 2026-12
+  built_on: null
+  live_on: null
+- id: CONTRACT
+  horizon: q4
+  title: 'ServiceNow: next incident queue contract'
+  outcome: Extend existing ServiceNow integrations to an agreed queue and supported incident patterns.
+  state: next
+  owner: Integration engineering with SRE
+  acceptance:
+  - Trusted target mapping, eligible payload and dedupe contract agreed.
+  - Data classification, review rules and ticket-update permissions owned.
+  - Representative replay cases and manual baseline available.
+  dependencies: []
+  evidence: []
+  gate: null
+  next_action: Confirm the owner and acceptance before starting.
+  track: agents
+  category: coordination
+  window: 2026-12
+  built_on: null
+  live_on: null
+- id: TRIAGE
+  horizon: q1
+  title: 'Triage: durable workflow expansion'
+  outcome: Extend the existing triage system with the next agreed durability, retry and handoff contract.
+  state: next
+  owner: Integration engineering with SRE
+  acceptance:
+  - Durable execution, bounded retries and explicit timeout/handoff.
+  - Duplicate and malicious-input cases pass the agreed evaluation.
+  - Facts, uncertainty and recommended checks carry citations and timestamps.
+  dependencies:
+  - ONBOARD
+  - CONTRACT
+  evidence: []
+  gate: null
+  next_action: Confirm the owner and acceptance before starting.
+  track: agents
+  category: coordination
+  window: 2027-01
+  built_on: null
+  live_on: null
+- id: TICKETS
+  horizon: q1
+  title: 'ServiceNow MCP: scoped update expansion'
+  outcome: Extend existing integrations with the next reviewed ticket-field, identity and read-back contract.
+  state: next
+  owner: Integration engineering / ServiceNow owner
+  acceptance:
+  - Separate write identity, permitted fields and review authority accepted.
+  - Ambiguous write, self-trigger loop and duplicate-comment scenarios handled.
+  - Receiving ticket read-back confirms the authorised update.
+  dependencies:
+  - TRIAGE
+  evidence: []
+  gate: null
+  next_action: Confirm the owner and acceptance before starting.
+  track: tools
+  category: mcp
+  window: 2027-02
+  built_on: null
+  live_on: null
+- id: CREW
+  horizon: q1
+  title: 'Specialist coordination: expansion'
+  outcome: Extend the existing specialist agents with bounded, evidence-led coordination.
+  state: next
+  owner: Agent owners with platform engineering
+  acceptance:
+  - Kubernetes, network, observability and knowledge scopes are catalogued.
+  - Delegation depth, time, tokens and operation limits enforced.
+  - Cross-session, cross-agent and direct-backend denials proved.
+  dependencies:
+  - ONBOARD
+  - TRIAGE
+  evidence: []
+  gate: null
+  next_action: Confirm the owner and acceptance before starting.
+  track: agents
+  category: coordination
+  window: 2027-02
+  built_on: null
+  live_on: null
+- id: KNOWLEDGE
+  horizon: q1
+  title: Reviewed knowledge and investigation skills
+  outcome: Incident lessons become versioned guidance through owner review and evaluation.
+  state: next
+  owner: Knowledge / evaluation engineering
+  acceptance:
+  - Applicability, provenance, entitlement and review date recorded.
+  - Retrieval is bounded and cited; withdrawal/re-indexing tested.
+  - Evaluation thresholds agreed before model, prompt, skill or knowledge promotion.
+  dependencies:
+  - CONTRACT
+  evidence: []
+  gate: null
+  next_action: Confirm the owner and acceptance before starting.
+  track: tools
+  category: skills
+  window: 2027-01
+  built_on: null
+  live_on: null
+- id: REUSE
+  horizon: q1
+  title: A second team can onboard
+  outcome: Another team consumes the platform without bespoke identity or security design.
+  state: next
+  owner: Pod lead / adopting service owner
+  acceptance:
+  - A second team meets documented readiness and owner requirements.
+  - The same supported contract, isolation and disable gates pass.
+  - Onboarding friction and support responsibilities reviewed.
+  dependencies:
+  - ONBOARD
+  - CREW
+  - KNOWLEDGE
+  evidence: []
+  gate: null
+  next_action: Confirm the owner and acceptance before starting.
+  track: governance
+  category: sdlc
+  window: 2027-03
+  built_on: null
+  live_on: null
+- id: OPERATE
+  horizon: q1
+  title: An offering with operational ownership
+  outcome: Owners can observe, support, stop and recover the service.
+  state: next
+  owner: Platform operations with SRE
+  acceptance:
+  - Caller-to-outcome traces, retention and cost visibility accepted.
+  - Disable, credential revocation and rollback demonstrated.
+  - Support/RACI and manual fallback accepted by receiving owners.
+  dependencies:
+  - TRIAGE
+  - TICKETS
+  evidence: []
+  gate: null
+  next_action: Confirm the owner and acceptance before starting.
+  track: governance
+  category: observability
+  window: 2027-03
+  built_on: null
+  live_on: null
+- id: K8S
+  horizon: q4
+  title: 'Kubernetes specialist: 1.0 acceptance'
+  outcome: Retest and harden the Kubernetes specialist profile against the reviewed 1.0 runtime and tool
+    contract.
+  state: next
+  owner: Agent owner with platform engineering
+  acceptance:
+  - Approved tool and resource allowlists accepted.
+  - A real allowed read and an out-of-scope denial have receiving-system receipts.
+  - No generic apply/delete or unrestricted shell tool.
+  dependencies:
+  - ONBOARD
+  - MCP-READ
+  evidence: []
+  gate: null
+  next_action: Confirm owner, scope and acceptance before starting.
+  track: agents
+  category: specialists
+  window: 2026-12
+  built_on: null
+  live_on: null
+- id: NET
+  horizon: q1
+  title: 'Network specialist: scope expansion'
+  outcome: Extend the specialist offering for named DNS, route, service and connectivity cases.
+  state: next
+  owner: Agent owner with platform engineering
+  acceptance:
+  - Approved target and query scope enforced.
+  - Useful network findings and denied arbitrary destinations evidenced.
+  dependencies:
+  - K8S
+  evidence: []
+  gate: null
+  next_action: Confirm owner, scope and acceptance before starting.
+  track: agents
+  category: specialists
+  window: 2027-02
+  built_on: null
+  live_on: null
+- id: OBS-AGENT
+  horizon: q1
+  title: 'Observability specialist: expansion'
+  outcome: Extend bounded metrics/log evidence gathering for the next supported use cases.
+  state: next
+  owner: Agent owner with platform engineering
+  acceptance:
+  - Approved datasources and time ranges enforced.
+  - Evidence retrieval and scope denials pass replay cases.
+  dependencies:
+  - MCP-OBS
+  evidence: []
+  gate: null
+  next_action: Confirm owner, scope and acceptance before starting.
+  track: agents
+  category: specialists
+  window: 2027-02
+  built_on: null
+  live_on: null
+- id: KB-AGENT
+  horizon: q1
+  title: 'Knowledge specialist: retrieval expansion'
+  outcome: Expand reviewed, entitled knowledge retrieval for existing operational workflows.
+  state: next
+  owner: Agent owner with platform engineering
+  acceptance:
+  - Caller entitlement, bounded retrieval and citation checks pass.
+  - Stale or withdrawn guidance is excluded.
+  dependencies:
+  - KNOWLEDGE
+  evidence: []
+  gate: null
+  next_action: Confirm owner, scope and acceptance before starting.
+  track: agents
+  category: specialists
+  window: 2027-03
+  built_on: null
+  live_on: null
+- id: GITOPS-AGENT
+  horizon: q1
+  title: 'GitOps specialist: guidance expansion'
+  outcome: Extend task-specific agents with reviewed repository and change-guidance use cases.
+  state: next
+  owner: Agent owner with platform engineering
+  acceptance:
+  - Approved repository and read scope demonstrated.
+  - Any change is a reviewed draft or fixed workflow request.
+  dependencies:
+  - TRIAGE
+  - EVAL
+  evidence: []
+  gate: null
+  next_action: Confirm owner, scope and acceptance before starting.
+  track: agents
+  category: specialists
+  window: 2027-03
+  built_on: null
+  live_on: null
+- id: MCP-READ
+  horizon: q4
+  title: 'Kubernetes MCP: 1.0 acceptance'
+  outcome: Retest the approved read-only tool profile with the reviewed gateway and runtime release.
+  state: next
+  owner: Tool / skills owner
+  acceptance:
+  - Least-privilege backend identity and namespace scope enforced.
+  - Allowed reads, forbidden operations and direct bypass tests evidenced.
+  dependencies:
+  - RUNTIME
+  evidence: []
+  gate: null
+  next_action: Confirm owner, scope and acceptance before starting.
+  track: tools
+  category: mcp
+  window: 2026-12
+  built_on: null
+  live_on: null
+- id: MCP-OBS
+  horizon: q1
+  title: Observability MCP queries
+  outcome: Expose bounded queries against approved observability datasources.
+  state: next
+  owner: Tool / skills owner
+  acceptance:
+  - Datasource, time-window and result limits enforced.
+  - Actual backend response and access-denial receipts retained.
+  dependencies:
+  - ONBOARD
+  evidence: []
+  gate: null
+  next_action: Confirm owner, scope and acceptance before starting.
+  track: tools
+  category: mcp
+  window: 2027-01
+  built_on: null
+  live_on: null
+- id: SKILLS
+  horizon: q4
+  title: 'Investigation skills: reuse and versioning'
+  outcome: Package and version procedures for central discovery and safe reuse by other teams.
+  state: next
+  owner: Tool / skills owner
+  acceptance:
+  - Named owner, provenance and supported tools recorded.
+  - Review, evaluation and withdrawal paths accepted.
+  dependencies:
+  - CONTRACT
+  evidence: []
+  gate: null
+  next_action: Confirm owner, scope and acceptance before starting.
+  track: tools
+  category: skills
+  window: 2026-12
+  built_on: null
+  live_on: null
+- id: EVAL
+  horizon: immediate
+  title: Agent evaluation capability
+  outcome: Build evaluation of agent and workflow quality, scope compliance and failure handling.
+  state: building
+  owner: Platform governance owner
+  acceptance:
+  - Owner agrees quality, scope-compliance and failure criteria.
+  - Misleading input, unavailable tools and oversized results included.
+  dependencies: []
+  evidence:
+  - label: Current-work confirmation
+    url: historical-achievements.md#current-work
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Agree representative cases and acceptance thresholds, then record evaluation results.
+  track: governance
+  category: evaluation
+  window: 2026-11
+  built_on: null
+  live_on: null
+- id: TELEMETRY
+  horizon: q1
+  title: Caller-to-tool traces and usage
+  outcome: Correlate caller, Agent revision, task, tool and outcome evidence.
+  state: next
+  owner: Platform governance owner
+  acceptance:
+  - Token/cost, latency, error and denial signals retained.
+  - Content capture, redaction and retention accepted.
+  dependencies:
+  - ONBOARD
+  evidence: []
+  gate: null
+  next_action: Confirm owner, scope and acceptance before starting.
+  track: governance
+  category: observability
+  window: 2027-01
+  built_on: null
+  live_on: null
+- id: SDLC
+  horizon: immediate
+  title: Documentation and roadmap commit checks
+  outcome: Keep the maintained calendar, achievement log and documentation changes in the same review.
+  state: built
+  owner: Platform governance owner
+  acceptance:
+  - Agent instructions require a roadmap impact decision.
+  - Commit checks reject stale generated pages and undocumented milestone changes.
+  - Portable CI configuration is ready for the receiving repository.
+  dependencies: []
+  evidence:
+  - label: Documentation and commit-check receipt
+    url: downloads/validation.json
+    scope: offline
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Maintain the source checks and adopt/run them through the receiving repository review process.
+  track: governance
+  category: sdlc
+  window: 2026-11
+  built_on: '2026-11-18'
+  live_on: null
+- id: MCP-DATA
+  horizon: q1
+  title: 'Data MCP: bounded-result hardening'
+  outcome: Harden existing custom MCP data integrations with bounded results and representative telemetry.
+  state: next
+  owner: Data / MCP service owner
+  acceptance:
+  - Preserve deployed authentication, approved views, grants and wiring.
+  - Typed read-only tools enforce row, byte, cell and timeout limits.
+  - Receiving evidence covers complete MCP envelopes and input-token telemetry.
+  dependencies:
+  - ONBOARD
+  evidence: []
+  gate: null
+  next_action: Agree the receiving canary and reviewed adapter delta.
+  track: tools
+  category: mcp
+  window: 2027-01
+  built_on: null
+  live_on: null
+- id: REG-AGENTS
+  horizon: immediate
+  title: Register reusable agents
+  outcome: Register existing agents in the central registry for discovery and controlled consumption.
+  state: building
+  owner: Registry / capability owner
+  acceptance:
+  - Registration work is confirmed underway by the pod lead.
+  - Owner, version, access contract and consumer guidance are recorded.
+  - An authorised consumer can discover and use the registered capability.
+  dependencies: []
+  evidence:
+  - label: Current-work confirmation
+    url: historical-achievements.md#current-work
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Complete registration metadata and prove discovery and authorised consumption.
+  track: agents
+  category: coordination
+  window: 2026-11
+  built_on: null
+  live_on: null
+- id: REG-TOOLS
+  horizon: immediate
+  title: Register MCP tools
+  outcome: Register custom MCP tool capabilities with owners, scopes and consumer contracts.
+  state: building
+  owner: Registry / capability owner
+  acceptance:
+  - Registration work is confirmed underway by the pod lead.
+  - Owner, version, access contract and consumer guidance are recorded.
+  - An authorised consumer can discover and use the registered capability.
+  dependencies: []
+  evidence:
+  - label: Current-work confirmation
+    url: historical-achievements.md#current-work
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Complete registration metadata and prove discovery and authorised consumption.
+  track: tools
+  category: mcp
+  window: 2026-11
+  built_on: null
+  live_on: null
+- id: REG-SKILLS
+  horizon: immediate
+  title: Register agent skills
+  outcome: Register versioned skills so other teams can discover and reuse approved procedures.
+  state: building
+  owner: Registry / capability owner
+  acceptance:
+  - Registration work is confirmed underway by the pod lead.
+  - Owner, version, access contract and consumer guidance are recorded.
+  - An authorised consumer can discover and use the registered capability.
+  dependencies: []
+  evidence:
+  - label: Current-work confirmation
+    url: historical-achievements.md#current-work
+    scope: owner-confirmation
+    reviewed: '2026-11-18'
+  gate: null
+  next_action: Complete registration metadata and prove discovery and authorised consumption.
+  track: tools
+  category: skills
+  window: 2026-11
+  built_on: null
+  live_on: null
+calendar:
+  label: Q2 2026 to Q1 2027
+  note: Q2/Q3 records completed capabilities confirmed by the pod lead. Their quarter placement is approximate.
+    Q4/Q1 shows ongoing work and proposed evolution; exact delivery and go-live dates are recorded only
+    when known.
+  windows:
+  - id: 2026-Q2
+    label: Q2 achievements
+    quarter: Q2 2026
+    horizon: history
+  - id: 2026-Q3
+    label: Q3 achievements
+    quarter: Q3 2026
+    horizon: history
+  - id: 2026-11
+    label: November
+    quarter: Q4 2026
+    horizon: immediate
+  - id: 2026-12
+    label: December
+    quarter: Q4 2026
+    horizon: q4
+  - id: 2027-01
+    label: January
+    quarter: Q1 2027
+    horizon: q1
+  - id: 2027-02
+    label: February
+    quarter: Q1 2027
+    horizon: q1
+  - id: 2027-03
+    label: March
+    quarter: Q1 2027
+    horizon: q1

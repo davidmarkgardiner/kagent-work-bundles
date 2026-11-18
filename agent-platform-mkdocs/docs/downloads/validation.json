@@ -1,0 +1,235 @@
+{
+  "checked_at": "2026-11-18T10:31:53.001345+00:00",
+  "scope": "Portable documentation, stakeholder reporting and offline release-artifact verification; no deployment",
+  "documentation": {
+    "pages": 22,
+    "selected_source_documents": 29,
+    "mkdocs_strict": "PASS",
+    "download_freshness": "PASS",
+    "public_safe_scan_strict": {
+      "clean": true,
+      "hits": 0
+    },
+    "local_link_check": {
+      "checked": 985,
+      "missing": 0,
+      "anchors_checked": true
+    },
+    "standalone_copied_project_build": "PASS",
+    "delivery_sources": "PASS: YAML schemas and generated-file freshness",
+    "generic_environment_language": "PASS: no named external environments, hosts or environment-specific machine anecdotes in the handoff"
+  },
+  "offline": {
+    "checked_at": "2026-11-18T09:26:42.110371+00:00",
+    "status": "PASS",
+    "mutation": false,
+    "cluster_contact": false,
+    "charts": [
+      {
+        "name": "kagent",
+        "version": "1.0.1",
+        "oci_digest": "sha256:1c491dde742b91acd8056786177279d3ba8d61fc2c314f6dce66d00ea4bfe9c1",
+        "download_sha256": "edb0c2bbfa3e440cd7f47307f80e6048a275c88519c5339dfebfed65998fef41"
+      },
+      {
+        "name": "kagent-crds",
+        "version": "1.0.1",
+        "oci_digest": "sha256:6fda1c3d10ebc67b7e38dc8361700aebbe5ee73fcc205c5fd2cc2de9e1b85eeb",
+        "download_sha256": "6a6aebfc2667d5a6f1c058741b672b3023844b05e78b921b7576a5b71dd57b4b"
+      },
+      {
+        "name": "substrate",
+        "version": "1.0.0",
+        "oci_digest": "sha256:2098ad8f79e8d00ffe5647286745ed1bf65531ce0b930175d83c8645345ac546",
+        "download_sha256": "1481fcdcbdc6f829c0ec95a7115194f7bd89cfdda9956d013e5d59da45c63239"
+      },
+      {
+        "name": "substrate-atelet",
+        "version": "1.0.0",
+        "oci_digest": "sha256:d1f92b24afe45c34b87f56446fb450f46c3e13869951df475867c7096ddf403f",
+        "download_sha256": "a769bab641f3873c5fce7060e1e31720d3e49302100eba7201c3a6fd7ac2198a"
+      },
+      {
+        "name": "substrate",
+        "version": "1.0.1",
+        "oci_digest": "sha256:336c12f7f265e1b6400529eb1ef69c8d0765872d810f18f97525c66d2ba90f86",
+        "download_sha256": "d01ddb5da82935cb23d230618552c6702d49f2d493d2fd824a20102ef83f6812"
+      },
+      {
+        "name": "substrate-atelet",
+        "version": "1.0.1",
+        "oci_digest": "sha256:233e1ed8f74a202abca851c43adee88849482d8ce37760b8be65f4d96fbc8ca3",
+        "download_sha256": "c576fb59afd410a3419178217e0c9de079693236b9d2456f43611b9ec2a11ab7"
+      },
+      {
+        "name": "agentgateway",
+        "version": "v1.7.0",
+        "oci_digest": "sha256:40340d639e35206317c934e9af3e29575cf7c5377b2940679732baac6e108c15",
+        "download_sha256": "00c63256acd5c4305b2e7eab1da56c3e3a35a74a8f04e34aca58641dfdbc6037"
+      },
+      {
+        "name": "substrate-crds",
+        "version": "1.0.0",
+        "oci_digest": "sha256:2d1b331c4774dcb88d2d5ebcb017b294a43b4bfb5abeca719534bbc73c14c8d4",
+        "download_sha256": "6f28af7fc8f5ee43f8de07613d6ebc31c4895e124daa47459c505fa3f33f96f0"
+      },
+      {
+        "name": "substrate-crds",
+        "version": "1.0.1",
+        "oci_digest": "sha256:3ed670bacd5680ecbcafc9d4a6c95ef90a20f96568b1ba621d0c9c7e411eb084",
+        "download_sha256": "2f9b57899399ed959a229a31c951bbbecb821915a41c959446c7260ff124eafe"
+      },
+      {
+        "name": "substrate-podcert",
+        "version": "1.0.0",
+        "oci_digest": "sha256:b21ec973ad28c9a417ce7167269bdf403a338ce96ff72cd422b5da987f9247cd",
+        "download_sha256": "bcb93a951cd327186a8fde37062776b0566da07f517377d94cc612473d2a8e0d"
+      },
+      {
+        "name": "substrate-podcert",
+        "version": "1.0.1",
+        "oci_digest": "sha256:366b0431ed99cd4ff74f49cb7746329a722c9f8ec9ce0ab4d0670817b34deb80",
+        "download_sha256": "1b4dd618d14ad1d5531230f1083ccd507d6e66dc09dfb67aac0a3391f41b1b47"
+      }
+    ],
+    "rendered_objects": {
+      "kagent-baseline": 21,
+      "kagent-candidate": 21,
+      "substrate-baseline": 59,
+      "atelet-baseline": 7,
+      "substrate-candidate": 59,
+      "atelet-candidate": 7,
+      "podcert-baseline": 6,
+      "podcert-candidate": 6,
+      "gateway": 9
+    },
+    "canary_objects_validated": 2,
+    "unknown_field_negative_control": true,
+    "route_assertion": "/agents/kagent/platform-docs-canary",
+    "images_inventoried": 20,
+    "security_contexts_inventoried": 37,
+    "limitations": [
+      "Not an installation",
+      "Kubernetes CEL/admission and references not executed",
+      "Gateway example path assertion only, not target CRD validation",
+      "No model/tool/identity/network/snapshot/runtime compatibility proof",
+      "Substrate default-chart renders are not complete production values"
+    ]
+  },
+  "browser": {
+    "desktop": {
+      "status": "PASS",
+      "viewport_width": 1200,
+      "observed_navigation_links": 15,
+      "horizontal_page_overflow": false
+    },
+    "mobile": {
+      "status": "PASS",
+      "viewport": [
+        390,
+        844
+      ],
+      "navigation_open_close": "PASS",
+      "horizontal_page_overflow": false
+    },
+    "search": {
+      "status": "PASS",
+      "query": "Entra",
+      "relevant_result": "Entra identity"
+    },
+    "code_blocks": "PASS",
+    "yaml_download": {
+      "status": 200,
+      "api_version": "api.kagent.dev/v1alpha3"
+    },
+    "limits": "Local HTTP preview only; no hosted workplace review"
+  },
+  "live": {
+    "baseline_pairing": "NOT RUN",
+    "latest_substrate_candidate": "NOT RUN",
+    "workplace_deployment": "NOT RUN",
+    "policy_exception": "OPEN: capabilities/root-filesystem review and approved enforcement required",
+    "identity_grants": "NOT CHANGED",
+    "servicenow_writes": "NOT RUN",
+    "gates": {
+      "L01": "NOT RUN",
+      "L02": "NOT RUN",
+      "L03": "NOT RUN",
+      "L04": "NOT RUN",
+      "L05": "NOT RUN",
+      "L06": "NOT RUN",
+      "L07": "NOT RUN",
+      "L08": "NOT RUN",
+      "L09": "NOT RUN",
+      "L10": "NOT RUN",
+      "L11": "NOT RUN",
+      "L12": "NOT RUN"
+    },
+    "runtime_acceptance": "PENDING: confirm intended validation environment prerequisites and collect L01-L12 receipts",
+    "scope": "New release/runtime acceptance within this documentation refresh; separate from the owner-confirmed existing capabilities."
+  },
+  "publication": {
+    "source": "Reviewed source handoff approved for GitHub distribution",
+    "distribution_url": "https://github.com/davidmarkgardiner/kagent-work-bundles/tree/main/agent-platform-mkdocs",
+    "canonical_url": "https://github.com/davidmarkgardiner/kagent-public/tree/main/work-agent-bundles/agent-platform-mkdocs",
+    "review": "Claude Opus: SHIP after portability corrections",
+    "hosted": "NOT PUBLISHED",
+    "remote_ci": "NOT RUN",
+    "limits": "The source/build review is separate from post-publication GitHub tree verification and receiving-environment acceptance."
+  },
+  "stakeholder_reporting": {
+    "milestones": 37,
+    "built": 13,
+    "owner_confirmed_historical_built": 10,
+    "building": 4,
+    "live": "No explicit go-live date or service receipt recorded; not an assertion that existing services are unavailable.",
+    "periods": [
+      "2026-Q2",
+      "2026-Q3",
+      "2026-11",
+      "2026-12",
+      "2027-01",
+      "2027-02",
+      "2027-03"
+    ],
+    "published_snapshots": 3,
+    "history_basis": "Pod lead confirmation on 2026-11-18; Q2/Q3 2026 placement is approximate, exact build/live dates remain unset.",
+    "current_work": [
+      "Agent evaluation capability",
+      "Register reusable agents",
+      "Register MCP tools",
+      "Register agent skills"
+    ],
+    "browser_checks": {
+      "status": "PASS",
+      "q2_historical_outcomes": 3,
+      "q3_historical_outcomes": 7,
+      "built_filter": 13,
+      "building_filter": 4,
+      "owner_confirmation_anchor": "PASS",
+      "history_download_http_status": 200,
+      "unknown_historical_dates_preserved": true,
+      "archive_entries": 3,
+      "print_details": 37,
+      "desktop_and_mobile_review": "PASS"
+    },
+    "schema_checks": [
+      "Historical owner-confirmed built without an invented date accepted",
+      "Built without date or owner confirmation rejected",
+      "Owner confirmation alone cannot assert live",
+      "Historical confirmation date required",
+      "Dated delivery can map into its quarter"
+    ],
+    "guard_fixture_cases": 10,
+    "staged_fixture_cases": 3,
+    "published_snapshot_preservation": "PASS",
+    "finish_review": "SHIP after validation receipt refresh",
+    "limits": "Historical completion is owner-confirmed, not independently re-executed. No comparative ranking, compliance certification, precise historical dates or new production go-live is asserted."
+  },
+  "previous_calendar_validation": {
+    "milestones": 24,
+    "built": 3,
+    "published_snapshots": 2,
+    "scope": "Prior calendar snapshot, superseded by current historical-backfill validation. Original offline chart/runtime evidence retains its own date and scope."
+  }
+}

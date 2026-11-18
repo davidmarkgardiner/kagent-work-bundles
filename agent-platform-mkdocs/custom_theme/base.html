@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-theme="paper">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ config.site_description }}">
+  <title>{{ page.title if page else 'Documentation' }} · Agent Platform Fieldnotes</title>
+  <link rel="stylesheet" href="{{ 'assets/fieldnotes.css' | url }}">
+  {% if page and page.file.src_path in ['roadmap.md', 'achievements.md'] %}<link rel="stylesheet" href="{{ 'assets/delivery.css' | url }}">{% endif %}
+  <link rel="icon" href="{{ 'assets/mark.svg' | url }}" type="image/svg+xml">
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('dg-docs-theme')||'paper'}catch(e){}</script>
+</head>
+{% set delivery_page = page and page.file.src_path in ['roadmap.md', 'achievements.md'] %}
+<body{% if delivery_page %} class="page-delivery"{% endif %}>
+  <a class="skip-link" href="#main">Skip to documentation</a>
+  <header class="masthead">
+    <a class="wordmark" href="{{ 'index.html' | url }}" aria-label="Agent Platform Fieldnotes home">
+      <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 8h16a16 16 0 0 1 0 32H8V8Zm8 8v16h8a8 8 0 0 0 0-16h-8Z" fill="currentColor"/><path d="M28 22h12v5H28z" fill="var(--signal)"/></svg>
+      <span class="wordmark-title">Agent <strong>Platform</strong><span class="byline">deployment · identity · evidence</span></span>
+    </a>
+    <div class="masthead-actions">
+      <span class="preview-label">18 November 2026</span>
+      <button class="search-trigger" type="button" aria-label="Find a page" data-open-search><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 5 5"/></svg><span>Find a page</span><kbd>/</kbd></button>
+      <button class="theme-trigger" type="button" aria-label="Switch to night ink" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M12 4a8 8 0 0 1 0 16Z" fill="currentColor"/></svg><span>Night ink</span></button>
+      <button class="menu-trigger" type="button" aria-controls="guide-nav" aria-expanded="false">Contents</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <aside class="guide-rail" id="guide-nav">
+      <div class="rail-title">Platform handbook</div>
+      <nav aria-label="Documentation">
+        {% for item in nav %}
+        <a href="{{ item.url | url }}" class="guide-link{% if item.active %} is-active{% endif %}"{% if item.active %} aria-current="page"{% endif %}>{{ item.title }}<span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 18 12-12M6 6h12v12"/></svg></span></a>
+        {% endfor %}
+      </nav>
+      <div class="rail-note"><span class="signal-square" aria-hidden="true"></span><strong>Follow the evidence.</strong><p>Historical results are dated. The new runtime and workplace controls need fresh acceptance.</p><a href="{{ 'evidence.html' | url }}">Read the evidence <span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></span></a></div>
+      <div class="rail-imprint">AGENT / PLATFORM<br>WORK-AGENT EDITION — 2026</div>
+    </aside>
+
+    <main id="main" tabindex="-1" class="document{% if page and page.is_homepage %} document-home{% endif %}">
+      {% if page and page.is_homepage %}
+      <section class="opening" aria-label="Guide introduction">
+        <div class="opening-title"><h1>Deploy.<br>Use.<br>Operate.</h1><p>A practical handbook for kagent 1.0, agentgateway, KRO and governed specialist agents.</p></div>
+        <div class="opening-actions"><a class="primary-action" href="{{ 'deploy.html' | url }}">Deploy an agent <span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></span></a><a class="text-action" href="{{ 'roadmap.html' | url }}">See the delivery roadmap</a></div>
+        <div class="signal-path" aria-label="Proposed workplace request path">
+          <div><span class="path-dot"></span><strong>Caller</strong><small>human or event</small></div><span class="path-wire" aria-hidden="true"></span>
+          <div><span class="path-dot"></span><strong>Identity</strong><small>scoped access</small></div><span class="path-wire" aria-hidden="true"></span>
+          <div><span class="path-dot accent"></span><strong>Gateway</strong><small>A2A · MCP · models</small></div><span class="path-wire" aria-hidden="true"></span>
+          <div><span class="path-dot"></span><strong>Agent</strong><small>isolated session</small></div>
+        </div>
+        <div class="proof-line"><span><strong>Release baseline</strong> kagent 1.0.1</span><span><strong>Live promotion</strong> gated</span></div>
+      </section>
+      {% endif %}
+      <div class="document-location"><a href="{{ 'index.html' | url }}">Fieldnotes</a><span aria-hidden="true">/</span><span>{{ page.title if page else 'Page not found' }}</span></div>
+      <article class="prose">{{ page.content if page else '<h1>Page not found</h1><p>Choose a guide from the contents.</p>' }}</article>
+      <footer class="document-footer"><span>Agent Platform Fieldnotes · a governed engineering handbook</span><a href="{{ 'sources.html' | url }}">Files &amp; evidence <span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></span></a></footer>
+    </main>
+
+    <aside class="page-rail" aria-label="On this page">
+      <div class="rail-title">On this page</div>
+      {% if page %}<nav>{% for heading in page.toc %}{% for section in heading.children %}<a href="{{ section.url }}">{{ section.title }}</a>{% endfor %}{% endfor %}</nav>{% endif %}
+      <div class="edition-note">Reviewed source and explicit evidence gates.<br><strong>Built for reading, testing and sharing.</strong></div>
+    </aside>
+  </div>
+
+  <dialog class="search-dialog" aria-labelledby="search-title">
+    <div class="search-dialog-top"><h2 id="search-title">Find in the fieldnotes</h2><button type="button" class="close-search" aria-label="Close search">Esc</button></div>
+    <label class="sr-only" for="fieldnotes-search">Search documentation</label><input type="search" id="fieldnotes-search" placeholder="Try Entra, YAML, or A2A…" autocomplete="off">
+    <div class="search-results" aria-live="polite"><p>Search the guide, configuration and recorded proof.</p></div>
+  </dialog>
+  <script>window.FIELDNOTES_BASE={{ base_url | tojson }};</script>
+  <script src="{{ 'assets/fieldnotes.js' | url }}" defer></script>
+  {% if delivery_page %}<script src="{{ 'assets/delivery.js' | url }}" defer></script>{% endif %}
+</body>
+</html>

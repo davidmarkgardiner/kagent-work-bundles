@@ -1,0 +1,3 @@
+# Render candidate only. This does not establish kagent compatibility.
+substrateWorkerPool:
+  workerImage: ghcr.io/kagent-dev/substrate/ateworker-gvisor:v1.0.1

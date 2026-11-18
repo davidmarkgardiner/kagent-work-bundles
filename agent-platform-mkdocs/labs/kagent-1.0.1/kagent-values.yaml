@@ -1,0 +1,22 @@
+# Render-test values. Database, credentials and Substrate identity are prerequisites.
+substrateWorkerPool:
+  create: true
+  name: kagent-default
+  replicas: 1
+  workerImage: ghcr.io/kagent-dev/substrate/ateworker-gvisor:v1.0.0
+  sandboxClass: gvisor
+harnesses:
+  enabled: true
+  codex:
+    enabled: false
+  claude:
+    enabled: false
+config:
+  server:
+    grpcReflection: true
+ui:
+  enabled: false
+
+# No shared cluster-admin tool backend is needed for this tool-free canary.
+kagent-tools:
+  enabled: false

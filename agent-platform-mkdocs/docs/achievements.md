@@ -1,0 +1,11 @@
+# What the pod has achieved
+
+A growing record of accepted outcomes, practical value and the next delivery. Each published update retains its original evidence scope.
+
+<div class="archive-feature"><span class="archive-date">Historical backfill · Q2/Q3 2026 (approximate) · 2026-11-18</span><h2>Historical achievements: AI integrated into operational workflows</h2><p>The historical record now includes health checks, ServiceNow, triage, specialist agents, alerting, governed data MCP and OC6 integrations, and self-service agent onboarding. Evaluation and central registry registration are underway.</p><a class="primary-action" href="updates/q2-q3-achievement-backfill.html">Read the complete update</a></div>
+
+## Delivery record
+
+<div class="update-ledger"><article><time datetime="2026-11-18">2026-11-18</time><div><h3><a href="updates/q2-q3-achievement-backfill.html">Historical achievements: AI integrated into operational workflows</a></h3><p>The historical record now includes health checks, ServiceNow, triage, specialist agents, alerting, governed data MCP and OC6 integrations, and self-service agent onboarding. Evaluation and central registry registration are underway.</p><span>10 evidenced outcomes · 14 state changes</span></div></article><article><time datetime="2026-11-18">2026-11-18</time><div><h3><a href="updates/calendar-and-commit-checks.html">A delivery calendar that stays with the documentation</a></h3><p>The roadmap now reads across Q4 and Q1 with named agent, MCP/skills and governance lanes. A source check requires a delivery-impact decision alongside relevant documentation changes.</p><span>2 evidenced outcomes · 1 state changes</span></div></article><article><time datetime="2026-11-18">2026-11-18</time><div><h3><a href="updates/opening-snapshot.html">A shared reference for the next delivery</a></h3><p>The platform handbook and versioned reference profile are ready for review. Runtime, identity and service outcomes retain their own acceptance gates.</p><span>2 evidenced outcomes · 2 state changes</span></div></article></div>
+
+[Add the next fortnightly update](fortnightly-updates.md) · [See the roadmap](roadmap.md)

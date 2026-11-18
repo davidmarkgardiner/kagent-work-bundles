@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+# Optional repository-local hook; install only through the repository owner's process.
+set -eu
+repo_root=$(git rev-parse --show-toplevel)
+if [ -n "${DOCS_PROJECT_DIR:-}" ]; then
+  case "$DOCS_PROJECT_DIR" in
+    /*) project_dir="$DOCS_PROJECT_DIR" ;;
+    *) project_dir="$repo_root/$DOCS_PROJECT_DIR" ;;
+  esac
+else
+  project_dir="$repo_root"
+  for candidate in "$repo_root/work-agent-bundles/agent-platform-mkdocs" "$repo_root/agent-platform-mkdocs" "$repo_root"; do
+    if [ -f "$candidate/scripts/build_docs.py" ]; then project_dir="$candidate"; break; fi
+  done
+fi
+if [ ! -f "$project_dir/scripts/build_docs.py" ]; then
+  echo "Documentation project not found; set DOCS_PROJECT_DIR to its repository-relative or absolute path." >&2
+  exit 1
+fi
+python_bin="${DOCS_PYTHON:-$project_dir/.venv/bin/python}"
+"$python_bin" "$project_dir/scripts/check_delivery_impact.py" --staged
+"$python_bin" "$project_dir/scripts/check_staged_docs.py"
