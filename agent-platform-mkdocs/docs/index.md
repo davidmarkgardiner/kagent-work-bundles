@@ -2,6 +2,8 @@
 
 ## Delivered capability and current work
 
+See [six workflows built with kagent](workflows.md) for a stakeholder summary of incident triage, health checks, Grafana investigation, ServiceNow intake, governed data access and agent-assisted delivery.
+
 The pod lead confirms completed health checks, ServiceNow instance/integrations, triage, task-specific agents, alerting, custom MCP data integration, Denodo security/compliance integration, OC6 integration and self-service agent onboarding. See [historical achievements](historical-achievements.md) for the owner-confirmed record and approximate Q2/Q3 placement. Evaluation and central-registry registration are underway. Q4/Q1 entries describe evolution of these services, including release-specific acceptance.
 
 **Refreshed: 18 November 2026.** This is the working guide for deploying, using and operating our agent platform. It brings the recent isolation, KRO composition, Entra identity, ServiceNow integration, skills/knowledge and delivery-planning work into one portable documentation site.
