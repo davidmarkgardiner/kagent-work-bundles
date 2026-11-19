@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: incident-model, namespace: kagent}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: incident-model}
+  template:
+    metadata:
+      labels: {app: incident-model}
+    spec:
+      automountServiceAccountToken: false
+      initContainers:
+        - name: load-model
+          image: docker.io/alpine/k8s:1.35.0@sha256:18bc02c1e0df04451f4f9194eb7b7341c1165da5495459b52f85f72fb9545032
+          command: [sh, -ec]
+          args:
+            - |
+              artifact=/models/qwen.gguf
+              checksum=72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb
+              if printf '%s  %s\n' "$checksum" "$artifact" | sha256sum -c -s; then exit 0; fi
+              curl -fLSs --max-time 600 --output "$artifact.tmp" \
+                https://huggingface.co/bartowski/Qwen_Qwen3-1.7B-GGUF/resolve/dcb19155b962dbb6389f4691a982043a8e651022/Qwen_Qwen3-1.7B-Q4_K_M.gguf
+              printf '%s  %s\n' "$checksum" "$artifact.tmp" | sha256sum -c -
+              mv "$artifact.tmp" "$artifact"
+          volumeMounts: [{name: models, mountPath: /models}]
+      containers:
+        - name: model
+          image: ghcr.io/ggml-org/llama.cpp:server@sha256:5b43086e3ba7ea5794d72904654f6cd41224a9b1c6ac0398f4940ee380d30f23
+          args:
+            - --model
+            - /models/qwen.gguf
+            - --alias
+            - qwen3-1.7b
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8080"
+            - --ctx-size
+            - "4096"
+            - --parallel
+            - "1"
+            - --threads
+            - "4"
+            - --jinja
+            - --chat-template-kwargs
+            - '{"enable_thinking":false}'
+          ports: [{name: http, containerPort: 8080}]
+          readinessProbe: {httpGet: {path: /health, port: http}, initialDelaySeconds: 2}
+          resources: {requests: {cpu: 100m, memory: 256Mi}, limits: {cpu: "4", memory: 3Gi}}
+          volumeMounts: [{name: models, mountPath: /models, readOnly: true}]
+      volumes:
+        - name: models
+          emptyDir: {sizeLimit: 3Gi}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: incident-model, namespace: kagent}
+spec:
+  selector: {app: incident-model}
+  ports: [{name: http, port: 8080}]
+---
+apiVersion: v1
+kind: Secret
+metadata: {name: incident-model-client, namespace: kagent}
+type: Opaque
+stringData:
+  api-key: lab-placeholder
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: ModelConfig
+metadata: {name: incident-model, namespace: kagent}
+spec:
+  provider: OpenAI
+  model: qwen3-1.7b
+  apiKeySecret: incident-model-client
+  apiKeySecretKey: api-key
+  openAI:
+    apiFormat: chatCompletions
+    baseUrl: http://incident-model.kagent.svc.cluster.local:8080/v1
+    maxTokens: 384

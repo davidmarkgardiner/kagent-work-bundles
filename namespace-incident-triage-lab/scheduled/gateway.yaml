@@ -1,0 +1,74 @@
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata: {name: application-incident, namespace: istio-system}
+spec:
+  selector: {istio: lab-ingress}
+  servers:
+    - port: {number: 80, name: http-incident, protocol: HTTP}
+      hosts: [application-incident.lab]
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata: {name: application-incident, namespace: istio-system}
+spec:
+  hosts: [application-incident.lab]
+  gateways: [application-incident]
+  http:
+    - match:
+        - uri: {exact: /incidents/application-triage/}
+          method: {exact: POST}
+      route:
+        - destination:
+            host: namespace-incident.kagent.svc.cluster.local
+            port: {number: 8080}
+      timeout: 280s
+      retries: {attempts: 0}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata: {name: application-incident, namespace: kagent}
+spec:
+  parentRefs: [{name: namespace-incident, sectionName: http}]
+  hostnames: [application-incident.lab]
+  rules:
+    - matches:
+        - path: {type: Exact, value: /incidents/application-triage/}
+          method: POST
+      filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            set:
+              - {name: A2A-Version, value: "1.0"}
+              - {name: X-User-Id, value: application-incident-scanner}
+        - type: URLRewrite
+          urlRewrite:
+            path: {type: ReplaceFullPath, replaceFullPath: /agents/kagent/cert-manager-incident-triage}
+      backendRefs: [{name: kagent-controller, port: 8083}]
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata: {name: application-incident-to-a2a, namespace: kagent}
+spec:
+  targetRefs:
+    - {group: gateway.networking.k8s.io, kind: HTTPRoute, name: application-incident}
+  traffic:
+    timeouts: {request: 270s}
+    transformation:
+      request:
+        metadata:
+          incident: json(request.body)
+          invocationID: uuid()
+        body: >-
+          toJson({
+            "jsonrpc": "2.0",
+            "id": metadata.invocationID,
+            "method": "SendMessage",
+            "params": {
+              "message": {
+                "messageId": metadata.invocationID,
+                "role": "ROLE_USER",
+                "parts": [{"text": toJson(metadata.incident)}]
+              },
+              "configuration": {"returnImmediately": false}
+            }
+          })

@@ -1,4 +1,61 @@
 updates:
+- id: scheduled-application-scanner-office-handoff
+  title: Office handoff for scheduled incident triage
+  published: '2026-11-19'
+  period:
+    label: Home-lab follow-up and office handoff
+    start: '2026-11-19'
+    end: '2026-11-19'
+  reviewer: Home-lab observations and bundle-owner confirmation
+  summary: The office handoff includes the scheduled path, editable MkDocs and a standalone interactive presentation.
+  achievements:
+  - milestone: TRIAGE-APP-LAB
+    outcome: Recorded a direct gateway and Substrate run with one assigned preview and prepared the office documentation handoff.
+    why_it_matters: The receiving team can reproduce the scanner and maintain its policy, runbook and evidence in the office site.
+    evidence:
+    - label: Dated home-lab evidence and walkthrough scope
+      url: workflows.md#scheduled-application-scanner-lab
+      scope: target-runtime
+      reviewed: '2026-11-19'
+  moved: []
+  unchanged:
+  - milestone: TRIAGE-APP-LAB
+    reason: The recorded result is a lab preview. The receiving-system issue and assignment have their own acceptance.
+  next:
+  - Reproduce the checks in the office and attach the approved receiving-system evidence.
+  decisions: []
+  scope_note: The first assigned preview was recorded after the call timed out. A recorded replay lacked a matching receipt. The bundle owner later confirmed completion and testing.
+- id: scheduled-application-scanner-lab
+  title: Scheduled application incident admission
+  published: '2026-11-19'
+  period:
+    label: Isolated scanner build
+    start: '2026-11-19'
+    end: '2026-11-19'
+  reviewer: Implementation verification in a disposable Kubernetes cluster
+  summary: Application-level persistence, budget and ticket preview are packaged with a reviewable noise feedback path.
+  achievements:
+  - milestone: TRIAGE-APP-LAB
+    outcome: Added a scheduled scanner and scoped MCP tools for application readiness, qualified alerts and ignore proposals.
+    why_it_matters: Application teams can tune noisy signals and limit automatic investigations without resetting the budget on Job restarts.
+    evidence:
+    - label: Isolated Kubernetes run and fixture results
+      url: workflows.md#scheduled-application-scanner-lab
+      scope: target-runtime
+      reviewed: '2026-11-19'
+  moved:
+  - milestone: TRIAGE-APP-LAB
+    from: next
+    to: built
+    reason: The packaged scanner and tools were exercised in an isolated cluster and the rolling budget passed repeatable fixture checks.
+  unchanged:
+  - milestone: TRIAGE
+    reason: The work-side target and acceptance criteria still require owner agreement.
+  next:
+  - Verify the installed agent path and receipt on the dedicated gateway and Substrate environment.
+  - Confirm private issue creation and assignment in the approved test project.
+  decisions: []
+  scope_note: The isolated read and preview checks use a fixture ingress. The receiving gateway, agent runtime and GitLab service have separate acceptance checks.
 - id: q2-q3-achievement-backfill
   title: 'Historical achievements: AI integrated into operational workflows'
   published: '2026-11-18'

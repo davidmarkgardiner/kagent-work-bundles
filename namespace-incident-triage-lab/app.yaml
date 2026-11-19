@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: certificate-lab
+  labels:
+    app.kubernetes.io/part-of: namespace-incident-triage
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata: {name: lab-selfsigned, namespace: certificate-lab}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata: {name: application-tls, namespace: certificate-lab}
+spec:
+  secretName: application-tls
+  dnsNames: [certificate-demo.example.test]
+  issuerRef: {name: intentionally-missing-issuer, kind: Issuer, group: cert-manager.io}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: incident-scanner, namespace: certificate-lab}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: incident-certificate-reader, namespace: certificate-lab}
+rules:
+  - apiGroups: [cert-manager.io]
+    resources: [certificates, issuers]
+    verbs: [get, list]
+  - apiGroups: [cert-manager.io]
+    resources: [certificaterequests]
+    verbs: [get, list]
+  - apiGroups: [""]
+    resources: [events]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: incident-certificate-reader, namespace: certificate-lab}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: incident-certificate-reader}
+subjects:
+  - {kind: ServiceAccount, name: incident-scanner, namespace: certificate-lab}

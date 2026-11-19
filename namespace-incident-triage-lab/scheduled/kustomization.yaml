@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources: [scanner.yaml, mcp.yaml, agent.yaml, gateway.yaml]
+configMapGenerator:
+  - name: cert-manager-scan-code
+    namespace: cert-manager
+    files: [scanner.py]
+  - name: cert-manager-scan-policy
+    namespace: cert-manager
+    files: [policy.json]
+  - name: cert-manager-triage-code
+    namespace: kagent
+    files: [scanner.py, mcp.py]
+  - name: cert-manager-triage-policy
+    namespace: kagent
+    files: [policy.json]

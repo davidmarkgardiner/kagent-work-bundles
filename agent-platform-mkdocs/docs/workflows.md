@@ -42,3 +42,24 @@ resource-changing workflows remain separate.
 For each workflow, useful outcomes depend on the agent having the right tool
 permissions, relevant knowledge and skills, and clear acceptance criteria.
 Successful incident delivery alone does not establish that capability.
+
+## Scheduled application scanner lab
+
+On 19 November 2026, a separate lab build added five-minute polling for
+application readiness, controller logs and Kubernetes Warning events. The
+scanner requires persistent evidence and reserves at most three dispatches
+per application in a rolling day. A scoped MCP tool can record an exact
+log or event signature as a proposed ignore rule for operator review.
+
+A disposable Kubernetes cluster exercised the packaged scanner, source
+reads, and an assigned issue preview through a fixture ingress. Dated fixture
+tests exercise duplicate suppression, the fourth-incident limit, and GitLab
+assignment read-back.
+
+The subsequent home-lab run used the actual Agent Gateway and Substrate
+agent with Argo scaled to zero. Its durable outcome recorded one assigned
+preview after the caller timed out. The recorded follow-up and replay did
+not have a matching receipt. The bundle owner later confirmed completion
+and testing. Workplace issue creation and assignment still require a
+receiving-project read-back. The work handoff includes editable MkDocs
+sources and the standalone presentation.

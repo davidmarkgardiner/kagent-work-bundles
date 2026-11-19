@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: incident-kubernetes-mcp, namespace: kagent}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: incident-kubernetes-source, namespace: certificate-lab}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: incident-ticket-source}
+subjects:
+  - {kind: ServiceAccount, name: incident-kubernetes-mcp, namespace: kagent}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: incident-kubernetes-mcp, namespace: kagent}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: incident-kubernetes-mcp}
+  template:
+    metadata:
+      labels: {app: incident-kubernetes-mcp}
+    spec:
+      serviceAccountName: incident-kubernetes-mcp
+      containers:
+        - name: mcp
+          image: docker.io/library/python:3.12-alpine@sha256:c5ba3deef00c7758561a0f03c26f44f10589263d40e732b8748e0d1f38f6dd89
+          command: [python, -B, /app/gitlab_mcp.py]
+          envFrom:
+            - configMapRef: {name: incident-gitlab-settings}
+          env:
+            - {name: MCP_ROLE, value: kubernetes}
+          volumeMounts:
+            - {name: code, mountPath: /app, readOnly: true}
+          ports: [{name: http, containerPort: 8084}]
+          readinessProbe: {httpGet: {path: /healthz, port: http}}
+          resources: {requests: {cpu: 25m, memory: 32Mi}, limits: {cpu: 250m, memory: 96Mi}}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+      volumes:
+        - name: code
+          configMap: {name: incident-gitlab-code}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: incident-kubernetes-mcp, namespace: kagent}
+spec:
+  selector: {app: incident-kubernetes-mcp}
+  ports: [{name: http, port: 8084}]

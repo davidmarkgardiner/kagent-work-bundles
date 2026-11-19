@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: incident-gitlab-mcp, namespace: kagent}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: incident-ticket-source, namespace: certificate-lab}
+rules:
+  - apiGroups: [cert-manager.io]
+    resources: [certificates]
+    resourceNames: [application-tls]
+    verbs: [get]
+  - apiGroups: [cert-manager.io]
+    resources: [issuers]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: incident-ticket-source, namespace: certificate-lab}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: incident-ticket-source}
+subjects:
+  - {kind: ServiceAccount, name: incident-gitlab-mcp, namespace: kagent}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: incident-gitlab-mcp, namespace: kagent}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: incident-gitlab-mcp}
+  template:
+    metadata:
+      labels: {app: incident-gitlab-mcp}
+    spec:
+      serviceAccountName: incident-gitlab-mcp
+      containers:
+        - name: mcp
+          image: docker.io/library/python:3.12-alpine@sha256:c5ba3deef00c7758561a0f03c26f44f10589263d40e732b8748e0d1f38f6dd89
+          command: [python, -B, /app/gitlab_mcp.py]
+          envFrom:
+            - configMapRef: {name: incident-gitlab-settings}
+            - secretRef: {name: incident-gitlab, optional: true}
+          env:
+            - name: MCP_SHARED_KEY
+              valueFrom:
+                secretKeyRef: {name: incident-mcp-key, key: key}
+          volumeMounts:
+            - {name: code, mountPath: /app, readOnly: true}
+          ports: [{name: http, containerPort: 8084}]
+          readinessProbe: {httpGet: {path: /healthz, port: http}}
+          resources: {requests: {cpu: 25m, memory: 32Mi}, limits: {cpu: 250m, memory: 96Mi}}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+      volumes:
+        - name: code
+          configMap: {name: incident-gitlab-code}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: incident-gitlab-mcp, namespace: kagent}
+spec:
+  selector: {app: incident-gitlab-mcp}
+  ports: [{name: http, port: 8084}]
+---
+apiVersion: api.kagent.dev/v1alpha3
+kind: RemoteMCPServer
+metadata: {name: incident-gitlab, namespace: kagent}
+spec:
+  description: Preview or ensure an assigned GitLab issue for a correlated certificate incident.
+  protocol: STREAMABLE_HTTP
+  url: http://incident-gitlab-mcp.kagent.svc.cluster.local:8084/mcp
+  headersFrom:
+    - name: X-Incident-MCP-Key
+      valueFrom: {type: Secret, name: incident-mcp-key, key: key}

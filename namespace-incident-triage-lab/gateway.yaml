@@ -1,0 +1,98 @@
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata: {name: namespace-incident, namespace: istio-system}
+spec:
+  selector: {istio: lab-ingress}
+  servers:
+    - port: {number: 80, name: http-incident, protocol: HTTP}
+      hosts: [namespace-incident.lab]
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata: {name: namespace-incident, namespace: istio-system}
+spec:
+  hosts: [namespace-incident.lab]
+  gateways: [namespace-incident]
+  http:
+    - match:
+        - uri: {exact: /incidents/namespace-triage/}
+          method: {exact: POST}
+      route:
+        - destination:
+            host: namespace-incident.kagent.svc.cluster.local
+            port: {number: 8080}
+      timeout: 280s
+      retries: {attempts: 0}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata: {name: namespace-incident, namespace: kagent}
+spec:
+  gatewayClassName: agentgateway
+  infrastructure:
+    parametersRef:
+      group: agentgateway.dev
+      kind: AgentgatewayParameters
+      name: namespace-incident
+  listeners:
+    - name: http
+      port: 8080
+      protocol: HTTP
+      allowedRoutes: {namespaces: {from: Same}}
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayParameters
+metadata: {name: namespace-incident, namespace: kagent}
+spec:
+  service:
+    spec:
+      type: ClusterIP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata: {name: namespace-incident, namespace: kagent}
+spec:
+  parentRefs: [{name: namespace-incident, sectionName: http}]
+  hostnames: [namespace-incident.lab]
+  rules:
+    - matches:
+        - path: {type: Exact, value: /incidents/namespace-triage/}
+          method: POST
+      filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            set:
+              - {name: A2A-Version, value: "1.0"}
+              - {name: X-User-Id, value: namespace-incident-scanner}
+        - type: URLRewrite
+          urlRewrite:
+            path: {type: ReplaceFullPath, replaceFullPath: /agents/kagent/namespace-incident}
+      backendRefs: [{name: kagent-controller, port: 8083}]
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata: {name: namespace-incident-to-a2a, namespace: kagent}
+spec:
+  targetRefs:
+    - {group: gateway.networking.k8s.io, kind: HTTPRoute, name: namespace-incident}
+  traffic:
+    timeouts: {request: 270s}
+    transformation:
+      request:
+        metadata:
+          incident: json(request.body)
+          invocationID: uuid()
+        body: >-
+          toJson({
+            "jsonrpc": "2.0",
+            "id": metadata.invocationID,
+            "method": "SendMessage",
+            "params": {
+              "message": {
+                "messageId": metadata.invocationID,
+                "role": "ROLE_USER",
+                "parts": [{"text": toJson(metadata.incident)}]
+              },
+              "configuration": {"returnImmediately": false}
+            }
+          })

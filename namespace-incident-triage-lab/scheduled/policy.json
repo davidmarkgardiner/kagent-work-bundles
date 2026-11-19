@@ -1,0 +1,16 @@
+{
+  "cluster": "incident-substrate",
+  "application": "cert-manager",
+  "deployment": "cert-manager",
+  "container": "cert-manager-controller",
+  "selector": "app.kubernetes.io/name=cert-manager,app.kubernetes.io/component=controller",
+  "persist_seconds": 300,
+  "max_gap_seconds": 1260,
+  "quiet_seconds": 900,
+  "daily_limit": 3,
+  "extra_event_reasons": [],
+  "related_event_objects": [],
+  "log_rules": [],
+  "ignore_signals": [],
+  "ignore_log_patterns": []
+}

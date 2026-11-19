@@ -1,0 +1,23 @@
+kagent-tools:
+  enabled: false
+ui:
+  replicas: 0
+harnesses:
+  codex:
+    enabled: false
+  claude:
+    enabled: false
+config:
+  kubernetes:
+    leaderElection: false
+controller:
+  startupProbe:
+    httpGet: {path: /health, port: http}
+    periodSeconds: 10
+    timeoutSeconds: 8
+    failureThreshold: 15
+  readinessProbe:
+    httpGet: {path: /health, port: http}
+    periodSeconds: 10
+    timeoutSeconds: 8
+    failureThreshold: 4

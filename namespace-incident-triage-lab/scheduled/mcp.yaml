@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: cert-manager-incident-mcp, namespace: kagent}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: cert-manager-incident-mcp, namespace: cert-manager}
+rules:
+  - apiGroups: [apps]
+    resources: [deployments]
+    resourceNames: [cert-manager]
+    verbs: [get]
+  - apiGroups: [apps]
+    resources: [replicasets]
+    verbs: [list]
+  - apiGroups: [""]
+    resources: [pods, events]
+    verbs: [list]
+  - apiGroups: [""]
+    resources: [pods/log]
+    verbs: [get]
+  - apiGroups: [""]
+    resources: [configmaps]
+    resourceNames: [cert-manager-incident-state]
+    verbs: [get]
+  - apiGroups: [""]
+    resources: [configmaps]
+    resourceNames: [cert-manager-incident-outcomes]
+    verbs: [get, update]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: cert-manager-incident-mcp, namespace: cert-manager}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: cert-manager-incident-mcp}
+subjects: [{kind: ServiceAccount, name: cert-manager-incident-mcp, namespace: kagent}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: cert-manager-incident-mcp, namespace: kagent}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: cert-manager-incident-mcp}
+  template:
+    metadata:
+      labels: {app: cert-manager-incident-mcp}
+    spec:
+      serviceAccountName: cert-manager-incident-mcp
+      securityContext: {seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: mcp
+          image: docker.io/library/python:3.12-alpine@sha256:c5ba3deef00c7758561a0f03c26f44f10589263d40e732b8748e0d1f38f6dd89
+          command: [python, -B, /app/mcp.py]
+          env:
+            - {name: APP_NAMESPACE, value: cert-manager}
+            - {name: STATE_NAME, value: cert-manager-incident-state}
+            - {name: OUTCOMES_NAME, value: cert-manager-incident-outcomes}
+            - {name: TICKET_MODE, value: preview}
+            - {name: GITLAB_ASSIGNEE_ID, value: "1"}
+            - name: MCP_SHARED_KEY
+              valueFrom: {secretKeyRef: {name: incident-mcp-key, key: key}}
+          envFrom:
+            - secretRef: {name: cert-manager-incident-gitlab, optional: true}
+          ports: [{name: http, containerPort: 8084}]
+          readinessProbe: {httpGet: {path: /healthz, port: http}}
+          securityContext: {runAsNonRoot: true, runAsUser: 10001, readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+          resources: {requests: {cpu: 20m, memory: 32Mi}, limits: {cpu: 250m, memory: 96Mi}}
+          volumeMounts:
+            - {name: code, mountPath: /app, readOnly: true}
+            - {name: policy, mountPath: /policy, readOnly: true}
+      volumes:
+        - {name: code, configMap: {name: cert-manager-triage-code}}
+        - {name: policy, configMap: {name: cert-manager-triage-policy}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: cert-manager-incident-mcp, namespace: kagent}
+spec:
+  selector: {app: cert-manager-incident-mcp}
+  ports: [{name: http, port: 8084}]

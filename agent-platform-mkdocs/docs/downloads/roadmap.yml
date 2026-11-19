@@ -469,6 +469,33 @@ milestones:
   window: 2026-12
   built_on: null
   live_on: null
+- id: TRIAGE-APP-LAB
+  horizon: q4
+  title: 'Triage: scheduled application scanner lab'
+  outcome: Admit persistent application incidents using scoped telemetry, a rolling budget and reviewable ignore recommendations.
+  state: built
+  owner: Integration engineering with SRE
+  acceptance:
+  - A persistent signal qualifies and an open incident stays quiet across runs.
+  - Exact incident reservations enforce the per-application rolling budget and MCP records an assigned preview.
+  - The agent can suggest an exact ignore rule for operator review.
+  dependencies: []
+  evidence:
+  - label: Isolated Kubernetes run and fixture results
+    url: workflows.md#scheduled-application-scanner-lab
+    scope: target-runtime
+    reviewed: '2026-11-19'
+  - label: Home-lab gateway and assigned preview, with owner completion confirmation
+    url: workflows.md#scheduled-application-scanner-lab
+    scope: target-runtime
+    reviewed: '2026-11-19'
+  gate: null
+  next_action: Reproduce the workflow in the office and read back assignment from the approved receiving project.
+  track: governance
+  category: observability
+  window: 2026-11
+  built_on: '2026-11-19'
+  live_on: null
 - id: TRIAGE
   horizon: q1
   title: 'Triage: durable workflow expansion'

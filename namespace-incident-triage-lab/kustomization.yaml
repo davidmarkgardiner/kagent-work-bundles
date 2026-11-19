@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources: [app.yaml, agent.yaml, gateway.yaml, gitlab-mcp.yaml, kubernetes-mcp.yaml]
+configMapGenerator:
+  - name: incident-scripts
+    namespace: certificate-lab
+    files: [scan.sh]
+  - name: incident-scanner-settings
+    namespace: certificate-lab
+    literals:
+      - APP_NAMESPACE=certificate-lab
+      - CLUSTER_ID=incident-substrate
+      - CERTIFICATE_NAME=application-tls
+      - INGRESS_URL=http://lab-ingress.istio-system.svc.cluster.local/incidents/namespace-triage/
+      - INGRESS_HOST=namespace-incident.lab
+      - TICKET_RECEIPT_URL=http://incident-gitlab-mcp.kagent.svc.cluster.local:8084/receipts
+  - name: incident-gitlab-code
+    namespace: kagent
+    files: [gitlab_mcp.py]
+  - name: incident-gitlab-settings
+    namespace: kagent
+    literals:
+      - APP_NAMESPACE=certificate-lab
+      - CLUSTER_ID=incident-substrate
+      - CERTIFICATE_NAME=application-tls
+      - TICKET_MODE=preview
+      - GITLAB_ASSIGNEE_ID=1
+generatorOptions:
+  disableNameSuffixHash: true

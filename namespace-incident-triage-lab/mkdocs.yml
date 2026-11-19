@@ -1,0 +1,28 @@
+site_name: Scheduled application incident triage
+site_description: Office adoption, operation and validation of the direct kagent incident path
+docs_dir: docs
+site_dir: site
+use_directory_urls: false
+theme:
+  name: mkdocs
+  highlightjs: false
+nav:
+  - Overview: index.md
+  - Office adoption: office-adoption.md
+  - Validation and evidence: validation.md
+  - Documentation maintenance: maintain.md
+plugins:
+  - search
+markdown_extensions:
+  - tables
+  - attr_list
+  - fenced_code
+  - toc:
+      permalink: true
+validation:
+  nav:
+    not_found: warn
+  links:
+    not_found: warn
+    unrecognized_links: warn
+    anchors: warn
