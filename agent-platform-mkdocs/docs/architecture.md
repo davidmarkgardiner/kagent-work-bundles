@@ -1,5 +1,7 @@
 # Platform architecture and KRO
 
+See the [Agent-as-a-Service solution architecture](agent-as-a-service-sad.md) for the shared service boundary, onboarding and approval responsibilities.
+
 ## Delivered platform foundation
 
 The pod lead confirms that teams already have a self-service agent-onboarding service and AI-enabled operational workflows. The [historical record](historical-achievements.md) lists the delivered capability. The architecture below describes ownership and the reviewed evolution path, including the newer runtime; it does not imply the platform starts from zero.

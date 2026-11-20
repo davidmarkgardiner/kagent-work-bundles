@@ -1,5 +1,5 @@
 impact: none
 reason: >-
-  Add a stakeholder summary of six existing kagent workflows and clarify MCP
-  integration and evidence scope. This editorial catalogue records no new
-  implementation, go-live event or delivery milestone state change.
+  Make the existing Agent-as-a-Service design discoverable through a dedicated
+  architecture page and connect it to current handbook guidance. The change is
+  editorial and records no new implementation or acceptance milestone.

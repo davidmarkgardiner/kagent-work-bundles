@@ -17,6 +17,7 @@ nav:
 - Fortnightly update template: fortnightly-updates.md
 - North Star and delivery: direction.md
 - Platform and KRO: architecture.md
+- Agent-as-a-Service SAD: agent-as-a-service-sad.md
 - Versions and migration: versions.md
 - Deploy an agent: deploy.md
 - Consume agents and the crew: consume.md

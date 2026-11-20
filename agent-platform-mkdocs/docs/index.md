@@ -13,7 +13,7 @@ The platform provides governed agent onboarding and AI-enabled operational workf
 | Reader | Start with | Outcome |
 | --- | --- | --- |
 | Product owner or pod lead | [Delivery roadmap](roadmap.md), [achievements](achievements.md) | Delivered outcomes, current focus, next delivery and decisions |
-| Platform engineer | [Architecture](architecture.md), [deployment](deploy.md) | Understand ownership and the supported onboarding path |
+| Platform engineer | [Agent-as-a-Service SAD](agent-as-a-service-sad.md), [deployment](deploy.md) | Understand ownership and the supported onboarding path |
 | Agent author or consumer | [Consumption and the crew](consume.md) | Choose a supported profile and invoke it correctly |
 | Security or identity owner | [Isolation](isolation.md), [Entra identity](identity.md) | Review boundaries and the outstanding policy gate |
 | Receiving work agent | [Handoff and hosting](handoff.md), [labs](labs.md) | Copy, build, adapt and collect target evidence |
