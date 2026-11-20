@@ -45,6 +45,8 @@ Successful incident delivery alone does not establish that capability.
 
 ## Scheduled application scanner lab
 
+Use the [Sentinel workplace verification prompt](sentinel-work-agent-prompt.md) to audit the deployed probe and collect receiving-system evidence.
+
 On 19 November 2026, a separate lab build added five-minute polling for
 application readiness, controller logs and Kubernetes Warning events. The
 scanner requires persistent evidence and reserves at most three dispatches
