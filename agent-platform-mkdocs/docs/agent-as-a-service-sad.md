@@ -2,6 +2,8 @@
 
 This page is the handbook's public-safe architecture overview for a shared service that lets application teams onboard agents and use approved tools and skills. It brings together the existing multi-namespace design and the current platform guidance. Use the [lab acceptance matrix](labs.md) for evidence requirements at the target release and environment.
 
+[Copy the architecture handoff prompt](architecture-work-agent-prompt.md) when passing this folder to the work agent.
+
 ## Interactive architecture diagrams
 
 [Open the layered architecture walkthrough](architecture-layers/index.html). Use **Next layer** to add JWT-protected access, Entra workload identity, the central registry, evaluation and observability to the basic service. Select any layer to jump straight to that cumulative view.
