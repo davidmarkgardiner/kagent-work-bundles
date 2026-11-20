@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent-as-a-Service · Architecture layers</title>
+<style>
+:root { color-scheme: dark; font: 17px/1.5 system-ui,sans-serif; background: #101923; color: #eaf0f3; --accent: #80e2cb; --line: #39505f; }
+* { box-sizing: border-box; }
+body { max-width: 1100px; margin: auto; padding: clamp(1rem,4vw,3rem); }
+a { color: var(--accent); }
+h1 { font-size: clamp(2.1rem,6vw,4rem); line-height: 1.04; margin: .65rem 0; letter-spacing: -.045em; }
+h2 { margin: 0; font-size: 1rem; }
+p { margin: .4rem 0 1rem; }
+fieldset { display: flex; flex-wrap: wrap; gap: .4rem; border: 0; margin: 1.5rem 0 .75rem; padding: 0; }
+legend { margin-bottom: .5rem; }
+label { display: inline-flex; align-items: center; gap: .35rem; padding: .32rem .55rem; border: 1px solid var(--line); border-radius: .3rem; cursor: pointer; }
+label:has(input:checked) { border-color: var(--accent); color: var(--accent); }
+button, input { accent-color: var(--accent); }
+button { padding: .35rem .7rem; border-radius: .3rem; border: 1px solid var(--line); color: inherit; background: #1b2b39; font: inherit; cursor: pointer; }
+button:disabled { opacity: .55; cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.controls { display: flex; align-items: center; gap: .55rem; margin-bottom: 1.1rem; }
+#stage { margin: 0 0 0 auto; font-size: .9rem; }
+.diagram { display: grid; gap: .65rem; }
+.layer { border: 1px solid var(--line); border-left: 4px solid var(--layer,#80e2cb); border-radius: .45rem; background: #172532; padding: .9rem 1rem; }
+.layer[hidden] { display: none; }
+.layer p { margin: .45rem 0 0; font-size: .9rem; color: #c8d4db; }
+.path { display: flex; align-items: stretch; flex-wrap: wrap; gap: .35rem; list-style: none; padding: 0; margin: .55rem 0 0; }
+.path li { display: inline-flex; align-items: center; gap: .35rem; }
+.path li + li::before { content: '→'; color: var(--layer,#80e2cb); }
+.path span { padding: .25rem .5rem; background: #223647; border-radius: .2rem; font-size: .88rem; }
+footer { margin-top: 1.7rem; color: #c8d4db; }
+</style>
+<script defer src="layers.js"></script>
+</head>
+<body>
+<a href="../agent-as-a-service-sad.html">Back to the solution architecture</a>
+<h1>Build up the agent platform</h1>
+<p>Follow the service from a deployed agent to secure tool access, then add discovery, evaluation and telemetry.</p>
+<form id="layer-picker">
+<fieldset>
+  <legend>Show layers through</legend>
+  <label><input type="radio" name="layer" value="0" checked> Basic service</label>
+  <label><input type="radio" name="layer" value="1"> JWT and tools</label>
+  <label><input type="radio" name="layer" value="2"> Entra identity</label>
+  <label><input type="radio" name="layer" value="3"> Central registry</label>
+  <label><input type="radio" name="layer" value="4"> Evaluation</label>
+  <label><input type="radio" name="layer" value="5"> Observability</label>
+</fieldset>
+<div class="controls">
+  <button id="back" type="button">Previous</button>
+  <button id="forward" type="button">Next layer</button>
+  <p id="stage" aria-live="polite"></p>
+</div>
+</form>
+<main class="diagram" aria-label="Cumulative architecture diagram">
+  <section class="layer">
+    <h2>Basic service</h2>
+    <ol class="path"><li><span>App team</span></li><li><span>Reviewed GitOps</span></li><li><span>KRO composition</span></li><li><span>Agent in team namespace</span></li></ol>
+    <p>The platform operates the shared controller and runtime. The team owns the agent configuration and where it fits into the workflow.</p>
+  </section>
+  <section class="layer" style="--layer:#afd6ff">
+    <h2>JWT and approved tools</h2>
+    <ol class="path"><li><span>User or workflow</span></li><li><span>Agent Gateway</span></li><li><span>Agent runtime</span></li><li><span>Approved MCP or API</span></li></ol>
+    <p>The gateway validates the caller JWT for the named agent. Outbound access has its own identity and audience. The backend enforces tool and resource scope.</p>
+  </section>
+  <section class="layer" style="--layer:#b6aff9">
+    <h2>Entra workload identity</h2>
+    <ol class="path"><li><span>Projected service-account assertion</span></li><li><span>Entra token exchange</span></li><li><span>Destination-scoped access token</span></li></ol>
+    <p>Federation replaces a provisioned client credential on this path. The resulting Entra access token is still a JWT. Use a distinct caller and agent identity.</p>
+  </section>
+  <section class="layer" style="--layer:#f6c98a">
+    <h2>Central registry</h2>
+    <ol class="path"><li><span>Discover approved agents, tools and skills</span></li><li><span>Choose reviewed versions</span></li><li><span>Bind approved access through GitOps</span></li></ol>
+    <p>The registry records ownership, provenance and supported versions. Gateway and backend policies enforce runtime permissions.</p>
+  </section>
+  <section class="layer" style="--layer:#eea9c3">
+    <h2>Evaluation</h2>
+    <ol class="path"><li><span>Candidate revision</span></li><li><span>Golden cases and denied cases</span></li><li><span>Evidence for promotion review</span></li></ol>
+    <p>Evaluate answer quality, tool choice and safety against the exact agent and tool revisions. The evaluator produces evidence for the release decision.</p>
+  </section>
+  <section class="layer" style="--layer:#9bd5a5">
+    <h2>Observability</h2>
+    <ol class="path"><li><span>Gateway, runtime and tools</span></li><li><span>OpenTelemetry and collectors</span></li><li><span>LGTM and Grafana</span></li></ol>
+    <p>Correlate requests, authorisation outcomes, tool calls, latency and usage. Keep sampled traces and evaluation results distinct.</p>
+  </section>
+</main>
+<footer>
+  <p>Architecture walkthrough. See the <a href="../evidence.html">handbook evidence</a> for verified scope.</p>
+  <a href="dice-detail.html">Open the original DICE diagrams and Entra handshake</a>
+</footer>
+</body>
+</html>

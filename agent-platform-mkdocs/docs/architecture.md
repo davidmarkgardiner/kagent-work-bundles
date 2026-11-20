@@ -1,6 +1,6 @@
 # Platform architecture and KRO
 
-See the [Agent-as-a-Service solution architecture](agent-as-a-service-sad.md) for the shared service boundary, onboarding and approval responsibilities.
+See the [Agent-as-a-Service solution architecture](agent-as-a-service-sad.md) for the shared service boundary, onboarding and approval responsibilities. [Walk through the architecture layer by layer](architecture-layers/index.html).
 
 ## Delivered platform foundation
 

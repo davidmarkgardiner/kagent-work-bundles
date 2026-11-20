@@ -2,6 +2,12 @@
 
 This page is the handbook's public-safe architecture overview for a shared service that lets application teams onboard agents and use approved tools and skills. It brings together the existing multi-namespace design and the current platform guidance. Use the [lab acceptance matrix](labs.md) for evidence requirements at the target release and environment.
 
+## Interactive architecture diagrams
+
+[Open the layered architecture walkthrough](architecture-layers/index.html). Use **Next layer** to add JWT-protected access, Entra workload identity, the central registry, evaluation and observability to the basic service. Select any layer to jump straight to that cumulative view.
+
+The [original DICE walkthrough](architecture-layers/dice-detail.html) includes the more detailed JWT, Entra handshake, telemetry and evaluation diagrams.
+
 ## Service boundary
 
 Application teams own the agent's behaviour, its workflow placement and the access they request. Platform operators own the shared controller, runtime profiles, gateway policies and GitOps reconciliation. Tool and data owners approve access and enforce it at the destination. A catalogue entry makes a tool or skill discoverable. An approved binding and runtime authorisation determine whether the agent can use it.

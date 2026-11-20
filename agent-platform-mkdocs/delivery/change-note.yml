@@ -1,5 +1,5 @@
 impact: none
 reason: >-
-  Make the existing Agent-as-a-Service design discoverable through a dedicated
-  architecture page and connect it to current handbook guidance. The change is
-  editorial and records no new implementation or acceptance milestone.
+  Add an interactive, cumulative architecture walkthrough and the existing DICE
+  diagrams to the handbook. This presentation change records no implementation
+  or receiving-environment acceptance milestone.
