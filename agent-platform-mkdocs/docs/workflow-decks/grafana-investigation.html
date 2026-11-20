@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:,">
+<title>Metrics and log investigation · Office handoff</title>
+<style>
+:root {
+  --paper: #f7f4ed;
+  --white: #fffdf7;
+  --ink: #201c25;
+  --muted: #625a65;
+  --line: #dcd4df;
+  --violet: #573a84;
+  --violet-dark: #292138;
+  --violet-pale: #eae0f6;
+  --green: #315a43;
+  --green-pale: #dceadf;
+  --amber: #75441b;
+  --amber-pale: #f4e4d1;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --serif: Georgia, ui-serif, "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--paper); font: 16px/1.6 var(--sans); }
+button, textarea { font: inherit; }
+button { cursor: pointer; }
+a { color: var(--violet); text-underline-offset: .22em; }
+:focus-visible { outline: 3px solid #a66c28; outline-offset: 4px; }
+[hidden] { display: none !important; }
+.wrap { width: min(1140px, calc(100% - 72px)); margin-inline: auto; }
+.skip { position: absolute; top: .5rem; left: .5rem; transform: translateY(-200%); z-index: 2; background: var(--white); padding: .5rem; }
+.skip:focus { transform: translateY(0); }
+.masthead { border-bottom: 1px solid var(--line); }
+.masthead .wrap { display: flex; justify-content: space-between; align-items: center; gap: 24px; min-height: 68px; }
+.wordmark { color: var(--ink); font-size: .92rem; font-weight: 760; text-decoration: none; display: inline-flex; align-items: center; gap: 11px; }
+.mark { width: 17px; height: 17px; background: var(--violet); transform: rotate(45deg); border-radius: 2px; display: inline-block; flex: none; }
+nav { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: .88rem; }
+nav a { color: var(--muted); text-decoration: none; }
+nav a:hover { text-decoration: underline; }
+.hero { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(245px, .74fr); align-items: end; gap: 52px; padding-block: 69px 55px; }
+.kicker { margin: 0 0 12px; color: var(--violet); font: 700 .74rem/1.5 var(--mono); letter-spacing: .13em; text-transform: uppercase; }
+h1,h2,h3,p { margin-top: 0; }
+h1,h2 { font-family: var(--serif); font-weight: 500; letter-spacing: -.043em; }
+h1 { margin-bottom: 22px; font-size: clamp(2.65rem, 6.25vw, 5.15rem); line-height: .99; }
+h1 em { color: var(--violet); font-weight: inherit; }
+.hero p:not(.kicker) { max-width: 63ch; margin-bottom: 0; }
+.hero .lede { color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.15rem); line-height: 1.65; }
+.hero-aside { border-top: 2px solid var(--violet); padding-top: 16px; }
+.hero-aside strong { font-family: var(--serif); font-size: 1.4rem; line-height: 1.23; display: block; margin: 0 0 8px; }
+.hero-aside p { color: var(--muted); font-size: .91rem; }
+.hero-aside .runtime { margin-top: 15px; font: .75rem/1.65 var(--mono); color: var(--violet); }
+section { scroll-margin-top: 18px; }
+.section { padding-block: 51px; border-bottom: 1px solid var(--line); }
+.section h2 { font-size: clamp(2.05rem, 4.5vw, 3.25rem); line-height: 1.08; margin-bottom: 10px; }
+.section > .intro { color: var(--muted); max-width: 76ch; margin-bottom: 24px; }
+.setup-note { max-width: 82ch; margin-bottom: 15px; color: var(--muted); font-size: .9rem; }
+.flow-panel { background: var(--violet-dark); border-radius: 16px; color: #fffaf2; padding: 30px 28px 25px; }
+.flow-panel h2 { font: 500 clamp(1.65rem, 3.5vw, 2.55rem)/1.12 var(--serif); letter-spacing: -.026em; margin: 0; }
+.flow-heading { display: flex; gap: 12px 28px; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 21px; }
+.mode-row, .code-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.mode-row button { border: 1px solid #796a8b; border-radius: 100px; color: #eee6f4; background: transparent; font-size: .82rem; padding: 7px 12px; }
+.mode-row button[aria-pressed="true"] { background: #efe5fa; color: #312443; border-color: #efe5fa; font-weight: 730; }
+.flow-grid { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; }
+.flow-grid li { min-width: 0; position: relative; }
+.flow-grid li:not(:last-child)::after { content: "→"; color: #af9bc1; position: absolute; right: -16px; top: 35%; font-weight: 800; }
+.flow-node { width: 100%; height: 100%; min-height: 104px; text-align: left; border: 1px solid #786a87; border-radius: 9px; padding: 12px 12px 13px; background: #352b46; color: #fffaf2; }
+.flow-node:hover { background: #403453; }
+.flow-node[aria-pressed="true"] { border-color: #d5b8fb; box-shadow: inset 0 -3px #c8a5f1; }
+.flow-node.skipped { opacity: .58; }
+.flow-node.skipped[aria-pressed="true"] { opacity: 1; }
+.node-tag { display: block; color: #dfc5ff; margin-bottom: .42rem; font: .66rem/1.3 var(--mono); }
+.node-title { display: block; font-weight: 740; font-size: clamp(.85rem, 1.5vw, 1.02rem); line-height: 1.28; }
+.flow-detail { margin-top: 19px; padding: 19px 17px 14px; border-top: 1px solid #73647e; display: grid; grid-template-columns: minmax(0, 1fr) minmax(160px, .44fr); gap: 19px 32px; }
+.flow-detail h3 { margin-bottom: 6px; font-size: 1.04rem; }
+.flow-detail p { color: #e6dced; font-size: .9rem; margin: 0; }
+.flow-detail .mode-note { border-left: 2px solid #c8a5f1; padding-left: 15px; align-self: start; }
+.flow-detail button { margin-top: 9px; padding: 0; color: #e4ccff; background: none; border: 0; text-decoration: underline; text-underline-offset: 4px; font-size: .85rem; }
+.branch-card { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-top: 19px; }
+.branch-card article { background: var(--white); padding: 19px 22px; }
+.branch-card h3 { font-size: 1rem; margin-bottom: 5px; }
+.branch-card p { margin-bottom: 0; font-size: .89rem; color: var(--muted); }
+.code-inline { background: #eee7f1; color: #432b63; font: .88em/1.4 var(--mono); padding: .12em .28em; border-radius: 4px; overflow-wrap: anywhere; }
+.code-row button { border: 1px solid #cfc0d7; padding: 7px 12px; border-radius: 6px; background: var(--white); color: var(--violet-dark); font-size: .83rem; }
+.code-row button[aria-pressed="true"] { background: var(--violet); color: white; border-color: var(--violet); font-weight: 700; }
+.code-shell { display: grid; grid-template-columns: minmax(0, 1fr) minmax(230px, .36fr); gap: 16px; align-items: start; margin-top: 13px; }
+.code-main { min-width: 0; background: #201a2c; border-radius: 10px; color: #f5ecfb; overflow: hidden; }
+.code-meta { display: flex; gap: 12px 18px; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 1px solid #544762; background: #2d243a; padding: 11px 12px 11px 16px; font: .76rem/1.4 var(--mono); }
+.code-meta small { color: #d6c5df; }
+.code-meta button { border: 1px solid #796586; border-radius: 5px; background: none; color: #f0e4f8; padding: 5px 9px; }
+pre { overflow-x: auto; margin: 0; padding: 14px 16px 16px; font: .8rem/1.65 var(--mono); tab-size: 2; white-space: pre; }
+pre code { display: block; width: max-content; min-width: 100%; }
+.code-line { display: block; min-height: 1em; padding-right: 10px; }
+.num { display: inline-block; color: #b2a0be; text-align: right; width: 3.4em; padding-right: 1.05em; user-select: none; }
+.syn-string { color: #b8debf; }
+.syn-key { color: #e4c2ff; }
+.syn-word { color: #ffcd9b; }
+.syn-comment { color: #bbacc6; }
+.code-aside { padding: 19px 19px 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--white); }
+.code-aside h3 { font-size: 1rem; line-height: 1.32; margin-bottom: 8px; }
+.code-aside p { color: var(--muted); font-size: .88rem; margin-bottom: 16px; }
+.code-aside a { font-size: .86rem; }
+.observations { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+.observations li { display: grid; grid-template-columns: minmax(145px,.32fr) minmax(0,1fr); gap: 15px 24px; border-bottom: 1px solid var(--line); padding: 14px 0; }
+.observations li:last-child { border-bottom: none; }
+.observations p { margin: 0; color: var(--muted); font-size: .92rem; }
+.observations strong { color: var(--ink); }
+.pill { display: inline-block; align-self: start; justify-self: start; padding: 3px 9px; border-radius: 100px; font-size: .74rem; font-weight: 750; line-height: 1.55; background: var(--green-pale); color: var(--green); }
+.pill.fixture { background: var(--violet-pale); color: var(--violet); }
+.pill.pending { background: var(--amber-pale); color: var(--amber); }
+.review-box { border: 1px solid var(--line); border-radius: 12px; padding: 23px; background: var(--white); }
+.review-box label { display: block; font-weight: 690; margin-bottom: 6px; }
+.hint, .review-context { margin-bottom: 13px; color: var(--muted); font-size: .87rem; }
+textarea { display: block; width: 100%; min-height: 121px; resize: vertical; border: 1px solid #b9a8c4; border-radius: 7px; padding: 11px 12px; color: var(--ink); background: #fffefb; }
+.review-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+.primary { border: 1px solid var(--violet); border-radius: 7px; padding: 8px 14px; color: white; background: var(--violet); font-weight: 690; }
+.primary:hover { background: #46306b; }
+.status { font-size: .82rem; color: var(--green); }
+.export-area { margin-top: 12px; font: .8rem/1.5 var(--mono); }
+footer { padding-block: 24px 35px; color: var(--muted); font-size: .85rem; }
+@media (max-width: 800px) {
+  .wrap { width: min(100% - 44px,1140px); }
+  .hero { gap: 25px; grid-template-columns: 1fr; padding-block: 51px 35px; }
+  .hero-aside { max-width: 570px; }
+  .code-shell { grid-template-columns: minmax(0,1fr); }
+  .code-aside { order: -1; }
+  .code-aside p { margin-bottom: 8px; }
+}
+@media (max-width: 610px) {
+  .wrap { width: calc(100% - 32px); }
+  .masthead .wrap { min-height: 0; padding-block: 12px; align-items: start; flex-direction: column; gap: 8px; }
+  nav { gap: 7px 15px; }
+  .hero { padding-block: 33px 25px; }
+  .hero-aside .runtime { margin-top: 9px; }
+  .flow-panel { padding: 17px 14px 13px; border-radius: 12px; }
+  .flow-heading { margin-bottom: 15px; }
+  .flow-grid { grid-template-columns: 1fr; gap: 11px; padding-left: 15px; border-left: 1px solid #796986; }
+  .flow-grid li:not(:last-child)::after { content: ""; }
+  .flow-grid li::before { content: ""; position: absolute; left: -19px; top: 21px; width: 7px; height: 7px; border-radius: 7px; background: #d4b4f8; }
+  .flow-node { min-height: auto; padding: 8px 11px 9px; }
+  .node-tag { margin-bottom: 2px; }
+  .flow-detail { grid-template-columns: 1fr; gap: 13px; padding: 13px 3px 5px; }
+  .branch-card { grid-template-columns: 1fr; }
+  .section { padding-block: 34px; }
+  .observations li { grid-template-columns: 1fr; gap: 5px; }
+  .review-box { padding: 15px; }
+}
+@media print {
+  body { font-size: 11pt; background: white; }
+  .wrap { width: 100%; }
+  .masthead nav, .mode-row, .flow-detail button, .code-row, .code-meta button, #feedback { display: none; }
+  .flow-panel { print-color-adjust: exact; }
+  .hero, .section { padding-block: 18px; }
+  .branch-card, .code-shell { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="wrap">
+    <a class="wordmark" href="#main"><span class="mark" aria-hidden="true"></span>Metrics and log investigation</a>
+    <nav aria-label="Page sections">
+      <a href="#flow">Flow</a><a href="#code">Code</a><a href="#evidence">Evidence</a><a href="#feedback">Feedback</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <div class="hero">
+    <div>
+      <p class="kicker">Office handoff</p>
+      <h1>From an alert<br><em>to Grafana evidence.</em></h1>
+      <p class="lede">A Grafana evidence agent scopes the incident, checks the relevant metrics and logs, and returns dashboard links and queries that responders can reuse.</p>
+    </div>
+    <aside class="hero-aside"><strong>Give responders a reproducible query.</strong><p>Record the source, time window and relevant variables with the finding.</p><p class="runtime">Grafana MCP · Prometheus · Loki</p></aside>
+  </div>
+
+  <section id="flow" aria-labelledby="flow-title">
+    <div class="flow-panel">
+      <div class="flow-heading">
+        <h2 id="flow-title">Follow the investigation</h2>
+        <div class="mode-row" role="group" aria-label="Scenario">
+          <button type="button" data-mode="primary" aria-pressed="true">Pod crash</button>
+          <button type="button" data-mode="control" aria-pressed="false">No matching signal</button>
+          <button type="button" data-mode="exception" aria-pressed="false">Telemetry unavailable</button>
+        </div>
+      </div>
+      <ol class="flow-grid" aria-label="Workflow stages">
+<li><button type="button" class="flow-node" data-step="0" aria-pressed="true"><span class="node-tag">Incident input</span><span class="node-title">Scope the signal</span></button></li>
+<li><button type="button" class="flow-node" data-step="1" aria-pressed="false"><span class="node-tag">Dashboard registry</span><span class="node-title">Choose the dashboard</span></button></li>
+<li><button type="button" class="flow-node" data-step="2" aria-pressed="false"><span class="node-tag">Grafana MCP</span><span class="node-title">Query evidence</span></button></li>
+<li><button type="button" class="flow-node" data-step="3" aria-pressed="false"><span class="node-tag">Investigation</span><span class="node-title">Correlate signals</span></button></li>
+<li><button type="button" class="flow-node" data-step="4" aria-pressed="false"><span class="node-tag">Responder</span><span class="node-title">Share evidence</span></button></li>
+</ol>
+      <div class="flow-detail" aria-live="polite">
+        <div>
+          <h3 id="step-title">Identify the affected workload</h3>
+          <p id="step-text">Capture the cluster, namespace, workload and alert window before querying.</p>
+          <button id="jump-code" type="button">Review Grafana MCP tool bindings</button>
+        </div>
+        <p class="mode-note" id="mode-note">Use the matching workload labels and time window to look for correlated evidence.</p>
+      </div>
+    </div>
+    <div class="branch-card"><article><h3>Query budget</h3><p>This reference agent defines a small per-request Grafana MCP budget.</p></article><article><h3>Kubernetes context</h3><p>The caller supplies Kubernetes evidence. Grafana owns the telemetry view.</p></article></div>
+  </section>
+
+  <section class="section" id="code" aria-labelledby="code-title">
+    <h2 id="code-title">Review the code</h2>
+    <p class="intro">Excerpts from the pinned public reference. Each excerpt names the source file and lines.</p>
+    <div class="code-row" role="group" aria-label="Code excerpts" id="excerpt-buttons"></div>
+    <div class="code-shell">
+      <div class="code-main">
+        <div class="code-meta"><span id="code-file"></span><button id="copy-code" type="button">Copy excerpt</button></div>
+        <pre tabindex="0" aria-label="Source code excerpt"><code id="code-body"></code></pre>
+      </div>
+      <aside class="code-aside">
+        <h3 id="code-title-detail"></h3>
+        <p id="code-description"></p><a id="code-source" target="_blank" rel="noopener">Open pinned source</a>
+        <p class="status" id="copy-code-status" aria-live="polite"></p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" id="evidence" aria-labelledby="evidence-title">
+    <h2 id="evidence-title">Evidence for the handoff</h2>
+    <ul class="observations"><li><span class="pill">Owner-confirmed</span><p>The handbook records Grafana-supported investigation in the operational workflow portfolio.</p></li><li><span class="pill fixture">Reference agent</span><p>The pinned manifest lists dashboard discovery, Prometheus, Loki and deep-link tools.</p></li><li><span class="pill pending">Target acceptance</span><p>Show the exact dashboard variables, the matching queries and their receiving-environment results.</p></li></ul>
+  </section>
+
+  <section class="section" id="feedback" aria-labelledby="feedback-title">
+    <h2 id="feedback-title">Review feedback</h2>
+    <div class="review-box">
+      <label for="notes">Notes for the application owner or work agent</label>
+      <textarea id="notes" placeholder="Capture a workflow finding, scope question or piece of evidence to check."></textarea>
+      <div class="review-actions">
+        <button id="copy-feedback" type="button" class="primary">Copy as Markdown</button>
+        <span id="feedback-status" class="status" aria-live="polite"></span>
+      </div>
+      <textarea id="export" class="export-area" readonly aria-label="Copyable output" hidden></textarea>
+    </div>
+  </section>
+</main>
+
+<script type="application/json" id="excerpts">
+[
+  {
+    "id": "tools",
+    "label": "Grafana MCP tool bindings",
+    "source": "agents/grafana-evidence-agent/agent.yaml",
+    "first": 40,
+    "last": 53,
+    "note": "The tool list covers discovery, metrics, logs and deep links.",
+    "text": "    tools:\n      - type: McpServer\n        mcpServer:\n          apiGroup: kagent.dev\n          kind: RemoteMCPServer\n          name: kagent-grafana-mcp\n          toolNames:\n            - list_datasources\n            - search_dashboards\n            - get_dashboard_summary\n            - get_dashboard_panel_queries\n            - query_prometheus\n            - query_loki_logs\n            - generate_deeplink",
+    "link": "https://github.com/davidmarkgardiner/kagent-public/blob/3231f911456831834e14cc17daf2dbbc607e8281/agents/grafana-evidence-agent/agent.yaml#L40-L53"
+  },
+  {
+    "id": "contract",
+    "label": "Scope and dashboard guidance",
+    "source": "agents/skills/grafana-incident-evidence-pack/SKILL.md",
+    "first": 44,
+    "last": 69,
+    "note": "The skill guides scope checks and incident dashboard selection.",
+    "text": "## Workflow\n\n### 1. Scope The Incident\n\nAnswer these before remediation:\n\n- Is this one pod, one workload, one namespace, one cluster, or fleet-wide?\n- Did it start after a rollout, chaos run, node event, certificate renewal, DNS\n  sync, model backend change, or gateway change?\n- Is observability itself healthy enough to trust the dashboard?\n\nFleet scope PromQL examples:\n\n```promql\ncount by (cluster) (ALERTS{alertname=\"{{ALERT_NAME}}\",alertstate=\"firing\"})\ncount by (cluster, namespace) (kube_pod_container_status_restarts_total{namespace=\"{{NAMESPACE}}\"} > 0)\ncount by (cluster, namespace, pod) (kube_pod_status_phase{phase=~\"Pending|Failed|Unknown\"})\n```\n\n### 2. Pick The Dashboard\n\nUse an incident dashboard when the payload identifies a concrete failing object:\n\n- crashing pod: `k8s-pod-crash-evidence`\n- service latency: `service-latency-evidence`\n- multi-cluster spread: `fleet-scope-evidence`",
+    "link": "https://github.com/davidmarkgardiner/kagent-public/blob/3231f911456831834e14cc17daf2dbbc607e8281/agents/skills/grafana-incident-evidence-pack/SKILL.md#L44-L69"
+  }
+]
+</script>
+<script>
+(() => {
+  const byId = id => document.getElementById(id);
+  const excerpts = JSON.parse(byId("excerpts").textContent);
+  const stages = [
+  {
+    "code": "contract",
+    "title": "Identify the affected workload",
+    "text": "Capture the cluster, namespace, workload and alert window before querying."
+  },
+  {
+    "code": "contract",
+    "title": "Select relevant panels",
+    "text": "Use the incident context to resolve the dashboard and set its variables."
+  },
+  {
+    "code": "tools",
+    "title": "Read metrics and logs",
+    "text": "Use scoped Prometheus and Loki tools. State which evidence was available."
+  },
+  {
+    "code": "contract",
+    "title": "Compare the scope",
+    "text": "Distinguish a single workload problem from a cluster-wide signal using matching time windows."
+  },
+  {
+    "code": "tools",
+    "title": "Return links and verification",
+    "text": "Return scoped dashboard links, exact queries and a check the responder can use after remediation."
+  }
+];
+  const scenarios = {
+  "primary": {
+    "name": "Pod crash",
+    "note": "Use the matching workload labels and time window to look for correlated evidence.",
+    "stage": 0
+  },
+  "control": {
+    "name": "No matching signal",
+    "note": "Stop escalation and record the scope searched. An empty result is evidence about that query only.",
+    "stage": 0
+  },
+  "exception": {
+    "name": "Telemetry unavailable",
+    "note": "Report the missing source or permission and limit conclusions to evidence that was accessible.",
+    "stage": 0
+  }
+};
+  let selectedStage = 0;
+  let selectedScenario = "primary";
+  let selectedExcerpt = excerpts[0];
+  const modeButtons = [...document.querySelectorAll("[data-mode]")];
+  const stageButtons = [...document.querySelectorAll("[data-step]")];
+  const codeButtons = new Map();
+
+  function drawFlow() {
+    const current = stages[selectedStage];
+    const skipped = selectedScenario === "control" && selectedStage > 1;
+    byId("step-title").textContent = skipped ? "The workflow stops here" : current.title;
+    byId("step-text").textContent = skipped ? scenarios[selectedScenario].note : current.text;
+    byId("mode-note").textContent = scenarios[selectedScenario].note;
+    const jump = byId("jump-code");
+    jump.dataset.target = skipped ? stages[1].code : current.code;
+    jump.textContent = "Review " + excerpts.find(excerpt => excerpt.id === jump.dataset.target).label;
+    modeButtons.forEach(button => button.setAttribute("aria-pressed", button.dataset.mode === selectedScenario));
+    stageButtons.forEach(button => {
+      const index = Number(button.dataset.step);
+      button.setAttribute("aria-pressed", index === selectedStage);
+      button.classList.toggle("skipped", selectedScenario === "control" && index > 1);
+    });
+  }
+
+  function showExcerpt(excerpt) {
+    selectedExcerpt = excerpt;
+    byId("code-file").textContent = excerpt.source + " · lines " + excerpt.first + "–" + excerpt.last;
+    byId("code-title-detail").textContent = excerpt.label;
+    byId("code-description").textContent = excerpt.note;
+    byId("code-body").textContent = excerpt.text;
+    byId("code-source").href = excerpt.link;
+    byId("copy-code-status").textContent = "";
+    codeButtons.forEach((button, id) => button.setAttribute("aria-pressed", id === excerpt.id));
+  }
+
+  async function copy(text, status, success, fallback) {
+    try {
+      await navigator.clipboard.writeText(text);
+      status.textContent = success;
+    } catch {
+      fallback();
+      status.textContent = "Selected. Use your copy shortcut.";
+    }
+  }
+
+  excerpts.forEach(excerpt => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = excerpt.label;
+    button.addEventListener("click", () => showExcerpt(excerpt));
+    byId("excerpt-buttons").append(button);
+    codeButtons.set(excerpt.id, button);
+  });
+  modeButtons.forEach(button => button.addEventListener("click", () => {
+    selectedScenario = button.dataset.mode;
+    selectedStage = scenarios[selectedScenario].stage;
+    drawFlow();
+  }));
+  stageButtons.forEach(button => button.addEventListener("click", () => {
+    selectedStage = Number(button.dataset.step);
+    drawFlow();
+  }));
+  byId("jump-code").addEventListener("click", event => {
+    const id = event.currentTarget.dataset.target;
+    showExcerpt(excerpts.find(excerpt => excerpt.id === id));
+    byId("code").scrollIntoView();
+    codeButtons.get(id).focus({ preventScroll: true });
+  });
+  byId("copy-code").addEventListener("click", () => copy(
+    selectedExcerpt.text, byId("copy-code-status"), "Excerpt copied.", () => {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(byId("code-body"));
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  ));
+  byId("copy-feedback").addEventListener("click", () => {
+    const notes = byId("notes").value.trim();
+    const status = byId("feedback-status");
+    if (!notes) {
+      status.textContent = "Add a note first.";
+      byId("notes").focus();
+      return;
+    }
+    const output = byId("export");
+    output.hidden = true;
+    const markdown = [
+      "# Metrics and log investigation feedback", "",
+      "- Scenario: " + scenarios[selectedScenario].name,
+      "- Code: " + selectedExcerpt.source + " lines " + selectedExcerpt.first + "–" + selectedExcerpt.last,
+      "", notes, ""
+    ].join("\n");
+    copy(markdown, status, "Feedback copied.", () => {
+      output.value = markdown;
+      output.hidden = false;
+      output.focus();
+      output.select();
+    });
+  });
+  drawFlow();
+  showExcerpt(selectedExcerpt);
+})();
+</script>
+</body>
+</html>

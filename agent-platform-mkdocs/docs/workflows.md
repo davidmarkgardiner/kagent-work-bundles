@@ -5,14 +5,16 @@ specialist agents with approved tools, knowledge and skills. These six examples
 summarise the capabilities we have built, including a bounded software-delivery
 prototype.
 
-| Workflow | MCP / integration | What it does |
-| --- | --- | --- |
-| **AI incident triage and specialist routing** | Kubernetes, Grafana | Picks up alerts or Kubernetes events, routes them to the appropriate specialist agent, gathers evidence and produces a diagnosis and recommended next steps. |
-| **Cluster health checks** | Kubernetes | Checks nodes, workloads, DNS, storage and platform components; investigates failures and produces actionable findings. |
-| **Metrics and log investigation** | Grafana | Queries metrics, logs and dashboards to understand cluster health, investigate incidents and assemble an evidence pack with relevant dashboard links. |
-| **ServiceNow incident intake and investigation** | ServiceNow integration, Kubernetes, Grafana | Brings incident context into the agent workflow for investigation and evidence gathering. The gateway intake implementation maps incoming incident JSON into an agent request. |
-| **Governed data and compliance investigation** | Denodo / custom data MCPs | Provides controlled access to approved data for inventory, security and compliance investigations, including the owner-confirmed OC6 integration. |
-| **Agent-assisted software delivery** | GitLab MCP | A bounded prototype coordinates planning, implementation, testing and review, producing a draft merge request with pipeline evidence for human review. |
+| Workflow | MCP / integration | What it does | Presentation |
+| --- | --- | --- | --- |
+| **AI incident triage and specialist routing** | Kubernetes, Grafana | Picks up alerts or Kubernetes events, routes them to the appropriate specialist agent, gathers evidence and produces a diagnosis and recommended next steps. | [Open deck](workflow-decks/incident-triage.html) |
+| **Cluster health checks** | Kubernetes | Checks nodes, workloads, DNS, storage and platform components; investigates failures and produces actionable findings. | [Open deck](workflow-decks/cluster-health.html) |
+| **Metrics and log investigation** | Grafana | Queries metrics, logs and dashboards to understand cluster health, investigate incidents and assemble an evidence pack with relevant dashboard links. | [Open deck](workflow-decks/grafana-investigation.html) |
+| **ServiceNow incident intake and investigation** | ServiceNow integration, Kubernetes, Grafana | Brings incident context into the agent workflow for investigation and evidence gathering. The gateway intake implementation maps incoming incident JSON into an agent request. | [Open deck](workflow-decks/servicenow-intake.html) |
+| **Governed data and compliance investigation** | Denodo / custom data MCPs | Provides controlled access to approved data for inventory, security and compliance investigations, including the owner-confirmed OC6 integration. | [Open deck](workflow-decks/governed-data.html) |
+| **Agent-assisted software delivery** | GitLab MCP | A bounded prototype coordinates planning, implementation, testing and review, producing a draft merge request with pipeline evidence for human review. | [Open deck](workflow-decks/software-delivery.html) |
+
+Each deck opens in a browser and includes an interactive flow, code excerpts and an evidence section. The triage deck presents the scheduled application-scanner example.
 
 ## Integration scope
 
