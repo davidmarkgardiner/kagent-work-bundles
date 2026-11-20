@@ -1,0 +1,20 @@
+site_name: Bring Your Own Sentinel
+site_description: Team launch, Whisky rehearsal, and workplace pilot handoff
+use_directory_urls: false
+theme:
+  name: mkdocs
+  highlightjs: false
+nav:
+  - Start here: index.md
+  - Sentinel launch: sentinel-launch.md
+  - Workplace onboarding: sentinel-onboarding.md
+  - KRO scanner profiles: sentinel-profiles.md
+  - KRO lab evidence: kro-lab-evidence.md
+  - Implementation handoff: implementation-handoff.md
+validation:
+  nav:
+    not_found: warn
+  links:
+    not_found: warn
+    unrecognized_links: warn
+    anchors: warn

@@ -1,0 +1,147 @@
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: external-dns-sentinel
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: ExternalDnsSentinel
+    spec:
+      targetName: string | required=true
+      scannerImage: string | required=true
+      schedule: string | default="*/5 * * * *"
+      suspended: boolean | default=true
+  resources:
+  - id: scannerAccount
+    template:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: ${schema.metadata.name}
+        namespace: ${schema.metadata.namespace}
+      automountServiceAccountToken: false
+  - id: readerRole
+    template:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        name: ${schema.metadata.name}
+        namespace: ${schema.metadata.namespace}
+      rules:
+      - apiGroups:
+        - apps
+        resources:
+        - deployments
+        resourceNames:
+        - ${schema.spec.targetName}
+        verbs:
+        - get
+  - id: readerBinding
+    template:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        name: ${schema.metadata.name}
+        namespace: ${schema.metadata.namespace}
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: Role
+        name: ${readerRole.metadata.name}
+      subjects:
+      - kind: ServiceAccount
+        name: ${scannerAccount.metadata.name}
+        namespace: ${schema.metadata.namespace}
+  - id: scannerSchedule
+    template:
+      apiVersion: batch/v1
+      kind: CronJob
+      metadata:
+        name: ${schema.metadata.name}
+        namespace: ${schema.metadata.namespace}
+        annotations:
+          sentinel.kro.run/reader-binding: ${readerBinding.metadata.name}
+      spec:
+        schedule: ${schema.spec.schedule}
+        suspend: ${schema.spec.suspended}
+        concurrencyPolicy: Forbid
+        startingDeadlineSeconds: 120
+        successfulJobsHistoryLimit: 1
+        failedJobsHistoryLimit: 2
+        jobTemplate:
+          spec:
+            backoffLimit: 0
+            activeDeadlineSeconds: 45
+            template:
+              spec:
+                serviceAccountName: ${scannerAccount.metadata.name}
+                automountServiceAccountToken: true
+                restartPolicy: Never
+                securityContext:
+                  runAsNonRoot: true
+                  runAsUser: 65532
+                  seccompProfile:
+                    type: RuntimeDefault
+                containers:
+                - name: scanner
+                  image: ${schema.spec.scannerImage}
+                  command:
+                  - /bin/sh
+                  - -c
+                  args:
+                  - |
+                    set -eu
+                    kubeconfig() {
+                      cat <<'CONFIG'
+                    apiVersion: v1
+                    kind: Config
+                    clusters:
+                    - name: worker
+                      cluster:
+                        server: https://kubernetes.default.svc
+                        certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+                    users:
+                    - name: scanner
+                      user:
+                        tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+                    contexts:
+                    - name: scanner
+                      context:
+                        cluster: worker
+                        user: scanner
+                    current-context: scanner
+                    CONFIG
+                    }
+                    if result=$(kubeconfig | kubectl --kubeconfig=/dev/stdin --request-timeout=10s -n "$POD_NAMESPACE" get -o 'jsonpath={.metadata.generation}|{.status.observedGeneration}|{.spec.replicas}|{.status.updatedReplicas}|{.status.availableReplicas}' -- deployment "$TARGET_NAME" 2>/dev/null); then
+                      IFS='|' read -r generation observed desired updated available <<EOF
+                    $result
+                    EOF
+                      if [ -n "$generation" ] && [ "$generation" = "$observed" ] &&
+                         [ -n "$desired" ] && [ "$desired" != 0 ] && [ "$desired" = "$updated" ] && [ "$desired" = "$available" ]; then
+                        state=healthy
+                      else
+                        state=unhealthy
+                      fi
+                    else
+                      state=unknown
+                    fi
+                    printf '{"profile":"external-dns","state":"%s"}\n' "$state"
+                  env:
+                  - name: TARGET_NAME
+                    value: ${schema.spec.targetName}
+                  - name: POD_NAMESPACE
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.namespace
+                  securityContext:
+                    allowPrivilegeEscalation: false
+                    readOnlyRootFilesystem: true
+                    capabilities:
+                      drop:
+                      - ALL
+                  resources:
+                    requests:
+                      cpu: 10m
+                      memory: 32Mi
+                    limits:
+                      cpu: 100m
+                      memory: 128Mi

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sentinel · Product demo</title>
+<link rel="stylesheet" href="launch.css">
+<script src="rehearsal.js" defer></script>
+</head>
+<body>
+<header>
+  <a href="../sentinel-launch.html">Sentinel</a>
+  <nav aria-label="Product demo"><a href="#signal">How it works</a><a href="#whisky">Try the demo</a><a href="../sentinel-onboarding.html">Onboarding</a></nav>
+</header>
+<main>
+  <section class="hero" aria-labelledby="title">
+    <p class="eyebrow">Kubernetes application monitoring</p>
+    <h1 id="title">Sentinel</h1>
+    <p class="hero-line">Give your agent a signal from every app.</p>
+    <p>Deploy Sentinel alongside your Kubernetes application. When it detects a problem, it sends a signal through Agent Gateway so an agent can investigate where it happened.</p>
+    <a class="button" href="#whisky">Run the Whisky demo</a>
+  </section>
+  <section class="signal" id="signal" aria-labelledby="signal-title">
+    <div class="signal-art" role="img" aria-label="A spherical Sentinel sends a signal to a relay, which connects back to a data centre"></div>
+    <div class="signal-content">
+      <h2 id="signal-title">From first signal to follow-up</h2>
+      <ol class="route">
+        <li><strong>Sentinel detects</strong><span>A scanner runs alongside the app in its worker cluster.</span></li>
+        <li><strong>Agent Gateway receives</strong><span>The scanner sends an alert to the configured gateway endpoint.</span></li>
+        <li><strong>The agent investigates</strong><span>It connects back to the worker cluster and checks the affected workload with scoped tools.</span></li>
+        <li><strong>The team gets a result</strong><span>Route the investigation to GitLab, ServiceNow, or another configured endpoint.</span></li>
+      </ol>
+    </div>
+  </section>
+  <section class="scanner-editions" aria-label="Current scanner and planned classifier">
+    <article>
+      <p class="eyebrow">Today</p><h2>Python scanner</h2>
+      <p>Deploy through GitOps and KRO. Each application can send up to <strong>three alerts per day, per cluster</strong>.</p>
+    </article>
+    <article>
+      <p class="eyebrow">Planned next</p><h2>Java classifier</h2>
+      <p>Run classification alongside the app. Evaluate signals locally as they arrive and send them to the agent when they cross the configured threshold.</p>
+    </article>
+  </section>
+  <section class="rehearsal" aria-labelledby="fleet">
+    <p class="eyebrow">Local rehearsal · sample fleet</p>
+    <h2 id="fleet">Enable Sentinel across the fleet</h2>
+    <p>Preview a GitOps request for Whisky on two worker clusters. A first accepted report confirms coverage for each target.</p>
+    <button type="button" id="fleet-step">Enable Sentinel · sample GitOps request</button>
+    <p id="fleet-status" aria-live="polite">No active Sentinels.</p>
+  </section>
+  <section class="whisky" id="whisky" aria-labelledby="app">
+    <div>
+      <p class="eyebrow">Local rehearsal · sample data</p>
+      <h2 id="app">Whisky</h2>
+      <dl>
+        <div><dt>Namespace</dt><dd>whisky-demo</dd></div>
+        <div><dt>Deployment</dt><dd>whisky</dd></div>
+        <div><dt>Available replicas</dt><dd>1 of 2</dd></div>
+      </dl>
+      <p>The sample deployment has one unavailable replica. Walk through onboarding, scanning and triage to see what the application team would receive.</p>
+    </div>
+    <figure>
+      <img src="highland-park.webp" alt="A bottle of Highland Park 12 on a wooden table">
+      <figcaption>Highland Park 12 · <a href="https://www.dramface.com/all-reviews/2024/highland-park-12yo-2024-official-bottling">Photo by Dramface</a></figcaption>
+    </figure>
+  </section>
+  <section class="rehearsal" aria-labelledby="walkthrough">
+    <h2 id="walkthrough">Follow the finding</h2>
+    <label for="scenario">Scenario</label>
+    <select id="scenario">
+      <option value="finding">Whisky reports an unavailable replica</option>
+      <option value="missing">Sentinel misses its report deadline</option>
+    </select>
+    <div id="delivery-option">
+      <label for="destination">Investigation output</label>
+      <select id="destination">
+        <option value="none">Agent investigation only</option>
+        <option value="gitlab">GitLab issue</option>
+        <option value="servicenow">ServiceNow incident</option>
+        <option value="endpoint">Configured endpoint</option>
+      </select>
+    </div>
+    <div class="controls">
+      <button type="button" id="advance">Register sample instance</button>
+      <button type="button" id="reset">Reset</button>
+    </div>
+    <ol id="timeline" aria-live="polite"></ol>
+    <noscript>Enable JavaScript to step through the local rehearsal.</noscript>
+  </section>
+</main>
+</body>
+</html>
