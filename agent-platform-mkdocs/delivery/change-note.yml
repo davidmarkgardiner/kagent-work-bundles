@@ -1,5 +1,4 @@
 impact: none
 reason: >-
-  Add interactive presentations for the six documented workflows, using the
-  existing triage handoff format. The change records no new implementation
-  or receiving-environment acceptance milestone.
+  Add a copy-ready prompt for applying and checking the six workflow decks
+  in the receiving handbook. This records no new delivery milestone.

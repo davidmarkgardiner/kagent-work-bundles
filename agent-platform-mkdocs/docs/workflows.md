@@ -14,7 +14,7 @@ prototype.
 | **Governed data and compliance investigation** | Denodo / custom data MCPs | Provides controlled access to approved data for inventory, security and compliance investigations, including the owner-confirmed OC6 integration. | [Open deck](workflow-decks/governed-data.html) |
 | **Agent-assisted software delivery** | GitLab MCP | A bounded prototype coordinates planning, implementation, testing and review, producing a draft merge request with pipeline evidence for human review. | [Open deck](workflow-decks/software-delivery.html) |
 
-Each deck opens in a browser and includes an interactive flow, code excerpts and an evidence section. The triage deck presents the scheduled application-scanner example.
+Each deck opens in a browser and includes an interactive flow, code excerpts and an evidence section. The triage deck presents the scheduled application-scanner example. [Copy the workflow decks handoff prompt](workflow-decks-work-agent-prompt.md) when passing these files to the work agent.
 
 ## Integration scope
 
