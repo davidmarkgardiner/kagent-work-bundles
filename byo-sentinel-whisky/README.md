@@ -12,4 +12,4 @@ Open `site/index.html` for the documentation or `site/sentinel/index.html` for t
 
 The launch, onboarding and rehearsal files are a dated portable copy from `work-agent-bundles/agent-platform-mkdocs/docs/` in the source repository. Refresh those files from the maintained handbook when updating this bundle. The implementation handoff belongs to this bundle.
 
-The browser rehearsal uses synthetic data. Workplace implementation starts with the existing scanner job, KRO contract and Whisky application. The included Dramface bottle photo is credited in the rehearsal. Use the app's approved bottle asset for the workplace presentation.
+The browser rehearsal uses synthetic data. Workplace implementation starts with the existing scanner job, KRO contract and Whisky application. The rehearsal uses an original bottle illustration. Use the app's approved asset when showing the actual workplace app.

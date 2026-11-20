@@ -36,7 +36,7 @@ Show online and expected counts together, for example **2 of 3 online**. Require
 2. Show the reviewed KRO instance for Whisky and its generated scanner job. Record the instance generation, job UID and collector image digest. Begin with GitLab issue creation disabled.
 3. Use the approved demo condition, such as one unavailable replica in a disposable Whisky deployment. Run a single scan. Show the resulting condition, workload identity and report correlation ID.
 4. Show the agentic-cluster receipt for that same report. Confirm the receiving system is using the authenticated namespace binding and that the report contains only permitted fields.
-5. Enable the approved demo project binding and process the finding. Verify the GitLab issue URL and board label in GitLab. Replay the same finding and check that the issue count is still one. Use the project binding, stable workload identity and finding type as the deduplication scope.
+5. Enable the approved demo project binding and process the finding. Verify the GitLab issue URL and board label in GitLab. Replay the same finding and check that the issue count is still one. Use the project binding, cluster, namespace, workload kind and stable name, and canonical finding type as the deduplication scope. A fresh recurrence after closure opens a new issue.
 6. Restore the demo deployment. Retain the correlated receipts privately and clean up the demo issue and instance according to the owners’ agreement.
 
 ## Acceptance receipts
@@ -45,7 +45,7 @@ Record the scanner source and digest, KRO instance generation and job UID, recei
 
 ## Investigate a missing report
 
-Run a scheduled check on the receiving side of the agentic cluster, independently of the scanner. Derive expected runs from the active Sentinel registration, its schedule and configured time zone. Give each run a deadline that allows for scanner runtime and delivery delay. Accept a correlated completion report for every scheduled run, including healthy scans with zero findings. Keep receiver health visible so an unavailable receipt store does not turn into a fleet of false scanner alerts.
+Run a scheduled check on the receiving side of the agentic cluster, independently of the scanner. Derive expected runs from the active Sentinel registration, its schedule and configured time zone. Give each run a deadline that allows for scanner runtime and delivery delay. Accept a correlated completion report for every scheduled run, including healthy scans with zero findings. Completion receipts are independent of the three-alert escalation cap. Keep receiver health visible so an unavailable receipt store does not turn into a fleet of false scanner alerts.
 
 When an active registration is overdue, open one investigation keyed by Sentinel registration and expected run. Give the agent read-only access to the registration, Job status, bounded Kubernetes events and receiver status. Skip intentionally suspended or retired registrations.
 

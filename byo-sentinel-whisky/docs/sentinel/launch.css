@@ -68,3 +68,8 @@ header a { text-decoration: none; }
   .scanner-editions { grid-template-columns: 1fr; }
   header { font-size: .82rem; }
 }
+
+.whisky-illustration { display: grid; place-items: center; min-height: 300px; background: radial-gradient(ellipse at 50% 62%, #58513d, #18262c 54%, #0e1b23 78%); border-radius: .5rem; }
+.bottle { position: relative; display: grid; place-items: center; width: 108px; height: 155px; margin-top: 35px; border: 2px solid #dda766; border-radius: 30px 30px 13px 13px; background: linear-gradient(100deg, #6a3519, #cf7d34 22%, #94511d 58%, #e5a652 80%, #6b361d); box-shadow: 0 16px 40px #08131c; }
+.bottle::before { content: ''; position: absolute; inset: -43px 31px auto; height: 44px; border: 1px solid #bb965c; border-top: 15px solid #252725; border-radius: 5px 5px 0 0; background: #715234; }
+.bottle span { width: 100%; padding: .55rem; background: #e9dbc2; color: #203039; font-size: .82rem; font-weight: 750; text-align: center; letter-spacing: .14em; line-height: 1.25; }

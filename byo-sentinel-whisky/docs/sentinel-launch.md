@@ -2,6 +2,8 @@
 
 **Give your agent a signal from every app.**
 
+This product demonstration simulates the Gateway, agent investigation and delivery path. The lab evidence covers the KRO-generated scanner Jobs.
+
 ![A hovering inspection probe scans server racks and relays results to a distant carrier](sentinel/probe.jpg)
 
 An application team selects its app and target clusters and clicks **Enable Sentinel**. The proposed onboarding control prepares a GitOps change for review. Once merged, the existing Flux or Sync reconciler applies the KRO registration on each selected worker cluster. The scanner job gathers Kubernetes health evidence in the worker cluster and sends qualified alerts to its configured Agent Gateway endpoint. The agent connects back to the affected cluster, inspects the workload with scoped tools, and can route the investigation to GitLab, ServiceNow, or another configured endpoint.
@@ -12,7 +14,7 @@ An application team selects its app and target clusters and clicks **Enable Sent
 
 > Meet Sentinel, an application health signal for Kubernetes. Deploy it alongside your app. When Sentinel spots a problem, it reports through Agent Gateway and the agent goes back to the affected cluster to investigate. The result can go to your GitLab board, ServiceNow, or another endpoint your team uses.
 
-## What runs today
+## Current scanner, as described by the owner
 
 The current Python scanner sends up to **three alerts per day, per application, per cluster**. The cap bounds agent investigations and downstream issue volume. In the demo, Whisky has one unavailable replica. Step through the Gateway receipt, the agent’s read-only investigation in the worker cluster, and the destination of your choice.
 

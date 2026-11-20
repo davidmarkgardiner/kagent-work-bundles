@@ -8,8 +8,6 @@ spec:
     kind: ExternalDnsSentinel
     spec:
       targetName: string | required=true
-      scannerImage: string | required=true
-      schedule: string | default="*/5 * * * *"
       suspended: boolean | default=true
   resources:
   - id: scannerAccount
@@ -61,7 +59,8 @@ spec:
         annotations:
           sentinel.kro.run/reader-binding: ${readerBinding.metadata.name}
       spec:
-        schedule: ${schema.spec.schedule}
+        schedule: "*/5 * * * *"
+        timeZone: Etc/UTC
         suspend: ${schema.spec.suspended}
         concurrencyPolicy: Forbid
         startingDeadlineSeconds: 120
@@ -70,7 +69,7 @@ spec:
         jobTemplate:
           spec:
             backoffLimit: 0
-            activeDeadlineSeconds: 45
+            activeDeadlineSeconds: 120
             template:
               spec:
                 serviceAccountName: ${scannerAccount.metadata.name}
@@ -81,9 +80,13 @@ spec:
                   runAsUser: 65532
                   seccompProfile:
                     type: RuntimeDefault
+                volumes:
+                - name: scratch
+                  emptyDir:
+                    sizeLimit: 1Mi
                 containers:
                 - name: scanner
-                  image: ${schema.spec.scannerImage}
+                  image: "{{APPROVED_KUBECTL_IMAGE_DIGEST}}"
                   command:
                   - /bin/sh
                   - -c
@@ -111,20 +114,33 @@ spec:
                     current-context: scanner
                     CONFIG
                     }
-                    if result=$(kubeconfig | kubectl --kubeconfig=/dev/stdin --request-timeout=10s -n "$POD_NAMESPACE" get -o 'jsonpath={.metadata.generation}|{.status.observedGeneration}|{.spec.replicas}|{.status.updatedReplicas}|{.status.availableReplicas}' -- deployment "$TARGET_NAME" 2>/dev/null); then
+                    errors=$(mktemp /tmp/sentinel-query.XXXXXX)
+                    trap 'rm -f "$errors"' EXIT
+                    if result=$(kubeconfig | kubectl --kubeconfig=/dev/stdin --request-timeout=10s -n "$POD_NAMESPACE" get -o 'jsonpath={.metadata.generation}|{.status.observedGeneration}|{.spec.replicas}|{.status.updatedReplicas}|{.status.availableReplicas}' -- deployment "$TARGET_NAME" 2>"$errors"); then
                       IFS='|' read -r generation observed desired updated available <<EOF
                     $result
                     EOF
                       if [ -n "$generation" ] && [ "$generation" = "$observed" ] &&
                          [ -n "$desired" ] && [ "$desired" != 0 ] && [ "$desired" = "$updated" ] && [ "$desired" = "$available" ]; then
                         state=healthy
+                        reason=rollout_available
                       else
                         state=unhealthy
+                        reason=rollout_unavailable
                       fi
                     else
                       state=unknown
+                      case "$(cat "$errors")" in
+                        *'(Forbidden)'*) reason=forbidden ;;
+                        *'(NotFound)'*) reason=not_found ;;
+                        *'context deadline exceeded'*|*'i/o timeout'*) reason=timeout ;;
+                        *) reason=query_failed ;;
+                      esac
                     fi
-                    printf '{"profile":"external-dns","state":"%s"}\n' "$state"
+                    printf '{"profile":"external-dns","state":"%s","reason":"%s"}\n' "$state" "$reason"
+                  volumeMounts:
+                  - name: scratch
+                    mountPath: /tmp
                   env:
                   - name: TARGET_NAME
                     value: ${schema.spec.targetName}

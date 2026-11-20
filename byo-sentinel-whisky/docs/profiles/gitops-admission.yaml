@@ -1,0 +1,28 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: sentinel-gitops-writes
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups: [kro.run]
+      apiVersions: [v1alpha1]
+      operations: [CREATE, UPDATE]
+      resources: [externaldnssentinels, externalsecretssentinels]
+      scope: Namespaced
+  validations:
+  - expression: "request.userInfo.username == 'system:serviceaccount:{{GITOPS_NAMESPACE}}:{{GITOPS_SERVICE_ACCOUNT}}'"
+    message: Sentinel instance writes require the approved GitOps service account.
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: sentinel-gitops-writes
+spec:
+  policyName: sentinel-gitops-writes
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        sentinel.kro.run/gitops-managed: "true"

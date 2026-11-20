@@ -29,3 +29,9 @@ ExternalDNS read a namespaced Whisky Service and logged creation of its A record
 External Secrets Operator reconciled two actual ExternalSecrets. A valid key produced `SecretSynced` and the expected dummy value in its target Secret. An absent key produced `SecretSyncedError`. KRO-generated Jobs returned `healthy` and `unhealthy` respectively. Fixing the reference produced a Secret, then the next one-shot Job returned `healthy` for the recovered resource. No ExternalSecret status was manually set in this follow-up.
 
 The local provider setup uses [ExternalDNS in-memory reconciliation](https://kubernetes-sigs.github.io/external-dns/latest/docs/contributing/sources-and-providers/) and the [External Secrets fake provider](https://external-secrets.io/latest/provider/fake/). Cloud provider credentials, authoritative DNS, central agent reporting and GitLab were outside the run.
+
+## Review fixes verified in Kind
+
+The updated definitions moved the scanner image and five-minute UTC schedule to the platform-owned RGD. After rendering the lab image, both revised CronJobs stayed suspended and one-shot Jobs against the installed controllers returned `rollout_available` and `secret_ready`. The generated instance CRDs had no image or schedule input.
+
+In a dedicated labelled namespace, two test service accounts had identical RBAC for creating ExternalDNS Sentinel instances. Server dry-run allowed the approved GitOps identity and denied the ordinary caller through the admission policy. This verifies the example policy in the lab. Workplace bindings and effective controller permissions still require review.

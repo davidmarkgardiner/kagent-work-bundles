@@ -5,5 +5,4 @@ metadata:
   namespace: '{{TARGET_NAMESPACE}}'
 spec:
   targetName: '{{TARGET_NAME}}'
-  scannerImage: '{{APPROVED_KUBECTL_IMAGE_DIGEST}}'
   suspended: true

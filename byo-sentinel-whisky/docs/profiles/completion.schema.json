@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Sentinel completion v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "registrationUid", "clusterId", "namespace", "scanner", "imageDigest", "scheduledAt", "jobUid", "state", "reason", "suppressedAlerts"],
+  "properties": {
+    "version": { "const": "v1" },
+    "registrationUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "clusterId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "namespace": { "type": "string", "minLength": 1, "maxLength": 63 },
+    "scanner": { "enum": ["generic", "cert-manager", "external-dns", "external-secrets"] },
+    "imageDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "scheduledAt": { "type": "string", "format": "date-time", "pattern": "Z$" },
+    "jobUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "state": { "enum": ["healthy", "unhealthy", "unknown"] },
+    "reason": { "enum": ["rollout_available", "rollout_unavailable", "secret_ready", "secret_not_ready", "ready_condition_unknown", "forbidden", "not_found", "timeout", "query_failed", "generic_result", "certificate_result"] },
+    "suppressedAlerts": { "type": "integer", "minimum": 0 }
+  }
+}
