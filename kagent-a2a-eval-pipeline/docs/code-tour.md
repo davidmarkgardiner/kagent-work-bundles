@@ -17,6 +17,20 @@ Two more views. `demo/show.sh map` prints which folder does what, for the start 
 - `evidence/`: what was actually run in the lab, with results and known limits
 - `docs/, presentation/`: the docs site, walkthrough, launch deck and flow pages
 
+## `lights`
+
+Run `demo/show.sh lights` (or `demo/show.sh lights --step 1`).
+
+1. **Say:** No agent runs here. This is plain kubectl and one probe per model route: which agents are ready, which model each uses, the gateway's answer and how many Guard blocks exist.
+   `demo/run-demo.sh`, from `lights() {`
+2. **Say:** The probe sends one token and classifies the answer in code: 429 is rate_limited, 5xx server_error, 401 or 403 auth, no answer timeout. The fix-it step later trusts this, not a model.
+   `guard/model_probe.py`, from `def probe`
+
+After the scene, `demo/show.sh lights --live` shows what it wrote:
+
+- `$RUN/probe-primary.json`: The probe of the stub route: rate_limited, HTTP 429. That is the starting state the broken scene fixes.
+- `$RUN/probe-fallback.json`: The probe of the real model: ok, HTTP 200.
+
 ## `assay`
 
 Run `demo/show.sh assay` (or `demo/show.sh assay --step 1`).
@@ -115,6 +129,15 @@ After the scene, `demo/show.sh broken --live` shows what it wrote:
 - `$RUN/probe-fallback.json`: The probe of the approved fallback: it must be healthy before anything is switched.
 - `$RUN/tickets/remediation-demo-worker.md`: The ticket the fix-it step wrote for a person: what it switched and how to undo it.
 - `$RUN/remediation.jsonl`: The remediation ledger: the switch, with a time.
+
+## `reset`
+
+Run `demo/show.sh reset` (or `demo/show.sh reset --step 1`).
+
+1. **Say:** Undo only what was recorded: the revert refuses unless the agent carries Guard's note that it was switched away from the approved primary.
+   `guard/remediate.py`, from `def cmd_revert`
+2. **Say:** The demo's reset: revert the model switch, clear the cooldown by hand, release every Guard-labelled block, delete the run's Guard files.
+   `demo/run-demo.sh`, from `reset() {`
 
 ## `lookout`
 

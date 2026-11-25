@@ -62,6 +62,8 @@ The three demo agents:
 
 ## Point at the code as you go
 
+Keep the one-page **Presenter card** (`docs/presenter-card.md`, or `demo/show.sh --card`) beside the terminal: for each scene, the command, what you should see, the sentence to say and what to point at.
+
 Start with `demo/show.sh map`: one screen saying which folder does what. Each scene then ends with two lines:
 
 - **SHOW THE CODE**: `demo/show.sh <scene>` prints the YAML or Python behind that scene, taken from the real files, each excerpt with the one line to say ("this is what the test is doing", "this is how that works"). `--step N` shows one excerpt, `--pause` waits for Enter between them, and `--list` shows them all.

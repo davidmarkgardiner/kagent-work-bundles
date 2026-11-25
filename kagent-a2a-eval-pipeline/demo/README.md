@@ -9,5 +9,6 @@ cp demo.env.example demo.env      # fill it: explicit context, URLs, caller iden
 ./show.sh <scene>                 # the YAML or Python behind a scene, with the line to say (--list, --step N, --pause)
 ./show.sh <scene> --live          # what that scene just wrote under $RUN (finding, policy, ledger, note, run record)
 ./show.sh map                     # one screen: which folder does what
+./show.sh --card                  # one-page presenter card: run, see, say, point at (docs/presenter-card.md)
 LOOKOUT_HARNESS=<harness> LOOKOUT_MODEL_CONFIG=<model-config> ./run-demo.sh lookout   # optional: a merge-request security review (mock GitLab), not part of `all`
 ```

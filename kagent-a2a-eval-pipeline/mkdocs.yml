@@ -23,6 +23,7 @@ nav:
   - "Live demo: healthy, rogue, broken": demo.md
   - "Demo walkthrough sheet": walkthrough.md
   - "Code tour: what to point at": code-tour.md
+  - "Presenter card": presenter-card.md
   - "Monitoring loop design": alert-loop.md
 markdown_extensions:
   - tables

@@ -23,7 +23,8 @@ bad() { printf '\033[1;31m%s\033[0m\n' "$*"; }
 what() { printf '  \033[0;36mWHAT IS HAPPENING:\033[0m %s\n' "$*"; }   # before a scene: what it does
 look() { printf '  \033[0;36mLOOK FOR:\033[0m %s\n' "$*"; }            # before a scene: what to watch
 proves() { printf '  \033[0;36mPROVES:\033[0m %s\n' "$*"; }              # before a scene: the claim, with its positive and negative test
-tour() { printf '  \033[0;36mSHOW THE CODE:\033[0m demo/show.sh %s   (the YAML or Python behind this scene; --pause steps through it)\n  \033[0;36mSHOW THE OUTPUT:\033[0m demo/show.sh %s --live   (what this scene just wrote under $RUN)\n' "$1" "$1"; }   # after a scene: where to point
+tour() { printf '  \033[0;36mSHOW THE CODE:\033[0m demo/show.sh %s   (the YAML or Python behind this scene; --pause steps through it)\n' "$1"
+  [[ "$1" == reset ]] || printf '  \033[0;36mSHOW THE OUTPUT:\033[0m demo/show.sh %s --live   (what this scene just wrote under $RUN)\n' "$1"; }   # after a scene: where to point
 means() { printf '  \033[0;36mWHAT THIS MEANS:\033[0m %s\n' "$*"; }    # after a scene: why it matters
 gw_call() { local t; t=$(k -n "$GW_CALLER_NS" create token "$GW_CALLER_SA" --audience "$GW_AUDIENCE" --duration 10m)
   curl -s -o /dev/null -w '%{http_code}' -X POST -H "Authorization: Bearer $t" -H 'content-type: application/json' "$GW_URL" -d '{}'; }
@@ -110,7 +111,7 @@ lights() {
   printf '  route %-22s %s\n' "$FALLBACK_MODEL" "$(python3 -c 'import json,sys;d=json.load(open(sys.argv[1]));print(d["kind"],d["http"])' "$RUN/probe-fallback.json")"
   printf '  gateway route as the caller: HTTP %s\n' "$(gw_call)"
   printf '  guard blocks active: %s\n' "$(k -n "$POLICY_NS" get agentgatewaypolicies.agentgateway.dev -l app.kubernetes.io/managed-by=guard-proposal --no-headers 2>/dev/null | wc -l | tr -d ' ')"
-  means "Three agents ready. demo-worker is set up to fail (its model route is a stub that always answers 429); the broken scene fixes it. 'rate_limited 429' on the stub is expected, not a fault in the demo."; }
+  means "Three agents ready. demo-worker is set up to fail (its model route is a stub that always answers 429); the broken scene fixes it. 'rate_limited 429' on the stub is expected, not a fault in the demo."; tour lights; }
 
 healthy() {
   scene "HEALTHY: a well-behaved agent (positive baseline)"
@@ -180,7 +181,7 @@ reset() {
   k -n "$NS" annotate agent demo-worker guard.kagent.dev/remediated-at- >/dev/null 2>&1 || true   # a person clears the cooldown, by hand
   for p in $(k -n "$POLICY_NS" get agentgatewaypolicies.agentgateway.dev -l app.kubernetes.io/managed-by=guard-proposal -o name | cut -d/ -f2); do
     python3 "$B/guard/enforce.py" release --context "$CTX" --namespace "$POLICY_NS" --name "$p" --ledger "$RUN/ledger.jsonl" >/dev/null; done
-  rm -f "$RUN/ledger.jsonl" "$RUN/remediation.jsonl"; rm -rf "$RUN/proposals" "$RUN/tickets" "$RUN"/propose-state* "$RUN/gw.txt"; printf "  \033[1;32mreset done\033[0m\n"; }
+  rm -f "$RUN/ledger.jsonl" "$RUN/remediation.jsonl"; rm -rf "$RUN/proposals" "$RUN/tickets" "$RUN"/propose-state* "$RUN/gw.txt"; printf "  \033[1;32mreset done\033[0m\n"; tour reset; }
 
 lookout() {  # optional scene: not part of `all`
   scene "LOOKOUT: an agent reviews a merge request and leaves one note (optional, mock GitLab)"

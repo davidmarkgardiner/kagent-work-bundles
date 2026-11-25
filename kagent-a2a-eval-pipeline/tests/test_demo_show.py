@@ -120,5 +120,28 @@ class LiveAndMap(unittest.TestCase):
         self.assertIn("--live", out.stdout)
 
 
+class PresenterCard(unittest.TestCase):
+    def test_card_covers_every_scene_in_demo_order(self):
+        runner = (ROOT / "demo" / "run-demo.sh").read_text()
+        order = re.search(r"all\) forward; (.*?)\n", runner).group(1).replace("printf", "").split("; ")
+        order = [x.strip() for x in order if x.strip() and x.strip() != "lights"]
+        scenes = [c[0] for c in show.CARD]
+        self.assertEqual(set(scenes), set(show.TOUR))
+        self.assertEqual([x for x in scenes if x not in ("lights", "lookout")], order)   # same order as `all`
+        self.assertEqual(scenes[0], "lights")
+        self.assertEqual(scenes[-1], "lookout")                                   # optional scene last
+
+    def test_card_page_is_generated(self):
+        self.assertEqual((ROOT / "docs" / "presenter-card.md").read_text(), show.card())
+
+    def test_card_points_at_live_only_where_there_is_output(self):
+        text = show.card()
+        self.assertNotIn("show.sh reset --live", text)
+        self.assertIn("show.sh rogue --live", text)
+        for _, _, expect, sentence in show.CARD:
+            self.assertGreater(len(expect), 30)
+            self.assertGreater(len(sentence), 30)
+
+
 if __name__ == "__main__":
     unittest.main()

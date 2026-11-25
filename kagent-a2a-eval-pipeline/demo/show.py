@@ -6,6 +6,7 @@
   demo/show.sh lookout --step 3       # just excerpt 3
   demo/show.sh lookout --pause        # wait for Enter between excerpts (you control the pace)
   demo/show.sh lookout --live         # what the scene just WROTE under $RUN (finding, policy, ledger, note, run record)
+  demo/show.sh --card                 # the one-page presenter card (docs/presenter-card.md is generated from it)
   demo/show.sh map                    # one screen: which folder does what (before the first scene)
   demo/show.sh --markdown            # the same table as a document (docs/code-tour.md is generated from it)
 
@@ -25,6 +26,12 @@ ROOT = Path(__file__).resolve().parent.parent
 
 # scene -> [(say, file, start_pattern or None for the whole file, lines before the match, number of lines)]
 TOUR: dict[str, list[tuple[str, str, str | None, int, int]]] = {
+    "lights": [
+        ("No agent runs here. This is plain kubectl and one probe per model route: which agents are ready, which model each uses, the gateway's answer and how many Guard blocks exist.",
+         "demo/run-demo.sh", r"^lights\(\) \{", 0, 17),
+        ("The probe sends one token and classifies the answer in code: 429 is rate_limited, 5xx server_error, 401 or 403 auth, no answer timeout. The fix-it step later trusts this, not a model.",
+         "guard/model_probe.py", r"^def probe", 0, 27),
+    ],
     "assay": [
         ("This is the test. One case file: the question the agent is asked, the terms a good answer must contain, the tools it must and must not call, and a budget.",
          "demo/cases/demo-healthy-lists-pods.yaml", None, 0, 0),
@@ -75,6 +82,12 @@ TOUR: dict[str, list[tuple[str, str, str | None, int, int]]] = {
         ("The fix-it step is plain code, not an agent: kill switch, never-touch list, the agent must be listed, the failure must be a kind a fallback can fix, and the fallback must probe healthy.",
          "guard/remediate.py", r"^def cmd_apply", 0, 26),
     ],
+    "reset": [
+        ("Undo only what was recorded: the revert refuses unless the agent carries Guard's note that it was switched away from the approved primary.",
+         "guard/remediate.py", r"^def cmd_revert", 0, 22),
+        ("The demo's reset: revert the model switch, clear the cooldown by hand, release every Guard-labelled block, delete the run's Guard files.",
+         "demo/run-demo.sh", r"^reset\(\) \{", 0, 7),
+    ],
     "lookout": [
         ("These seven tools are everything the review agent can call. There is no approve, merge, push or delete tool, and no tool to write code.",
          "lookout/manifests/mr-security-review-agent.yaml", r"^    tools:", 0, 12),
@@ -98,6 +111,12 @@ TOUR: dict[str, list[tuple[str, str, str | None, int, int]]] = {
 # --live: what the scene just WROTE under $RUN. scene -> [(say, path under $RUN (a glob is allowed), kind, max lines)]
 # kind: text (the first lines), json (pretty-printed; json:a,b keeps only those fields), jsonl (the last lines). A missing file is reported, never faked.
 LIVE: dict[str, list[tuple[str, str, str, int]]] = {
+    "lights": [
+        ("The probe of the stub route: rate_limited, HTTP 429. That is the starting state the broken scene fixes.",
+         "probe-primary.json", "json", 15),
+        ("The probe of the real model: ok, HTTP 200.",
+         "probe-fallback.json", "json", 15),
+    ],
     "assay": [
         ("The scorecard Assay just wrote from the real runs: one verdict per agent and the first problem it found.",
          "assay/report/summary.md", "text", 30),
@@ -162,6 +181,28 @@ MAP: list[tuple[str, str]] = [
     ("tests/", "unit tests for all of the above (run by verify-bundle.sh)"),
     ("evidence/", "what was actually run in the lab, with results and known limits"),
     ("docs/, presentation/", "the docs site, walkthrough, launch deck and flow pages"),
+]
+
+# card: one page for the presenter, in demo order. (scene, about how long, what you should see, the one sentence to say)
+CARD: list[tuple[str, str, str, str]] = [
+    ("lights", "instant", "three agents ready; demo-worker on demo-stub-429; stub route rate_limited 429, real model ok 200; gateway 200; guard blocks active: 0",
+     "This is the starting state. One agent is set up to fail on purpose; we fix it later."),
+    ("assay", "about 3 min", "demo-healthy pass, demo-rogue fail with 'forbidden tool used: k8s_delete_resource', gate exit code 1",
+     "No agent merges without passing its test, and the test checks the tools it really called, not just its answer."),
+    ("warden", "instant", "good run and overseer: PASS route=ticket; extra tool and too many calls: FAIL route=reject; evaluator said FAIL: route=evaluation_failed_ticket",
+     "The agent never decides whether its own work is good enough; a contract and plain code do."),
+    ("healthy", "about 1 min", "the agent lists pods, then 'clean: nothing flagged, nothing blocked'",
+     "A normal run raises no alarm. Guard is quiet when nothing is wrong."),
+    ("rogue", "about 2 min", "finding forbidden_tool [k8s_delete_resource]; gateway BEFORE 200, then BLOCKED 403; a ticket for a person",
+     "The agent used a tool it should not have. Guard blocked that one caller on that one route, and wrote a ticket."),
+    ("release", "under 1 min", "Gateway timeline: BEFORE 200 -> BLOCKED 403 -> RELEASED 200",
+     "Blocks never lift themselves. A person read the ticket and released it."),
+    ("broken", "about 3 min", "stub 429, fallback 200; demo-worker switched from demo-stub-429 to the approved fallback; a ticket",
+     "Its model was out of quota. Code switched it to a fallback a person had approved in advance, after checking that fallback works."),
+    ("reset", "instant", "'reset done'; run lights again and it shows the starting state",
+     "Everything the demo changed is put back, through the same audited paths."),
+    ("lookout", "about 4 min (optional)", "four checks: the note names the planted flaws; the retry is up_to_date; after a push the note lists every finding; the injection run calls no forbidden tool",
+     "The agent reviews a merge request and leaves one advisory note. It has no tool that can approve or merge."),
 ]
 
 START_HINT = {None: "the whole file"}
@@ -261,6 +302,18 @@ def show_map(plain: bool) -> int:
     return 0
 
 
+def card() -> str:
+    out = ["# Presenter card", "",
+           "One page to keep beside the terminal. Generated from `demo/show.py` (`demo/show.sh --card`); a test keeps it in step with the code tour.", "",
+           "Before the first scene: `demo/show.sh map` (which folder does what).", ""]
+    for n, (scene, how_long, expect, sentence) in enumerate(CARD, 1):
+        views = f"`demo/show.sh {scene}`" + (f", then `demo/show.sh {scene} --live`" if scene in LIVE else "")
+        out += [f"## {n}. `demo/run-demo.sh {scene}` ({how_long})", "",
+                f"- **See:** {expect}", f"- **Say:** {sentence}", f"- **Point at:** {views}", ""]
+    out += ["If a result is not what this card says, stop and read it; do not re-run in a loop. `reset` removes the Guard files, so show `--live` before you reset."]
+    return "\n".join(out) + "\n"
+
+
 def markdown() -> str:
     out = ["# Code tour: what to point at during the demo", "",
            "While you run a scene, show the YAML or Python behind it. `demo/show.sh <scene>` prints each excerpt from the real file, with the line to say, and `--step N`, `--pause` and `--list` help you pace it. This page is generated from `demo/show.py` (`demo/show.sh --markdown`), and a test keeps the two in step, so every excerpt below exists.",
@@ -287,6 +340,7 @@ def main() -> int:
     ap.add_argument("scene", nargs="?", choices=sorted(set(TOUR) | {"map"}))
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--markdown", action="store_true")
+    ap.add_argument("--card", action="store_true", help="the one-page presenter card (docs/presenter-card.md)")
     ap.add_argument("--step", type=int)
     ap.add_argument("--pause", action="store_true")
     ap.add_argument("--live", action="store_true", help="show what the scene just wrote under $RUN instead of the code")
@@ -295,6 +349,8 @@ def main() -> int:
     args = ap.parse_args()
     if args.markdown:
         sys.stdout.write(markdown()); return 0
+    if args.card:
+        sys.stdout.write(card()); return 0
     if args.scene == "map":
         return show_map(args.plain)
     if args.live:
