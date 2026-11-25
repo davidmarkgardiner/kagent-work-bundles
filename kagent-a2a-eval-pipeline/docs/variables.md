@@ -14,6 +14,9 @@
 | `policyNamespace`, route name, JWT subject | the Guard's block proposals | from gateway config, via the identity map only |
 | GitLab project, labels | `sentinel`, `guard`, `agent-health` | the owner-approved ones |
 | budgets | `guard/rules.yaml`, `guard/loop-limits.yaml`, each case's `maxTokens` and `maxToolCalls` | set from observed baselines |
+| `{{GITLAB_URL}}`, `{{LOOKOUT_ALLOWED_PROJECTS}}` | Lookout: the GitLab base URL and the projects its review tool may touch (exact paths or `group/*`; empty refuses everything) | `https://<host>` and the sandbox project first |
+| `{{PLATFORM_PROJECT}}`, `{{RUNNER_IMAGE}}` | Lookout CI template: the project that holds it, and the runner image that contains `lookout_review.py` and `a2a_capture.py` | internal |
+| `LOOKOUT_MAX_TOOL_CALLS` | Lookout: warn above this many tool calls in one review (default 20) | set from observed reviews |
 
 ## Stays the same (pinned, do not change without re-testing)
 
@@ -26,3 +29,5 @@
 | `delivery.owner: downstream` | A worker never writes the ticket |
 | Direct blocking only for definite offences (`autoApply.signals`), with a re-validated single-subject Deny, caps, kill switch, ledger and a human `release`; never-block list; fail-closed spend state | Safety rules enforced in code |
 | Scoring weights and hard gates (`docs/scoring.md`) | The scorer is the repo's own and is reused unchanged |
+| Lookout's tool server code: GET calls plus note create and update only; no approve, merge, push or delete | The agent's safety limit lives in this code, and a test fails if it changes |
+| Lookout's agent tool list (seven tools, no `lookout_get_delta_diff`) and its prompt, identical in both kagent manifests | Incremental review is off until findings are structured; a test pins both |

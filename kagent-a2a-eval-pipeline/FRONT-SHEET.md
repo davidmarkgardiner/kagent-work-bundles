@@ -12,6 +12,8 @@ whisky app falls over → Sentinel alerts → agent investigates (read-only)
 The agents here **diagnose and report; they do not fix**. Remediation stays with a human or a
 separately approved agent. Warden checks the investigation, not a repair.
 
+**Lookout** is a separate, newer piece in the same bundle: it gives merge requests a first, advisory security review and leaves one note for the human reviewer. It does not change Assay or Warden. See `lookout/README.md`.
+
 ## What is in this folder
 
 | Need | File |
@@ -22,12 +24,13 @@ separately approved agent. Warden checks the investigation, not a repair.
 | Air-gap image inventory and pinned versions | [PREREQUISITES-AIRGAP.md](PREREQUISITES-AIRGAP.md) |
 | What changes at work and what stays pinned | [VARIABLES.md](VARIABLES.md) |
 | Explainer (open in a browser) | [EVALUATION-EXPLAINED.html](EVALUATION-EXPLAINED.html) |
-| Presentation | [presentation/assay-warden-deck.pdf](presentation/assay-warden-deck.pdf) (source: `.html`) |
+| Presentation | [presentation/assay-warden-deck.pdf](presentation/assay-warden-deck.pdf) (Assay and Warden, source: `.html`); the full launch deck with Lookout: [presentation/launch-deck.pdf](presentation/launch-deck.pdf) (24 slides, source: `launch-deck.html`) |
 | Handbook pages | `mkdocs.yml` + `docs/`; build with `requirements-docs.txt` |
 | Assay code and CI | `a2a_capture.py`, `score_and_gate.py`, `judge.py`, `.gitlab-ci.yml`, `cases/`, `fixtures/`, `gateway/` |
 | Warden code and contracts | `verify_completion.py`, `completion-gate/` |
 | Evidence | `evidence/LIVE-PROXMOX-2026-11-23.md`, `tests/fixtures/` (sanitized live receipts) |
 | Guard (rogue-agent detector, block proposals, overseer intake) | `guard/`, `docs/alert-loop.md`, `evidence/GUARD-AND-LOOP-2026-11-24.md` |
+| Lookout (merge-request security review) | [lookout/README.md](lookout/README.md), `lookout/`, `lookout/DESIGN.md`, `docs/lookout.md`, `evidence/LIVE-LOOKOUT-LAB-2026-11-25.md`, `presentation/lookout-flow.html` (open in a browser), `presentation/launch-deck.html` |
 | Independent review: claims, gaps, where to push | [REVIEW-HANDOVER.md](REVIEW-HANDOVER.md) |
 | Check the bundle is intact | `./verify-bundle.sh` |
 
@@ -35,7 +38,7 @@ separately approved agent. Warden checks the investigation, not a repair.
 
 | Claim | Status | Receipt |
 |---|---|---|
-| 224 offline tests, case lint, generated evaluator is current | PASS | `./verify-bundle.sh` |
+| 354 offline tests, case lint, generated evaluator is current | PASS | `./verify-bundle.sh` |
 | Assay: smoke and full pass^3 through the gateway on kagent 0.7.13 | PASS (1.0 each) | evidence file, stage 1 sections |
 | Warden on kagent 0.7.13 (evaluator as a `type: Agent` tool) | 1 live PASS | evidence file, stage 2 section |
 | Warden on kagent 1.0.0-alpha17 (evaluator as a `subAgent`), A2A 1.0 | 2 of 3 PASS; the third was a correct block | evidence file, 1.x section |
@@ -56,6 +59,12 @@ separately approved agent. Warden checks the investigation, not a repair.
 | Spend and retry guards for the loop (attempt cap, 400 hold, 429 backoff, breaker, token budget, kill switch) | PASS offline, 25 tests incl. a replay of a real failed run; not driven by a live scheduler | `guard/circuit.py` |
 | Alert delivery (Alertmanager to agent), Tempo span-metric alerts | **NOT RUN** | |
 | kagent 1.0.1 (the lab profile version) | **NOT RUN**; verified on alpha17 only | |
+| Lookout: review note on a merge request: first review, same-commit retry (`up_to_date`), push, and an injection merge request (`demo/run-demo.sh lookout`) | PASSED live in the lab, 25 Nov 2026, against a **mock** GitLab on kagent 1.0.0-alpha17: 4 of 4 checks | `evidence/LIVE-LOOKOUT-LAB-2026-11-25.md` |
+| Lookout against a real GitLab | PASSED once on a gitlab.com sandbox merge request: note posted, then updated in place; cleaned up afterwards | same |
+| Lookout incremental (delta-only) review | **SWITCHED OFF**: in a lab run it dropped two earlier findings from the note; the agent has no delta tool | same |
+| Lookout on very large merge requests | Partial by design: about 1,500 lines fit; the note says PARTIAL; a 10,500-line merge request was reviewed as 30 of 150 files | same |
+| Lookout from a real CI runner, through the agentgateway route, on kagent 0.7.x, on a work GitLab, or with a least-privilege token | **NOT RUN** | |
+| Lookout independent code review | **NOT DONE** (the reviewer was unavailable) | |
 
 A gate with no receipt is NOT RUN, never PASS.
 

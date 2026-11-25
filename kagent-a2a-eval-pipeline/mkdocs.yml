@@ -18,6 +18,7 @@ nav:
   - kagent 0.7 and 1.x: kagent-versions.md
   - Evidence and limits: evidence.md
   - Guard and spend guards: guard.md
+  - Lookout (merge request review): lookout.md
   - Grafana alerting setup: grafana-alerting.md
   - "Live demo: healthy, rogue, broken": demo.md
   - "Demo walkthrough sheet": walkthrough.md

@@ -13,6 +13,7 @@ Visual explainer: [EVALUATION-EXPLAINED.html](EVALUATION-EXPLAINED.html).
 |---|---|---|
 | **Assay** | Tests an agent before it ships: a GitLab pipeline sends seeded-fault cases through the gateway and scores the result (pass^3) | this folder |
 | **Warden** | Signs off each run after it ships: an evaluator agent plus a deterministic check of the controller history gate delivery | `completion-gate/`, `verify_completion.py` |
+| **Lookout** | Reviews each merge request for security: a GitLab job sends a pointer over A2A, an agent reads the MR through a read-only GitLab MCP and leaves one advisory note | `lookout/` |
 
 **Handing this to a work agent?** Start at [FRONT-SHEET.md](FRONT-SHEET.md), complete [HUMAN-PREREQUISITES.md](HUMAN-PREREQUISITES.md), then give the work agent
 [WORK-AGENT-PROMPT.md](WORK-AGENT-PROMPT.md). `./verify-bundle.sh` checks the bundle offline. The agents here are read-only investigators: they diagnose and report, they do not fix.
@@ -50,7 +51,7 @@ over A2A and captured trajectories. This bundle fills that gap and nothing more.
 
 ```sh
 pip install -r requirements.txt
-python -m unittest discover -s tests -v        # offline, 224 tests
+python -m unittest discover -s tests -v        # offline, 354 tests
 python tests/lint_cases.py cases
 
 export AGW_BASE_URL=https://{{AGW_HOST}} AGW_TOKEN={{TOKEN}}
@@ -61,6 +62,12 @@ python score_and_gate.py --capture-dirs out/cap --repeat 3 --out out/report
 ```
 
 Exit codes: `0` pass, `1` quality failure, `3` errors/missing (inconclusive), `2` nothing scored.
+
+## Lookout: security review on every merge request
+
+A third feature in this bundle, separate from Assay and Warden and changing neither. A GitLab MR pipeline job (`lookout/ci/lookout.gitlab-ci.yml`) sends a pointer (project, MR iid, head sha) over A2A through agentgateway to the `mr-security-review` agent. The agent reads the MR through a eight-tool GitLab MCP and leaves one advisory note for the human reviewer. It never approves or merges, and the job never blocks the pipeline. Start at [`lookout/README.md`](lookout/README.md).
+
+Status (incremental review is switched off pending a fix; every new commit gets a full review): proven on a home-lab kagent 1.0.0-alpha17 with GLM against a mock GitLab (including a prompt-injection MR and a stale-SHA case that exposed and fixed a real overwrite bug) and once against a real gitlab.com sandbox MR (one note, updated in place on re-run). Not proven from a real CI runner, through agentgateway, on kagent 0.7.x, or with a least-privilege token. See [`evidence/LIVE-LOOKOUT-LAB-2026-11-25.md`](evidence/LIVE-LOOKOUT-LAB-2026-11-25.md).
 
 ## Two evaluation stages
 
@@ -103,4 +110,4 @@ Live findings now built in:
 
 ## Launch deck
 
-`presentation/launch-deck.html`: the five-product launch deck (Sentinel, Assay, Warden, Guard, Overseer) with the two live demos and the evidence. One self-contained file: open it in Chrome, no network needed. Arrow keys or space to move, N for speaker notes, F for full screen, Ctrl+P prints one slide per page.
+`presentation/launch-deck.pdf` is the same deck as a 24-page PDF. `presentation/launch-deck.html`: the five-product launch deck (Sentinel, Assay, Warden, Guard, Overseer) with the two live demos and the evidence. One self-contained file: open it in Chrome, no network needed. Arrow keys or space to move, N for speaker notes, F for full screen, Ctrl+P prints one slide per page.

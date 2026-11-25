@@ -1,6 +1,6 @@
 # Human prerequisites
 
-Phase 1 (Warden) needs rows 1 to 4 and 8; Phase 2 (Assay) adds rows 5 to 7 and 12. Grafana, telemetry and alert rows (8 and later) are Phase 0 checks and gate Phases 2 and 3; see `docs/rollout.md`.
+Phase 1 (Warden) needs rows 1 to 4 and 8; Phase 2 (Assay) adds rows 5 to 7 and 12. Grafana, telemetry and alert rows (8 and later) are Phase 0 checks and gate Phases 2 and 3; see `docs/rollout.md`. Phase 6 (Lookout) needs rows 2, 4 and 21 to 25.
 
 The work agent cannot create these. Complete the sheet before handing over
 [WORK-AGENT-PROMPT.md](WORK-AGENT-PROMPT.md). Use placeholders in anything you commit.
@@ -27,6 +27,11 @@ The work agent cannot create these. Complete the sheet before handing over
 | 18 | A JWT-authenticated test caller and a throwaway route | Phase 5 must prove a Deny really blocks traffic at work (proven in the lab on 25 Nov 2026: 200 → 403 → 200) | Platform |
 | 19 | The approved fallback ModelConfig per agent (`guard/fallbacks.yaml`) and who may run `remediate.py` (patch on the listed Agents only) | The overseer's fix-it step switches only between ModelConfigs a person approved | Agent owner / Platform |
 | 20 | Read access (get/list/watch on `agents` and `modelconfigs` in `api.kagent.dev`) for the tool server the overseer uses: `guard/manifests/overseer-crd-read-rbac.yaml` | Without it the overseer can read pods but not the agents and model routes it is asked about; it wanders and Warden rejects it (lab, 25 Nov 2026) | Platform / Security |
+| 21 | A **dedicated, least-privilege GitLab token** for Lookout's review tool server, created by a person into the Secret `lookout-gitlab-token` (never in git), and the list of projects it may touch (`LOOKOUT_ALLOWED_PROJECTS`, exact paths or `group/*`; empty refuses everything) | Posting a note needs a token that can write merge request notes, and as far as we know GitLab has no note-only scope, so the tool server's code is the real limit on what it can do. Do not reuse a personal token | Platform / Security |
+| 22 | A **sandbox GitLab project** and a throwaway merge request for the first runs | The first runs post real notes; close the merge request afterwards (a note stays visible on a closed merge request, and on a public project that means publicly) | DevEx |
+| 23 | A **model approved to read your source code**, a kagent ModelConfig for it, and (kagent 1.x) an approved Harness | The review sends merge request code to the model; whoever owns data classification must agree that this model may see it | Platform / Security |
+| 24 | Either a runner that can reach the agentgateway route, with CI variables `AGW_BASE_URL` and `AGW_TOKEN` and a runner image containing `lookout_review.py` and `a2a_capture.py`, or agreement to run `lookout/ci/run_local.py` instead | Hosted runners can only call the agent if the gateway is reachable from them, which means exposing an endpoint | Platform / DevEx |
+| 25 | Decisions: who reads the notes, how long Lookout stays advisory-only, how reviewers record acted-on or dismissed, who owns the prompt, and what happens above a size limit (for example, ask the author to split) | Noise is what makes people ignore a review bot; without a reader and a measure it will be ignored | Product owner / Engineering |
 
 ## Do not do
 

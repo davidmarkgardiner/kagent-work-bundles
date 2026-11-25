@@ -1,0 +1,39 @@
+# Dedicated agentgateway route for Lookout. DEPLOY ON: the cluster running kagent.
+#   https://{{AGW_HOST}}/a2a/kagent/mr-security-review/  ->  kagent-controller:8083/api/a2a/kagent/mr-security-review/
+# One rule, one agent: CI callers on this route can reach the review agent and nothing else.
+# Same shape as ../../gateway/route-a2a-eval.yaml; reuses its ReferenceGrant. kagent 1.x: see the 1.x note in ../README.md.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: a2a-lookout-route
+  namespace: agentgateway-system
+  labels: {app.kubernetes.io/part-of: lookout}
+spec:
+  parentRefs:
+    - name: ai-gateway          # OVERRIDE to your Gateway name
+      namespace: agentgateway-system
+  rules:
+    - matches:
+        - path: {type: PathPrefix, value: /a2a/kagent/mr-security-review/}
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path: {type: ReplacePrefixMatch, replacePrefixMatch: /api/a2a/kagent/mr-security-review/}
+      backendRefs:
+        - {name: kagent-controller, namespace: kagent, port: 8083}
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: a2a-lookout-policy
+  namespace: agentgateway-system
+  labels: {app.kubernetes.io/part-of: lookout}
+spec:
+  targetRefs:
+    - {group: gateway.networking.k8s.io, kind: HTTPRoute, name: a2a-lookout-route}
+  traffic:
+    rateLimit:
+      local:
+        - {requests: 1, unit: Seconds, burst: 5}
+    timeouts:
+      request: "300s"

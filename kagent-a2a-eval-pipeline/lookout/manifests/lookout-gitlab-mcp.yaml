@@ -1,0 +1,59 @@
+# Lookout GitLab review MCP: Deployment + Service + RemoteMCPServer.
+# The code is NOT inlined here. deploy.sh creates the ConfigMap from gitlab_review_mcp.py so there is one source of truth:
+#   kubectl -n kagent create configmap lookout-gitlab-mcp --from-file=server.py=../gitlab_review_mcp.py
+# Create the token Secret yourself (never commit it):
+#   read -rs T; kubectl -n kagent create secret generic lookout-gitlab-token --from-literal=token="$T"; unset T
+# Replace {{GITLAB_URL}} and {{LOOKOUT_ALLOWED_PROJECTS}} (comma list, e.g. group/project or group/*).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lookout-gitlab-mcp
+  namespace: kagent
+  labels: {app.kubernetes.io/name: lookout-gitlab-mcp, app.kubernetes.io/part-of: lookout}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app.kubernetes.io/name: lookout-gitlab-mcp}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: lookout-gitlab-mcp, app.kubernetes.io/part-of: lookout}
+    spec:
+      containers:
+        - name: mcp
+          image: python:3.12-alpine
+          command: ["python", "/app/server.py"]
+          ports: [{containerPort: 8080}]
+          env:
+            - {name: GITLAB_URL, value: "{{GITLAB_URL}}"}
+            - {name: LOOKOUT_ALLOWED_PROJECTS, value: "{{LOOKOUT_ALLOWED_PROJECTS}}"}
+            - name: GITLAB_TOKEN
+              valueFrom: {secretKeyRef: {name: lookout-gitlab-token, key: token}}
+          resources:
+            requests: {cpu: 10m, memory: 64Mi}
+            limits: {cpu: 250m, memory: 192Mi}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, runAsNonRoot: true, runAsUser: 65532, capabilities: {drop: [ALL]}}
+          volumeMounts: [{name: app, mountPath: /app, readOnly: true}]
+      volumes: [{name: app, configMap: {name: lookout-gitlab-mcp}}]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lookout-gitlab-mcp
+  namespace: kagent
+  labels: {app.kubernetes.io/name: lookout-gitlab-mcp, app.kubernetes.io/part-of: lookout}
+spec:
+  selector: {app.kubernetes.io/name: lookout-gitlab-mcp}
+  ports: [{name: http, port: 8080, targetPort: 8080}]
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: lookout-gitlab-mcp
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: lookout}
+spec:
+  description: "Lookout GitLab review tools: read an MR, its diff and files, and upsert one review note. No approve, merge or write-code tool exists."
+  protocol: STREAMABLE_HTTP
+  timeout: 120s
+  sseReadTimeout: 10m0s
+  url: http://lookout-gitlab-mcp.kagent.svc.cluster.local:8080/mcp

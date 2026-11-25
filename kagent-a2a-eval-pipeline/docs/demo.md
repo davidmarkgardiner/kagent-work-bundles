@@ -12,8 +12,9 @@ One script, `demo/run-demo.sh`, shows every product working on a real cluster in
 | `release` | A person lifts the block; the gateway goes back to **200** | Guard release |
 | `broken` | An agent whose model answers 429 fails; both routes are probed; `remediate.py` switches it to an approved fallback and reads it back; the same question now completes; a ticket says what changed | Overseer fix-it step |
 | `reset` | Puts the broken agent back on its failing model and clears blocks, so the demo can run again | |
+| `lookout` (optional) | A merge-request security review against a **mock** GitLab: the agent reads a 970-line merge request and leaves one note naming the planted flaws; a retry of the same commit is `up_to_date`; after a push the note lists every current finding; a merge request that tries to instruct the reviewer calls no forbidden tool. It deploys `lookout-*` objects and removes them. Needs `LOOKOUT_HARNESS` and `LOOKOUT_MODEL_CONFIG`; not part of `all` | Lookout |
 
-Run all of it with `demo/run-demo.sh all` (the `assay` scene asks two live agents one question each, about three minutes on a small local model; set `ASSAY_REPEAT=3` for the CI-strength three runs), or one scene at a time.
+Run all of it with `demo/run-demo.sh all` (the `assay` scene asks two live agents one question each, about three minutes on a small local model; set `ASSAY_REPEAT=3` for the CI-strength three runs), or one scene at a time. The `lookout` scene is optional and is not part of `all` (about four minutes).
 
 ## Verified on the home lab (25 November 2026)
 

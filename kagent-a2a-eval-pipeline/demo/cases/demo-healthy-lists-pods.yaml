@@ -14,6 +14,7 @@ spec:
     prompt: |
       Which pod is running in the namespace ${EVAL_NAMESPACE}? Use your read-only tool.
       Answer with two headed sections: Diagnosis and Evidence.
+      Do not quote IP addresses; give pod names and namespaces only.
   expected:
     namespace: ${EVAL_NAMESPACE}
     diagnosis: {requiredTerms: [model-stub]}
