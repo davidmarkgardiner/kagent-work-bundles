@@ -1,0 +1,1228 @@
+{
+ "schemas": {
+  "Agent": {
+   "properties": {
+    "apiVersion": {
+     "type": "string"
+    },
+    "kind": {
+     "type": "string"
+    },
+    "metadata": {
+     "type": "object"
+    },
+    "spec": {
+     "properties": {
+      "allowedNamespaces": {
+       "properties": {
+        "from": {
+         "default": "Same",
+         "enum": [
+          "All",
+          "Same",
+          "Selector"
+         ],
+         "type": "string"
+        },
+        "selector": {
+         "properties": {
+          "matchExpressions": {
+           "items": {
+            "properties": {
+             "key": {
+              "type": "string"
+             },
+             "operator": {
+              "type": "string"
+             },
+             "values": {
+              "items": {
+               "type": "string"
+              },
+              "type": "array",
+              "x-kubernetes-list-type": "atomic"
+             }
+            },
+            "required": [
+             "key",
+             "operator"
+            ],
+            "type": "object"
+           },
+           "type": "array",
+           "x-kubernetes-list-type": "atomic"
+          },
+          "matchLabels": {
+           "additionalProperties": {
+            "type": "string"
+           },
+           "type": "object"
+          }
+         },
+         "type": "object",
+         "x-kubernetes-map-type": "atomic"
+        }
+       },
+       "type": "object",
+       "x-kubernetes-validations": [
+        {
+         "message": "selector must be specified when from is Selector",
+         "rule": "!(self.from == 'Selector' && !has(self.selector))"
+        }
+       ]
+      },
+      "byo": {
+       "type": "object"
+      },
+      "declarative": {
+       "properties": {
+        "a2aConfig": {
+         "properties": {
+          "skills": {
+           "items": {
+            "properties": {
+             "description": {
+              "type": "string"
+             },
+             "examples": {
+              "items": {
+               "type": "string"
+              },
+              "maxItems": 20,
+              "type": "array"
+             },
+             "id": {
+              "type": "string"
+             },
+             "inputModes": {
+              "items": {
+               "type": "string"
+              },
+              "type": "array"
+             },
+             "name": {
+              "minLength": 1,
+              "type": "string"
+             },
+             "outputModes": {
+              "items": {
+               "type": "string"
+              },
+              "type": "array"
+             },
+             "tags": {
+              "items": {
+               "type": "string"
+              },
+              "maxItems": 20,
+              "type": "array"
+             }
+            },
+            "required": [
+             "name"
+            ],
+            "type": "object"
+           },
+           "minItems": 1,
+           "type": "array"
+          }
+         },
+         "type": "object"
+        },
+        "context": {
+         "properties": {
+          "compaction": {
+           "properties": {
+            "compactionInterval": {
+             "default": 5,
+             "minimum": 1,
+             "type": "integer"
+            },
+            "eventRetentionSize": {
+             "type": "integer"
+            },
+            "overlapSize": {
+             "default": 2,
+             "minimum": 0,
+             "type": "integer"
+            },
+            "summarizer": {
+             "properties": {
+              "modelConfig": {
+               "type": "string"
+              },
+              "promptTemplate": {
+               "type": "string"
+              }
+             },
+             "type": "object"
+            },
+            "tokenThreshold": {
+             "type": "integer"
+            }
+           },
+           "type": "object"
+          }
+         },
+         "type": "object"
+        },
+        "deployment": {
+         "type": "object"
+        },
+        "executeCodeBlocks": {
+         "type": "boolean"
+        },
+        "memory": {
+         "properties": {
+          "modelConfig": {
+           "type": "string"
+          },
+          "ttlDays": {
+           "minimum": 1,
+           "type": "integer"
+          }
+         },
+         "required": [
+          "modelConfig"
+         ],
+         "type": "object"
+        },
+        "modelConfig": {
+         "type": "string"
+        },
+        "promptTemplate": {
+         "properties": {
+          "dataSources": {
+           "items": {
+            "properties": {
+             "alias": {
+              "type": "string"
+             },
+             "apiGroup": {
+              "type": "string"
+             },
+             "kind": {
+              "type": "string"
+             },
+             "name": {
+              "type": "string"
+             }
+            },
+            "required": [
+             "name"
+            ],
+            "type": "object"
+           },
+           "maxItems": 20,
+           "type": "array"
+          }
+         },
+         "type": "object"
+        },
+        "runtime": {
+         "default": "python",
+         "enum": [
+          "python",
+          "go"
+         ],
+         "type": "string"
+        },
+        "stream": {
+         "type": "boolean"
+        },
+        "systemMessage": {
+         "type": "string"
+        },
+        "systemMessageFrom": {
+         "properties": {
+          "key": {
+           "maxLength": 253,
+           "type": "string"
+          },
+          "name": {
+           "maxLength": 253,
+           "type": "string"
+          },
+          "type": {
+           "enum": [
+            "ConfigMap",
+            "Secret"
+           ],
+           "type": "string"
+          }
+         },
+         "required": [
+          "key",
+          "name",
+          "type"
+         ],
+         "type": "object"
+        },
+        "tools": {
+         "items": {
+          "properties": {
+           "agent": {
+            "properties": {
+             "apiGroup": {
+              "type": "string"
+             },
+             "kind": {
+              "type": "string"
+             },
+             "name": {
+              "type": "string"
+             },
+             "namespace": {
+              "type": "string"
+             }
+            },
+            "required": [
+             "name"
+            ],
+            "type": "object"
+           },
+           "headersFrom": {
+            "items": {
+             "properties": {
+              "name": {
+               "type": "string"
+              },
+              "value": {
+               "type": "string"
+              },
+              "valueFrom": {
+               "properties": {
+                "key": {
+                 "maxLength": 253,
+                 "type": "string"
+                },
+                "name": {
+                 "maxLength": 253,
+                 "type": "string"
+                },
+                "type": {
+                 "enum": [
+                  "ConfigMap",
+                  "Secret"
+                 ],
+                 "type": "string"
+                }
+               },
+               "required": [
+                "key",
+                "name",
+                "type"
+               ],
+               "type": "object"
+              }
+             },
+             "required": [
+              "name"
+             ],
+             "type": "object",
+             "x-kubernetes-validations": [
+              {
+               "message": "Exactly one of value or valueFrom must be specified",
+               "rule": "(has(self.value) && !has(self.valueFrom)) || (!has(self.value) && has(self.valueFrom))"
+              }
+             ]
+            },
+            "type": "array"
+           },
+           "mcpServer": {
+            "properties": {
+             "allowedHeaders": {
+              "items": {
+               "type": "string"
+              },
+              "type": "array"
+             },
+             "apiGroup": {
+              "type": "string"
+             },
+             "kind": {
+              "type": "string"
+             },
+             "name": {
+              "type": "string"
+             },
+             "namespace": {
+              "type": "string"
+             },
+             "requireApproval": {
+              "items": {
+               "type": "string"
+              },
+              "maxItems": 50,
+              "type": "array"
+             },
+             "toolNames": {
+              "items": {
+               "type": "string"
+              },
+              "maxItems": 50,
+              "type": "array"
+             }
+            },
+            "required": [
+             "name"
+            ],
+            "type": "object",
+            "x-kubernetes-validations": [
+             {
+              "message": "each RequireApproval entry must also appear in ToolNames",
+              "rule": "!has(self.requireApproval) || self.requireApproval.all(x, has(self.toolNames) && x in self.toolNames)"
+             }
+            ]
+           },
+           "type": {
+            "enum": [
+             "McpServer",
+             "Agent"
+            ],
+            "type": "string"
+           }
+          },
+          "type": "object",
+          "x-kubernetes-validations": [
+           {
+            "message": "type.mcpServer must be nil if the type is not McpServer",
+            "rule": "!(has(self.mcpServer) && self.type != 'McpServer')"
+           },
+           {
+            "message": "type.mcpServer must be specified for McpServer filter.type",
+            "rule": "!(!has(self.mcpServer) && self.type == 'McpServer')"
+           },
+           {
+            "message": "type.agent must be nil if the type is not Agent",
+            "rule": "!(has(self.agent) && self.type != 'Agent')"
+           },
+           {
+            "message": "type.agent must be specified for Agent filter.type",
+            "rule": "!(!has(self.agent) && self.type == 'Agent')"
+           }
+          ]
+         },
+         "maxItems": 20,
+         "type": "array"
+        }
+       },
+       "type": "object",
+       "x-kubernetes-validations": [
+        {
+         "message": "systemMessage and systemMessageFrom are mutually exclusive",
+         "rule": "!has(self.systemMessage) || !has(self.systemMessageFrom)"
+        }
+       ]
+      },
+      "description": {
+       "type": "string"
+      },
+      "sandbox": {
+       "type": "object"
+      },
+      "skills": {
+       "properties": {
+        "gitAuthSecretRef": {
+         "properties": {
+          "name": {
+           "default": "",
+           "type": "string"
+          }
+         },
+         "type": "object",
+         "x-kubernetes-map-type": "atomic"
+        },
+        "gitRefs": {
+         "items": {
+          "properties": {
+           "name": {
+            "type": "string"
+           },
+           "path": {
+            "type": "string"
+           },
+           "ref": {
+            "default": "main",
+            "type": "string"
+           },
+           "url": {
+            "type": "string"
+           }
+          },
+          "required": [
+           "url"
+          ],
+          "type": "object"
+         },
+         "maxItems": 20,
+         "minItems": 1,
+         "type": "array"
+        },
+        "imagePullSecrets": {
+         "items": {
+          "properties": {
+           "name": {
+            "default": "",
+            "type": "string"
+           }
+          },
+          "type": "object",
+          "x-kubernetes-map-type": "atomic"
+         },
+         "maxItems": 20,
+         "type": "array"
+        },
+        "initContainer": {
+         "properties": {
+          "env": {
+           "items": {
+            "properties": {
+             "name": {
+              "type": "string"
+             },
+             "value": {
+              "type": "string"
+             },
+             "valueFrom": {
+              "properties": {
+               "configMapKeyRef": {
+                "properties": {
+                 "key": {
+                  "type": "string"
+                 },
+                 "name": {
+                  "default": "",
+                  "type": "string"
+                 },
+                 "optional": {
+                  "type": "boolean"
+                 }
+                },
+                "required": [
+                 "key"
+                ],
+                "type": "object",
+                "x-kubernetes-map-type": "atomic"
+               },
+               "fieldRef": {
+                "properties": {
+                 "apiVersion": {
+                  "type": "string"
+                 },
+                 "fieldPath": {
+                  "type": "string"
+                 }
+                },
+                "required": [
+                 "fieldPath"
+                ],
+                "type": "object",
+                "x-kubernetes-map-type": "atomic"
+               },
+               "fileKeyRef": {
+                "properties": {
+                 "key": {
+                  "type": "string"
+                 },
+                 "optional": {
+                  "default": false,
+                  "type": "boolean"
+                 },
+                 "path": {
+                  "type": "string"
+                 },
+                 "volumeName": {
+                  "type": "string"
+                 }
+                },
+                "required": [
+                 "key",
+                 "path",
+                 "volumeName"
+                ],
+                "type": "object",
+                "x-kubernetes-map-type": "atomic"
+               },
+               "resourceFieldRef": {
+                "properties": {
+                 "containerName": {
+                  "type": "string"
+                 },
+                 "divisor": {
+                  "anyOf": [
+                   {
+                    "type": "integer"
+                   },
+                   {
+                    "type": "string"
+                   }
+                  ],
+                  "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                  "x-kubernetes-int-or-string": true
+                 },
+                 "resource": {
+                  "type": "string"
+                 }
+                },
+                "required": [
+                 "resource"
+                ],
+                "type": "object",
+                "x-kubernetes-map-type": "atomic"
+               },
+               "secretKeyRef": {
+                "properties": {
+                 "key": {
+                  "type": "string"
+                 },
+                 "name": {
+                  "default": "",
+                  "type": "string"
+                 },
+                 "optional": {
+                  "type": "boolean"
+                 }
+                },
+                "required": [
+                 "key"
+                ],
+                "type": "object",
+                "x-kubernetes-map-type": "atomic"
+               }
+              },
+              "type": "object"
+             }
+            },
+            "required": [
+             "name"
+            ],
+            "type": "object"
+           },
+           "type": "array"
+          },
+          "resources": {
+           "properties": {
+            "claims": {
+             "items": {
+              "properties": {
+               "name": {
+                "type": "string"
+               },
+               "request": {
+                "type": "string"
+               }
+              },
+              "required": [
+               "name"
+              ],
+              "type": "object"
+             },
+             "type": "array",
+             "x-kubernetes-list-map-keys": [
+              "name"
+             ],
+             "x-kubernetes-list-type": "map"
+            },
+            "limits": {
+             "additionalProperties": {
+              "anyOf": [
+               {
+                "type": "integer"
+               },
+               {
+                "type": "string"
+               }
+              ],
+              "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+              "x-kubernetes-int-or-string": true
+             },
+             "type": "object"
+            },
+            "requests": {
+             "additionalProperties": {
+              "anyOf": [
+               {
+                "type": "integer"
+               },
+               {
+                "type": "string"
+               }
+              ],
+              "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+              "x-kubernetes-int-or-string": true
+             },
+             "type": "object"
+            }
+           },
+           "type": "object"
+          }
+         },
+         "type": "object"
+        },
+        "insecureSkipVerify": {
+         "type": "boolean"
+        },
+        "refs": {
+         "items": {
+          "type": "string"
+         },
+         "maxItems": 20,
+         "minItems": 1,
+         "type": "array"
+        }
+       },
+       "type": "object"
+      },
+      "type": {
+       "default": "Declarative",
+       "enum": [
+        "Declarative",
+        "BYO"
+       ],
+       "type": "string"
+      }
+     },
+     "type": "object",
+     "x-kubernetes-validations": [
+      {
+       "message": "type must be specified",
+       "rule": "has(self.type)"
+      },
+      {
+       "message": "type must be either Declarative or BYO",
+       "rule": "self.type == 'Declarative' || self.type == 'BYO'"
+      },
+      {
+       "message": "declarative must be specified if type is Declarative, or byo must be specified if type is BYO",
+       "rule": "(self.type == 'Declarative' && has(self.declarative)) || (self.type == 'BYO' && has(self.byo))"
+      }
+     ]
+    },
+    "status": {
+     "properties": {
+      "conditions": {
+       "items": {
+        "properties": {
+         "lastTransitionTime": {
+          "format": "date-time",
+          "type": "string"
+         },
+         "message": {
+          "maxLength": 32768,
+          "type": "string"
+         },
+         "observedGeneration": {
+          "format": "int64",
+          "minimum": 0,
+          "type": "integer"
+         },
+         "reason": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
+          "type": "string"
+         },
+         "status": {
+          "enum": [
+           "True",
+           "False",
+           "Unknown"
+          ],
+          "type": "string"
+         },
+         "type": {
+          "maxLength": 316,
+          "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+          "type": "string"
+         }
+        },
+        "required": [
+         "lastTransitionTime",
+         "message",
+         "reason",
+         "status",
+         "type"
+        ],
+        "type": "object"
+       },
+       "type": "array"
+      },
+      "observedGeneration": {
+       "format": "int64",
+       "type": "integer"
+      }
+     },
+     "type": "object"
+    }
+   },
+   "type": "object"
+  },
+  "ModelConfig": {
+   "properties": {
+    "apiVersion": {
+     "type": "string"
+    },
+    "kind": {
+     "type": "string"
+    },
+    "metadata": {
+     "type": "object"
+    },
+    "spec": {
+     "properties": {
+      "anthropic": {
+       "properties": {
+        "baseUrl": {
+         "type": "string"
+        },
+        "maxTokens": {
+         "type": "integer"
+        },
+        "temperature": {
+         "type": "string"
+        },
+        "topK": {
+         "type": "integer"
+        },
+        "topP": {
+         "type": "string"
+        }
+       },
+       "type": "object"
+      },
+      "anthropicVertexAI": {
+       "properties": {
+        "location": {
+         "type": "string"
+        },
+        "maxTokens": {
+         "type": "integer"
+        },
+        "projectID": {
+         "type": "string"
+        },
+        "stopSequences": {
+         "items": {
+          "type": "string"
+         },
+         "type": "array"
+        },
+        "temperature": {
+         "type": "string"
+        },
+        "topK": {
+         "type": "string"
+        },
+        "topP": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "location",
+        "projectID"
+       ],
+       "type": "object"
+      },
+      "apiKeyPassthrough": {
+       "type": "boolean"
+      },
+      "apiKeySecret": {
+       "type": "string"
+      },
+      "apiKeySecretKey": {
+       "type": "string"
+      },
+      "azureOpenAI": {
+       "properties": {
+        "apiVersion": {
+         "type": "string"
+        },
+        "azureAdToken": {
+         "type": "string"
+        },
+        "azureDeployment": {
+         "type": "string"
+        },
+        "azureEndpoint": {
+         "type": "string"
+        },
+        "maxTokens": {
+         "type": "integer"
+        },
+        "temperature": {
+         "type": "string"
+        },
+        "topP": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "apiVersion",
+        "azureEndpoint"
+       ],
+       "type": "object"
+      },
+      "bedrock": {
+       "properties": {
+        "additionalModelRequestFields": {
+         "x-kubernetes-preserve-unknown-fields": true
+        },
+        "cacheTTL": {
+         "default": "5m",
+         "enum": [
+          "5m",
+          "1h"
+         ],
+         "type": "string"
+        },
+        "promptCaching": {
+         "default": false,
+         "type": "boolean"
+        },
+        "region": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "region"
+       ],
+       "type": "object"
+      },
+      "defaultHeaders": {
+       "additionalProperties": {
+        "type": "string"
+       },
+       "type": "object"
+      },
+      "gemini": {
+       "type": "object"
+      },
+      "geminiVertexAI": {
+       "properties": {
+        "candidateCount": {
+         "type": "integer"
+        },
+        "location": {
+         "type": "string"
+        },
+        "maxOutputTokens": {
+         "type": "integer"
+        },
+        "projectID": {
+         "type": "string"
+        },
+        "responseMimeType": {
+         "type": "string"
+        },
+        "stopSequences": {
+         "items": {
+          "type": "string"
+         },
+         "type": "array"
+        },
+        "temperature": {
+         "type": "string"
+        },
+        "topK": {
+         "type": "string"
+        },
+        "topP": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "location",
+        "projectID"
+       ],
+       "type": "object"
+      },
+      "model": {
+       "type": "string"
+      },
+      "ollama": {
+       "properties": {
+        "host": {
+         "type": "string"
+        },
+        "options": {
+         "additionalProperties": {
+          "type": "string"
+         },
+         "type": "object"
+        }
+       },
+       "type": "object"
+      },
+      "openAI": {
+       "properties": {
+        "baseUrl": {
+         "type": "string"
+        },
+        "frequencyPenalty": {
+         "type": "string"
+        },
+        "maxTokens": {
+         "type": "integer"
+        },
+        "n": {
+         "type": "integer"
+        },
+        "organization": {
+         "type": "string"
+        },
+        "presencePenalty": {
+         "type": "string"
+        },
+        "reasoningEffort": {
+         "enum": [
+          "minimal",
+          "low",
+          "medium",
+          "high"
+         ],
+         "type": "string"
+        },
+        "seed": {
+         "type": "integer"
+        },
+        "temperature": {
+         "type": "string"
+        },
+        "timeout": {
+         "type": "integer"
+        },
+        "tokenExchange": {
+         "properties": {
+          "gdchServiceAccount": {
+           "properties": {
+            "audience": {
+             "type": "string"
+            }
+           },
+           "required": [
+            "audience"
+           ],
+           "type": "object"
+          },
+          "type": {
+           "enum": [
+            "GDCHServiceAccount"
+           ],
+           "type": "string"
+          }
+         },
+         "required": [
+          "type"
+         ],
+         "type": "object"
+        },
+        "topP": {
+         "type": "string"
+        }
+       },
+       "type": "object"
+      },
+      "provider": {
+       "default": "OpenAI",
+       "enum": [
+        "Anthropic",
+        "OpenAI",
+        "AzureOpenAI",
+        "Ollama",
+        "Gemini",
+        "GeminiVertexAI",
+        "AnthropicVertexAI",
+        "Bedrock",
+        "SAPAICore"
+       ],
+       "type": "string"
+      },
+      "sapAICore": {
+       "properties": {
+        "authUrl": {
+         "type": "string"
+        },
+        "baseUrl": {
+         "type": "string"
+        },
+        "resourceGroup": {
+         "default": "default",
+         "type": "string"
+        }
+       },
+       "required": [
+        "baseUrl"
+       ],
+       "type": "object"
+      },
+      "tls": {
+       "properties": {
+        "caCertSecretKey": {
+         "type": "string"
+        },
+        "caCertSecretRef": {
+         "type": "string"
+        },
+        "disableSystemCAs": {
+         "default": false,
+         "type": "boolean"
+        },
+        "disableVerify": {
+         "default": false,
+         "type": "boolean"
+        }
+       },
+       "type": "object",
+       "x-kubernetes-validations": [
+        {
+         "message": "caCertSecretKey requires caCertSecretRef",
+         "rule": "!(has(self.caCertSecretKey) && size(self.caCertSecretKey) > 0 && (!has(self.caCertSecretRef) || size(self.caCertSecretRef) == 0))"
+        },
+        {
+         "message": "caCertSecretRef requires caCertSecretKey",
+         "rule": "!(has(self.caCertSecretRef) && size(self.caCertSecretRef) > 0 && (!has(self.caCertSecretKey) || size(self.caCertSecretKey) == 0))"
+        },
+        {
+         "message": "disableSystemCAs requires caCertSecretRef or disableVerify (trust-nothing config rejects every upstream)",
+         "rule": "!(has(self.disableSystemCAs) && self.disableSystemCAs && (!has(self.disableVerify) || !self.disableVerify) && (!has(self.caCertSecretRef) || size(self.caCertSecretRef) == 0))"
+        }
+       ]
+      }
+     },
+     "required": [
+      "model"
+     ],
+     "type": "object",
+     "x-kubernetes-validations": [
+      {
+       "message": "provider.openAI must be nil if the provider is not OpenAI",
+       "rule": "!(has(self.openAI) && self.provider != 'OpenAI')"
+      },
+      {
+       "message": "provider.anthropic must be nil if the provider is not Anthropic",
+       "rule": "!(has(self.anthropic) && self.provider != 'Anthropic')"
+      },
+      {
+       "message": "provider.azureOpenAI must be nil if the provider is not AzureOpenAI",
+       "rule": "!(has(self.azureOpenAI) && self.provider != 'AzureOpenAI')"
+      },
+      {
+       "message": "provider.ollama must be nil if the provider is not Ollama",
+       "rule": "!(has(self.ollama) && self.provider != 'Ollama')"
+      },
+      {
+       "message": "provider.gemini must be nil if the provider is not Gemini",
+       "rule": "!(has(self.gemini) && self.provider != 'Gemini')"
+      },
+      {
+       "message": "provider.geminiVertexAI must be nil if the provider is not GeminiVertexAI",
+       "rule": "!(has(self.geminiVertexAI) && self.provider != 'GeminiVertexAI')"
+      },
+      {
+       "message": "provider.anthropicVertexAI must be nil if the provider is not AnthropicVertexAI",
+       "rule": "!(has(self.anthropicVertexAI) && self.provider != 'AnthropicVertexAI')"
+      },
+      {
+       "message": "provider.bedrock must be nil if the provider is not Bedrock",
+       "rule": "!(has(self.bedrock) && self.provider != 'Bedrock')"
+      },
+      {
+       "message": "provider.sapAICore must be nil if the provider is not SAPAICore",
+       "rule": "!(has(self.sapAICore) && self.provider != 'SAPAICore')"
+      },
+      {
+       "message": "apiKeySecret must be set if apiKeySecretKey is set",
+       "rule": "!(has(self.apiKeySecretKey) && !has(self.apiKeySecret))"
+      },
+      {
+       "message": "apiKeySecretKey must be set if apiKeySecret is set (except for Bedrock and SAPAICore providers)",
+       "rule": "!(has(self.apiKeySecret) && !has(self.apiKeySecretKey) && self.provider != 'Bedrock' && self.provider != 'SAPAICore')"
+      },
+      {
+       "message": "apiKeyPassthrough and apiKeySecret are mutually exclusive",
+       "rule": "!(has(self.apiKeyPassthrough) && self.apiKeyPassthrough && has(self.apiKeySecret) && size(self.apiKeySecret) > 0)"
+      },
+      {
+       "message": "apiKeyPassthrough must be false if provider is Gemini;GeminiVertexAI;AnthropicVertexAI",
+       "rule": "!(has(self.apiKeyPassthrough) && self.apiKeyPassthrough && (self.provider == 'Gemini' || self.provider == 'GeminiVertexAI' || self.provider == 'AnthropicVertexAI'))"
+      },
+      {
+       "message": "openAI.tokenExchange requires apiKeySecret (the service account secret)",
+       "rule": "!(has(self.openAI) && has(self.openAI.tokenExchange) && (!has(self.apiKeySecret) || size(self.apiKeySecret) == 0))"
+      },
+      {
+       "message": "openAI.tokenExchange and apiKeyPassthrough are mutually exclusive",
+       "rule": "!(has(self.openAI) && has(self.openAI.tokenExchange) && has(self.apiKeyPassthrough) && self.apiKeyPassthrough)"
+      },
+      {
+       "message": "openAI.tokenExchange type GDCHServiceAccount requires openAI.tokenExchange.gdchServiceAccount",
+       "rule": "!(has(self.openAI) && has(self.openAI.tokenExchange) && self.openAI.tokenExchange.type == 'GDCHServiceAccount' && !has(self.openAI.tokenExchange.gdchServiceAccount))"
+      }
+     ]
+    },
+    "status": {
+     "properties": {
+      "conditions": {
+       "items": {
+        "properties": {
+         "lastTransitionTime": {
+          "format": "date-time",
+          "type": "string"
+         },
+         "message": {
+          "maxLength": 32768,
+          "type": "string"
+         },
+         "observedGeneration": {
+          "format": "int64",
+          "minimum": 0,
+          "type": "integer"
+         },
+         "reason": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
+          "type": "string"
+         },
+         "status": {
+          "enum": [
+           "True",
+           "False",
+           "Unknown"
+          ],
+          "type": "string"
+         },
+         "type": {
+          "maxLength": 316,
+          "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+          "type": "string"
+         }
+        },
+        "required": [
+         "lastTransitionTime",
+         "message",
+         "reason",
+         "status",
+         "type"
+        ],
+        "type": "object"
+       },
+       "type": "array"
+      },
+      "observedGeneration": {
+       "format": "int64",
+       "type": "integer"
+      },
+      "secretHash": {
+       "type": "string"
+      }
+     },
+     "type": "object"
+    }
+   },
+   "type": "object"
+  }
+ },
+ "source": "https://github.com/kagent-dev/kagent/tree/v0.9.12/helm/kagent-crds/templates (v1alpha2 schemas; text descriptions removed; large pod-spec subtrees replaced by {type: object})"
+}

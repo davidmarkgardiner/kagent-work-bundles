@@ -66,7 +66,8 @@ separately approved agent. Warden checks the investigation, not a repair.
 | Lookout incremental (delta-only) review | **SWITCHED OFF**: in a lab run it dropped two earlier findings from the note; the agent has no delta tool | same |
 | Lookout on very large merge requests | Partial by design: about 1,500 lines fit; the note says PARTIAL; a 10,500-line merge request was reviewed as 30 of 150 files | same |
 | Lookout from a real CI runner, through the agentgateway route, on kagent 0.7.x, on a work GitLab, or with a least-privilege token | **NOT RUN** | |
-| Lookout on **kagent 0.9** (the work cluster's version): manifests validated offline against the 0.9.12 CRD schemas (v1alpha2), client 0.x path unit-tested | **NOT RUN** on a 0.9 cluster; the live demo kit other than the `warden` and `lookout` scenes is 1.x only | `docs/kagent-versions.md` |
+| Lookout on **kagent 0.9** (the work cluster's version): manifests validated offline against the 0.9.12 CRD schemas (v1alpha2), client 0.x path unit-tested | **NOT RUN** on a 0.9 cluster | `docs/kagent-versions.md` |
+| Live demo on **kagent 0.9**: `KAGENT_API=0.9` switches every scene; `demo/lab/v1alpha2/*.yaml` generated from the 1.x files | Offline only: schema-checked against 0.9.12, 0.x A2A call tested over HTTP, Warden passes a recorded 0.x Sentinel run. **NOT RUN** on a 0.9 cluster | `docs/kagent-versions.md` |
 | Lookout independent code review | **NOT DONE** (the reviewer was unavailable) | |
 
 A gate with no receipt is NOT RUN, never PASS.

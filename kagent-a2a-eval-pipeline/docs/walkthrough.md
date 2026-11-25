@@ -119,6 +119,8 @@ demo/run-demo.sh forward          # opens the port-forwards the scenes use
 
 **You will see:** `port-forwards up`.
 
+**On kagent 0.9** (the work cluster today): set `KAGENT_API=0.9` and the 0.x `A2A_BASE` (`.../api/a2a/<namespace>`) in the env file, and deploy `demo/lab/v1alpha2/*.yaml`. The scenes and what to look for are the same, except that agent states print as `COMPLETED`/`FAILED` without the `TASK_STATE_` prefix. This path is checked offline only, so do a dry run on the 0.9 cluster before presenting from it.
+
 If SSH cannot connect, the VM's address may have changed after a restart. On the host that runs the VM, list its addresses (for Proxmox: `qm guest cmd <VMID> network-get-interfaces`).
 
 ## 1. Lights: what is running
@@ -195,7 +197,7 @@ demo/run-demo.sh sentinel
 
 **If it says FAIL:** that is the gate working: the agent cut a corner (for example it handed off without the full report) and no ticket is written. Read the failure line; do not re-run in a loop. Scene 3 shows the same gate on saved runs.
 
-**Not shown:** the real Sentinel is a scheduled job in its own bundle (`cluster-health-baseline-sentinel`); here detection runs once. The ticket is a file in `$RUN`, not a GitLab issue. On kagent 1.x the evaluator is a hand-off, so a first FAIL is final (no retry). Needs kagent 1.x and a model that follows numbered steps (GLM 4.6 on the lab).
+**Not shown:** the real Sentinel is a scheduled job in its own bundle (`cluster-health-baseline-sentinel`); here detection runs once. The ticket is a file in `$RUN`, not a GitLab issue. On kagent 1.x the evaluator is a hand-off, so a first FAIL is final (no retry); on 0.9 (`KAGENT_API=0.9`) the worker calls it as a tool and may retry, but that path has not been run on a 0.9 cluster. Needs a model that follows numbered steps (GLM 4.6 on the lab).
 
 **Point at:** `demo/show.sh sentinel` (the detector, the agent's steps, the contract, the ticket rule), then `demo/show.sh sentinel --live` (the finding, Warden's verdict, the ticket).
 

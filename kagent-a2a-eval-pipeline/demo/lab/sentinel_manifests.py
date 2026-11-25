@@ -9,6 +9,12 @@ then wrapped as a kagent 1.x AgentTemplate. The workload is a small "whisky" app
   HARNESS=... SENTINEL_MODELCONFIG=... READONLY_MCP_SERVER=... PYTHON_IMAGE=... NS=kagent APP_NS=guard-demo \
     python3 demo/lab/sentinel_manifests.py | kubectl apply -f -
 
+KAGENT_API=0.9 (any 0.x) prints the kagent.dev/v1alpha2 form instead: the bundle's v1alpha2 Sentinel worker
+(completion-gate/manifests/sentinel-investigator-agent.yaml) renamed, which calls the evaluator as an Agent tool and may retry
+after a FAIL, and the evaluator Agent the contract names (completion-evaluator-agent). HARNESS is not needed on 0.x.
+--part evaluator | workload prints one part, so the scene can create the evaluator only when it is missing (it may already
+exist at work, and must not be overwritten).
+
 Everything carries the label guard-demo-sentinel=true, so the scene can remove it again by label.
 """
 from __future__ import annotations
@@ -73,16 +79,51 @@ def whisky_app(image: str, app_ns: str) -> dict:
                                       "resources": {"requests": {"cpu": "10m", "memory": "16Mi"}, "limits": {"memory": "64Mi"}}}]}}}}
 
 
-def manifests(env: dict[str, str]) -> list[dict]:
-    need = ["HARNESS", "SENTINEL_MODELCONFIG", "READONLY_MCP_SERVER", "PYTHON_IMAGE"]
+def evaluator_agent_0x(model: str, ns: str) -> dict:
+    """kagent 0.x: the evaluator is an Agent with the name the contract gives (completion-evaluator-agent)."""
+    out = subprocess.run([sys.executable, str(B / "completion-gate/render_evaluator.py"),
+                          str(B / "completion-gate/contracts/sentinel-investigator.yaml"), "--model-config", model],
+                         capture_output=True, text=True, check=True).stdout
+    agent = next(d for d in yaml.safe_load_all(out) if d)
+    agent["metadata"]["namespace"] = ns
+    return agent
+
+
+def investigator_0x(model: str, tools_server: str, ns: str) -> dict:
+    agent = yaml.safe_load((B / "completion-gate/manifests/sentinel-investigator-agent.yaml").read_text())
+    agent["metadata"] = {"name": AGENT, "namespace": ns, "labels": dict(LABEL)}
+    decl = agent["spec"]["declarative"]
+    decl["modelConfig"] = model
+    for tool in decl["tools"]:
+        if tool.get("type") == "McpServer":
+            tool["mcpServer"]["name"] = tools_server
+        if tool.get("type") == "Agent":
+            tool["agent"]["namespace"] = ns
+    return agent
+
+
+def is_0x(env: dict[str, str]) -> bool:
+    return env.get("KAGENT_API", "1x") != "1x"
+
+
+def manifests(env: dict[str, str], part: str = "all") -> list[dict]:
+    need = ["SENTINEL_MODELCONFIG", "READONLY_MCP_SERVER", "PYTHON_IMAGE"] + ([] if is_0x(env) else ["HARNESS"])
     missing = [k for k in need if not env.get(k)]
     if missing:
         raise SystemExit("set " + ", ".join(missing))
-    ns, app_ns = env.get("NS", "kagent"), env.get("APP_NS", "guard-demo")
-    return [evaluator_template(env["SENTINEL_MODELCONFIG"], ns),
-            investigator(env["HARNESS"], env["SENTINEL_MODELCONFIG"], env["READONLY_MCP_SERVER"], ns),
-            whisky_app(env["PYTHON_IMAGE"], app_ns)]
+    ns, app_ns, model = env.get("NS", "kagent"), env.get("APP_NS", "guard-demo"), env["SENTINEL_MODELCONFIG"]
+    if is_0x(env):
+        evaluator = evaluator_agent_0x(model, ns)
+        worker = investigator_0x(model, env["READONLY_MCP_SERVER"], ns)
+    else:
+        evaluator = evaluator_template(model, ns)
+        worker = investigator(env["HARNESS"], model, env["READONLY_MCP_SERVER"], ns)
+    parts = {"evaluator": [evaluator], "workload": [worker, whisky_app(env["PYTHON_IMAGE"], app_ns)]}
+    return parts["evaluator"] + parts["workload"] if part == "all" else parts[part]
 
 
 if __name__ == "__main__":
-    sys.stdout.write(yaml.safe_dump_all(manifests(dict(os.environ)), sort_keys=False))
+    part = sys.argv[sys.argv.index("--part") + 1] if "--part" in sys.argv else "all"
+    if part not in ("all", "evaluator", "workload"):
+        raise SystemExit("--part must be all, evaluator or workload")
+    sys.stdout.write(yaml.safe_dump_all(manifests(dict(os.environ), part), sort_keys=False))

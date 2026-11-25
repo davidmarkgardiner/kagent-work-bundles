@@ -5,6 +5,7 @@
 # Usage: demo/run-demo.sh <stage>     stages: forward | lights | assay | sentinel | warden | healthy | rogue | release | broken | reset | all
 #   Optional, not part of `all`: lookout  (a merge-request security review against a MOCK GitLab; needs LOOKOUT_HARNESS and LOOKOUT_MODEL_CONFIG)
 # Config: demo/demo.env (copy demo/demo.env.example). Every value is explicit; nothing uses the current kubectl context.
+# KAGENT_API=1x (default) or 0.9 picks the agent API and A2A protocol for every scene; deploy demo/lab/*.yaml on 1.x, demo/lab/v1alpha2/*.yaml on 0.9.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; B="$(cd "$HERE/.." && pwd)"
 # shellcheck disable=SC1091
@@ -16,6 +17,10 @@ mkdir -p "$RUN"
 export NS POLICY_NS GW_ROUTE GW_CALLER_SA GW_CALLER_NS STUB_MODELCONFIG FALLBACK_MODELCONFIG
 for f in rules ids fallbacks; do  # fill the demo config from demo.env
   python3 -c 'import os,re,sys;print(re.sub(r"\$\{(\w+)\}",lambda m:os.environ[m.group(1)],open(sys.argv[1]).read()),end="")' "$HERE/config/$f.demo.yaml" >"$RUN/$f.yaml"; done
+# kagent version: 1x (default) or 0.9 (any 0.x: kagent.dev/v1alpha2 agents, message/send at /api/a2a/<ns>/<agent>/).
+KAGENT_API="${KAGENT_API:-1x}"
+if [[ "$KAGENT_API" == 1x ]]; then AGENT_RES=agents.api.kagent.dev; MODEL_PATH='{.spec.template.inline.modelConfig.name}'; PROTO=1x
+else AGENT_RES=agents.kagent.dev; MODEL_PATH='{.spec.declarative.modelConfig}'; PROTO=0.7; fi
 k() { kubectl --context "$CTX" "$@"; }
 say() { printf '\n\033[1;33m== %s\033[0m\n' "$*"; }
 ok() { printf '\033[1;32m%s\033[0m\n' "$*"; }
@@ -35,9 +40,9 @@ agent() { tag '1;35' "AGENT $1" "$2"; }; code() { tag '0;34' "CODE $1" "$2"; }; 
 expect_ok() { printf '  \033[1;32m✔ %s\033[0m\n' "$*"; SCORE+=("✔ $*"); }
 expect_no() { printf '  \033[1;31m✘ %s\033[0m\n' "$*"; SCORE+=("✘ $*"); }
 # ask <agent> <question> <outfile>: the agent does the work; show its model, tool calls and answer before any verdict.
-ask() { local rc=0 m; m=$(k -n "$NS" get agent "$1" -o jsonpath='{.spec.template.inline.modelConfig.name}' 2>/dev/null || echo "?")
+ask() { local rc=0 m; m=$(k -n "$NS" get "$AGENT_RES" "$1" -o jsonpath="$MODEL_PATH" 2>/dev/null || echo "?")
   agent "$1" "model=$m   asked: \"${4:-$2}\""
-  python3 "$HERE/ask_agent.py" --base "$A2A_BASE" --agent "$1" --text "$2" --out "$RUN/$3" >"$RUN/$3.sum" || rc=$?
+  python3 "$HERE/ask_agent.py" --protocol "$PROTO" --base "$A2A_BASE" --agent "$1" --text "$2" --out "$RUN/$3" >"$RUN/$3.sum" || rc=$?
   python3 - "$RUN/$3.sum" "$1" <<'PY'
 import json,sys,textwrap
 d=json.load(open(sys.argv[1])); P='  \033[1;35m[AGENT %-20s]\033[0m '%sys.argv[2]
@@ -72,15 +77,19 @@ PY
 sentinel() {
   scene "SENTINEL: code spots a broken app, an agent investigates, Warden checks"
   if [[ -z "${SENTINEL_MODELCONFIG:-}" ]]; then printf '  skipped: set SENTINEL_MODELCONFIG, SENTINEL_HARNESS, READONLY_MCP_SERVER and PYTHON_IMAGE in demo.env to run this scene\n'; return 0; fi
-  : "${SENTINEL_HARNESS:?}" "${READONLY_MCP_SERVER:?}" "${PYTHON_IMAGE:?}"
+  : "${READONLY_MCP_SERVER:?}" "${PYTHON_IMAGE:?}"; [[ "$KAGENT_API" == 1x ]] && : "${SENTINEL_HARNESS:?set SENTINEL_HARNESS (kagent 1.x)}"
   local app_ns="${SENTINEL_APP_NS:-guard-demo}" i
   what "A small 'whisky' app is deployed that cannot start. Sentinel's detection step is plain CODE: it reads the pods and raises one finding. The finding goes to a read-only investigator AGENT over A2A; the agent works out why, writes a report and hands it to an evaluator agent. Then Warden's CODE checks the real run against the Sentinel contract. Only a PASS becomes a ticket."
   proves "Sentinel finds a real problem and the investigation is checked before anyone acts on it. POSITIVE tests: the code finds the broken app; the investigator's run passes the Sentinel contract (route ticket) and its report names the cause. If the agent cuts a corner, Warden says FAIL and no ticket is written: that is the gate working."
   look "the finding's incident key, the agent's read-only tool calls (get, describe, events, logs), then Warden's verdict and the ticket. The agent call takes 1 to 3 minutes."
   code "demo/lab/sentinel_manifests.py" "applies the whisky app, the investigator (the bundle's own Sentinel agent, renamed) and its evaluator (generated from the contract)"
-  HARNESS="$SENTINEL_HARNESS" SENTINEL_MODELCONFIG="$SENTINEL_MODELCONFIG" READONLY_MCP_SERVER="$READONLY_MCP_SERVER" PYTHON_IMAGE="$PYTHON_IMAGE" \
-    NS="$NS" APP_NS="$app_ns" python3 "$HERE/lab/sentinel_manifests.py" | k apply -f - | sed 's/^/    /'
-  k -n "$NS" wait --for=condition=Ready agents.api.kagent.dev/demo-sentinel --timeout=300s >/dev/null || { expect_no "demo-sentinel did not become Ready"; return 0; }
+  local menv=(KAGENT_API="$KAGENT_API" HARNESS="${SENTINEL_HARNESS:-}" SENTINEL_MODELCONFIG="$SENTINEL_MODELCONFIG" READONLY_MCP_SERVER="$READONLY_MCP_SERVER" PYTHON_IMAGE="$PYTHON_IMAGE" NS="$NS" APP_NS="$app_ns")
+  if [[ "$KAGENT_API" == 1x ]]; then env "${menv[@]}" python3 "$HERE/lab/sentinel_manifests.py" | k apply -f - | sed 's/^/    /'
+  else  # 0.x: the evaluator Agent has the contract's name and may already exist at work: create it only if missing, never overwrite
+    k -n "$NS" get "$AGENT_RES" completion-evaluator-agent >/dev/null 2>&1 && echo "    completion-evaluator-agent already exists: left as it is" \
+      || env "${menv[@]}" python3 "$HERE/lab/sentinel_manifests.py" --part evaluator | k create -f - | sed 's/^/    /'
+    env "${menv[@]}" python3 "$HERE/lab/sentinel_manifests.py" --part workload | k apply -f - | sed 's/^/    /'; fi
+  k -n "$NS" wait --for=condition=Ready "$AGENT_RES/demo-sentinel" --timeout=300s >/dev/null || { expect_no "demo-sentinel did not become Ready"; return 0; }
   for i in $(seq 1 30); do  # wait until the app has crashed a few times (deterministic polling, no model)
     k -n "$app_ns" get pods -l app=whisky-app -o json >"$RUN/sentinel-pods.json"
     python3 "$B/demo/sentinel_check.py" --pods "$RUN/sentinel-pods.json" --cluster "$CTX" --restarts 2 --out "$RUN/sentinel-finding.json" >/dev/null && sleep 5 || break; done
@@ -90,7 +99,7 @@ sentinel() {
   expect_ok "POSITIVE TEST: Sentinel's code found the broken app"
   local msg; msg=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["message"])' "$RUN/sentinel-finding.json")
   ask demo-sentinel "$msg" r-sentinel.json "the Sentinel finding above (as data)" || true
-  k -n "$NS" get agents.api.kagent.dev demo-sentinel -o json >"$RUN/sentinel-agent.json"
+  k -n "$NS" get "$AGENT_RES" demo-sentinel -o json >"$RUN/sentinel-agent.json"
   code "verify_completion.py" "checks the real run against completion-gate/contracts/sentinel-investigator.yaml (no model)"
   python3 "$B/verify_completion.py" --contract "$B/completion-gate/contracts/sentinel-investigator.yaml" --receipt "$RUN/r-sentinel.json" \
     --agent-crd "$RUN/sentinel-agent.json" --out "$RUN/sentinel-verdict.json" >/dev/null 2>&1 || true
@@ -116,10 +125,12 @@ assay() {
   proves "Assay blocks a bad agent and lets a good one through. POSITIVE test: demo-healthy must pass. NEGATIVE test: demo-rogue must fail."
   look "a table with one verdict per agent, then a closing line that states what actually happened. Each agent call takes 1 to 2 minutes."
   local out="$RUN/assay"; rm -rf "$out"; mkdir -p "$out"
+  local capture_proto=(--protocol 1x --base-url "${A2A_BASE%/agents/*}")
+  [[ "$PROTO" == 1x ]] || capture_proto=(--protocol 0.7 --base-url "${A2A_BASE%/api/a2a/*}" --url-template "{base}/api/a2a/{agent_ns}/{agent}/")
   export EVAL_NAMESPACE=guard-demo EVAL_REPEAT="${ASSAY_REPEAT:-1}" EVAL_MODEL_LABEL=demo
   for ag in demo-healthy demo-rogue; do
     agent "$ag" "answers the test question over A2A (real model, real tool calls); recorded below"
-    python3 "$B/a2a_capture.py" --protocol 1x --base-url "${A2A_BASE%/agents/*}" --cases-dir "$B/demo/cases" --tier full --agent "$ag" --repeat "$EVAL_REPEAT" --out "$out/eval-$ag" --timeout 300 | sed 's/^/    /' || true
+    python3 "$B/a2a_capture.py" "${capture_proto[@]}" --cases-dir "$B/demo/cases" --tier full --agent "$ag" --repeat "$EVAL_REPEAT" --out "$out/eval-$ag" --timeout 300 | sed 's/^/    /' || true
   done
   code "score_and_gate.py" "scores the recorded runs; its exit code is what blocks a merge"
   local rc=0; python3 "$B/score_and_gate.py" --capture-dirs "$out"/eval-* --repeat "$EVAL_REPEAT" --expect-agents demo-healthy demo-rogue --out "$out/report" >"$out/gate.txt" || rc=$?
@@ -142,8 +153,8 @@ lights() {
   what "A status check, no model calls beyond one token per route. It shows the starting state every later scene changes."
   look "demo-worker on 'demo-stub-429' and that route answering 429 (it is a deliberate stub that always fails); the real model answering 200; the gateway answering 200; zero Guard blocks. (No agent runs in this scene: code only.)"
   for a in demo-healthy demo-rogue demo-worker; do
-    r=$(k -n "$NS" get agent "$a" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo missing)
-    m=$(k -n "$NS" get agent "$a" -o jsonpath='{.spec.template.inline.modelConfig.name}' 2>/dev/null || echo -)
+    r=$(k -n "$NS" get "$AGENT_RES" "$a" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo missing)
+    m=$(k -n "$NS" get "$AGENT_RES" "$a" -o jsonpath="$MODEL_PATH" 2>/dev/null || echo -)
     printf '  %-14s ready=%-6s model=%s\n' "$a" "$r" "$m"; done
   python3 "$B/guard/model_probe.py" --url "$STUB_URL" --model "$STUB_MODEL" >"$RUN/probe-primary.json" || true
   FALLBACK_KEY="$( [[ -n "${FALLBACK_KEY_CMD:-}" ]] && eval "$FALLBACK_KEY_CMD" || true )" \
@@ -231,7 +242,7 @@ lookout() {  # optional scene: not part of `all`
   proves "Lookout reviews, retries cheaply and stays inside its tools. POSITIVE tests: the first review posts a note naming the planted flaws; a retry of the same commit is up_to_date; after a push the note lists every current finding. NEGATIVE test: a merge request that tries to instruct the reviewer does not make it call anything outside its allowed tools."
   look "for each run: the agent's tool calls, then one status line (posted or up_to_date) with its mode and token cost, then the note. About 4 minutes; each agent call takes 10 to 60 seconds."
   : "${LOOKOUT_MODEL_CONFIG:?set LOOKOUT_MODEL_CONFIG (a ModelConfig that can call tools)}"
-  local api="${LOOKOUT_KAGENT_API:-1x}"   # 1x = kagent 1.x; 0.7 = kagent 0.x, including 0.9 (kagent.dev/v1alpha2, /api/a2a/<ns>/<agent>/)
+  local api="${LOOKOUT_KAGENT_API:-$([[ "$KAGENT_API" == 1x ]] && echo 1x || echo 0.7)}"   # 1x = kagent 1.x; 0.7 = kagent 0.x, including 0.9 (kagent.dev/v1alpha2, /api/a2a/<ns>/<agent>/)
   [[ "$api" == 1x ]] && : "${LOOKOUT_HARNESS:?set LOOKOUT_HARNESS (a kagent 1.x Harness) to run this scene on 1.x}"
   local L="$B/lookout" out="$RUN/lookout" base="${A2A_BASE%%/agents/*}"; base="${base%%/api/a2a/*}"
   local proto=(--protocol 1x); [[ "$api" == 1x ]] || proto=(--protocol 0.7 --url-template "{base}/api/a2a/{agent_ns}/{agent}/")

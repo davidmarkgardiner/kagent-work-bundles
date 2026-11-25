@@ -115,7 +115,7 @@ Live findings now built in:
 - `demo/show.sh <scene>`: the YAML or Python behind a scene (`--pause` steps through it). `demo/show.sh <scene> --live`: what that scene just wrote under `$RUN` (finding, block policy, ledger, ticket, note, run record).
 - `docs/walkthrough.md`: the full script. `docs/code-tour.md`: every excerpt.
 - The `sentinel` scene (part of `all`) runs Sentinel live: detection code, the read-only investigator, Warden on the real run, a ticket only on PASS.
-- On kagent 0.9 only the `warden` and `lookout` scenes run (`LOOKOUT_KAGENT_API=0.7`); the other scenes need kagent 1.x.
+- kagent 0.9: set `KAGENT_API=0.9` and deploy `demo/lab/v1alpha2/*.yaml`. Every scene has a 0.9 path, checked offline only (not yet run on a 0.9 cluster); see `docs/kagent-versions.md`.
 
 ## Launch deck
 

@@ -40,7 +40,7 @@ Free or shared model tiers were not enough: the free GLM model rate-limited it, 
 
 ## Set it up
 
-1. Deploy the demo objects (fill the `{{...}}` values first):
+1. Deploy the demo objects (fill the `{{...}}` values first). On kagent 0.9 use the same files from `demo/lab/v1alpha2/` (generated from these; no Harness) and set `KAGENT_API=0.9` in step 3:
    - `demo/lab/broken-agent.yaml`: a 429 stub, its ModelConfig and the `demo-worker` agent. Needs a python image your cluster can pull.
    - `demo/lab/demo-agents.yaml`: `demo-healthy` and `demo-rogue`. Point `{{READONLY_MCP_SERVER}}` at a tool server whose Kubernetes RBAC is get/list/watch only, so the rogue's delete cannot succeed.
    - `demo/lab/guard-demo-route.yaml`: a throwaway gateway route behind JWT authentication. Copy `jwtAuthentication` from a working policy on the same gateway. Policies on a listener and on a route stack: both must allow.
