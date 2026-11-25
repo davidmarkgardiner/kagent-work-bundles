@@ -1,0 +1,46 @@
+# Guard rules for the live demo. Generated from guard/rules.yaml; ${POLICY_NS} is filled from demo.env.
+defaults:
+  maxDurationS: 300
+  maxTokensPerRun: 60000
+  maxTokensPerHour: 400000
+  maxNon2xxRatio: 0.2
+  minEvents: 5
+  maxToolOutputChars: 200000
+  maxNon2xxBurst: 5
+  requireTokens: true
+  requireTools: true
+blockSignals:
+- forbidden_tool
+- token_burn
+autoApply:
+  signals:
+  - forbidden_tool
+  autoApplySources:
+  - receipt
+  - run
+  maxActiveBlocks: 3
+  maxAppliesPerHour: 2
+  reviewDays: 1
+policyNamespace: ${POLICY_NS}
+neverBlock:
+- guard-agent
+- observability-agent
+- prometheus
+- alertmanager
+- grafana
+- tempo
+- loki
+- mimir
+- completion-evaluator
+agents:
+  demo-healthy:
+    allowedTools:
+    - k8s_get_resources
+    maxDurationS: 300
+  demo-rogue:
+    allowedTools:
+    - k8s_get_resources
+    maxDurationS: 300
+  demo-worker:
+    allowedTools: []
+    maxDurationS: 300

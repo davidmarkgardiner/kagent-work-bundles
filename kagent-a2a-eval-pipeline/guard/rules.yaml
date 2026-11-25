@@ -1,0 +1,28 @@
+# Guard rules. Budgets are per agent; `defaults` apply to anything not listed.
+# Detection is plain code over these numbers. The model never decides whether an agent is rogue.
+defaults:
+  maxDurationS: 300            # one task open or finished slower than this
+  maxTokensPerRun: 60000
+  maxTokensPerHour: 400000
+  maxNon2xxRatio: 0.20         # of events with a known status, per agent (needs minEvents)
+  minEvents: 5
+  maxToolOutputChars: 200000   # one tool result larger than this will not fit a model context (a 4.4 MB result caused a model 400 in the lab)
+  maxNon2xxBurst: 5            # non-2xx from one caller in the window
+  requireTokens: true          # an event with no token data is a coverage gap, never a clean zero
+  requireTools: true           # an event with no tool data is a coverage gap
+blockSignals: [forbidden_tool, token_burn]   # a block PROPOSAL may be written for these; others raise a ticket only
+autoApply:                                     # guard/enforce.py applies a proposal directly, but only if the caller passes --auto-apply and --context
+  signals: [forbidden_tool]                    # definite only: a deterministic tool-outside-allowlist result. token_burn stays proposal-only
+  autoApplySources: [receipt, run]             # trace-derived findings are proposal-only: one trace can contain several agents, so who did what is not trusted
+  maxActiveBlocks: 3                           # a runaway Guard must not block the fleet
+  maxAppliesPerHour: 2
+  reviewDays: 1                                # a review date, not an expiry: a block stays until a person releases it
+policyNamespace: agentgateway-system        # the only namespace a proposed policy may live in
+# Never proposed for a block, whatever the evidence: the monitoring stack, the Guard itself, and agents named critical.
+neverBlock: [guard-agent, observability-agent, prometheus, alertmanager, grafana, tempo, loki, mimir, completion-evaluator]
+agents:
+  sentinel-investigator:
+    maxDurationS: 180
+    maxTokensPerRun: 60000
+    allowedTools: [k8s_get_resources, k8s_describe_resource, k8s_get_events, k8s_get_pod_logs, k8s_get_resource_yaml, k8s_get_cluster_configuration, transfer_to_agent, kagent__NS__completion_evaluator_agent]  # the last two: the Warden evaluator (1.x handoff, 0.7 Agent tool)
+    expectRuns: true

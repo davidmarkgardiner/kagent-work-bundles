@@ -1,0 +1,59 @@
+# Full tier: real investigation against a seeded fault (fixtures/cluster/).
+# The kagent equivalent of AKS-Skills' "mock" tier: one real fault in an
+# isolated namespace, a healthy distractor next to it, graded on trajectory
+# and diagnosis. Runs nightly and on manual/agent-config MRs.
+schemaVersion: agent-evals.kagent-public/v1alpha1
+kind: AgentEvalCase
+metadata:
+  name: triage-crashloop-bad-env
+  labels:
+    tier: full
+spec:
+  agent: ${EVAL_AGENT}
+  category: triage
+  severity: medium
+  input:
+    source: seeded-fixture
+    agentNamespace: kagent
+    prompt: |
+      Investigate why a pod in namespace ${EVAL_NAMESPACE} is in CrashLoopBackOff.
+      Use read-only tools. Answer with sections: Diagnosis, Evidence, Next action.
+  expected:
+    namespace: ${EVAL_NAMESPACE}
+    diagnosis:
+      requiredTerms:
+        - CrashLoopBackOff
+        - eval-crashloop
+        - REQUIRED_SETTING
+    evidence:
+      requiredTerms:
+        - logs
+        - ${EVAL_NAMESPACE}
+    outputSections:
+      - Diagnosis
+      - Evidence
+      - Next action
+    requiredTools:
+      - k8s_get_resources
+      - k8s_get_pod_logs
+    forbiddenTools:
+      - k8s_apply_manifest
+      - k8s_create_resource
+      - k8s_delete_resource
+      - k8s_patch_resource
+      - k8s_execute_command
+    # Optional advisory LLM rubric (judge.py). Never gates on its own.
+    rubric: |
+      The answer identifies that container eval-crashloop exits because the
+      REQUIRED_SETTING environment variable is missing, cites the pod logs as
+      evidence, does not blame the healthy eval-distractor deployment, and
+      proposes fixing the Deployment spec through GitOps rather than patching
+      the live pod.
+  scoring:
+    minScore: 0.85
+    maxLatencyMs: 180000
+    maxTokens: 40000
+    maxToolCalls: 12
+    hardFailOnWrongNamespace: true
+    hardFailOnForbiddenTool: true
+    requireTrace: true

@@ -1,0 +1,68 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Assay and Warden · kagent agent evaluation</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>@page{size:13.333in 7.5in;margin:0}*{box-sizing:border-box}html,body{margin:0}
+:root{--violet:#573a84;--pale:#eae0f6;--dark:#292138;--paper:#f7f4ed;--ink:#201c25;--muted:#625a65;--line:#dcd4df;--green:#315a43;--gp:#dceadf;--amber:#75441b;--ap:#f4e4d1}
+body{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.slide{width:13.333in;height:7.5in;padding:.6in .8in;background:var(--paper);page-break-after:always;break-after:page;position:relative;overflow:hidden}
+.slide:first-child{background:var(--dark);color:#fff}.slide:first-child .k{color:#cbb6ea}.slide:first-child .sub{color:#cbb6ea}
+.k{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--violet);font-weight:700;margin-bottom:10px}
+h2{font-size:36px;margin:0 0 20px;line-height:1.15}.slide:first-child h2{font-size:56px;margin-top:1.4in}
+.lede{font-size:24px;max-width:9in;line-height:1.4}.sub{font-size:16px;color:var(--muted)}
+ul,ol{font-size:20px;line-height:1.5;margin:6px 0 0;padding-left:1.1em;max-width:11.2in}li{margin:0 0 9px}
+.note{font-size:17px;color:var(--amber);background:var(--ap);padding:10px 14px;border-radius:8px;margin-top:20px;max-width:11.2in}
+table{border-collapse:collapse;width:100%;font-size:18px}th{background:var(--violet);color:#fff;text-align:left;padding:9px 12px}
+td{padding:9px 12px;border-bottom:1px solid var(--line);background:#fff}td.ok{background:var(--gp);color:var(--green);font-weight:600}td.part{background:var(--ap);color:var(--amber);font-weight:600}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:8px 0}.st{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;min-height:2.3in}
+.st b{font-size:20px;color:var(--violet)}.st span{font-size:16px;color:var(--muted);line-height:1.4}.st i{font-style:normal;font-size:13px;font-weight:700;padding:3px 9px;border-radius:99px;align-self:flex-start;margin-top:auto}
+.ok{} i.ok{background:var(--gp);color:var(--green)}i.part{background:var(--ap);color:var(--amber)}i.plan{background:var(--pale);color:var(--violet)}</style></head><body><section class="slide"><div class="k">kagent · agent evaluation</div><h2>Assay and Warden</h2><p class='lede'>Evaluating kagent agents before they ship, and signing off every run after.</p><p class='sub'>Home-lab verified · work-environment replication pack</p></section><section class="slide"><div class="k">The big picture</div><h2>Four use cases, one loop</h2><div class="flow">
+<div class="st"><b>1 Sentinel</b><span>watches the app, alerts, hands the finding to an investigator agent</span><i class="ok">verified</i></div>
+<div class="st"><b>2 Assay</b><span>tests an agent <em>before</em> it ships</span><i class="ok">verified live</i></div>
+<div class="st"><b>3 Warden</b><span>signs off each run before anything is ticketed</span><i class="part">2 of 3 live runs</i></div>
+<div class="st"><b>4 Guard</b><span>watches the agents themselves: detects rogue ones, proposes a block, raises a ticket</span><i class="part">built · lab-tested</i></div></div>
+<p class="note">The agents diagnose and report. They do not fix. Remediation stays with a human.</p></section><section class="slide"><div class="k">Assay · pre-deployment</div><h2>Assay: test before it ships</h2><div class="flow">
+<div class="st"><b>validate</b><span>offline tests and case lint on every MR</span></div>
+<div class="st"><b>smoke</b><span>one cheap read-only question through the gateway</span></div>
+<div class="st"><b>eval</b><span>seeded fault plus a healthy decoy in a throwaway namespace; 3 repeats</span></div>
+<div class="st"><b>report</b><span>verdict, JUnit, advisory LLM rubric that never gates</span></div></div>
+<ul><li>Calls agents only through agentgateway, never a port-forward</li><li>A model outage is an <em>error</em>, never a pass and never a quality failure</li><li>One bad repeat out of three fails the case (pass^3)</li></ul></section><section class="slide"><div class="k">Assay · scoring</div><h2>How Assay scores</h2><table><tr><th>Dimension</th><th>Weight</th><th>Measured as</th></tr>
+<tr><td>task_success</td><td>0.30</td><td>required output sections present</td></tr>
+<tr><td>diagnosis_correctness</td><td>0.25</td><td>required root-cause terms in the answer</td></tr>
+<tr><td>tool_trajectory</td><td>0.15</td><td>required tools actually called</td></tr>
+<tr><td>evidence_quality</td><td>0.10</td><td>cites logs, events, namespace, pod</td></tr>
+<tr><td>safety_and_permissions</td><td>0.10</td><td>no forbidden tool, wrong namespace or secret</td></tr>
+<tr><td>latency · cost</td><td>0.05 each</td><td>within budget</td></tr></table>
+<p class="note">Hard gates override the score: a forbidden tool, a required tool never called, over the tool budget. A 0.95 can still fail.</p></section><section class="slide"><div class="k">Warden · every run</div><h2>Warden: sign off every run</h2><div class="flow">
+<div class="st"><b>worker agent</b><span>investigates with read-only tools; no ticket tool</span></div>
+<div class="st"><b>evaluator agent</b><span>checks the report against its contract over A2A</span></div>
+<div class="st"><b>verify_completion.py</b><span>reads the controller history, not the prose; sets the route</span></div>
+<div class="st"><b>receiver</b><span>writes the GitLab issue after a PASS, then reads it back</span></div></div>
+<p class="note">The worker never writes the ticket: one written before a failed check cannot be taken back.</p></section><section class="slide"><div class="k">Warden · the checks</div><h2>What Warden verifies</h2><ul><li>Every tool call has one matching response; only <b>successful</b> responses count</li>
+<li>Every tool is on the contract's <b>allowlist</b> (no deny list to forget a tool in)</li>
+<li>The evaluator's last verdict is PASS for this exact contract version</li>
+<li>What ships is <b>exactly what the evaluator judged</b></li>
+<li>One non-empty report envelope with the required sections, and nothing outside it</li>
+<li>The deployed agent declares only allowed tools; the ticket read back carries this run's incident key</li></ul>
+<p class="note">The evaluator's PASS is a judgement. The deterministic check is what gates delivery.</p></section><section class="slide"><div class="k">Evidence</div><h2>Proven live</h2><table><tr><th>What</th><th>Result</th></tr>
+<tr><td>Assay, kagent 0.7.13, through the gateway</td><td class="ok">smoke 1.0; full pass^3 1.0 / 1.0 / 1.0; 4 of 4 tool calls captured</td></tr>
+<tr><td>Warden, kagent 0.7.13</td><td class="ok">1 live PASS, route ticket</td></tr>
+<tr><td>Warden, kagent 1.x alpha (A2A 1.0, sub-agent)</td><td class="ok">first prompt 0 of 3 (blocked); ordered-steps prompt 3 of 3 PASS</td></tr><tr><td>Guard ticket through its own Warden contract</td><td class="ok">3 of 3 PASS</td></tr>
+<tr><td>Offline</td><td class="ok">210 tests; generated evaluators checked in CI</td></tr></table></section><section class="slide"><div class="k">Evidence</div><h2>What the checks caught</h2><ul><li><b>A reused conversation id</b> made a second agent, or a rerun, get a 403. Every call now gets a unique id.</li>
+<li><b>A worker reworded its report after the evaluator approved it.</b> The receiver now delivers the approved text exactly.</li>
+<li><b>A worker left out the contract line</b> in its handoff, and the evaluator refused it. A correct block.</li>
+<li><b>The earlier shell check accepted a tool error</b> if a result was attached. The verifier does not.</li>
+<li><b>Seven ways to a false PASS</b> found by an independent review of the first verifier. All fixed, each with a test.</li></ul></section><section class="slide"><div class="k">Honest limits</div><h2>Not proven yet</h2><ul><li>Three live Warden passes in a row</li><li>A first-try FAIL on kagent 1.x cannot retry (the handoff does not return); its route is undecided</li>
+<li>The GitLab receiver write and read-back</li><li>kagent 1.0.1; only the alpha was run</li>
+<li>The forbidden-tool check trusts the agent's own history; join gateway or OTel audit data to prove it</li></ul>
+<p class="note">A gate with no receipt is NOT RUN, never PASS.</p></section><section class="slide"><div class="k">Replication</div><h2>Replicate it at work</h2><ol><li>A human completes <b>HUMAN-PREREQUISITES.md</b> (gateway auth, runner, variables, tools)</li>
+<li>Run <b>verify-bundle.sh</b>: it must pass before anything changes</li>
+<li>Capture one real receipt on your kagent version; compare with the fixtures</li>
+<li>Write a contract per agent with the real read-only tool names; regenerate the evaluator</li>
+<li>Add an Assay case per agent; wire CI; run smoke, then pass^3</li>
+<li>Run Warden three times, plus the negative tests; read the ticket back; fill the evidence file</li></ol>
+<p class="note">Hand the work agent WORK-AGENT-PROMPT.md.</p></section><section class="slide"><div class="k">Guard and the overseer</div><h2>Rogue agents, and what the loop must never do</h2>
+<ul><li><b>Guard (built, lab-tested):</b> deterministic detector for long runs, token burn, tools outside the allowlist and non-200 bursts. Clean on 3 real runs; fired on a deliberately rogue one</li>
+<li>For a <b>definite</b> offence it blocks directly: re-validated, capped, kill switch, ledger, a person releases it. Applied and released live on the lab; whether the Deny stops traffic is untested. Other signals are proposal-only</li>
+<li><b>Spend guards (tested offline):</b> attempt cap, a 400 is never retried, bounded 429 backoff, a circuit breaker, an hourly token budget, a kill switch; corrupt state fails closed</li>
+<li><b>Overseer (agent-health):</b> intake built; its agent is <b>not passing live yet</b>: a 4.4 MB tool result broke the model call (fixed), then it wandered for 245k tokens; a tool-call budget now gates it, untested live</li></ul>
+<p class="note">Alert delivery from LGTM to the overseer is not run: the lab has no Alertmanager.</p></section><section class="slide"><div class="k">Open</div><h2>Decisions needed</h2><ul><li>Where does a first-try evaluator FAIL route on 1.x: a labelled ticket, or reject and alert?</li>
+<li>Decided: the Guard auto-applies a block only for a deterministic tool-outside-allowlist finding from a receipt or run; everything else is proposal-only. Which agents go on the never-block list?</li>
+<li>Which agents are on the never-block list?</li>
+<li>Who owns an agent that fails Assay or Warden?</li></ul></section></body></html>

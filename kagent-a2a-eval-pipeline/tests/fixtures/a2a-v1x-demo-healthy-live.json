@@ -1,0 +1,107 @@
+{
+ "jsonrpc": "2.0",
+ "id": "demo-demo-healthy-f00e4a6b",
+ "result": {
+  "task": {
+   "id": "01a2124c-c884-7c55-85a9-295fec2c4f9f",
+   "artifacts": [
+    {
+     "artifactId": "01a2124d-7f78-789a-b463-f9d2ca400ae0",
+     "metadata": {
+      "kagent.dev/a2a/timeline-position": "2026-11-25T10:43:18.516029Z",
+      "kagent.dev/a2a/usage": {
+       "candidatesTokenCount": 31,
+       "promptTokenCount": 1351,
+       "totalTokenCount": 1382
+      }
+     },
+     "parts": [
+      {
+       "data": {
+        "args": {
+         "namespace": "guard-demo",
+         "resource_type": "pod"
+        },
+        "id": "ad7a9bd1-8b47-4666-8a76-00c0518f6913",
+        "name": "k8s_get_resources"
+       },
+       "metadata": {
+        "kagent.dev/a2a/part-type": "function_call"
+       }
+      }
+     ]
+    },
+    {
+     "artifactId": "01a2124d-7fe0-7d00-b7fb-74055ac05877",
+     "metadata": {
+      "kagent.dev/a2a/timeline-position": "2026-11-25T10:43:18.583962Z"
+     },
+     "parts": [
+      {
+       "data": {
+        "id": "ad7a9bd1-8b47-4666-8a76-00c0518f6913",
+        "name": "k8s_get_resources",
+        "response": {
+         "output": {
+          "output": "NAME                          READY   STATUS    RESTARTS   AGE   IP            NODE                           NOMINATED NODE   READINESS GATES\nmodel-stub-5577bb587b-nkrmt   1/1     Running   0          21m   198.51.100.1   kagent-alpha17-control-plane   <none>           <none>\n"
+         }
+        }
+       },
+       "metadata": {
+        "kagent.dev/a2a/part-type": "function_response"
+       }
+      }
+     ]
+    },
+    {
+     "artifactId": "01a2124d-8d8a-78f3-8f2f-6a2f1f1d3d36",
+     "metadata": {
+      "kagent.dev/a2a/timeline-position": "2026-11-25T10:43:39.387243Z",
+      "kagent.dev/a2a/usage": {
+       "candidatesTokenCount": 51,
+       "promptTokenCount": 1505,
+       "totalTokenCount": 1556
+      }
+     },
+     "parts": [
+      {
+       "text": "The pod `model-stub-5577bb587b-nkrmt` is running in the namespace guard-demo with 1/1 ready containers, 0 restarts, and has been running for 21 minutes."
+      }
+     ]
+    }
+   ],
+   "contextId": "01a2124c-c753-7aa9-bc4f-ad0abe88718f",
+   "history": [
+    {
+     "messageId": "4c64bbf1-726d-4d65-8f28-4ce468dad3c4",
+     "contextId": "01a2124c-c753-7aa9-bc4f-ad0abe88718f",
+     "metadata": {
+      "kagent.dev/a2a/timeline-position": "2026-11-25T10:42:31.445452127Z"
+     },
+     "parts": [
+      {
+       "text": "List the pods in namespace guard-demo."
+      }
+     ],
+     "role": "ROLE_USER",
+     "taskId": "01a2124c-c884-7c55-85a9-295fec2c4f9f"
+    }
+   ],
+   "metadata": {
+    "https://google.github.io/adk-docs/a2a/a2a-extension/": true,
+    "https://kagent.dev/extensions/usage/v1": {
+     "cachedInputTokens": 0,
+     "inputTokens": 2856,
+     "outputTokens": 82,
+     "reasoningTokens": 0,
+     "totalTokens": 2938
+    },
+    "kagent.dev/a2a/task-created-at": "2026-11-25T10:42:31.703391Z"
+   },
+   "status": {
+    "state": "TASK_STATE_COMPLETED",
+    "timestamp": "2026-11-25T10:43:39.391278542Z"
+   }
+  }
+ }
+}

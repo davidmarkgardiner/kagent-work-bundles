@@ -1,0 +1,29 @@
+site_name: Assay and Warden
+site_description: Evaluate kagent agents before they ship (Assay) and sign off each run (Warden)
+docs_dir: docs
+use_directory_urls: false
+theme:
+  name: mkdocs
+  highlightjs: false
+nav:
+  - Start here: index.md
+  - Assay (before shipping): assay.md
+  - Warden (every run): warden.md
+  - Scoring and gates: scoring.md
+  - Contracts: contracts.md
+  - Rollout order: rollout.md
+  - Prerequisites and air-gap: prerequisites.md
+  - Variables: variables.md
+  - Run it: run-it.md
+  - kagent 0.7 and 1.x: kagent-versions.md
+  - Evidence and limits: evidence.md
+  - Guard and spend guards: guard.md
+  - Grafana alerting setup: grafana-alerting.md
+  - "Live demo: healthy, rogue, broken": demo.md
+  - "Monitoring loop design": alert-loop.md
+markdown_extensions:
+  - tables
+  - fenced_code
+validation:
+  nav: {not_found: warn}
+  links: {not_found: warn, unrecognized_links: warn, anchors: warn}

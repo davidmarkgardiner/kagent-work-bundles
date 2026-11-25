@@ -1,0 +1,155 @@
+# kagent agent evaluation pipeline.
+#
+# Flow:  validate (offline, every MR)  ->  smoke (live, cheap, 1 case)
+#        ->  eval (live, seeded faults, pass^k, one shard per agent)
+#        ->  report (always; owns the verdict, JUnit + summary + advisory judge)
+#
+# Live stages call agents ONLY through the agentgateway A2A route
+# (gateway/route-a2a-eval.yaml). No kubectl port-forward to kagent.
+#
+# Required CI/CD variables (masked + protected, set on the project, never in git):
+#   AGW_BASE_URL       https://{{AGW_HOST}}            agentgateway base URL
+#   AGW_TOKEN          bearer token for the eval caller identity, scoped to the eval route
+#   EVAL_KUBECONFIG    file-type; SA that can only create/delete eval-* namespaces and
+#                      apply fixtures into them (no access to kagent or workload namespaces)
+#   EVAL_IMAGE         runner image built from ./Dockerfile, pinned by digest
+# Optional:
+#   EVAL_MODEL_LABEL   model name recorded in results, e.g. the agent's ModelConfig model
+#   AGW_EXTRA_HEADERS  JSON object of extra headers, e.g. {"x-kagent-cluster":"ci"}
+#   JUDGE_BASE_URL / JUDGE_MODEL / JUDGE_API_KEY   advisory rubric grading (judge.py)
+#
+# Trust boundary: live jobs run only for schedules, manual web runs, and MRs from
+# branches in THIS project (protected variables are not exposed to fork MRs).
+# Mark AGW_TOKEN protected so only protected branches/tags can read it; then an
+# MR pipeline from an unprotected branch fails closed at capture (infra_error).
+# Use a protected runner tagged `kagent-eval`.
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+stages: [validate, smoke, eval, report]
+
+variables:
+  BUNDLE: work-agent-bundles/kagent-a2a-eval-pipeline
+  EVAL_TIMEOUT_S: "180"
+  EVAL_REPEAT_FULL: "3"
+  # Runtime completion gate (completion-gate/): checks each agent with a contract
+  # actually closed its A2A evaluator loop. Set "true" once every matrix agent has
+  # a contract, so an agent without one fails instead of only warning.
+  EVAL_REQUIRE_CONTRACTS: "false"
+
+.live-rules: &live-rules
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+  - if: $CI_PIPELINE_SOURCE == "web"
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == $CI_PROJECT_ID
+    changes:
+      - agents/**/*
+      - work-agent-bundles/kagent-a2a-eval-pipeline/**/*
+      - observability/agent-evals/scripts/**/*
+
+.live:
+  image: $EVAL_IMAGE
+  tags: [kagent-eval]
+  resource_group: kagent-eval      # serialize live runs: shared agents, shared rate limit
+  rules: *live-rules
+  after_script:
+    - KUBECONFIG=$EVAL_KUBECONFIG kubectl delete namespace "$EVAL_NAMESPACE" --wait=false --ignore-not-found
+
+# ---------------------------------------------------------------- validate
+validate:
+  stage: validate
+  image: python:3.12-slim          # mirror internally
+  script:
+    - pip install --quiet --no-cache-dir -r $BUNDLE/requirements.txt
+    - python -m unittest discover -s $BUNDLE/tests -v
+    - python $BUNDLE/tests/lint_cases.py $BUNDLE/cases
+    - |  # contracts load, and the checked-in evaluator is regenerated from them
+      python $BUNDLE/completion-gate/render_evaluator.py $BUNDLE/completion-gate/contracts/*.yaml \
+        | diff -u $BUNDLE/completion-gate/manifests/completion-evaluator-agent.yaml -
+
+# ---------------------------------------------------------------- smoke
+# Fails fast (route, auth, agent startup, tool wiring) before spending tokens.
+smoke:
+  extends: .live
+  stage: smoke
+  variables:
+    EVAL_AGENT: k8s-agent
+    EVAL_NAMESPACE: eval-$CI_PIPELINE_ID-smoke
+  script:
+    - export KUBECONFIG=$EVAL_KUBECONFIG
+    - kubectl create namespace "$EVAL_NAMESPACE"
+    - kubectl -n "$EVAL_NAMESPACE" apply -f $BUNDLE/fixtures/cluster/
+    - kubectl -n "$EVAL_NAMESPACE" wait --for=condition=Available deploy/eval-distractor --timeout=120s
+    - python $BUNDLE/a2a_capture.py --cases-dir $BUNDLE/cases --tier smoke --repeat 1 --out out/smoke
+    - python $BUNDLE/score_and_gate.py --capture-dirs out/smoke --repeat 1 --out out/smoke/report
+  artifacts:
+    when: always
+    expire_in: 14 days             # receipts hold prompts, tool args and answers
+    access: developer
+    paths: [out/smoke/]
+    reports:
+      junit: out/smoke/report/junit.xml
+
+# ---------------------------------------------------------------- eval
+# Capture only. Exits 0 unless every call was an infra error, so one bad answer
+# never hides the artifacts; `report` decides pass/fail.
+eval:
+  extends: .live
+  stage: eval
+  needs: [smoke]
+  parallel:
+    matrix:
+      - EVAL_AGENT: [k8s-agent]     # one shard per agent under test
+  variables:
+    EVAL_NAMESPACE: eval-$CI_PIPELINE_ID-$CI_NODE_INDEX
+  script:
+    - export KUBECONFIG=$EVAL_KUBECONFIG
+    - kubectl create namespace "$EVAL_NAMESPACE"
+    - kubectl -n "$EVAL_NAMESPACE" apply -f $BUNDLE/fixtures/cluster/
+    - kubectl -n "$EVAL_NAMESPACE" wait --for=condition=Available deploy/eval-distractor --timeout=120s
+    - sleep 45                      # let eval-crashloop reach CrashLoopBackOff
+    - python $BUNDLE/a2a_capture.py --cases-dir $BUNDLE/cases --tier full --agent "$EVAL_AGENT" --repeat $EVAL_REPEAT_FULL --out "out/eval-$EVAL_AGENT"
+  artifacts:
+    when: always
+    expire_in: 14 days
+    access: developer
+    paths: [out/]
+
+# ---------------------------------------------------------------- report
+report:
+  stage: report
+  image: $EVAL_IMAGE
+  needs:
+    - job: eval
+      artifacts: true
+      optional: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == $CI_PROJECT_ID
+      changes:
+        - agents/**/*
+        - work-agent-bundles/kagent-a2a-eval-pipeline/**/*
+        - observability/agent-evals/scripts/**/*
+      when: always
+  script:
+    - ls -d out/eval-* >/dev/null 2>&1 || { echo "no eval shard produced artifacts (smoke failed or eval never ran)"; exit 3; }
+    - python $BUNDLE/judge.py --capture-dirs out/eval-* --out out/report || echo "advisory judge failed; ignored"
+    - |
+      REQUIRE=""; [ "$EVAL_REQUIRE_CONTRACTS" = "true" ] && REQUIRE="--require-contracts"
+      python $BUNDLE/score_and_gate.py --capture-dirs out/eval-* --repeat $EVAL_REPEAT_FULL \
+        --expect-agents k8s-agent --contracts-dir $BUNDLE/completion-gate/contracts $REQUIRE \
+        --out out/report   # keep --expect-agents in sync with the matrix
+  artifacts:
+    when: always
+    expire_in: 30 days
+    access: developer
+    paths: [out/report/]
+    reports:
+      junit: out/report/junit.xml

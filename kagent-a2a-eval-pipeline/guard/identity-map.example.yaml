@@ -1,0 +1,8 @@
+# Trusted identity map for guard/propose.py: which gateway-authenticated caller a block proposal may name.
+# Fill from gateway configuration (the JWT `sub` claim and the route) and NEVER from event or agent data.
+# An agent that is not listed gets a ticket and no policy.
+agents:
+  "{{AGENT_NAME}}":
+    subject: "{{JWT_SUBJECT}}"        # plain identifier: letters, digits . _ : @ / -
+    route: "{{HTTPROUTE_NAME}}"       # exactly one named HTTPRoute, no wildcard
+    namespace: "{{POLICY_NAMESPACE}}" # must equal policyNamespace in guard/rules.yaml

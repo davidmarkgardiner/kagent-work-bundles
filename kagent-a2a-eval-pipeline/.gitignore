@@ -1,0 +1,4 @@
+out/
+__pycache__/
+# local-only: contains real LAN addresses
+LIVE-TEST-HANDOVER.md

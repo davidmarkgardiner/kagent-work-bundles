@@ -1,0 +1,61 @@
+# Grafana-managed alert rules (file provisioning). Real signals need datasource UIDs: replace {{PROM_DS_UID}} with your Mimir/Prometheus
+# (Tempo span metrics) datasource UID. The first rule (GuardLoopSelfTest) needs NO datasource: use it to prove the whole path.
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: guard
+    folder: Guard
+    interval: 1m
+    rules:
+      - uid: guard-loop-selftest
+        title: GuardLoopSelfTest
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: __expr__
+            model: {type: math, expression: "1", refId: A}
+          - refId: C
+            datasourceUid: __expr__
+            model: {type: threshold, expression: A, refId: C, conditions: [{evaluator: {type: gt, params: [0]}}]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels: {guard: "true", severity: info, source: selftest, agent: lab-selftest}
+        annotations: {summary: "Self-test: this alert always fires. Remove it after the loop is proven."}
+      - uid: guard-tool-outside-allowlist
+        title: GuardToolOutsideAllowlist
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: "{{PROM_DS_UID}}"
+            relativeTimeRange: {from: 600, to: 0}
+            model:
+              refId: A
+              expr: sum by (service_name, tool) (increase(traces_spanmetrics_calls_total{span_name=~"tools/call.*", tool!~"k8s_get_.*|k8s_describe_resource|transfer_to_agent"}[10m]))
+              instant: true
+          - refId: C
+            datasourceUid: __expr__
+            model: {type: threshold, expression: A, refId: C, conditions: [{evaluator: {type: gt, params: [0]}}]}
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels: {guard: "true", severity: critical, source: otel-traces}
+        annotations: {summary: "Agent {{ $labels.service_name }} called tool {{ $labels.tool }}, which is not on its allowlist"}
+      - uid: guard-heartbeat-missing
+        title: GuardHeartbeatMissing
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: "{{PROM_DS_UID}}"
+            relativeTimeRange: {from: 1200, to: 0}
+            model: {refId: A, expr: "time() - max(guard_heartbeat_timestamp_seconds)", instant: true}
+          - refId: C
+            datasourceUid: __expr__
+            model: {type: threshold, expression: A, refId: C, conditions: [{evaluator: {type: gt, params: [900]}}]}
+        noDataState: Alerting            # no heartbeat at all is also an alarm
+        execErrState: Alerting
+        for: 5m
+        labels: {guard: "true", severity: critical, route: human-only}
+        annotations: {summary: "The Guard has not run for 15 minutes. Do not rely on automatic detection."}
+# The remaining rules in ../guard-alerts.yaml (token burn, long runs, non-2xx burst, telemetry missing, Warden) convert the same way:
+# keep the PromQL in `expr`, add the threshold node, copy labels/annotations.

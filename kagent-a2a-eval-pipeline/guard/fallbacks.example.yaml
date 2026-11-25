@@ -1,0 +1,9 @@
+# Approved fallbacks for guard/remediate.py (the overseer's fix-it step). Only agents and ModelConfigs listed here can ever be switched.
+namespace: kagent
+triggerKinds: [rate_limited, server_error, timeout, connect]   # 401/403, 400/404 and DNS go to a person
+maxSwitchesPerHour: 2            # all agents together; also counted from the agents' annotations
+perAgentCooldownS: 3600          # one switch per agent per hour
+readbackTimeoutS: 90             # not Ready on the fallback in time: the switch is reverted
+neverTouch: [guard-agent, completion-evaluator, agent-health-agent]
+agents:
+  "{{AGENT_NAME}}": {primary: "{{PRIMARY_MODELCONFIG}}", fallbacks: ["{{FALLBACK_MODELCONFIG}}"]}

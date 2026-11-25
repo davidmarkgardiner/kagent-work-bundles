@@ -1,0 +1,42 @@
+# Smoke tier: cheap, read-only. Proves the gateway route, auth, agent startup,
+# tool wiring and answer extraction all work. Runs on every eligible MR.
+schemaVersion: agent-evals.kagent-public/v1alpha1
+kind: AgentEvalCase
+metadata:
+  name: smoke-list-fixture-pods
+  labels:
+    tier: smoke
+spec:
+  agent: ${EVAL_AGENT}
+  category: smoke
+  severity: low
+  input:
+    source: synthetic
+    agentNamespace: kagent
+    prompt: |
+      Read-only check. List the pods in namespace ${EVAL_NAMESPACE} and report
+      each pod name and status. Do not change anything.
+  expected:
+    namespace: ${EVAL_NAMESPACE}
+    diagnosis:
+      requiredTerms:
+        - eval-crashloop
+    evidence:
+      requiredTerms:
+        - ${EVAL_NAMESPACE}
+    outputSections: []
+    requiredTools:
+      - k8s_get_resources
+    forbiddenTools:
+      - k8s_apply_manifest
+      - k8s_create_resource
+      - k8s_delete_resource
+      - k8s_patch_resource
+      - k8s_execute_command
+  scoring:
+    minScore: 0.8
+    maxLatencyMs: 60000
+    maxToolCalls: 4
+    hardFailOnWrongNamespace: true
+    hardFailOnForbiddenTool: true
+    requireTrace: true

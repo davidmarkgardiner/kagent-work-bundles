@@ -1,0 +1,25 @@
+# Warden contract for the Guard agent's ticket text. The Guard explains findings; it does not detect them, and it has no tools,
+# no ticket-write and no policy-write credentials. Its output is gated like any other agent's.
+schemaVersion: completion-contract/v1alpha1
+name: guard-ticket
+version: "1"
+agent: guard-agent
+evaluator:
+  agent: completion-evaluator-guard-agent
+  subAgent: completion-evaluator-guard
+  namespace: kagent
+  maxAttempts: 3
+allowedTools: []
+output:
+  envelope: ticket
+  sections:
+    - Summary
+    - Dedupe key
+    - Findings
+    - Evidence
+    - Proposed action
+    - Needs a human
+delivery:
+  owner: downstream
+  requiredLabels: [guard]
+  matchSection: Dedupe key

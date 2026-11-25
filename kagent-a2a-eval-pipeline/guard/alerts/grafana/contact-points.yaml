@@ -1,0 +1,23 @@
+# Grafana file provisioning: contact points. Copy to /etc/grafana/provisioning/alerting/ (or the Helm chart's alerting.* values).
+# Grafana's built-in Alertmanager sends these; no separate Alertmanager is needed.
+apiVersion: 1
+contactPoints:
+  - orgId: 1
+    name: guard-agent-intake          # plain-code receiver (guard/alert_receiver.py), never the agent directly
+    receivers:
+      - uid: guard-agent-intake
+        type: webhook
+        settings:
+          url: http://{{ALERT_RECEIVER_HOST}}:9094/alert
+          httpMethod: POST
+          authorization_scheme: Bearer
+          authorization_credentials: $ALERT_RECEIVER_TOKEN   # Grafana expands $ENV at provisioning time; keep it in a Secret
+          maxAlerts: 10
+        disableResolveMessage: true
+  - orgId: 1
+    name: guard-human-page            # the dead-man's switch path: must NOT depend on the agent system
+    receivers:
+      - uid: guard-human-page
+        type: webhook                 # replace with email / Teams / Slack / PagerDuty at work
+        settings:
+          url: http://{{HUMAN_PAGE_URL}}

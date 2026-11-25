@@ -1,0 +1,19 @@
+# Warden contract for the agent-health (overseer) agent. It reads an alert, looks at the agents with read-only tools,
+# and drafts an issue: what is failing, the likely cause, a recommendation. It never fixes anything itself.
+schemaVersion: completion-contract/v1alpha1
+name: agent-health-issue
+version: "1"
+agent: agent-health-agent
+evaluator:
+  agent: completion-evaluator-agent-health-agent
+  subAgent: completion-evaluator-agent-health
+  namespace: kagent
+  maxAttempts: 3
+maxToolCalls: 8   # hard gate; the prompt asks for 6. One live run made 14 calls and used 245000 tokens
+allowedTools: [k8s_get_resources, k8s_describe_resource, k8s_get_pod_logs, k8s_get_resource_yaml]  # no k8s_get_events: it returns a whole namespace and once produced a 4.4 MB result
+requiredTools:
+  - anyOf: [k8s_get_resources, k8s_describe_resource, k8s_get_resource_yaml]   # looked at the agents or pods named in the alert
+output:
+  envelope: issue
+  sections: [Summary, Dedupe key, What is failing, Likely cause, Recommendation, Needs a human]
+delivery: {owner: downstream, requiredLabels: [agent-health], matchSection: Dedupe key}

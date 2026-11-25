@@ -1,0 +1,14 @@
+# Spend and retry limits for the monitoring loop (alert -> overseer agent). Enforced in code by guard/circuit.py.
+# The aim: a failing agent, a 429 storm or a bad alert can never turn into a loop that burns tokens.
+maxAttemptsPerKey: 2          # per alert fingerprint per window: the first try plus at most one retry
+windowS: 3600
+backoffBaseS: 60              # retry delay doubles each failure: 60, 120, 240 ... capped
+backoffCapS: 900
+permanentStatuses: [400, 401, 403, 404, 422]   # retrying cannot help: hold the alert, tell a human
+permanentHoldS: 86400
+holdByStatus: {401: 21600, 403: 21600}   # a credential or permission error is held 6 h, not 24 h, and a person is told
+retryableStatuses: [429, 500, 502, 503, 504]   # one bounded retry, honouring Retry-After
+breakerFailures: 3            # consecutive failures anywhere in the loop open the breaker
+cooldownS: 1800
+tokenBudgetPerHour: 150000    # whole loop, failed runs included
+killSwitchFile: guard-loop.disabled   # create this file next to the state file to stop everything at once

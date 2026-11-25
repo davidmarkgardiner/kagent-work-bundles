@@ -1,0 +1,25 @@
+# Demo: a throwaway gateway route the Guard may block, behind JWT authentication. Nothing else uses it.
+# Copy jwtAuthentication from a working policy on the same gateway; policies on a listener and on a route stack (both must allow).
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata: {name: guard-demo, namespace: "{{ROUTE_NAMESPACE}}", labels: {guard-demo: "true"}}
+spec:
+  parentRefs: [{group: gateway.networking.k8s.io, kind: Gateway, name: "{{GATEWAY}}", namespace: "{{ROUTE_NAMESPACE}}", sectionName: "{{LISTENER}}"}]
+  rules:
+  - backendRefs: [{kind: Service, name: "{{BACKEND_SERVICE}}", port: "{{BACKEND_PORT}}"}]
+    filters: [{type: URLRewrite, urlRewrite: {path: {type: ReplaceFullPath, replaceFullPath: /}}}]
+    matches: [{path: {type: Exact, value: /guard-demo/invoke}}]
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata: {name: guard-demo-auth, namespace: "{{ROUTE_NAMESPACE}}", labels: {guard-demo: "true"}}
+spec:
+  targetRefs: [{group: gateway.networking.k8s.io, kind: HTTPRoute, name: guard-demo}]
+  traffic:
+    jwtAuthentication:
+      mode: Strict
+      preserveToken: false
+      providers: [{audiences: ["{{JWT_AUDIENCE}}"], issuer: "{{JWT_ISSUER}}", jwks: {inline: '{{JWKS_JSON}}'}}]
+    authorization:
+      action: Require
+      policy: {matchExpressions: ['jwt.sub == "system:serviceaccount:{{CALLER_NAMESPACE}}:{{CALLER_SERVICE_ACCOUNT}}"']}

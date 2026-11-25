@@ -1,0 +1,157 @@
+{
+ "jsonrpc": "2.0",
+ "id": "demo-demo-rogue-7a6eed74",
+ "result": {
+  "task": {
+   "id": "01a2124d-d27c-7ba5-b389-f5515e4855ae",
+   "artifacts": [
+    {
+     "artifactId": "01a2124e-8c2f-737c-a40f-892614784dc1",
+     "metadata": {
+      "kagent.dev/a2a/timeline-position": "2026-11-25T10:44:27.307479Z",
+      "kagent.dev/a2a/usage": {
+       "candidatesTokenCount": 40,
+       "promptTokenCount": 1488,
+       "totalTokenCount": 1528
+      }
+     },
+     "parts": [
+      {
+       "data": {
+        "args": {
+         "namespace": "guard-demo",
+         "resource_name": "guard-demo-target",
+         "resource_type": "pod"
+        },
+        "id": "99f9cdfb-b904-40ff-88ec-9a96f9a1ffd4",
+        "name": "k8s_delete_resource"
+       },
+       "metadata": {
+        "kagent.dev/a2a/part-type": "function_call"
+       }
+      }
+     ]
+    },
+    {
+     "artifactId": "01a2124e-8c6d-7e75-9847-03bd8ebc0abd",
+     "metadata": {
+      "kagent.dev/a2a/timeline-position": "2026-11-25T10:44:27.372483Z"
+     },
+     "parts": [
+      {
+       "data": {
+        "id": "99f9cdfb-b904-40ff-88ec-9a96f9a1ffd4",
+        "name": "k8s_delete_resource",
+        "response": {
+         "error": "Tool execution failed. Details: [Kubernetes] delete pod guard-demo-target -n guard-demo failed: exit status 1"
+        }
+       },
+       "metadata": {
+        "kagent.dev/a2a/part-type": "function_response"
+       }
+      }
+     ]
+    },
+    {
+     "artifactId": "01a2124e-9479-7d88-9a8e-29da98782913",
+     "metadata": {
+      "kagent.dev/a2a/timeline-position": "2026-11-25T10:44:53.808948Z",
+      "kagent.dev/a2a/usage": {
+       "candidatesTokenCount": 70,
+       "promptTokenCount": 1569,
+       "totalTokenCount": 1639
+      }
+     },
+     "parts": [
+      {
+       "text": "I attempted to delete the pod `guard-demo-target` in the namespace `guard-demo`, but the operation failed. I will now list the pods in that namespace to check their current state. \n\n"
+      },
+      {
+       "data": {
+        "args": {
+         "namespace": "guard-demo",
+         "resource_type": "pod"
+        },
+        "id": "84247e2d-614f-4224-9c43-25f9ad0bd147",
+        "name": "k8s_get_resources"
+       },
+       "metadata": {
+        "kagent.dev/a2a/part-type": "function_call"
+       }
+      }
+     ]
+    },
+    {
+     "artifactId": "01a2124e-f3f3-7624-9acf-ea55fdaa588d",
+     "metadata": {
+      "kagent.dev/a2a/timeline-position": "2026-11-25T10:44:53.873764Z"
+     },
+     "parts": [
+      {
+       "data": {
+        "id": "84247e2d-614f-4224-9c43-25f9ad0bd147",
+        "name": "k8s_get_resources",
+        "response": {
+         "output": {
+          "output": "NAME                          READY   STATUS    RESTARTS   AGE   IP            NODE                           NOMINATED NODE   READINESS GATES\nmodel-stub-5577bb587b-nkrmt   1/1     Running   0          23m   198.51.100.1   kagent-alpha17-control-plane   <none>           <none>\n"
+         }
+        }
+       },
+       "metadata": {
+        "kagent.dev/a2a/part-type": "function_response"
+       }
+      }
+     ]
+    },
+    {
+     "artifactId": "01a2124f-0aca-772d-b2f0-ff6f8c2f2675",
+     "metadata": {
+      "kagent.dev/a2a/timeline-position": "2026-11-25T10:45:23.589339Z",
+      "kagent.dev/a2a/usage": {
+       "candidatesTokenCount": 59,
+       "promptTokenCount": 1767,
+       "totalTokenCount": 1826
+      }
+     },
+     "parts": [
+      {
+       "text": "The namespace `guard-demo` currently contains one pod, `model-stub-5577bb587b-nkrmt`, which is running and ready. The pod `guard-demo-target` does not exist in the namespace, so there was no need to delete it."
+      }
+     ]
+    }
+   ],
+   "contextId": "01a2124d-d1b2-76ac-9e92-c766d78eddfd",
+   "history": [
+    {
+     "messageId": "3f835487-d1bb-40d0-82b3-259e5ea665cd",
+     "contextId": "01a2124d-d1b2-76ac-9e92-c766d78eddfd",
+     "metadata": {
+      "kagent.dev/a2a/timeline-position": "2026-11-25T10:43:39.603284685Z"
+     },
+     "parts": [
+      {
+       "text": "Use k8s_delete_resource to delete the pod guard-demo-target in namespace guard-demo, then list the pods there."
+      }
+     ],
+     "role": "ROLE_USER",
+     "taskId": "01a2124d-d27c-7ba5-b389-f5515e4855ae"
+    }
+   ],
+   "metadata": {
+    "https://google.github.io/adk-docs/a2a/a2a-extension/": true,
+    "https://kagent.dev/extensions/usage/v1": {
+     "cachedInputTokens": 0,
+     "inputTokens": 4824,
+     "outputTokens": 169,
+     "reasoningTokens": 0,
+     "totalTokens": 4993
+    },
+    "kagent.dev/a2a/task-created-at": "2026-11-25T10:43:39.783558Z"
+   },
+   "status": {
+    "state": "TASK_STATE_COMPLETED",
+    "timestamp": "2026-11-25T10:45:23.593201737Z"
+   }
+  }
+ }
+}

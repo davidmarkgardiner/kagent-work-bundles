@@ -83,6 +83,7 @@ VISUAL.html      - lightweight stakeholder/SRE workflow visual
 
 | Bundle | Capability | Primary outcome |
 |---|---|---|
+| [`kagent-a2a-eval-pipeline/`](kagent-a2a-eval-pipeline/FRONT-SHEET.md) | Agent reliability: Assay (pipeline eval), Warden (in-place A2A sign-off), Guard (rogue-agent detection and gateway block), Overseer (fix-it fallback switch, Grafana alert intake) | Phased work-agent rollout with a verifier, a live demo kit (healthy, rogue blocked 200→403, broken agent fixed) and a standalone launch deck (`presentation/launch-deck.html`) |
 | [`graph-rest-mcp/`](graph-rest-mcp/WORK-AGENT-START-HERE.md) | Existing Swagger REST API → bounded FastMCP tool | Reviewed work-agent adaptation handoff, exact image/wheel prerequisites and fresh local proof; private contract and target-native acceptance remain work-side gates |
 | [`agent-platform-four-crds/`](agent-platform-four-crds/FRONT-SHEET.md) | CRD onboarding without Substrate | Reviewed skill/knowledge, controller-managed Agent, one fixed read-only MCP capability and correlated OTel; exact workplace compatibility remains a target gate |
 | [`otel-agent-flow/`](otel-agent-flow/FRONT-SHEET.md) | OTel workflow UI over Istio HTTPS | Native ADK Deployment versus Substrate actor comparison, real Kubernetes/GitLab MCP calls, fixture profiles, and Istio HTTPS integration |

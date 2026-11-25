@@ -1,0 +1,6 @@
+# Trusted identity map for the demo: the gateway caller a block may name. From gateway config, never from event data.
+agents:
+  demo-rogue:
+    subject: "system:serviceaccount:${GW_CALLER_NS}:${GW_CALLER_SA}"
+    route: "${GW_ROUTE}"
+    namespace: "${POLICY_NS}"

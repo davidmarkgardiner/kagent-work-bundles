@@ -1,0 +1,51 @@
+# Prometheus alert rules for the Guard signals and the Warden gate.
+#
+# STATUS: structure is tested offline. The metric names are an UNVERIFIED mapping from OpenTelemetry semantic conventions and
+# Tempo's metrics-generator output; check them against the metrics your gateway and Tempo actually export before relying on
+# any rule. Thresholds are placeholders: take them from guard/rules.yaml.
+groups:
+  - name: guard
+    rules:
+      - alert: GuardAgentRunTooLong
+        expr: histogram_quantile(0.99, sum by (le, service_name) (rate(traces_spanmetrics_latency_bucket{span_name=~"invoke_agent.*"}[5m]))) > 300
+        for: 5m
+        labels: {severity: warning, guard: "true", source: otel-traces}
+        annotations: {summary: "Agent {{ $labels.service_name }} runs are slower than the 300 s budget"}
+      - alert: GuardAgentTokenBurn
+        expr: sum by (service_name) (increase(gen_ai_client_token_usage_sum[1h])) > 400000
+        for: 5m
+        labels: {severity: critical, guard: "true", source: otel-traces}
+        annotations: {summary: "Agent {{ $labels.service_name }} used more than 400000 tokens in an hour"}
+      - alert: GuardToolOutsideAllowlist
+        expr: sum by (service_name, tool) (increase(traces_spanmetrics_calls_total{span_name=~"tools/call.*", tool!~"k8s_get_.*|k8s_describe_resource|transfer_to_agent"}[10m])) > 0
+        for: 0m
+        labels: {severity: critical, guard: "true", source: otel-traces}
+        annotations: {summary: "Agent {{ $labels.service_name }} called tool {{ $labels.tool }}, which is not on its allowlist"}
+      - alert: GuardNon2xxBurst
+        expr: sum by (caller) (increase(traces_spanmetrics_calls_total{http_response_status_code!~"2.."}[5m])) >= 5
+        for: 1m
+        labels: {severity: warning, guard: "true", source: otel-traces}
+        annotations: {summary: "Caller {{ $labels.caller }} received a burst of non-2xx responses"}
+      - alert: GuardTelemetryMissing
+        expr: absent(traces_spanmetrics_calls_total{service_name="sentinel-investigator"})
+        for: 30m
+        labels: {severity: warning, guard: "true", source: otel-traces}
+        annotations: {summary: "No spans from sentinel-investigator for 30 minutes: the export may be down, or the agent is not running"}
+      # Dead-man's switch. This must page a person through a path that does not depend on the agent system.
+      - alert: GuardHeartbeatMissing
+        expr: absent(guard_heartbeat_timestamp_seconds) or (time() - guard_heartbeat_timestamp_seconds) > 900
+        for: 5m
+        labels: {severity: critical, guard: "true", route: human-only}
+        annotations: {summary: "The Guard has not run for 15 minutes. Do not rely on automatic detection."}
+  - name: warden
+    rules:
+      - alert: WardenRunBlocked
+        expr: sum by (agent, route) (increase(warden_runs_total{verdict!="PASS"}[15m])) > 0
+        for: 0m
+        labels: {severity: warning, guard: "true", source: warden}
+        annotations: {summary: "Warden blocked a run of {{ $labels.agent }} (route {{ $labels.route }})"}
+      - alert: WardenAllRunsBlocked
+        expr: sum by (agent) (increase(warden_runs_total{verdict!="PASS"}[1h])) > 3 and sum by (agent) (increase(warden_runs_total{verdict="PASS"}[1h])) == 0
+        for: 0m
+        labels: {severity: critical, guard: "true", source: warden}
+        annotations: {summary: "Every Warden-checked run of {{ $labels.agent }} was blocked in the last hour"}

@@ -1,0 +1,41 @@
+# Completion contract for the BYO Sentinel investigation agent.
+# The worker investigates one Sentinel finding or missing-report event with
+# read-only tools, has the evaluator check its report, and returns it. The
+# receiver (never the worker) then writes or updates the GitLab issue and reads
+# it back; pass that read-back to verify_completion.py --readback.
+schemaVersion: completion-contract/v1alpha1
+name: sentinel-investigation
+version: "1"
+agent: sentinel-investigator-agent
+evaluator:
+  agent: completion-evaluator-agent   # kagent 0.7.x: a type: Agent tool (kagent__NS__completion_evaluator_agent)
+  subAgent: completion-evaluator       # kagent 1.x: subAgent name, reached by transfer_to_agent
+  namespace: kagent
+  maxAttempts: 3
+# Allowlist. Anything else the worker calls fails the gate and routes to reject.
+# Workplace: swap these for the read-only aks-mcp tool names bound to the agent.
+maxToolCalls: 14   # the live runs used 4 to 6; a wandering run should fail, not continue
+allowedTools:
+  - k8s_get_resources
+  - k8s_describe_resource
+  - k8s_get_events
+  - k8s_get_pod_logs
+  - k8s_get_resource_yaml
+  - k8s_get_cluster_configuration
+requiredTools:
+  # Looked at the live objects, then at why they are failing.
+  - anyOf: [k8s_get_resources, k8s_describe_resource, k8s_get_resource_yaml]
+  - anyOf: [k8s_get_events, k8s_get_pod_logs]
+output:
+  envelope: result
+  sections:
+    - Summary
+    - Incident key          # binding/cluster/namespace/kind/name/finding-type, one line
+    - Evidence
+    - Likely cause
+    - Owner and next steps
+    - Confidence
+delivery:
+  owner: downstream         # receiver writes the issue after PASS; worker has no GitLab write tool
+  requiredLabels: [sentinel]
+  matchSection: Incident key

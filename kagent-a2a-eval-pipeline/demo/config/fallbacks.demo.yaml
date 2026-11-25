@@ -1,0 +1,9 @@
+# Approved fallbacks for guard/remediate.py. Only agents and ModelConfigs listed here can ever be switched.
+namespace: ${NS}
+triggerKinds: [rate_limited, server_error, timeout, connect]
+maxSwitchesPerHour: 2
+perAgentCooldownS: 3600
+readbackTimeoutS: 120
+neverTouch: [guard-agent, completion-evaluator]
+agents:
+  demo-worker: {primary: "${STUB_MODELCONFIG}", fallbacks: ["${FALLBACK_MODELCONFIG}"]}

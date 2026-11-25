@@ -1,0 +1,43 @@
+# Seeded fault for triage-crashloop-bad-env. Applied into ${EVAL_NAMESPACE}
+# by the CI fixture step; the namespace is deleted afterwards.
+# eval-crashloop: exits because REQUIRED_SETTING is unset (the real fault).
+# eval-distractor: healthy, so the agent must not stop at "something is odd".
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eval-crashloop
+  labels: {app: eval-crashloop, eval.kagent/fixture: "true"}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: eval-crashloop}}
+  template:
+    metadata: {labels: {app: eval-crashloop}}
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: app
+          image: busybox:1.36   # mirror to your internal registry
+          command: ["sh", "-c", "if [ -z \"$REQUIRED_SETTING\" ]; then echo 'FATAL: environment variable REQUIRED_SETTING is not set' >&2; exit 1; fi; sleep 3600"]
+          resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eval-distractor
+  labels: {app: eval-distractor, eval.kagent/fixture: "true"}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: eval-distractor}}
+  template:
+    metadata: {labels: {app: eval-distractor}}
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 65532, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: app
+          image: busybox:1.36
+          command: ["sh", "-c", "echo healthy; sleep 3600"]
+          resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {cpu: 50m, memory: 32Mi}}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
