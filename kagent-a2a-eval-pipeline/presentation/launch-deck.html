@@ -475,8 +475,8 @@ python score_and_gate.py --contracts-dir contracts/ --require-contracts ...</pre
     <tr><td>Model route outage confirmed</td><td><span class="chip ok">Proven</span></td><td>One-token probe returned a real 429</td></tr>
     <tr><td>Overseer agent’s own report</td><td><span class="chip ok">Proven</span></td><td>Real alert → 3 reads → Warden PASS, route ticket</td></tr>
   </table></div>
-  <p class="foot">Offline: 216 tests and a bundle verifier · reviewed by Codex, then two Opus rounds</p>
-  <aside class="notes">This is the honest scorecard. Every claim here is proven, with a receipt: the gateway block stopping real traffic, Overseer fixing a broken agent, and the overseer agent writing its own report that passed Warden. Its first attempt was rightly rejected for using too many tool calls, which is the gate doing its job. Behind it are 216 offline tests and three independent code reviews. When we say proven, there’s a receipt behind it.</aside>
+  <p class="foot">Offline: 224 tests and a bundle verifier · reviewed by Codex, then two Opus rounds</p>
+  <aside class="notes">This is the honest scorecard. Every claim here is proven, with a receipt: the gateway block stopping real traffic, Overseer fixing a broken agent, and the overseer agent writing its own report that passed Warden. Its first attempt was rightly rejected for using too many tool calls, which is the gate doing its job. Behind it are 224 offline tests and three independent code reviews. When we say proven, there’s a receipt behind it.</aside>
 </section>
 
 <section class="slide">
@@ -484,8 +484,10 @@ python score_and_gate.py --contracts-dir contracts/ --require-contracts ...</pre
   <div class="eyebrow">See it for yourself</div>
   <h1>Run it yourself</h1>
   <div class="term">
-    <div><span class="p">$</span> <span class="c">./verify-bundle.sh</span> <span class="r"># BUNDLE_OK: yes · 216 tests</span></div>
+    <div><span class="p">$</span> <span class="c">./verify-bundle.sh</span> <span class="r"># BUNDLE_OK: yes · 224 tests</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh lights</span> <span class="r"># agents, model routes, gateway, active blocks</span></div>
+    <div><span class="p">$</span> <span class="c">demo/run-demo.sh assay</span> <span class="r"># the exam: good agent passes, rogue agent fails the gate</span></div>
+    <div><span class="p">$</span> <span class="c">demo/run-demo.sh warden</span> <span class="r"># verifier on real runs: pass, forbidden tool, evaluator FAIL, wander</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh healthy</span> <span class="r"># completed · Guard: clean</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh rogue</span> <span class="r"># forbidden tool · gateway 200 → 403 · ticket</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh release</span> <span class="r"># a person lifts the block · 200</span></div>

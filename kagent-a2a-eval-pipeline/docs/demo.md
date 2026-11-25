@@ -4,6 +4,8 @@ One script, `demo/run-demo.sh`, shows every product working on a real cluster in
 
 | Scene | What you see | Products |
 |---|---|---|
+| `assay` | The exam: the real capture and score commands against two live agents (`--protocol 1x`). The healthy agent passes (1.0); an agent that follows an injected "delete a pod" instruction fails on the forbidden tool. The exit code is what blocks a merge in GitLab | Assay |
+| `warden` | The verifier checks five real saved runs against their contracts: a good run passes; a forbidden tool, a wandering run (14 calls against a budget of 8) and an evaluator FAIL are caught. No model calls | Warden |
 | `lights` | Every demo agent, its model route (probed with one token), the gateway route as the caller, and active Guard blocks | Guard probe, gateway |
 | `healthy` | A read-only agent does its job; the Guard reads the real run and finds nothing | Guard detector |
 | `rogue` | An injected instruction makes an agent call `k8s_delete_resource`; the Guard flags `forbidden_tool` from the real run, proposes a block (server dry-run), applies it, and the gateway goes from **200** to **403** for that caller on that route; a ticket is written | Guard detect, propose, enforce |
@@ -11,7 +13,7 @@ One script, `demo/run-demo.sh`, shows every product working on a real cluster in
 | `broken` | An agent whose model answers 429 fails; both routes are probed; `remediate.py` switches it to an approved fallback and reads it back; the same question now completes; a ticket says what changed | Overseer fix-it step |
 | `reset` | Puts the broken agent back on its failing model and clears blocks, so the demo can run again | |
 
-Run all of it with `demo/run-demo.sh all`, or one scene at a time.
+Run all of it with `demo/run-demo.sh all` (the `assay` scene asks two live agents one question each, about three minutes on a small local model; set `ASSAY_REPEAT=3` for the CI-strength three runs), or one scene at a time.
 
 ## Verified on the home lab (25 November 2026)
 

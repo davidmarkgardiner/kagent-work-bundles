@@ -5,5 +5,5 @@
 ```sh
 cp demo.env.example demo.env      # fill it: explicit context, URLs, caller identity, fallback
 ./run-demo.sh forward             # lab port-forwards
-./run-demo.sh all                 # or: lights | healthy | rogue | release | broken | reset
+./run-demo.sh all                 # or: lights | assay | warden | healthy | rogue | release | broken | reset
 ```

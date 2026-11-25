@@ -21,6 +21,32 @@ gw_call() { local t; t=$(k -n "$GW_CALLER_NS" create token "$GW_CALLER_SA" --aud
   curl -s -o /dev/null -w '%{http_code}' -X POST -H "Authorization: Bearer $t" -H 'content-type: application/json' "$GW_URL" -d '{}'; }
 ask() { python3 "$HERE/ask_agent.py" --base "$A2A_BASE" --agent "$1" --text "$2" --out "$RUN/$3"; }
 
+warden() {
+  say "WARDEN: the verifier checks the real record of a run against its contract (real saved runs, no model calls)"
+  local fx="$B/tests/fixtures" ct="$B/completion-gate/contracts"
+  show() {  # label, contract, receipt
+    python3 "$B/verify_completion.py" --contract "$ct/$2" --receipt "$fx/$3" >"$RUN/warden-out.json" 2>/dev/null || true
+    python3 -c 'import json,sys;d=json.load(open(sys.argv[2]));print("  %-34s -> %-4s route=%-24s %s"%(sys.argv[1],d["verdict"],d["route"],(d["failures"] or ["all checks hold"])[0][:70]))' "$1" "$RUN/warden-out.json"; }
+  show "good run" sentinel-investigator.yaml a2a-v1x-sentinel-pass-live.json
+  show "used a tool it was not allowed" sentinel-investigator.yaml a2a-v1x-rogue-extra-tool-live.json
+  show "evaluator said FAIL" sentinel-investigator.yaml a2a-v1x-subagent-missing-contract.json
+  show "wandered: too many tool calls" agent-health.yaml a2a-v1x-overseer-wander-live.json
+  show "overseer, with its read access" agent-health.yaml a2a-v1x-overseer-pass-live.json
+  echo "  reject = nothing is ticketed; evaluation_failed_ticket = a labelled ticket for a person. The agent never writes the ticket; the receiver does."; }
+
+assay() {
+  say "ASSAY: the exam an agent must pass before it can merge (the same commands the GitLab job runs)"
+  local out="$RUN/assay"; rm -rf "$out"; mkdir -p "$out"
+  export EVAL_NAMESPACE=guard-demo EVAL_REPEAT="${ASSAY_REPEAT:-1}" EVAL_MODEL_LABEL=demo
+  for ag in demo-healthy demo-rogue; do
+    echo "  asking $ag (through the same A2A endpoint), repeat $EVAL_REPEAT ..."
+    python3 "$B/a2a_capture.py" --protocol 1x --base-url "${A2A_BASE%/agents/*}" --cases-dir "$B/demo/cases" --tier full --agent "$ag" --repeat "$EVAL_REPEAT" --out "$out/eval-$ag" --timeout 300 | sed 's/^/    /' || true
+  done
+  say "Score and gate (score_and_gate.py): the exit code is what blocks the merge"
+  local rc=0; python3 "$B/score_and_gate.py" --capture-dirs "$out"/eval-* --repeat "$EVAL_REPEAT" --expect-agents demo-healthy demo-rogue --out "$out/report" >"$out/gate.txt" || rc=$?
+  sed 's/^/  /' "$out/gate.txt"
+  [[ $rc == 1 ]] && ok "exit 1: demo-rogue fails, so its merge is blocked; demo-healthy passes" || bad "exit $rc (expected 1: one agent should fail)"; }
+
 forward() {  # lab only: port-forwards with pid files (never pkill -f)
   for spec in ${FORWARDS:-}; do IFS='|' read -r ns svc ports <<<"$spec"; local pid="$RUN/pf-${svc}.pid"
     if [[ -f "$pid" ]] && kill -0 "$(cat "$pid")" 2>/dev/null; then continue; fi
@@ -96,7 +122,7 @@ reset() {
   rm -f "$RUN/ledger.jsonl" "$RUN/remediation.jsonl"; rm -rf "$RUN/proposals" "$RUN/tickets" "$RUN"/propose-state*; ok "reset"; }
 
 case "${1:-}" in
-  forward) forward ;; lights) lights ;; healthy) healthy ;; rogue) rogue ;; release) release ;; broken) broken ;; reset) reset ;;
-  all) forward; lights; healthy; rogue; release; broken; lights ;;
-  *) echo "usage: $0 forward|lights|healthy|rogue|release|broken|reset|all"; exit 3 ;;
+  forward) forward ;; assay) assay ;; warden) warden ;; lights) lights ;; healthy) healthy ;; rogue) rogue ;; release) release ;; broken) broken ;; reset) reset ;;
+  all) forward; lights; assay; warden; healthy; rogue; release; broken; lights ;;
+  *) echo "usage: $0 forward|lights|assay|warden|healthy|rogue|release|broken|reset|all"; exit 3 ;;
 esac

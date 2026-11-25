@@ -50,7 +50,7 @@ over A2A and captured trajectories. This bundle fills that gap and nothing more.
 
 ```sh
 pip install -r requirements.txt
-python -m unittest discover -s tests -v        # offline, 216 tests
+python -m unittest discover -s tests -v        # offline, 224 tests
 python tests/lint_cases.py cases
 
 export AGW_BASE_URL=https://{{AGW_HOST}} AGW_TOKEN={{TOKEN}}

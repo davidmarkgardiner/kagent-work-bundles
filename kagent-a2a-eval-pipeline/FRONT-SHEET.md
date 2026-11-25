@@ -35,7 +35,7 @@ separately approved agent. Warden checks the investigation, not a repair.
 
 | Claim | Status | Receipt |
 |---|---|---|
-| 216 offline tests, case lint, generated evaluator is current | PASS | `./verify-bundle.sh` |
+| 224 offline tests, case lint, generated evaluator is current | PASS | `./verify-bundle.sh` |
 | Assay: smoke and full pass^3 through the gateway on kagent 0.7.13 | PASS (1.0 each) | evidence file, stage 1 sections |
 | Warden on kagent 0.7.13 (evaluator as a `type: Agent` tool) | 1 live PASS | evidence file, stage 2 section |
 | Warden on kagent 1.0.0-alpha17 (evaluator as a `subAgent`), A2A 1.0 | 2 of 3 PASS; the third was a correct block | evidence file, 1.x section |
@@ -47,6 +47,8 @@ separately approved agent. Warden checks the investigation, not a repair.
 | Direct block (`guard/enforce.py`): apply, read back, release on a real cluster; caps and kill switch | PASSED live on the lab again on 25 Nov 2026 after all hardening, through the full Guard path: the caller went **200 → 403 → 200** after `release`, and the same caller on another route stayed 200. Caps and kill switch are tested offline (fake kubectl, mutation-tested) | same |
 | Overseer fix-it step (`guard/remediate.py`): switch a broken agent to an approved fallback ModelConfig | PASSED live on the lab, 25 Nov 2026: 429 failure → probes → switched and read back → the same question completed; ticket written; second apply refused. 15 offline tests, 5 safeguard mutations caught | lab |
 | Live demo (`demo/run-demo.sh all`): lights, healthy, rogue blocked, broken fixed | PASSED end to end on the lab in 6 min 30 s (`docs/demo.md`) | lab |
+| `assay` scene: capture + score against live agents on kagent 1.x (`a2a_capture.py --protocol 1x`) | PASSED live, 25 Nov 2026: healthy agent passes (1.0); rogue agent fails on `k8s_delete_resource`; exit 1 blocks the merge. 8 new tests incl. a fake-gateway replay of both runs | lab |
+| `warden` scene: the verifier on real saved runs | PASSED: pass, forbidden tool, evaluator FAIL, 14-call wander, overseer pass all give the expected verdicts | offline |
 | Overseer agent's own report through its Warden contract | PASSED live, 25 Nov 2026, after giving its tool server read access to Agents and ModelConfigs (the first run was rightly rejected for 9 tool calls > 8): 3 reads, evaluator PASS, verifier `ticket` | lab |
 | Whole loop with Grafana (`demo/grafana-loop/`): failure → metric → Grafana → receiver → overseer → Warden → fix → alert resolves | PASSED live, 25 Nov 2026: one webhook, one overseer run (Warden PASS, `ticket`), resolved 105 s after the fix, 5 quiet minutes, replay suppressed, `down.sh` ALL STOPPED | lab |
 | Model-route probe | PASS live (ok, and a closed port classified as a wait) | same |

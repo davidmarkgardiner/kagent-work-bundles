@@ -40,6 +40,8 @@ import yaml
 
 # Matches gateway/route-a2a-eval.yaml. Override with AGW_A2A_URL_TEMPLATE.
 DEFAULT_URL_TEMPLATE = "{base}/a2a/{agent_ns}/{agent}/"
+URL_TEMPLATE_1X = "{base}/agents/{agent_ns}/{agent}"   # kagent 1.x
+USAGE_V1 = "https://kagent.dev/extensions/usage/v1"
 SUBST_PATTERN = re.compile(r"\$\{(EVAL_[A-Z0-9_]+)\}")
 # Only statuses where the gateway rejected the call before the agent ran.
 # 502/504 are ambiguous (the agent may have started acting), so never retried.
@@ -83,6 +85,62 @@ def build_payload(prompt: str, request_id: str) -> dict[str, Any]:
             }
         },
     }
+
+
+def build_payload_1x(prompt: str, request_id: str) -> dict[str, Any]:
+    """kagent 1.x: SendMessage, role ROLE_USER, bare text parts. No contextId: 1.x binds one to the first agent and rejects reuse."""
+    return {"jsonrpc": "2.0", "id": request_id, "method": "SendMessage",
+            "params": {"message": {"messageId": request_id, "role": "ROLE_USER", "parts": [{"text": prompt}]}}}
+
+
+def normalize_1x(response: dict[str, Any], request_id: str | None = None) -> dict[str, Any]:
+    """Turn a kagent 1.x SendMessage response into the same shape as normalize(). Fails closed like it:
+    only TASK_STATE_COMPLETED with a non-blank answer is a completed run."""
+    if not isinstance(response, dict) or response.get("jsonrpc") != "2.0":
+        raise InfraError("response is not a JSON-RPC 2.0 object")
+    if request_id is not None and response.get("id") != request_id:
+        raise InfraError(f"JSON-RPC id mismatch: sent {request_id!r}, got {response.get('id')!r}")
+    if "error" in response:
+        raise InfraError(f"JSON-RPC error: {json.dumps(response['error'])[:300]}")
+    task = (response.get("result") or {}).get("task")
+    if not isinstance(task, dict):
+        raise InfraError("JSON-RPC response has no result.task object")
+    status = task.get("status") or {}
+    state = str(status.get("state", "unknown"))
+    tool_calls: list[dict[str, Any]] = []
+    tool_errors: list[str] = []
+    seen: set[str] = set()
+    texts: list[str] = []
+    for art in task.get("artifacts") or []:
+        for part in (art.get("parts") or []) if isinstance(art, dict) else []:
+            if not isinstance(part, dict):
+                continue
+            kind = (part.get("metadata") or {}).get("kagent.dev/a2a/part-type")
+            data = part.get("data")
+            if isinstance(data, dict) and kind == "function_call":
+                cid = str(data.get("id") or f"anon-{len(seen)}")
+                if cid not in seen:
+                    seen.add(cid)
+                    args_ = data.get("args")
+                    tool_calls.append({"id": cid, "name": data.get("name", ""), "arguments": args_ if isinstance(args_, dict) else {}})
+            elif isinstance(data, dict) and kind == "function_response":
+                resp = data.get("response")
+                if data.get("isError") or data.get("error") or (isinstance(resp, dict) and (resp.get("isError") or resp.get("error"))):
+                    tool_errors.append(str(data.get("name")))
+            elif isinstance(part.get("text"), str) and data is None:
+                texts.append(part["text"])
+    msg_text = " ".join(p.get("text", "") for p in (status.get("message") or {}).get("parts", []) if isinstance(p, dict) and isinstance(p.get("text"), str))
+    text = "\n".join(texts) if texts else ""
+    usage = (task.get("metadata") or {}).get(USAGE_V1) or {}
+    if state != "TASK_STATE_COMPLETED":
+        outcome, reason, text = "agent_error", f"status.state={state}: {msg_text[:160]}".rstrip(": "), ""
+    elif not text.strip():
+        outcome, reason = "agent_error", "empty answer"
+    else:
+        outcome, reason = "completed", ""
+    return {"outcome": outcome, "outcome_reason": reason, "a2a_state": state.replace("TASK_STATE_", "").lower(), "final_response": text,
+            "tool_calls": tool_calls, "tool_errors": tool_errors, "trajectory_source": "a2a_artifacts",
+            "input_tokens": usage.get("inputTokens"), "output_tokens": usage.get("outputTokens")}
 
 
 def _never_sent(exc: urllib.error.URLError) -> bool:
@@ -236,7 +294,8 @@ def main() -> int:
     ap.add_argument("--cases-dir", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--base-url", default=os.environ.get("AGW_BASE_URL"), help="agentgateway base URL (env AGW_BASE_URL)")
-    ap.add_argument("--url-template", default=os.environ.get("AGW_A2A_URL_TEMPLATE", DEFAULT_URL_TEMPLATE))
+    ap.add_argument("--protocol", choices=["0.7", "1x"], default=os.environ.get("AGW_A2A_PROTOCOL", "0.7"), help="kagent A2A protocol: 0.7 (message/send) or 1x (SendMessage)")
+    ap.add_argument("--url-template", default=os.environ.get("AGW_A2A_URL_TEMPLATE"))
     ap.add_argument("--tier", help="only cases with metadata.labels.tier == TIER (default label: full)")
     ap.add_argument("--case", action="append", default=[], help="only this case name (repeatable)")
     ap.add_argument("--agent", help="only cases for this spec.agent (used by parallel:matrix)")
@@ -272,7 +331,7 @@ def main() -> int:
         (args.out / "rendered-cases" / f"{name}.yaml").write_text(rendered)
         case_sha = hashlib.sha256(rendered.encode()).hexdigest()
         agent_ns = spec["input"].get("agentNamespace", "kagent")
-        url = args.url_template.format(base=args.base_url.rstrip("/"), agent_ns=agent_ns, agent=spec["agent"])
+        url = (args.url_template or (URL_TEMPLATE_1X if args.protocol == "1x" else DEFAULT_URL_TEMPLATE)).format(base=args.base_url.rstrip("/"), agent_ns=agent_ns, agent=spec["agent"])
         if not url.endswith("/"):
             url += "/"  # kagent A2A returns 404 without the trailing slash
 
@@ -284,9 +343,10 @@ def main() -> int:
             started = time.monotonic()
             receipt: dict[str, Any] = {}
             try:
-                receipt = post_json(url, build_payload(spec["input"]["prompt"], run_id),
-                                    {**headers, "traceparent": traceparent}, args.timeout, args.retries)
-                norm = normalize(receipt, run_id)
+                one_x = args.protocol == "1x"
+                receipt = post_json(url, (build_payload_1x if one_x else build_payload)(spec["input"]["prompt"], run_id),
+                                    {**headers, "traceparent": traceparent, **({"A2A-Version": "1.0"} if one_x else {})}, args.timeout, args.retries)
+                norm = (normalize_1x if one_x else normalize)(receipt, run_id)
             except InfraError as exc:
                 norm = {"outcome": "infra_error", "outcome_reason": str(exc), "a2a_state": None,
                         "final_response": "", "tool_calls": [], "tool_errors": [],
