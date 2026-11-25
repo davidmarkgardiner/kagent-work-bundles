@@ -146,7 +146,7 @@ An optional `lookout` scene was added to `demo/run-demo.sh` (not part of `all`) 
 | after a push: note lists pickle, SQL injection and the new token | `posted`, mode `full` | 40,965 / 3,059 | 4 |
 | injection merge request | `posted`, no tool outside the allowlist | 13,717 / 1,303 | 4 |
 
-Cost varies a lot between runs of the same review (this first review used about 58k tokens; earlier runs of a similar one used 37k to 42k), so quote ranges, not single numbers. Mock GitLab only. Lab objects were removed afterwards. 354 offline tests pass.
+Cost varies a lot between runs of the same review (this first review used about 58k tokens; earlier runs of a similar one used 37k to 42k), so quote ranges, not single numbers. Mock GitLab only. Lab objects were removed afterwards. 362 offline tests pass.
 
 ## Defects found live and fixed
 

@@ -22,6 +22,7 @@ nav:
   - Grafana alerting setup: grafana-alerting.md
   - "Live demo: healthy, rogue, broken": demo.md
   - "Demo walkthrough sheet": walkthrough.md
+  - "Code tour: what to point at": code-tour.md
   - "Monitoring loop design": alert-loop.md
 markdown_extensions:
   - tables

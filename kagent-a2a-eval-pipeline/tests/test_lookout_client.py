@@ -60,6 +60,12 @@ class Prompt(unittest.TestCase):
         _, seen, _ = run_main(lambda rid: a2a_response(rid, [GOOD_POST]))
         self.assertTrue(seen["url"].endswith("/a2a/kagent/mr-security-review/"))
 
+    def test_kagent_0x_controller_path_with_a_url_template(self):
+        _, seen, out = run_main(lambda rid: a2a_response(rid, [GOOD_POST]), extra=["--protocol", "0.7", "--url-template", "{base}/api/a2a/{agent_ns}/{agent}/"])
+        self.assertEqual(seen["url"], "http://gw/api/a2a/kagent/mr-security-review/")
+        self.assertEqual(seen["body"]["method"], "message/send")            # the 0.x request shape (1.x uses SendMessage)
+        self.assertEqual(json.loads((out / "lookout-run.json").read_text())["status"], "posted")
+
     def test_context_id_is_unique_per_run(self):
         _, a, _ = run_main(lambda rid: a2a_response(rid, [GOOD_POST]))
         _, b, _ = run_main(lambda rid: a2a_response(rid, [GOOD_POST]))

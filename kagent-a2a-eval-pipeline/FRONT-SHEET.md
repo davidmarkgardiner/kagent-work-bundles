@@ -38,7 +38,7 @@ separately approved agent. Warden checks the investigation, not a repair.
 
 | Claim | Status | Receipt |
 |---|---|---|
-| 354 offline tests, case lint, generated evaluator is current | PASS | `./verify-bundle.sh` |
+| 362 offline tests, case lint, generated evaluator is current | PASS | `./verify-bundle.sh` |
 | Assay: smoke and full pass^3 through the gateway on kagent 0.7.13 | PASS (1.0 each) | evidence file, stage 1 sections |
 | Warden on kagent 0.7.13 (evaluator as a `type: Agent` tool) | 1 live PASS | evidence file, stage 2 section |
 | Warden on kagent 1.0.0-alpha17 (evaluator as a `subAgent`), A2A 1.0 | 2 of 3 PASS; the third was a correct block | evidence file, 1.x section |
@@ -64,6 +64,7 @@ separately approved agent. Warden checks the investigation, not a repair.
 | Lookout incremental (delta-only) review | **SWITCHED OFF**: in a lab run it dropped two earlier findings from the note; the agent has no delta tool | same |
 | Lookout on very large merge requests | Partial by design: about 1,500 lines fit; the note says PARTIAL; a 10,500-line merge request was reviewed as 30 of 150 files | same |
 | Lookout from a real CI runner, through the agentgateway route, on kagent 0.7.x, on a work GitLab, or with a least-privilege token | **NOT RUN** | |
+| Lookout on **kagent 0.9** (the work cluster's version): manifests validated offline against the 0.9.12 CRD schemas (v1alpha2), client 0.x path unit-tested | **NOT RUN** on a 0.9 cluster; the live demo kit other than the `warden` and `lookout` scenes is 1.x only | `docs/kagent-versions.md` |
 | Lookout independent code review | **NOT DONE** (the reviewer was unavailable) | |
 
 A gate with no receipt is NOT RUN, never PASS.

@@ -14,7 +14,7 @@ One script, `demo/run-demo.sh`, shows every product working on a real cluster in
 | `reset` | Puts the broken agent back on its failing model and clears blocks, so the demo can run again | |
 | `lookout` (optional) | A merge-request security review against a **mock** GitLab: the agent reads a 970-line merge request and leaves one note naming the planted flaws; a retry of the same commit is `up_to_date`; after a push the note lists every current finding; a merge request that tries to instruct the reviewer calls no forbidden tool. It deploys `lookout-*` objects and removes them. Needs `LOOKOUT_HARNESS` and `LOOKOUT_MODEL_CONFIG`; not part of `all` | Lookout |
 
-Run all of it with `demo/run-demo.sh all` (the `assay` scene asks two live agents one question each, about three minutes on a small local model; set `ASSAY_REPEAT=3` for the CI-strength three runs), or one scene at a time. The `lookout` scene is optional and is not part of `all` (about four minutes).
+Run all of it with `demo/run-demo.sh all` (the `assay` scene asks two live agents one question each, about three minutes on a small local model; set `ASSAY_REPEAT=3` for the CI-strength three runs), or one scene at a time. The `lookout` scene is optional and is not part of `all` (about four minutes). To point at the code behind a scene while you run it, use `demo/show.sh <scene>`: see [Code tour](code-tour.md).
 
 ## Verified on the home lab (25 November 2026)
 

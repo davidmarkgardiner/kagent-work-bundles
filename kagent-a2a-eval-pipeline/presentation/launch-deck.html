@@ -510,8 +510,8 @@ lookout_get_file  lookout_list_tree  lookout_search  lookout_post_note</span></p
     <tr><td>Overseer agent’s own report</td><td><span class="chip ok">Proven</span></td><td>Real alert → 3 reads → Warden PASS, route ticket</td></tr>
     <tr><td>Lookout reviews a merge request</td><td><span class="chip todo">Lab only</span></td><td>kagent 1.x: planted flaws found, injection reported, clean change left clean; note posted and updated on one real GitLab MR. Delta-only review switched off after a lab defect. Not yet from a real CI job</td></tr>
   </table></div>
-  <p class="foot">Offline: 354 tests and a bundle verifier · first five reviewed by Codex, then two Opus rounds · Lookout not yet independently reviewed</p>
-  <aside class="notes">This is the honest scorecard. Every claim here is proven, with a receipt: the gateway block stopping real traffic, Overseer fixing a broken agent, and the overseer agent writing its own report that passed Warden. Its first attempt was rightly rejected for using too many tool calls, which is the gate doing its job. Behind it are 354 offline tests and three independent code reviews. When we say proven, there’s a receipt behind it.</aside>
+  <p class="foot">Offline: 362 tests and a bundle verifier · first five reviewed by Codex, then two Opus rounds · Lookout not yet independently reviewed</p>
+  <aside class="notes">This is the honest scorecard. Every claim here is proven, with a receipt: the gateway block stopping real traffic, Overseer fixing a broken agent, and the overseer agent writing its own report that passed Warden. Its first attempt was rightly rejected for using too many tool calls, which is the gate doing its job. Behind it are 362 offline tests and three independent code reviews. When we say proven, there’s a receipt behind it.</aside>
 </section>
 
 <section class="slide">
@@ -519,7 +519,7 @@ lookout_get_file  lookout_list_tree  lookout_search  lookout_post_note</span></p
   <div class="eyebrow">See it for yourself</div>
   <h1>Run it yourself</h1>
   <div class="term">
-    <div><span class="p">$</span> <span class="c">./verify-bundle.sh</span> <span class="r"># BUNDLE_OK: yes · 354 tests</span></div>
+    <div><span class="p">$</span> <span class="c">./verify-bundle.sh</span> <span class="r"># BUNDLE_OK: yes · 362 tests</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh lights</span> <span class="r"># agents, model routes, gateway, active blocks</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh assay</span> <span class="r"># the exam: good agent passes, rogue agent fails the gate</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh warden</span> <span class="r"># verifier on real runs: pass, forbidden tool, evaluator FAIL, wander</span></div>

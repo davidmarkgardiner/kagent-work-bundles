@@ -60,6 +60,19 @@ The three demo agents:
 
 **Lookout** is a sixth, separate piece, shown by the optional scene 9: a first security pass on a merge request. An agent reads the merge request through a small GitLab tool server and leaves one advisory note for the person who reviews it. It is not part of the loop above and does not change it.
 
+## Point at the code as you go
+
+Each scene ends with a **SHOW THE CODE** line. `demo/show.sh <scene>` prints the YAML or Python behind that scene, taken from the real files, each excerpt with the one line to say ("this is what the test is doing", "this is how that works"). `--step N` shows one excerpt, `--pause` waits for Enter between them, and `--list` shows them all. The same list is on the Code tour page (`docs/code-tour.md`). A test fails if an excerpt can no longer be found, so the tour follows the code.
+
+| Scene | Command | What you show |
+|---|---|---|
+| 2 Assay | `demo/show.sh assay` | the test case file, how a run is judged, the GitLab job |
+| 3 Warden | `demo/show.sh warden` | the contract, the evaluator that has no tools, the verifier |
+| 4 Healthy | `demo/show.sh healthy` | the agent's allowlist, Guard's per-agent rules and budgets, the detector |
+| 5 Rogue | `demo/show.sh rogue` | the rogue agent, the blocking rules, the check made before a block is applied |
+| 6 Broken | `demo/show.sh broken` | the 429 stub, the approved fallbacks, the fix-it code |
+| 9 Lookout | `demo/show.sh lookout` | the seven tools, the prompt, the read-only tool server, how "posted" is checked, the CI job, the planted flaws, the test that keeps it read-only |
+
 ## What is proven, and what is not
 
 | Proven on the VM | Proof of concept only / not built |

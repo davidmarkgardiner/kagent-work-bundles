@@ -54,6 +54,15 @@ The agent starts every run by reading the previous review note (`lookout_get_rev
 - `up_to_date` is **agent-attested**: the client accepts it only if the agent read the review state and posted nothing, but it can't check GitLab itself. The note's own commit sha makes a wrong claim visible.
 - **Cost of the safe choice:** after a push, a full review of a 1,000-line MR is about 40k input tokens, against about 25k for the (defective) incremental review.
 
+## Which kagent version
+
+| kagent | Agent manifest | A2A call | Status |
+|---|---|---|---|
+| 0.7.x and **0.9** | `manifests/mr-security-review-agent.yaml` (`kagent.dev/v1alpha2`) | `--protocol 0.7`, path `/api/a2a/<ns>/<agent>/` | 0.9: manifests validated offline against the 0.9.12 CRD schemas; the client's 0.x path is unit-tested; **not run on a 0.9 cluster**. 0.7.13 was never run with Lookout. |
+| 1.x | `manifests/mr-security-review-agent-v1alpha3.yaml` (needs a Harness) | `--protocol 1x`, path `/agents/<ns>/<agent>` | run live on 1.0.0-alpha17 |
+
+Move to 1.0 later by switching to the v1alpha3 manifest and `--protocol 1x`; the tool server and the prompt are the same.
+
 ## Deploy
 
 1. **Token Secret** (a person types it; never commit it). Use a project or group token with the least scope that can read the MR and post notes:

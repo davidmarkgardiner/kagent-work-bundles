@@ -7,7 +7,7 @@ The work agent cannot create these. Complete the sheet before handing over
 
 | # | Item | Why | Owner |
 |---|---|---|---|
-| 1 | Target agent(s) to evaluate and the kagent version in use (0.7.x or 1.x) | The URL and request shape depend on it | Platform |
+| 1 | Target agent(s) to evaluate and the kagent version in use (0.7.x, 0.9 or 1.x; 0.9 serves the 0.7.x shapes, see `docs/kagent-versions.md`) | The URL and request shape depend on it | Platform |
 | 2 | Agentgateway route to the A2A endpoint with **caller authentication**, plus a test token scoped to the eval agents | Assay and Warden call agents only through the gateway | Platform / Security |
 | 3 | Read-only Kubernetes tool server and its exact tool names (for example the `aks-mcp` read tools) | They go in the contract's `allowedTools`; anything else a worker calls fails the gate | Platform |
 | 4 | An approved model route for the agents and the evaluator | The evaluator needs a model too | Platform |
