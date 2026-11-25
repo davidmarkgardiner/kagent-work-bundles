@@ -113,6 +113,13 @@ td:first-child{color:var(--text);font-weight:600}
 .hood-r .file{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 pre.code{margin:0;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px 26px;font-family:var(--code-font);font-size:18px;line-height:1.55;color:var(--text);white-space:pre;overflow:hidden}
 pre.code .c{color:var(--muted)}pre.code .k{color:var(--text);font-weight:700}pre.code .hl{background:var(--accent-tint);box-shadow:-26px 0 0 var(--accent-tint),26px 0 0 var(--accent-tint);color:var(--accent-dark)}
+
+table.where{width:100%;font-size:17.5px;border-collapse:collapse}
+table.where th{font-size:12px}
+table.where td{padding:13px 11px;vertical-align:top;line-height:1.35}
+table.where td:first-child{font-size:19px;font-weight:700;white-space:nowrap}
+table.where code{font-family:var(--code-font);font-size:.92em;background:var(--panel);padding:1px 5px;border-radius:4px}
+.dash{color:var(--muted)}
 aside.notes{display:none}
 
 /* controls */
@@ -275,7 +282,27 @@ aside.notes{display:none}
 </section>
 
 <section class="slide">
-  <div class="hood-l"><div class="accent-rule"></div><div class="eyebrow">02 · Under the hood</div><h1>Assay: how it’s set up</h1><div class="pt"><b>One case</b>A seeded fault, a healthy decoy next to it, and a marking scheme.</div><div class="pt"><b>The marking</b>Terms the diagnosis must contain, tools it must call, tools it must never call.</div><div class="pt"><b>In GitLab</b>Each case runs three times through the gateway. All three must pass, or the merge is blocked.</div></div>
+  <div class="hood-l"><div class="accent-rule"></div><div class="eyebrow">02 · Under the hood</div><h1>Assay: how a run works</h1><div class="pt"><b>Who asks the agent</b>The GitLab job, over A2A, through agentgateway. The agent is called the same way production calls it.</div><div class="pt"><b>What the gateway does</b>Carries the call: checks the caller&#x27;s token, routes it to the agent, records the trace. It does not score anything.</div><div class="pt"><b>Who scores it</b>The same GitLab pipeline, in its report job. Its exit code is what blocks the merge.</div></div>
+  <div class="hood-r" style="top:70px"><div class="file">.gitlab-ci.yml, trimmed</div><pre class="code" style="font-size:16.5px"><span class="c"># .gitlab-ci.yml  (the whole exam runs from GitLab)</span>
+<span class="k">stages</span>: [validate, smoke, eval, report]
+<span class="k">eval</span>:
+  <span class="k">stage</span>: eval
+  <span class="k">parallel</span>: {matrix: [{EVAL_AGENT: [k8s-agent]}]}  <span class="c"> # one job per agent</span>
+  <span class="k">script</span>:
+    - kubectl create namespace &quot;eval-$CI_PIPELINE_ID&quot;         <span class="c"> # throwaway</span>
+    - kubectl -n &quot;eval-$CI_PIPELINE_ID&quot; apply -f fixtures/ <span class="c"># fault + decoy</span>
+<span class="hl">    - python a2a_capture.py --agent &quot;$EVAL_AGENT&quot; --repeat 3 <span class="c"># asks, via gateway</span></span>
+<span class="k">report</span>:
+  <span class="k">stage</span>: report
+  <span class="k">script</span>:
+<span class="hl">    - python score_and_gate.py --capture-dirs out/eval-* --repeat 3 <span class="c"># scores it here</span></span>
+<span class="c"># exit 0 pass · 1 fail · 3 inconclusive: a non-zero exit blocks the merge</span>
+<span class="c"># variables: AGW_BASE_URL + AGW_TOKEN (gateway, masked + protected)</span></pre></div>
+  <aside class="notes">This is how an Assay run works. It all starts in GitLab. When an agent changes, the pipeline creates a throwaway namespace, applies the broken pod and its healthy decoy, then asks the agent to diagnose it, three times. Those calls go through agentgateway, the same front door production uses: the gateway checks the caller&#x27;s token, routes to the agent and records the trace, but it does not score anything. The scoring happens back in the pipeline&#x27;s report job, and its exit code, pass, fail or inconclusive, is what blocks the merge. We could instead put an evaluation service behind the gateway, but we didn&#x27;t need to: the pipeline already does it, and the evaluator agent idea is Warden, which checks real runs.</aside>
+</section>
+
+<section class="slide">
+  <div class="hood-l"><div class="accent-rule"></div><div class="eyebrow">02 · Under the hood</div><h1>Assay: the test case</h1><div class="pt"><b>One case</b>A seeded fault, a healthy decoy next to it, and a marking scheme.</div><div class="pt"><b>The marking</b>Terms the diagnosis must contain, tools it must call, tools it must never call.</div><div class="pt"><b>In GitLab</b>Each case runs three times through the gateway. All three must pass, or the merge is blocked.</div></div>
   <div class="hood-r"><div class="file">cases/triage-crashloop-bad-env.yaml</div><pre class="code"><span class="c"># One test case: a real fault, a healthy decoy, a marking scheme</span>
 <span class="k">kind</span>: AgentEvalCase
 <span class="k">metadata</span>: {name: triage-crashloop-bad-env}
@@ -359,6 +386,17 @@ aside.notes{display:none}
 
 <section class="slide">
   <div class="accent-rule"></div>
+  <div class="eyebrow">Where it runs</div>
+  <h1 style="margin-bottom:0">Where each piece is deployed</h1>
+  <div class="tablewrap" style="top:170px"><table class="where">
+    <tr><th style="width:8%">Piece</th><th style="width:16%">In GitLab</th><th style="width:27%">In the cluster</th><th style="width:13%">At the gateway</th><th style="width:16%">Jobs and signals</th><th style="width:20%">State</th></tr>
+    <tr><td>Sentinel</td><td><span class="dash">—</span></td><td>Agent <code>sentinel-investigator</code> plus a read-only tool server</td><td>A2A route, caller authentication</td><td><span class="dash">—</span></td><td><span class="chip ok">Deployed</span></td></tr><tr><td>Assay</td><td><code>.gitlab-ci.yml</code>, a protected runner, the scoring job</td><td>Throwaway <code>eval-&lt;id&gt;</code> namespace per run, then deleted</td><td>Own route and token</td><td>Each call traced</td><td><span class="chip todo" style="white-space:normal;font-size:15px;line-height:1.3;border-radius:10px;padding:5px 9px">Tested offline; steps run by hand. Not yet on a real GitLab</span></td></tr><tr><td>Warden</td><td>The same contracts gate the Assay run</td><td>Evaluator agent, generated from the contract</td><td><span class="dash">—</span></td><td>Verifier after each run (receiver or workflow step)</td><td><span class="chip todo" style="white-space:normal;font-size:13.5px;line-height:1.3;border-radius:10px;padding:5px 9px">Evaluator deployed; verifier run as a script</span></td></tr><tr><td>Guard</td><td><span class="dash">—</span></td><td>Guard agent for ticket text; <code>enforce.py</code> under its own narrow service account</td><td>Deny policy it applies, one namespace</td><td>Scheduled job: detect, then propose</td><td><span class="chip todo" style="white-space:normal;font-size:13.5px;line-height:1.3;border-radius:10px;padding:5px 9px">Scripts proven; schedule and service account to set up</span></td></tr><tr><td>Overseer</td><td><span class="dash">—</span></td><td>Overseer agent and evaluator; tools that can read Agents and ModelConfigs; <code>remediate.py</code> (patch on listed agents only)</td><td>Own model route</td><td>Grafana rule, webhook, small receiver; route exporter</td><td><span class="chip todo" style="white-space:normal;font-size:13.5px;line-height:1.3;border-radius:10px;padding:5px 9px">Run end to end as processes; fix started by a script; manifests to write</span></td></tr>
+  </table></div>
+  <aside class="notes">This is where each piece actually runs. Sentinel&#x27;s investigator is an Agent resource in the kagent namespace, with a read-only tool server, reached through a gateway route. Assay lives in GitLab: the pipeline file, a protected runner, and the scoring job, and for each run it creates a throwaway namespace in the cluster and deletes it afterwards. The pipeline file is tested offline and its steps have run by hand against a real agent, but it hasn&#x27;t run on a real GitLab yet. Warden has three homes: the evaluator agent in the cluster, the verifier that runs after each run in the receiver or a workflow step, and the same contracts gating Assay. Guard is a scheduled job that reads receipts and traces, plus an enforcer with its own narrow service account that applies the Deny policy at the gateway. Overseer is the Grafana rule, a small receiver, a route exporter, the overseer agent, and the fix step. We ran all of that end to end as processes; the fix step was started by a script, and the service manifests for the receiver and exporter are still to write. So the code is real and proven; what&#x27;s left is packaging it as deployments at work.</aside>
+</section>
+
+<section class="slide">
+  <div class="accent-rule"></div>
   <div class="eyebrow">How they work together</div>
   <h1>One run, end to end</h1>
   <div class="flow">
@@ -384,7 +422,7 @@ aside.notes{display:none}
     <div class="step"><div class="n">1</div><div class="what">The agent’s model answers 429 <span>· the agent fails, just as in a real quota outage</span></div><div><span class="chip ok">Proven</span></div></div>
     <div class="step"><div class="n">2</div><div class="what">Grafana fires on the failure, the receiver checks it, spend guards decide <span>· one webhook, one overseer run</span></div><div><span class="chip ok">Proven</span></div></div>
     <div class="step"><div class="n">3</div><div class="what">Both model routes probed: one token each <span>· failing route 429, fallback ok</span></div><div><span class="chip ok">Proven</span></div></div>
-    <div class="step"><div class="n">4</div><div class="what">Switched to the approved fallback, then read back <span>· plain code, capped, with an undo</span></div><div><span class="chip ok">Proven</span></div></div>
+    <div class="step"><div class="n">4</div><div class="what">Switched to the approved fallback, then read back <span>· plain code, capped, with an undo; started by a script today</span></div><div><span class="chip ok">Proven</span></div></div>
     <div class="step"><div class="n">5</div><div class="what">Same question again: answered <span>· ticket says what changed and how to revert</span></div><div><span class="chip ok">Proven</span></div></div>
   </div>
   <aside class="notes">Demo one, the self-healing loop. We make an agent fail: its model returns 429, rate limited. That’s exactly what a real quota outage looks like. Grafana picks it up from a route-health metric, our receiver checks it, and the spend guards decide whether to wake Overseer. One webhook, one run, and when the fix lands the alert resolves by itself without waking anything. Both model routes are probed with one token. Code switches the agent to an approved fallback, checks it reports ready, and we ask the same question again: it answers. A ticket says exactly what changed. The model can suggest a fix, but code applies it, from an approved list, with a cap and an undo.</aside>
