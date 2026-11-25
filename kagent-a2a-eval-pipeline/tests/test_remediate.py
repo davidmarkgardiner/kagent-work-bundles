@@ -204,3 +204,14 @@ class DemoReplay(unittest.TestCase):
         bad = det.evaluate(det.load_events(B / "tests/fixtures/a2a-v1x-demo-rogue-delete-live.json", "demo-rogue"), rules, now, [])
         self.assertEqual([(f["signal"], f["evidence"]["tools"], f["source"]) for f in bad["findings"]],
                          [("forbidden_tool", ["k8s_delete_resource"], "receipt")])
+
+
+class OverseerPassReplay(unittest.TestCase):
+    """The first full overseer pass (25 Nov 2026), replayed through the Warden verifier."""
+
+    def test_live_overseer_pass_verifies_offline(self):
+        p = subprocess.run([PY, str(B / "verify_completion.py"), "--contract", str(B / "completion-gate/contracts/agent-health.yaml"),
+                            "--receipt", str(B / "tests/fixtures/a2a-v1x-overseer-pass-live.json")], capture_output=True, text=True)
+        d = json.loads(p.stdout)
+        self.assertEqual((p.returncode, d["verdict"], d["route"], d["failures"]), (0, "PASS", "ticket", []))
+        self.assertIn("## Needs a human", d["approved_output"])

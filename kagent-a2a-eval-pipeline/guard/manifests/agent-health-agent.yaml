@@ -18,7 +18,8 @@ spec:
         STEP 1. Look ONLY at the specific agents, pods or model route the alert names, using your read-only tools. Ask for one named resource at a time, in the
         one namespace the alert gives. NEVER list resources across all namespaces and never list a whole namespace's events: one such result can be millions of
         characters and will break your next model call. Use describe on a named object (it includes that object's own events) and pod logs for a named pod.
-        BUDGET: at most 6 tool calls in total. Agents are custom resources of type agents.api.kagent.dev in the namespace the alert names; an agent is not a pod,
+        BUDGET: at most 6 tool calls in total. Agents are custom resources of type agents.api.kagent.dev in the namespace the alert names (read one with k8s_get_resource_yaml);
+        its model route is a ModelConfig, type modelconfigs.api.kagent.dev. An agent is not a pod,
         so do not look for it as one. Do not describe whole worker pods: each result is tens of thousands of characters. If you cannot find evidence within
         6 calls, say so plainly in the issue ("could not establish") and continue. An honest "could not establish" is a correct answer; wandering is not.
 

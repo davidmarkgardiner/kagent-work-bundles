@@ -25,6 +25,15 @@ A full `all` run passed in 6 min 30 s on kagent 1.0.0-alpha17 with agentgateway:
 
 The two live receipts are fixtures: `tests/fixtures/a2a-v1x-demo-healthy-live.json` and `a2a-v1x-demo-rogue-delete-live.json`.
 
+## The overseer agent's own report (25 November 2026)
+
+One bounded run of `agent-health-agent` on a real alert about the broken `demo-worker`, on a dedicated GLM Coding plan route that no watched agent uses:
+
+- First run: completed and wrote a sensible report, but **Warden rejected it** (9 tool calls against a budget of 8). Cause: its read-only tool server could read pods but **not Agent or ModelConfig objects**, so every look at the agent failed and it kept trying. Fix: read access to `agents` and `modelconfigs` (`guard/manifests/overseer-crd-read-rbac.yaml`, prerequisite row 20) and the exact resource names in its prompt.
+- Second run: 3 read-only reads (the Agent, its ModelConfig, a describe), handoff to the evaluator, **Warden PASS, route `ticket`**, in 60 s and about 20,000 tokens. The report found the configuration healthy and put the fault in the model endpoint at runtime, noticed the route was a labelled demo fixture, and claimed no changes. Receipt: `tests/fixtures/a2a-v1x-overseer-pass-live.json`.
+
+Free or shared model tiers were not enough: the free GLM model rate-limited it, and the shared route was out of quota. The overseer needs its own route with quota for tool calls.
+
 ## Set it up
 
 1. Deploy the demo objects (fill the `{{...}}` values first):
@@ -38,7 +47,7 @@ The two live receipts are fixtures: `tests/fixtures/a2a-v1x-demo-healthy-live.js
 ## What it does not show
 
 - **Grafana in the loop.** The broken scene starts from the failure itself. The alert path (Grafana's built-in Alertmanager → receiver → request, with spend guards) is proven separately: see the Grafana alerting page.
-- **The overseer agent writing its own report.** The fix-it step and its ticket are plain code acting on checked facts. A full overseer agent run, gated by its Warden contract, has not passed live.
+- **The overseer agent writing its own report** is not part of `run-demo.sh` (the fix-it step and its ticket are plain code). It has passed separately: see below.
 - The ticket is a file. Writing it to GitLab and reading it back belongs to the receiver at work.
 
 ## Why the fix-it step is code

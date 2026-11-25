@@ -1,0 +1,20 @@
+# The overseer must be able to READ the agents and model routes it is asked about. Without this, its read-only tool server
+# can see pods but not kagent's Agent or ModelConfig objects, and the overseer is blind (lab finding, 25 Nov 2026).
+# Read-only, one namespace. Bind it to the identity of the tool server the overseer uses ({{TOOL_SERVER_SA}}), ideally a
+# tool server only the overseer uses, so other agents do not gain it.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: overseer-kagent-read, namespace: "{{AGENT_NAMESPACE}}"}
+rules:
+- apiGroups: ["api.kagent.dev"]
+  resources: [agents, modelconfigs]
+  verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: overseer-kagent-read, namespace: "{{AGENT_NAMESPACE}}"}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: overseer-kagent-read}
+subjects:
+- kind: ServiceAccount
+  name: "{{TOOL_SERVER_SA}}"
+  namespace: "{{TOOL_SERVER_NAMESPACE}}"

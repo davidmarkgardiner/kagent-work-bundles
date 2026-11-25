@@ -26,6 +26,7 @@ The work agent cannot create these. Complete the sheet before handing over
 | 17 | A narrow identity for `enforce.py` (create, get, list, delete `agentgatewaypolicies` with the guard label, in one namespace) and findings, identity map and rules files writable only by that identity | The trust anchor for what it applies is operational | Platform / Security |
 | 18 | A JWT-authenticated test caller and a throwaway route | Phase 5 must prove a Deny really blocks traffic at work (proven in the lab on 25 Nov 2026: 200 → 403 → 200) | Platform |
 | 19 | The approved fallback ModelConfig per agent (`guard/fallbacks.yaml`) and who may run `remediate.py` (patch on the listed Agents only) | The overseer's fix-it step switches only between ModelConfigs a person approved | Agent owner / Platform |
+| 20 | Read access (get/list/watch on `agents` and `modelconfigs` in `api.kagent.dev`) for the tool server the overseer uses: `guard/manifests/overseer-crd-read-rbac.yaml` | Without it the overseer can read pods but not the agents and model routes it is asked about; it wanders and Warden rejects it (lab, 25 Nov 2026) | Platform / Security |
 
 ## Do not do
 

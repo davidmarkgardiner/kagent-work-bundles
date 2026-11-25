@@ -35,7 +35,7 @@ separately approved agent. Warden checks the investigation, not a repair.
 
 | Claim | Status | Receipt |
 |---|---|---|
-| 210 offline tests, case lint, generated evaluator is current | PASS | `./verify-bundle.sh` |
+| 211 offline tests, case lint, generated evaluator is current | PASS | `./verify-bundle.sh` |
 | Assay: smoke and full pass^3 through the gateway on kagent 0.7.13 | PASS (1.0 each) | evidence file, stage 1 sections |
 | Warden on kagent 0.7.13 (evaluator as a `type: Agent` tool) | 1 live PASS | evidence file, stage 2 section |
 | Warden on kagent 1.0.0-alpha17 (evaluator as a `subAgent`), A2A 1.0 | 2 of 3 PASS; the third was a correct block | evidence file, 1.x section |
@@ -47,6 +47,7 @@ separately approved agent. Warden checks the investigation, not a repair.
 | Direct block (`guard/enforce.py`): apply, read back, release on a real cluster; caps and kill switch | PASSED live on the lab again on 25 Nov 2026 after all hardening, through the full Guard path: the caller went **200 → 403 → 200** after `release`, and the same caller on another route stayed 200. Caps and kill switch are tested offline (fake kubectl, mutation-tested) | same |
 | Overseer fix-it step (`guard/remediate.py`): switch a broken agent to an approved fallback ModelConfig | PASSED live on the lab, 25 Nov 2026: 429 failure → probes → switched and read back → the same question completed; ticket written; second apply refused. 15 offline tests, 5 safeguard mutations caught | lab |
 | Live demo (`demo/run-demo.sh all`): lights, healthy, rogue blocked, broken fixed | PASSED end to end on the lab in 6 min 30 s (`docs/demo.md`) | lab |
+| Overseer agent's own report through its Warden contract | PASSED live, 25 Nov 2026, after giving its tool server read access to Agents and ModelConfigs (the first run was rightly rejected for 9 tool calls > 8): 3 reads, evaluator PASS, verifier `ticket` | lab |
 | Model-route probe | PASS live (ok, and a closed port classified as a wait) | same |
 | Overseer (agent-health) agent live | **NOT PASSING.** First 3 runs: model 400 (a 4.4 MB tool result), fixed. One follow-up run: no 400, but it wandered (14 calls, 245000 tokens) and wrote no report; Warden blocked it. Budget and prompt fixes are offline-tested only | same |
 | Spend and retry guards for the loop (attempt cap, 400 hold, 429 backoff, breaker, token budget, kill switch) | PASS offline, 25 tests incl. a replay of a real failed run; not driven by a live scheduler | `guard/circuit.py` |

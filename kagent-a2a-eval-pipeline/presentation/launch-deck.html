@@ -236,10 +236,10 @@ aside.notes{display:none}
     <p class="line">When an agent breaks, it gets fixed.</p>
     <div class="row"><div class="k">What it does</div><p>Checks the failing agent and its model route, switches it to an approved fallback, and raises a ticket.</p></div>
     <div class="row"><div class="k">How</div><p>Code applies the fix from an approved list, capped, with an undo. Spend guards stop token loops.</p></div>
-    <div class="row"><div class="k">Proof</div><p>Fix-it step proven: a broken agent switched to a fallback and answered again.</p></div>
-    <p style="margin-top:14px"><span class="chip ok">Fix-it proven</span></p>
+    <div class="row"><div class="k">Proof</div><p>Fix-it proven, and its own report passed Warden on a real alert.</p></div>
+    <p style="margin-top:14px"><span class="chip ok">Proven</span></p>
   </div>
-  <aside class="notes">Overseer is the responder. When an agent’s model route is down, plain code confirms it with a one-token probe, switches the agent to an approved fallback model, checks it came back, and writes a ticket. Spend guards make sure a failing agent never turns into a loop that burns tokens. The fix is proven. What’s left is the overseer agent writing its own full report through Warden.</aside>
+  <aside class="notes">Overseer is the responder. When an agent’s model route is down, plain code confirms it with a one-token probe, switches the agent to an approved fallback model, checks it came back, and writes a ticket. Spend guards make sure a failing agent never turns into a loop that burns tokens. The fix is proven, and the overseer agent’s own report on a real alert passed Warden: three reads, a clear diagnosis, nothing changed.</aside>
 </section>
 
 <section class="slide">
@@ -302,10 +302,10 @@ aside.notes{display:none}
     <tr><td>Overseer fixes a broken agent</td><td><span class="chip ok">Proven</span></td><td>429 → switched → same question answered</td></tr>
     <tr><td>Alert reaches Overseer’s intake</td><td><span class="chip ok">Proven</span></td><td>Grafana 11.6 built-in alerting to the receiver</td></tr>
     <tr><td>Model route outage confirmed</td><td><span class="chip ok">Proven</span></td><td>One-token probe returned a real 429</td></tr>
-    <tr><td>Overseer agent’s own report</td><td><span class="chip todo">Next</span></td><td>Needs its own paid model route; free and shared tiers rate-limit it</td></tr>
+    <tr><td>Overseer agent’s own report</td><td><span class="chip ok">Proven</span></td><td>Real alert → 3 reads → Warden PASS, route ticket</td></tr>
   </table></div>
-  <p class="foot">Offline: 210 tests and a bundle verifier · reviewed by Codex, then two Opus rounds</p>
-  <aside class="notes">This is the honest scorecard. Seven claims are proven, with receipts, including the gateway block stopping real traffic and Overseer fixing a broken agent. One is left: the overseer agent writing its own full report through Warden. Behind it are 210 offline tests and three independent code reviews. When we say proven, there’s a receipt behind it.</aside>
+  <p class="foot">Offline: 211 tests and a bundle verifier · reviewed by Codex, then two Opus rounds</p>
+  <aside class="notes">This is the honest scorecard. Every claim here is proven, with a receipt: the gateway block stopping real traffic, Overseer fixing a broken agent, and the overseer agent writing its own report that passed Warden. Its first attempt was rightly rejected for using too many tool calls, which is the gate doing its job. Behind it are 211 offline tests and three independent code reviews. When we say proven, there’s a receipt behind it.</aside>
 </section>
 
 <section class="slide">
@@ -313,7 +313,7 @@ aside.notes{display:none}
   <div class="eyebrow">See it for yourself</div>
   <h1>Run it yourself</h1>
   <div class="term">
-    <div><span class="p">$</span> <span class="c">./verify-bundle.sh</span> <span class="r"># BUNDLE_OK: yes · 210 tests</span></div>
+    <div><span class="p">$</span> <span class="c">./verify-bundle.sh</span> <span class="r"># BUNDLE_OK: yes · 211 tests</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh lights</span> <span class="r"># agents, model routes, gateway, active blocks</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh healthy</span> <span class="r"># completed · Guard: clean</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh rogue</span> <span class="r"># forbidden tool · gateway 200 → 403 · ticket</span></div>
@@ -329,10 +329,10 @@ aside.notes{display:none}
   <div class="eyebrow">Where we are</div>
   <h1>Built. Proof of concept proven.</h1>
   <div class="close-grid">
-    <div><h2>Next</h2><p>Give Overseer its own model route and prove its full report through Warden. Wire Grafana to fire on the failure itself. Then run the same demo on a work cluster.</p></div>
-    <div><h2>What we need from you</h2><p>A dedicated, paid model route for Overseer that the agents it watches don’t share, with enough quota for tool calls. Owners for the never-block and fallback lists.</p></div>
+    <div><h2>Next</h2><p>Wire Grafana to fire on the failure itself, so the whole loop runs without a person starting it. Then run the same demo on a work cluster.</p></div>
+    <div><h2>What we need from you</h2><p>A dedicated, paid model route for Overseer that the agents it watches don’t share. Read access for its tools to Agents and ModelConfigs. Owners for the never-block and fallback lists.</p></div>
   </div>
-  <aside class="notes">So, where we are. Five products, built, proof of concept proven. Both demos run end to end. What’s left is the overseer agent writing its own full report. It can’t run on the shared or free model tiers we tried: they rate-limit it after a few calls. So we need a dedicated, paid model route for Overseer that the agents it watches don’t share, so an outage on their model can’t take it down too. Plus agreement on which agents can never be blocked and which fallback models are approved. Questions?</aside>
+  <aside class="notes">So, where we are. Five products, built, proof of concept proven. Both demos run end to end. The overseer agent’s own report has passed Warden too. Two things made that work, and they’re what we need at work: a dedicated, paid model route for Overseer that the agents it watches don’t share, because free and shared tiers rate-limited it; and read access for its tools to Agents and ModelConfigs, because without it Overseer is blind to the very agents it checks. Plus agreement on which agents can never be blocked and which fallback models are approved. Questions?</aside>
 </section>
 
 </div></div>

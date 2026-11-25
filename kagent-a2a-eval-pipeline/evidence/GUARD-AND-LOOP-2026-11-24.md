@@ -1,7 +1,7 @@
 # Guard, overseer intake and Warden changes: evidence, 24 November 2026
 
 Live runs were on the kagent 1.0.0-alpha17 + Substrate lab (kind inside a Proxmox VM), model Kimi through the lab gateway, A2A 1.0. Receipts stay in the
-gitignored `out/`; sanitized copies are fixtures in `tests/fixtures/*-live.json`. Offline suite: **210 tests** at the time of the last review fixes.
+gitignored `out/`; sanitized copies are fixtures in `tests/fixtures/*-live.json`. Offline suite: **211 tests** at the time of the last review fixes.
 
 ## Warden changes
 - **A planned check was dropped.** I planned to verify that the worker named its contract in the handoff. On 1.x the handoff message is not in the receipt, so it cannot be
@@ -74,3 +74,11 @@ Result: `TASK_STATE_FAILED` after 45 s and about 20,700 tokens. The agent made 5
 **Full walkthrough.** `demo/run-demo.sh all` passed end to end in 6 min 30 s (`docs/demo.md`).
 
 Lab notes: after the nightly host restart the kind node's DNS was `0.0.0.0` again and the agent runtime's worker pool held a stale session ("input was not accepted"); fixed by setting the node's resolver and restarting the worker pool. The free GLM tier rate-limited any multi-call agent (429), and the paid lab model was out of its weekly quota, so the demo agents and the fallback used the in-cluster local model. Not shown: Grafana firing on the real failure (the alert path is proven separately), and a full overseer agent run gated by Warden.
+
+## The overseer agent passes Warden (25 November 2026, lab)
+
+Model route: a dedicated GLM Coding plan key (`glm-4.6`), used by the overseer and its evaluator only. A real alert about the broken `demo-worker` went through `alert_to_a2a.py` (spend guards, quoting) to `agent-health-agent`.
+
+- Run 1: `TASK_STATE_COMPLETED`, 9 tool calls, about 24,000 tokens; evaluator PASS; **verifier FAIL, route `reject`: "tool call budget exceeded: 9 > 8"**. The tool server's identity could `get` pods and deployments but not `agents.api.kagent.dev` or `modelconfigs.api.kagent.dev` (`kubectl auth can-i`: no), so the overseer could not see what the alert named. The breaker recorded the run.
+- Fix: a namespaced read-only Role on `agents` and `modelconfigs` bound to the tool server (Secrets still denied), and the exact resource names in the prompt.
+- Run 2: 3 read-only reads plus the handoff, about 20,000 tokens, 60 s; **evaluator PASS on the first attempt; verifier PASS, route `ticket`**. Fixture: `tests/fixtures/a2a-v1x-overseer-pass-live.json` (replayed in the tests).

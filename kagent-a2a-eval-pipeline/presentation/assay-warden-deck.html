@@ -44,7 +44,7 @@ td{padding:9px 12px;border-bottom:1px solid var(--line);background:#fff}td.ok{ba
 <tr><td>Assay, kagent 0.7.13, through the gateway</td><td class="ok">smoke 1.0; full pass^3 1.0 / 1.0 / 1.0; 4 of 4 tool calls captured</td></tr>
 <tr><td>Warden, kagent 0.7.13</td><td class="ok">1 live PASS, route ticket</td></tr>
 <tr><td>Warden, kagent 1.x alpha (A2A 1.0, sub-agent)</td><td class="ok">first prompt 0 of 3 (blocked); ordered-steps prompt 3 of 3 PASS</td></tr><tr><td>Guard ticket through its own Warden contract</td><td class="ok">3 of 3 PASS</td></tr>
-<tr><td>Offline</td><td class="ok">210 tests; generated evaluators checked in CI</td></tr></table></section><section class="slide"><div class="k">Evidence</div><h2>What the checks caught</h2><ul><li><b>A reused conversation id</b> made a second agent, or a rerun, get a 403. Every call now gets a unique id.</li>
+<tr><td>Offline</td><td class="ok">211 tests; generated evaluators checked in CI</td></tr></table></section><section class="slide"><div class="k">Evidence</div><h2>What the checks caught</h2><ul><li><b>A reused conversation id</b> made a second agent, or a rerun, get a 403. Every call now gets a unique id.</li>
 <li><b>A worker reworded its report after the evaluator approved it.</b> The receiver now delivers the approved text exactly.</li>
 <li><b>A worker left out the contract line</b> in its handoff, and the evaluator refused it. A correct block.</li>
 <li><b>The earlier shell check accepted a tool error</b> if a result was attached. The verifier does not.</li>
