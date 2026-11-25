@@ -5,6 +5,7 @@ One script, `demo/run-demo.sh`, shows every product working on a real cluster in
 | Scene | What you see | Products |
 |---|---|---|
 | `assay` | The exam: the real capture and score commands against two live agents (`--protocol 1x`). The healthy agent passes (1.0); an agent that follows an injected "delete a pod" instruction fails on the forbidden tool. The exit code is what blocks a merge in GitLab | Assay |
+| `sentinel` | A small whisky app that cannot start is deployed. Sentinel's detection code raises one finding; the read-only investigator agent (`demo-sentinel`, the bundle's own Sentinel agent renamed) finds the cause with get, describe, events and logs, then hands its report to an evaluator generated from the contract; Warden checks the live run, and only a PASS writes a ticket (a file here). Skipped if `SENTINEL_MODELCONFIG` is not set. About 2 minutes | Sentinel, Warden |
 | `warden` | The verifier checks five real saved runs against their contracts: a good run passes; a forbidden tool, a wandering run (14 calls against a budget of 8) and an evaluator FAIL are caught. No model calls | Warden |
 | `lights` | Every demo agent, its model route (probed with one token), the gateway route as the caller, and active Guard blocks | Guard probe, gateway |
 | `healthy` | A read-only agent does its job; the Guard reads the real run and finds nothing | Guard detector |

@@ -25,6 +25,7 @@ About 25 to 30 minutes in total (measured machine time is about 10 minutes of mo
 |---|---|---|---|---|---|
 | 1 Lights | nothing | status and route probes | | | 10 s |
 | 2 Assay | `demo-healthy` and `demo-rogue` answer and call tools | scores the runs, sets the exit code | healthy passes | rogue fails, exit 1 | 3 min |
+| 2b Sentinel | `demo-sentinel` investigates the broken whisky app with read-only tools, then hands off to the evaluator | Sentinel's detection code raises the finding; Warden checks the live run; only a PASS writes a ticket | finding raised; PASS, route `ticket`; the report names `WHISKY_DB_URL` | a run that breaks the contract gets FAIL and no ticket | 2 min |
 | 3 Warden | the investigator and evaluator ran earlier (saved real runs) | verifier gives the route | good run: `ticket` | forbidden tool, failed evaluator, over budget | under 1 s |
 | 4 Healthy | `demo-healthy` lists pods | Guard finds nothing | clean run | | 1 min |
 | 5 Rogue + release | `demo-rogue` reaches for the delete tool | Guard finds it and blocks the caller; a person releases | release: 403 back to 200 | gateway 200 becomes 403 | 2 min |
@@ -35,7 +36,7 @@ About 25 to 30 minutes in total (measured machine time is about 10 minutes of mo
 
 | Product | One line | When it acts |
 |---|---|---|
-| **Sentinel** | Finds a problem and hands it to a read-only investigator agent. Its investigator is the agent whose runs Warden checks here; the real cluster Sentinel is a separate scheduled job (not in this demo). | When something looks wrong |
+| **Sentinel** | Finds a problem and hands it to a read-only investigator agent. Scene 2b shows a small live version: code spots a broken app, the investigator finds out why, Warden checks the run before a ticket. The real cluster Sentinel is a scheduled job in its own bundle (`cluster-health-baseline-sentinel`). | When something looks wrong |
 | **Assay** | An exam. Real agents answer test questions and are scored by code; a fail stops the merge. | Before an agent ships |
 | **Warden** | A checker. Code (not a model) compares the real record of a run with a contract and picks one of three routes. Only a `ticket` route leads to a normal ticket. | After each run |
 | **Guard** | A watcher. Code reads the real tool calls of a run; if an agent used a forbidden tool, it blocks the gateway identity linked to that agent. | After a run, before the next call |
@@ -74,6 +75,7 @@ The same lists are on the Code tour page (`docs/code-tour.md`). A test fails if 
 | Scene | The code (`demo/show.sh <scene>`) | The output (`--live`) |
 |---|---|---|
 | 2 Assay | the test case file, how a run is judged, the GitLab job | the scorecard: one verdict per agent and the first problem |
+| 2b Sentinel | the detector, the investigator's ordered steps, the demo agent being the real one renamed, the contract, the ticket rule | the finding, Warden's verdict on the live run, the ticket |
 | 3 Warden | the contract, the evaluator that has no tools, the verifier | the verifier's verdict and route |
 | 4 Healthy | the agent's allowlist, Guard's per-agent rules and budgets, the detector | Guard's report: no findings |
 | 5 Rogue | the rogue agent, the blocking rules, the check made before a block is applied | the finding, the block policy, the ticket, the ledger |
@@ -97,12 +99,13 @@ A **positive test** shows the good thing is allowed. A **negative test** shows t
 | Step | Claim | Positive test (must succeed) | Negative test (must be stopped) |
 |---|---|---|---|
 | 2 Assay | A bad agent cannot merge | `demo-healthy` passes | `demo-rogue` fails, exit 1 |
+| 2b Sentinel | A finding is investigated, and checked before anyone acts | Code finds the broken app; the live run passes the contract and the ticket names the cause | A run that breaks the contract gets FAIL and no ticket (scene 3 shows this on saved runs) |
 | 3 Warden | Only runs that meet the contract reach a ticket | Good run and overseer run: PASS, route `ticket` | Tool off the allowlist, failed evaluator, 14 calls against a budget of 8: each FAIL |
 | 4 Guard, healthy | No false alarms | Normal run is clean, nothing blocked | (none: this step is the baseline) |
 | 5 Guard, rogue | A rogue caller is stopped at the source | Release: gateway 403 back to 200 | Delete tool is found; gateway 200 becomes 403 |
 | 6 Overseer fix | A failing model route is fixed safely | After the switch the same question answers | Before the switch the agent fails with 429 |
 
-Scenes 2, 4, 5 and 6 end with a green `✔` or red `✘` test line; `all` prints them together as a scorecard. Lights, Warden and reset print verdicts only. A red `✘` means stop and read it; do not re-run in a loop.
+Scenes 2, 2b, 4, 5 and 6 end with a green `✔` or red `✘` test line; `all` prints them together as a scorecard. Lights, Warden and reset print verdicts only. A red `✘` means stop and read it; do not re-run in a loop.
 
 
 ## 0. Get in
@@ -177,6 +180,24 @@ demo/run-demo.sh assay
 **Why it matters:** in GitLab, exit 1 stops the merge. The rogue agent that fails here is the one Guard catches at runtime in step 5.
 
 **Look inside:** `cat demo/cases/demo-rogue-injection.yaml` (the test), `sed -n 1,40p ../.gitlab-ci.yml` (the pipeline that runs it).
+
+## 2b. Sentinel: code spots a broken app, an agent finds out why, Warden checks  (about 2 minutes)
+
+```bash
+demo/run-demo.sh sentinel
+```
+
+**What it does:** deploys a small "whisky" app that cannot start (it needs `WHISKY_DB_URL`, and the Deployment does not set it). Sentinel's detection step is plain **code** (`demo/sentinel_check.py`): it reads the pods and raises one finding with an incident key. The finding goes over A2A to `demo-sentinel`, the bundle's own Sentinel investigator renamed for the demo. The **agent** uses read-only tools (get, describe, events, logs), writes its report in fixed sections and hands it to an evaluator agent that is generated from the contract. Then Warden's **code** checks the real run against `completion-gate/contracts/sentinel-investigator.yaml`. Only a PASS writes a ticket, and the ticket is the exact report the evaluator approved. The scene removes the app at the end.
+
+**What you see:** `finding: demo/<cluster>/guard-demo/Deployment/whisky-app/...`, the agent's tool calls ending in `transfer_to_agent`, `verdict: PASS  route: ticket`, then the start of the ticket, and two green lines: the run passed the contract, and the report names `WHISKY_DB_URL` as the cause.
+
+**Say:** "Code spotted the broken app. An agent with read-only tools worked out why. Code checked the agent's work against a contract it never sees, and only then was a ticket written. The agent cannot fix anything and cannot write the ticket."
+
+**If it says FAIL:** that is the gate working: the agent cut a corner (for example it handed off without the full report) and no ticket is written. Read the failure line; do not re-run in a loop. Scene 3 shows the same gate on saved runs.
+
+**Not shown:** the real Sentinel is a scheduled job in its own bundle (`cluster-health-baseline-sentinel`); here detection runs once. The ticket is a file in `$RUN`, not a GitLab issue. On kagent 1.x the evaluator is a hand-off, so a first FAIL is final (no retry). Needs kagent 1.x and a model that follows numbered steps (GLM 4.6 on the lab).
+
+**Point at:** `demo/show.sh sentinel` (the detector, the agent's steps, the contract, the ticket rule), then `demo/show.sh sentinel --live` (the finding, Warden's verdict, the ticket).
 
 ## 3. Warden: checking runs against a contract  (instant)
 

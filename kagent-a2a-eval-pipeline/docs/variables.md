@@ -17,6 +17,7 @@
 | `{{GITLAB_URL}}`, `{{LOOKOUT_ALLOWED_PROJECTS}}` | Lookout: the GitLab base URL and the projects its review tool may touch (exact paths or `group/*`; empty refuses everything) | `https://<host>` and the sandbox project first |
 | `{{PLATFORM_PROJECT}}`, `{{RUNNER_IMAGE}}` | Lookout CI template: the project that holds it, and the runner image that contains `lookout_review.py` and `a2a_capture.py` | internal |
 | `LOOKOUT_MAX_TOOL_CALLS` | Lookout: warn above this many tool calls in one review (default 20) | set from observed reviews |
+| `SENTINEL_MODELCONFIG`, `SENTINEL_HARNESS`, `READONLY_MCP_SERVER`, `PYTHON_IMAGE`, `SENTINEL_APP_NS` | Demo `sentinel` scene (kagent 1.x): the investigator's ModelConfig (a model that follows numbered steps and hands off to a sub-agent; GLM 4.6 passed on the lab), its Harness, the read-only tool server, a python image the cluster can pull, and the namespace for the broken whisky app. Empty `SENTINEL_MODELCONFIG` skips the scene | `demo/demo.env` |
 
 ## Stays the same (pinned, do not change without re-testing)
 

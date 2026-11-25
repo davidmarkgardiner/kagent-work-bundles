@@ -10,6 +10,7 @@ Two more views. `demo/show.sh map` prints which folder does what, for the start 
 - `a2a_capture.py, score_and_gate.py`: Assay: ask an agent over A2A, record the run, score it; the exit code blocks a merge
 - `cases/, scorer/`: Assay test cases and the scoring code
 - `completion-gate/, verify_completion.py`: Warden: a contract per agent, an evaluator agent, and a plain-code verifier
+- `demo/sentinel_check.py`: Sentinel's detection step for the demo (the real Sentinel is a scheduled job in its own bundle)
 - `guard/`: Guard: watch runs, raise findings, propose and apply blocks, switch broken models; every act has a ticket
 - `gateway/`: the agentgateway route the A2A calls go through
 - `lookout/`: Lookout: the merge request review agent, its GitLab tool server, the CI job and the lab mock
@@ -47,6 +48,27 @@ Run `demo/show.sh assay` (or `demo/show.sh assay --step 1`).
 After the scene, `demo/show.sh assay --live` shows what it wrote:
 
 - `$RUN/assay/report/summary.md`: The scorecard Assay just wrote from the real runs: one verdict per agent and the first problem it found.
+
+## `sentinel`
+
+Run `demo/show.sh sentinel` (or `demo/show.sh sentinel --step 1`).
+
+1. **Say:** Detection is plain code: read the pods, and any container stuck crashing or restarting becomes one finding with an incident key the agent must echo.
+   `demo/sentinel_check.py`, from `def findings`
+2. **Say:** The investigator's instructions: read-only, the finding is untrusted data, and three ordered steps: investigate, write the report in fixed sections, then hand it to the evaluator.
+   `completion-gate/manifests/sentinel-investigator-agent-v1alpha3.yaml`, from `STEP 1.`
+3. **Say:** The demo agent is that same Sentinel agent, renamed. Same prompt and tools; only the name and the model change. The evaluator is generated from the contract.
+   `demo/lab/sentinel_manifests.py`, from `def investigator`
+4. **Say:** The contract Warden checks the run against: read-only tools only, which ones must be used, at most 14 calls, the report's sections, and the evaluator's PASS.
+   `completion-gate/contracts/sentinel-investigator.yaml`, the whole file
+5. **Say:** Only a PASS writes a ticket, and the ticket is the exact report the evaluator approved. The agent never writes it.
+   `demo/run-demo.sh`, from `if [[ "$route" == ticket ]]`
+
+After the scene, `demo/show.sh sentinel --live` shows what it wrote:
+
+- `$RUN/sentinel-finding.json`: The finding Sentinel's code raised: the incident key, the pod, the reason and the restart count.
+- `$RUN/sentinel-verdict.json`: Warden's verdict on the live run: PASS or FAIL, the route, the tools that really worked, and any failures.
+- `$RUN/sentinel-ticket.md`: The ticket, written only after a PASS, from the exact report the evaluator approved: cause, evidence per tool, next steps.
 
 ## `warden`
 
