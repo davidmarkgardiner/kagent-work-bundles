@@ -1,0 +1,7 @@
+apiVersion: lab.example/v1alpha1
+kind: AgentFixtureCanary
+metadata:
+  name: tls-fixture-canary
+  namespace: kagent
+spec:
+  systemPrompt: Return the fixture response.

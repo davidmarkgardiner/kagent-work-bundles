@@ -1,0 +1,37 @@
+# Lab HTTPS agent-card route. JWT policy and TLS Secret are installed separately.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tls-lab-caller
+  namespace: kagent
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayParameters
+metadata:
+  name: tls-agent-gateway-config
+  namespace: kagent
+spec:
+  istio:
+    enabled: true
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: tls-agent-gateway
+  namespace: kagent
+spec:
+  gatewayClassName: agentgateway
+  infrastructure:
+    parametersRef:
+      group: agentgateway.dev
+      kind: AgentgatewayParameters
+      name: tls-agent-gateway-config
+  listeners:
+  - name: https
+    protocol: HTTPS
+    port: 8443
+    hostname: tls-agent-gateway.kagent.svc.cluster.local
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: tls-agent-gateway-cert

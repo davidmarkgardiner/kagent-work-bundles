@@ -1,0 +1,46 @@
+# Isolated backend-transport experiment only. The listener is HTTP for the
+# in-cluster test client; do not treat this as a secure front door.
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayParameters
+metadata:
+  name: tls-lab-gateway-config
+  namespace: tls-proof
+spec:
+  istio:
+    enabled: true
+  deployment:
+    spec:
+      template:
+        metadata:
+          labels:
+            sidecar.istio.io/inject: "false"
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: tls-lab-gateway
+  namespace: tls-proof
+spec:
+  gatewayClassName: agentgateway
+  infrastructure:
+    parametersRef:
+      group: agentgateway.dev
+      kind: AgentgatewayParameters
+      name: tls-lab-gateway-config
+  listeners:
+  - name: http-test
+    protocol: HTTP
+    port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: tls-lab-to-mesh-server
+  namespace: tls-proof
+spec:
+  parentRefs:
+  - name: tls-lab-gateway
+  rules:
+  - backendRefs:
+    - name: tls-server
+      port: 8080

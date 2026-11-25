@@ -1,0 +1,39 @@
+# Test-only composition. This graph does not implement the secure production KRO policy set.
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: agent-security-lab-fixture
+spec:
+  schema:
+    apiVersion: v1alpha1
+    group: lab.example
+    kind: AgentFixtureCanary
+    scope: Namespaced
+    spec:
+      systemPrompt: string | default="Return the fixture response." maxLength=1000
+  resources:
+  - id: template
+    template:
+      apiVersion: api.kagent.dev/v1alpha3
+      kind: AgentTemplate
+      metadata:
+        name: ${schema.metadata.name}
+        namespace: ${schema.metadata.namespace}
+      spec:
+        description: Deterministic local fixture, not a real model.
+        modelConfig:
+          name: tls-lab-fixture-model
+        systemPrompt: ${schema.spec.systemPrompt}
+  - id: agent
+    template:
+      apiVersion: api.kagent.dev/v1alpha3
+      kind: Agent
+      metadata:
+        name: ${schema.metadata.name}
+        namespace: ${schema.metadata.namespace}
+      spec:
+        harnessRef:
+          name: kagent-default
+        template:
+          ref:
+            name: ${template.metadata.name}

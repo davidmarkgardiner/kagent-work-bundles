@@ -1,0 +1,16 @@
+# Lab fixture only. The referenced Secret contains a generated non-secret placeholder.
+apiVersion: api.kagent.dev/v1alpha3
+kind: ModelConfig
+metadata:
+  name: tls-lab-fixture-model
+  namespace: kagent
+spec:
+  provider: OpenAI
+  model: lab-fixture
+  apiKeySecret: tls-lab-fixture-model-key
+  apiKeySecretKey: key
+  openAI:
+    baseUrl: http://tls-lab-gateway.tls-proof.svc.cluster.local:8080/v1
+    apiFormat: chatCompletions
+    timeout: 30
+  stream: false

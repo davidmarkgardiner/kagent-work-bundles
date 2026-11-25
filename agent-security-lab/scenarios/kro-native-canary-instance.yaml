@@ -1,0 +1,7 @@
+apiVersion: lab.example/v1alpha1
+kind: AgentSecurityCanary
+metadata:
+  name: tls-lab-canary
+  namespace: kagent
+spec:
+  systemPrompt: You are a read-only synthetic lab canary.

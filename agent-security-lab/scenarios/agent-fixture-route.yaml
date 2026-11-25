@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: tls-agent-fixture
+  namespace: kagent
+spec:
+  parentRefs:
+  - name: tls-agent-gateway
+    sectionName: https
+  hostnames:
+  - tls-agent-gateway.kagent.svc.cluster.local
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /agents/kagent/tls-fixture-canary
+    backendRefs:
+    - name: kagent-controller
+      port: 8083
