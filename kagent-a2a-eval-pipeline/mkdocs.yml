@@ -20,6 +20,7 @@ nav:
   - Guard and spend guards: guard.md
   - Grafana alerting setup: grafana-alerting.md
   - "Live demo: healthy, rogue, broken": demo.md
+  - "Demo walkthrough sheet": walkthrough.md
   - "Monitoring loop design": alert-loop.md
 markdown_extensions:
   - tables
