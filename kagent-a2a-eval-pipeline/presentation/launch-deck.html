@@ -101,7 +101,7 @@ td:first-child{color:var(--text);font-weight:600}
 .slide.dark h1{font-size:60px}
 .close-grid{position:absolute;left:56px;right:56px;top:330px;display:grid;grid-template-columns:1fr 1fr;gap:56px}
 .close-grid h2{color:var(--text);font-size:28px;border-top:4px solid var(--accent);padding-top:16px}
-.close-grid p{font-size:22px;line-height:1.45;color:var(--body-text)}
+.close-grid p{font-size:21px;line-height:1.5;color:var(--body-text)}.close-grid p b{color:var(--text)}
 
 
 /* under the hood */
@@ -483,9 +483,13 @@ aside.notes{display:none}
   <h1>Built. Proof of concept proven.</h1>
   <div class="close-grid">
     <div><h2>Next</h2><p>Run the same demo on a work cluster, with its own Grafana, gateway and model routes.</p></div>
-    <div><h2>What we need from you</h2><p>A dedicated, paid model route for Overseer that the agents it watches don’t share. Read access for its tools to Agents and ModelConfigs. Owners for the never-block and fallback lists.</p></div>
+    <div><h2>What we need from you</h2><p>
+<b>Its own model route.</b> A route for Overseer that the agents it watches don’t use, so one outage can’t take both down.<br>
+<b>Read access.</b> Its tools need to read Agents and ModelConfigs.<br>
+<b>Places to run things.</b> A GitLab runner and variables for Assay; a small service for the alert receiver and route exporter; a service account for the Guard enforcer.<br>
+<b>Owners.</b> Who decides the never-block list and the approved fallback models.</p></div>
   </div>
-  <aside class="notes">So, where we are. Five products, built, proof of concept proven. Both demos run end to end. The overseer agent’s own report has passed Warden too. Two things made that work, and they’re what we need at work: a dedicated, paid model route for Overseer that the agents it watches don’t share, because free and shared tiers rate-limited it; and read access for its tools to Agents and ModelConfigs, because without it Overseer is blind to the very agents it checks. Plus agreement on which agents can never be blocked and which fallback models are approved. Questions?</aside>
+  <aside class="notes">So, where we are. Five products, built, proof of concept proven. Both demos run end to end. The overseer agent’s own report has passed Warden too. What we need from the team: a model route for Overseer that the agents it watches don’t share, so an outage on theirs can’t take it down too; read access for its tools to Agents and ModelConfigs, because without it Overseer is blind to the agents it checks; somewhere to run things, which is a GitLab runner for Assay, a small service for the alert receiver and route exporter, and a service account for the Guard enforcer; and owners for the never-block list and the approved fallback models. Questions?</aside>
 </section>
 
 </div></div>
