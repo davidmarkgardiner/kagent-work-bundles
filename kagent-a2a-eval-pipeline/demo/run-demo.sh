@@ -23,7 +23,7 @@ bad() { printf '\033[1;31m%s\033[0m\n' "$*"; }
 what() { printf '  \033[0;36mWHAT IS HAPPENING:\033[0m %s\n' "$*"; }   # before a scene: what it does
 look() { printf '  \033[0;36mLOOK FOR:\033[0m %s\n' "$*"; }            # before a scene: what to watch
 proves() { printf '  \033[0;36mPROVES:\033[0m %s\n' "$*"; }              # before a scene: the claim, with its positive and negative test
-tour() { printf '  \033[0;36mSHOW THE CODE:\033[0m demo/show.sh %s   (the YAML or Python behind this scene; --pause steps through it)\n' "$1"; }   # after a scene: where to point
+tour() { printf '  \033[0;36mSHOW THE CODE:\033[0m demo/show.sh %s   (the YAML or Python behind this scene; --pause steps through it)\n  \033[0;36mSHOW THE OUTPUT:\033[0m demo/show.sh %s --live   (what this scene just wrote under $RUN)\n' "$1" "$1"; }   # after a scene: where to point
 means() { printf '  \033[0;36mWHAT THIS MEANS:\033[0m %s\n' "$*"; }    # after a scene: why it matters
 gw_call() { local t; t=$(k -n "$GW_CALLER_NS" create token "$GW_CALLER_SA" --audience "$GW_AUDIENCE" --duration 10m)
   curl -s -o /dev/null -w '%{http_code}' -X POST -H "Authorization: Bearer $t" -H 'content-type: application/json' "$GW_URL" -d '{}'; }
@@ -153,7 +153,7 @@ release() {
     python3 "$B/guard/enforce.py" release --context "$CTX" --namespace "$POLICY_NS" --name "$p" --ledger "$RUN/ledger.jsonl"; done
   sleep 4; c=$(gw_call); echo "$c" >>"$RUN/gw.txt"
   [[ "$c" == 200 ]] && expect_ok "POSITIVE TEST: gateway back to HTTP 200 after a person released the block" || expect_no "gateway answered $c, expected 200 after release"
-  [[ $(wc -w <"$RUN/gw.txt") == 3 ]] && printf '  Gateway timeline (identity linked to demo-rogue): BEFORE %s  ->  BLOCKED %s  ->  RELEASED %s\n' $(cat "$RUN/gw.txt"); }
+  [[ $(wc -w <"$RUN/gw.txt") == 3 ]] && printf '  Gateway timeline (identity linked to demo-rogue): BEFORE %s  ->  BLOCKED %s  ->  RELEASED %s\n' $(cat "$RUN/gw.txt"); tour release; }
 
 broken() {
   scene "BROKEN: a failing model route, switched to an approved fallback"
