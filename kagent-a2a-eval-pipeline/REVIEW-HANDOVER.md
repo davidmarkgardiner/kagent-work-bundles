@@ -18,7 +18,7 @@ Four parts for kagent agents, plus an overseer:
 Branch `feat/kagent-agent-eval-two-stage`, based on `main`. Commits, oldest first: `17a18cd3` (Assay and Warden), `5ad8a18f` (packaging), `732b2725` (Guard, overseer intake, Warden hardening),
 `81b89bb2` (air-gap, variables, Guard page), `834a27c3` (overseer root cause, tool-call budget), `6e14395b` (429 as a wait), `8c4e6e20` (lessons from the factory handoff). Not pushed.
 
-Start here: run `./verify-bundle.sh` (needs `pip install -r requirements-docs.txt` for the MkDocs check). It must print `BUNDLE_OK: yes`. It currently runs 211 tests.
+Start here: run `./verify-bundle.sh` (needs `pip install -r requirements-docs.txt` for the MkDocs check). It must print `BUNDLE_OK: yes`. It currently runs 216 tests.
 
 ## 2. Claims against evidence
 

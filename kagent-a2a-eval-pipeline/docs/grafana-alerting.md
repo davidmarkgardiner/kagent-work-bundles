@@ -60,3 +60,32 @@ The agent is never called by Grafana directly. A person or a job can review the 
 - `maxAlerts: 10` on the contact point bounds one webhook; the intake bounds it again at 20 and the sender at `--max-sends`.
 - The webhook body contains the rule's labels and annotations. Treat them as untrusted text: the intake quotes them and the agent prompt says not to follow instructions in them.
 - Grafana's payload has extra keys (`orgId`, `state`, `title`, `message`). The intake reads only `alerts[]`; the rest is ignored.
+
+## The whole loop, live (25 November 2026)
+
+`demo/grafana-loop/up.sh` starts it; `demo/grafana-loop/down.sh` stops everything and proves it.
+
+```text
+agent's model route fails ─► guard/route_exporter.py (one-token probe per minute, follows the agent's CURRENT ModelConfig)
+   ─► Prometheus ─► Grafana rule AgentModelRouteDown (for 1m) ─► webhook ─► guard/alert_receiver.py (answers at once)
+   ─► overseer agent (one send, in the background) ─► Warden PASS, route ticket ─► guard/remediate.py switches to the fallback
+   ─► the route probes ok ─► the alert resolves by itself (resolve messages are off, so no agent wakes)
+```
+
+Result on the lab: Grafana fired 4 minutes after start; one webhook, one overseer run; **Warden PASS, route `ticket`**; the fix switched the agent; the alert went inactive 105 s later; 5 quiet minutes with no further webhook or run; a replayed copy of the firing alert was `suppressed_duplicate`; `down.sh` reported ALL STOPPED.
+
+Two faults this run found, both fixed and tested: the metric had no namespace label, so the alert did not say where the agent lives and the overseer read the wrong namespace (Warden rejected that run); and the receiver held the webhook open for the whole agent run, so Grafana timed out and would have retried. It now answers at once and sends in the background.
+
+### Why it cannot become a loop
+
+| Way it could loop | What stops it |
+|---|---|
+| Grafana retries a webhook that took too long | The receiver answers at once; the agent run happens in the background |
+| Grafana re-sends a still-firing alert | `repeat_interval: 4h`; the intake suppresses the same fingerprint for 1 h; the breaker allows 2 attempts per alert per hour |
+| One webhook carries many alerts | At most one agent run per webhook (`--max-sends 1`); the rest are deferred, not dropped |
+| The alert resolves | `disableResolveMessage: true`: a resolved alert never wakes an agent |
+| The overseer triggers an alert about itself | Alerts about the overseer are dropped in code |
+| The overseer changes something that fires again | It is read-only; the only change is `remediate.py`: approved fallbacks only, one switch per agent per hour, two per hour in total |
+| A failing or slow agent run burns tokens | Hourly token budget, breaker after 3 failures, a 429 pauses everything, a timeout sets the kill switch |
+| Something is left running | `down.sh` sets the kill switch, stops containers, processes and port-forwards, and fails loudly if anything is still running |
+| The exporter itself dies | `RouteExporterStale` pages a person (human-only route), never an agent |

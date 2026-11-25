@@ -1,0 +1,65 @@
+# Grafana-managed alerting for the live loop: an agent's model route is down -> the receiver -> the overseer.
+apiVersion: 1
+contactPoints:
+  - orgId: 1
+    name: guard-agent-intake
+    receivers:
+      - uid: guard-agent-intake
+        type: webhook
+        settings: {url: "http://127.0.0.1:9094/alert", httpMethod: POST, authorization_scheme: Bearer, authorization_credentials: $ALERT_RECEIVER_TOKEN, maxAlerts: 5}
+        disableResolveMessage: true          # a resolved alert never wakes an agent
+  - orgId: 1
+    name: guard-human-page
+    receivers:
+      - {uid: guard-human-page, type: webhook, settings: {url: "http://127.0.0.1:9095/page"}}
+policies:
+  - orgId: 1
+    receiver: guard-human-page
+    group_by: [alertname]
+    routes:
+      - {receiver: guard-human-page, object_matchers: [["alertname", "=~", "DatasourceError|DatasourceNoData"]], group_wait: 0s}
+      - {receiver: guard-human-page, object_matchers: [["route", "=", "human-only"]], group_wait: 0s}
+      - receiver: guard-agent-intake
+        object_matchers: [["guard", "=", "true"], ["route", "!=", "human-only"]]
+        group_by: [alertname, agent]
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 4h                  # a still-firing alert is re-sent at most every 4 h; the intake also dedupes for 1 h
+groups:
+  - orgId: 1
+    name: agent-health
+    folder: Guard
+    interval: 30s
+    rules:
+      - uid: agent-model-route-down
+        title: AgentModelRouteDown
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prom
+            relativeTimeRange: {from: 300, to: 0}
+            model: {refId: A, instant: true, expr: "agent_modelconfig_info * on (modelconfig) group_left agent_model_route_up"}
+          - refId: C
+            datasourceUid: __expr__
+            model: {type: threshold, expression: A, refId: C, conditions: [{evaluator: {type: lt, params: [1]}}]}
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        labels: {guard: "true", severity: critical, source: route-exporter}
+        annotations: {summary: "Agent {{ $labels.agent }}: its model route (ModelConfig {{ $labels.modelconfig }}) failed a one-token probe."}
+      - uid: route-exporter-stale
+        title: RouteExporterStale
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prom
+            relativeTimeRange: {from: 600, to: 0}
+            model: {refId: A, instant: true, expr: "time() - max(route_exporter_last_run_timestamp_seconds)"}
+          - refId: C
+            datasourceUid: __expr__
+            model: {type: threshold, expression: A, refId: C, conditions: [{evaluator: {type: gt, params: [300]}}]}
+        noDataState: OK
+        execErrState: OK
+        for: 2m
+        labels: {severity: warning, route: human-only}
+        annotations: {summary: "The route exporter has not run for 5 minutes: route health is unknown."}

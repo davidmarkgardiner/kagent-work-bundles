@@ -178,3 +178,77 @@ class GrafanaProvisioning(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AsyncAck(unittest.TestCase):
+    def test_server_answers_before_the_agent_run_finishes_and_sends_once(self):
+        import http.client
+        import time as _t
+        d = Path(tempfile.mkdtemp())
+
+        class Slow(BaseHTTPRequestHandler):
+            hits = []
+
+            def do_POST(self):  # noqa: N802
+                self.rfile.read(int(self.headers["Content-Length"]))
+                _t.sleep(2)  # a slow agent run
+                Slow.hits.append(1)
+                self.send_response(200); self.end_headers(); self.wfile.write(b'{"jsonrpc":"2.0","result":{}}')
+
+            def log_message(self, *_): pass
+
+        gw = HTTPServer(("127.0.0.1", 0), Slow); threading.Thread(target=gw.serve_forever, daemon=True).start()
+        a = ns(d, f"http://127.0.0.1:{gw.server_port}/")
+        srv = R.ThreadingHTTPServer(("127.0.0.1", 0), R.make_handler(a, "t" * 16, R.start_sender(a)))
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        try:
+            t0 = _t.time()
+            c = http.client.HTTPConnection("127.0.0.1", srv.server_port, timeout=10)
+            c.request("POST", "/alert", LIVE, {"Authorization": "Bearer " + "t" * 16, "Content-Length": str(len(LIVE))})
+            r = c.getresponse(); body = json.loads(r.read())
+            self.assertEqual(r.status, 200)
+            self.assertLess(_t.time() - t0, 1.5)  # answered before the 2 s agent run
+            self.assertEqual(len(body["queued"]), 1)
+            c2 = http.client.HTTPConnection("127.0.0.1", srv.server_port, timeout=10)  # Grafana retries the same alert
+            c2.request("POST", "/alert", LIVE, {"Authorization": "Bearer " + "t" * 16, "Content-Length": str(len(LIVE))})
+            self.assertEqual(json.loads(c2.getresponse().read())["results"][0]["outcome"], "suppressed_duplicate")
+            _t.sleep(3)
+            self.assertEqual(len(Slow.hits), 1)  # one agent run, not two
+        finally:
+            srv.shutdown(); gw.shutdown()
+
+
+class RouteExporter(unittest.TestCase):
+    def setUp(self):
+        sys.path.insert(0, str(B / "guard"))
+        import route_exporter
+        self.E = route_exporter
+
+    def test_metrics_carry_namespace_and_follow_the_current_modelconfig(self):
+        probed = []
+        cfg = {"namespace": "kagent", "agents": ["w"], "routes": {"stub": {"url": "u1", "model": "m1"}, "fb": {"url": "u2", "model": "m2"}}}
+        txt = self.E.collect(cfg, "c", probe_fn=lambda url, *a: probed.append(url) or {"kind": "ok", "http": 200}, mc_fn=lambda *a: "fb", now=1)
+        self.assertIn('agent_modelconfig_info{agent="w",namespace="kagent",modelconfig="fb"} 1', txt)
+        self.assertIn('agent_model_route_up{modelconfig="fb"} 1', txt)
+        self.assertEqual(probed, ["u2"])  # only the route the agent uses now
+
+    def test_unlisted_or_opted_out_routes_are_never_probed(self):
+        probed = []
+        cfg = {"agents": ["a", "b"], "routes": {"paid": {"url": "u", "model": "m", "probe": False}}}
+        mcs = {"a": "paid", "b": "unknown"}
+        txt = self.E.collect(cfg, "c", probe_fn=lambda *a: probed.append(1) or {"kind": "ok"}, mc_fn=lambda ctx, ns, ag: mcs[ag], now=1)
+        self.assertEqual(probed, [])
+        self.assertNotIn("agent_model_route_up{", txt)
+
+    def test_failing_route_reads_zero(self):
+        txt = self.E.collect({"agents": ["w"], "routes": {"s": {"url": "u", "model": "m"}}}, "c",
+                             probe_fn=lambda *a: {"kind": "rate_limited", "http": 429}, mc_fn=lambda *a: "s", now=1)
+        self.assertIn('agent_model_route_up{modelconfig="s"} 0', txt)
+        self.assertIn('agent_model_route_http_status{modelconfig="s"} 429', txt)
+
+    def test_loop_provisioning_never_wakes_an_agent_on_resolve(self):
+        doc = yaml.safe_load((B / "demo/grafana-loop/provisioning/alerting/loop.yaml").read_text())
+        intake = [c for c in doc["contactPoints"] if c["name"] == "guard-agent-intake"][0]
+        self.assertTrue(intake["receivers"][0]["disableResolveMessage"])
+        stale = [r for g in doc["groups"] for r in g["rules"] if r["title"] == "RouteExporterStale"][0]
+        self.assertEqual(stale["labels"]["route"], "human-only")

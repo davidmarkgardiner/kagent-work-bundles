@@ -267,12 +267,12 @@ aside.notes{display:none}
   <h1>An agent stops working, and gets fixed</h1>
   <div class="steps">
     <div class="step"><div class="n">1</div><div class="what">The agent’s model answers 429 <span>· the agent fails, just as in a real quota outage</span></div><div><span class="chip ok">Proven</span></div></div>
-    <div class="step"><div class="n">2</div><div class="what">Grafana fires, the receiver checks it, spend guards decide <span>· proven on its own, not yet wired into this demo</span></div><div><span class="chip ok">Proven</span></div></div>
+    <div class="step"><div class="n">2</div><div class="what">Grafana fires on the failure, the receiver checks it, spend guards decide <span>· one webhook, one overseer run</span></div><div><span class="chip ok">Proven</span></div></div>
     <div class="step"><div class="n">3</div><div class="what">Both model routes probed: one token each <span>· failing route 429, fallback ok</span></div><div><span class="chip ok">Proven</span></div></div>
     <div class="step"><div class="n">4</div><div class="what">Switched to the approved fallback, then read back <span>· plain code, capped, with an undo</span></div><div><span class="chip ok">Proven</span></div></div>
     <div class="step"><div class="n">5</div><div class="what">Same question again: answered <span>· ticket says what changed and how to revert</span></div><div><span class="chip ok">Proven</span></div></div>
   </div>
-  <aside class="notes">Demo one, the self-healing loop. We make an agent fail: its model returns 429, rate limited. That’s exactly what a real quota outage looks like. In production Grafana picks it up, our receiver checks it and the spend guards decide whether to act; we’ve proven that path on its own, and the live demo starts from the failure itself. Both model routes are probed with one token. Code switches the agent to an approved fallback, checks it reports ready, and we ask the same question again: it answers. A ticket says exactly what changed. The model can suggest a fix, but code applies it, from an approved list, with a cap and an undo.</aside>
+  <aside class="notes">Demo one, the self-healing loop. We make an agent fail: its model returns 429, rate limited. That’s exactly what a real quota outage looks like. Grafana picks it up from a route-health metric, our receiver checks it, and the spend guards decide whether to wake Overseer. One webhook, one run, and when the fix lands the alert resolves by itself without waking anything. Both model routes are probed with one token. Code switches the agent to an approved fallback, checks it reports ready, and we ask the same question again: it answers. A ticket says exactly what changed. The model can suggest a fix, but code applies it, from an approved list, with a cap and an undo.</aside>
 </section>
 
 <section class="slide">
@@ -300,12 +300,12 @@ aside.notes{display:none}
     <tr><td>Guard catches a rogue agent</td><td><span class="chip ok">Proven</span></td><td>Forbidden tool found in its live run</td></tr>
     <tr><td>Deny stops live traffic</td><td><span class="chip ok">Proven</span></td><td>200 → 403 → 200 on a throwaway JWT route</td></tr>
     <tr><td>Overseer fixes a broken agent</td><td><span class="chip ok">Proven</span></td><td>429 → switched → same question answered</td></tr>
-    <tr><td>Alert reaches Overseer’s intake</td><td><span class="chip ok">Proven</span></td><td>Grafana 11.6 built-in alerting to the receiver</td></tr>
+    <tr><td>Grafana drives the whole loop</td><td><span class="chip ok">Proven</span></td><td>Failure → alert → Overseer → fix → resolved; no repeat</td></tr>
     <tr><td>Model route outage confirmed</td><td><span class="chip ok">Proven</span></td><td>One-token probe returned a real 429</td></tr>
     <tr><td>Overseer agent’s own report</td><td><span class="chip ok">Proven</span></td><td>Real alert → 3 reads → Warden PASS, route ticket</td></tr>
   </table></div>
-  <p class="foot">Offline: 211 tests and a bundle verifier · reviewed by Codex, then two Opus rounds</p>
-  <aside class="notes">This is the honest scorecard. Every claim here is proven, with a receipt: the gateway block stopping real traffic, Overseer fixing a broken agent, and the overseer agent writing its own report that passed Warden. Its first attempt was rightly rejected for using too many tool calls, which is the gate doing its job. Behind it are 211 offline tests and three independent code reviews. When we say proven, there’s a receipt behind it.</aside>
+  <p class="foot">Offline: 216 tests and a bundle verifier · reviewed by Codex, then two Opus rounds</p>
+  <aside class="notes">This is the honest scorecard. Every claim here is proven, with a receipt: the gateway block stopping real traffic, Overseer fixing a broken agent, and the overseer agent writing its own report that passed Warden. Its first attempt was rightly rejected for using too many tool calls, which is the gate doing its job. Behind it are 216 offline tests and three independent code reviews. When we say proven, there’s a receipt behind it.</aside>
 </section>
 
 <section class="slide">
@@ -313,7 +313,7 @@ aside.notes{display:none}
   <div class="eyebrow">See it for yourself</div>
   <h1>Run it yourself</h1>
   <div class="term">
-    <div><span class="p">$</span> <span class="c">./verify-bundle.sh</span> <span class="r"># BUNDLE_OK: yes · 211 tests</span></div>
+    <div><span class="p">$</span> <span class="c">./verify-bundle.sh</span> <span class="r"># BUNDLE_OK: yes · 216 tests</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh lights</span> <span class="r"># agents, model routes, gateway, active blocks</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh healthy</span> <span class="r"># completed · Guard: clean</span></div>
     <div><span class="p">$</span> <span class="c">demo/run-demo.sh rogue</span> <span class="r"># forbidden tool · gateway 200 → 403 · ticket</span></div>
@@ -329,7 +329,7 @@ aside.notes{display:none}
   <div class="eyebrow">Where we are</div>
   <h1>Built. Proof of concept proven.</h1>
   <div class="close-grid">
-    <div><h2>Next</h2><p>Wire Grafana to fire on the failure itself, so the whole loop runs without a person starting it. Then run the same demo on a work cluster.</p></div>
+    <div><h2>Next</h2><p>Run the same demo on a work cluster, with its own Grafana, gateway and model routes.</p></div>
     <div><h2>What we need from you</h2><p>A dedicated, paid model route for Overseer that the agents it watches don’t share. Read access for its tools to Agents and ModelConfigs. Owners for the never-block and fallback lists.</p></div>
   </div>
   <aside class="notes">So, where we are. Five products, built, proof of concept proven. Both demos run end to end. The overseer agent’s own report has passed Warden too. Two things made that work, and they’re what we need at work: a dedicated, paid model route for Overseer that the agents it watches don’t share, because free and shared tiers rate-limited it; and read access for its tools to Agents and ModelConfigs, because without it Overseer is blind to the very agents it checks. Plus agreement on which agents can never be blocked and which fallback models are approved. Questions?</aside>

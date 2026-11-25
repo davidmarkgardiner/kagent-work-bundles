@@ -30,7 +30,7 @@ MAX_BODY = 256 * 1024
 _LOCK = Lock()  # one webhook at a time: the breaker is check-then-act
 
 
-def handle(body: bytes, a: argparse.Namespace, token_ok: bool) -> tuple[int, dict]:
+def handle(body: bytes, a: argparse.Namespace, token_ok: bool, enqueue=None) -> tuple[int, dict]:
     if not token_ok:
         return 401, {"error": "bad token"}
     if len(body) > MAX_BODY:
@@ -61,8 +61,13 @@ def handle(body: bytes, a: argparse.Namespace, token_ok: bool) -> tuple[int, dic
     res["sent"] = []
     if a.send_url:
         written = [r["file"] for r in res["results"] if r.get("outcome") == "request_written"]  # only THIS call's requests
-        for name in written[: a.max_sends]:
-            res["sent"].append(send(out / name, out, a))
+        if enqueue is not None:  # server mode: answer Grafana now, send in the background (a slow agent must not make Grafana retry)
+            res["queued"] = written[: a.max_sends]
+            for name in res["queued"]:
+                enqueue(out / name, out)
+        else:
+            for name in written[: a.max_sends]:
+                res["sent"].append(send(out / name, out, a))
         res["deferred"] = [r["alert"] for r in res["results"] if r.get("outcome") == "deferred_over_cap"]  # not marked sent: Grafana re-delivers them
     return 200, res
 
@@ -113,7 +118,31 @@ def send(req: Path, out: Path, a: argparse.Namespace) -> dict:
     return {"request": req.name, "http": status, "receipt": receipt.name, "recorded": json.loads(rec.stdout), "kill_switch_set": timed_out}
 
 
-def make_handler(a: argparse.Namespace, token: str):
+def start_sender(a: argparse.Namespace):
+    """One background worker: sends run one at a time, in arrival order, under the same lock as intake (check-then-act)."""
+    import queue
+    import threading
+    q: "queue.Queue[tuple[Path, Path]]" = queue.Queue(maxsize=20)
+
+    def work():
+        while True:
+            req, out = q.get()
+            with _LOCK:
+                r = send(req, out, a)
+            print(json.dumps({"sent": r}), flush=True)
+            q.task_done()
+
+    threading.Thread(target=work, daemon=True).start()
+
+    def enqueue(req: Path, out: Path) -> None:
+        try:
+            q.put_nowait((req, out))
+        except queue.Full:  # never block or grow without bound; a person sees it in the log and the outbox
+            print(json.dumps({"dropped_queue_full": str(req)}), flush=True)
+    return enqueue
+
+
+def make_handler(a: argparse.Namespace, token: str, enqueue=None):
     class H(BaseHTTPRequestHandler):
         timeout = 10  # a client that stalls cannot hold the server
 
@@ -132,7 +161,7 @@ def make_handler(a: argparse.Namespace, token: str):
                 return self._reply(408, {"error": "read timed out"})
             ok = hmac.compare_digest(self.headers.get("Authorization", ""), f"Bearer {token}")
             with _LOCK:
-                code, res = handle(body, a, ok)
+                code, res = handle(body, a, ok, enqueue)
             self._reply(code, res)
 
         def _reply(self, code, res):
@@ -167,7 +196,8 @@ def main() -> int:
         print("ALERT_RECEIVER_TOKEN (16+ chars) is required", file=sys.stderr)
         return 3
     host, port = a.listen.rsplit(":", 1)
-    ThreadingHTTPServer((host, int(port)), make_handler(a, token)).serve_forever()
+    enqueue = start_sender(a) if a.send_url else None
+    ThreadingHTTPServer((host, int(port)), make_handler(a, token, enqueue)).serve_forever()
     return 0
 
 

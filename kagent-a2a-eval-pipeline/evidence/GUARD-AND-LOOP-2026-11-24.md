@@ -1,7 +1,7 @@
 # Guard, overseer intake and Warden changes: evidence, 24 November 2026
 
 Live runs were on the kagent 1.0.0-alpha17 + Substrate lab (kind inside a Proxmox VM), model Kimi through the lab gateway, A2A 1.0. Receipts stay in the
-gitignored `out/`; sanitized copies are fixtures in `tests/fixtures/*-live.json`. Offline suite: **211 tests** at the time of the last review fixes.
+gitignored `out/`; sanitized copies are fixtures in `tests/fixtures/*-live.json`. Offline suite: **216 tests** at the time of the last review fixes.
 
 ## Warden changes
 - **A planned check was dropped.** I planned to verify that the worker named its contract in the handoff. On 1.x the handoff message is not in the receipt, so it cannot be
@@ -82,3 +82,11 @@ Model route: a dedicated GLM Coding plan key (`glm-4.6`), used by the overseer a
 - Run 1: `TASK_STATE_COMPLETED`, 9 tool calls, about 24,000 tokens; evaluator PASS; **verifier FAIL, route `reject`: "tool call budget exceeded: 9 > 8"**. The tool server's identity could `get` pods and deployments but not `agents.api.kagent.dev` or `modelconfigs.api.kagent.dev` (`kubectl auth can-i`: no), so the overseer could not see what the alert named. The breaker recorded the run.
 - Fix: a namespaced read-only Role on `agents` and `modelconfigs` bound to the tool server (Secrets still denied), and the exact resource names in the prompt.
 - Run 2: 3 read-only reads plus the handoff, about 20,000 tokens, 60 s; **evaluator PASS on the first attempt; verifier PASS, route `ticket`**. Fixture: `tests/fixtures/a2a-v1x-overseer-pass-live.json` (replayed in the tests).
+
+## Whole loop with Grafana (25 November 2026, lab)
+
+`demo/grafana-loop/up.sh`: `guard/route_exporter.py` (new) → Prometheus 3.5 → Grafana 11.6 rule `AgentModelRouteDown` → `guard/alert_receiver.py` → `agent-health-agent` (GLM Coding route) → Warden → `guard/remediate.py`.
+
+- Run 1: Grafana fired, one overseer run, **Warden FAIL `reject`** ("no successful call"): the metric had no `namespace` label, so the alert did not say where the agent lives and every read went to the wrong namespace. Grafana also logged "Notify for alerts failed": the receiver held the webhook open for the agent run. Both fixed (namespace label; the receiver answers at once and sends in the background) and tested.
+- Run 2 (fresh state): fired after 240 s; **1 webhook, 1 overseer run, 0 Grafana notify failures, Warden PASS route `ticket`**. `remediate.py` switched the agent to its fallback; the exporter followed the new ModelConfig, the route probed ok, and the alert went **inactive 105 s later**. Then 5 minutes with no further webhook or run; a replayed copy of the firing alert returned `suppressed_duplicate`.
+- Teardown: `down.sh` → ALL STOPPED (no loop containers, no exporter or receiver, nothing listening on 3000, 9090, 9094, 9105, kill switch on); all port-forwards stopped; no guard blocks left in the cluster.

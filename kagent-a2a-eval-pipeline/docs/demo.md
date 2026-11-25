@@ -46,7 +46,7 @@ Free or shared model tiers were not enough: the free GLM model rate-limited it, 
 
 ## What it does not show
 
-- **Grafana in the loop.** The broken scene starts from the failure itself. The alert path (Grafana's built-in Alertmanager → receiver → request, with spend guards) is proven separately: see the Grafana alerting page.
+- **Grafana in the loop** is a separate run: `demo/grafana-loop/up.sh` then `down.sh` (see the Grafana alerting page, "The whole loop, live"). It passed end to end on 25 Nov 2026.
 - **The overseer agent writing its own report** is not part of `run-demo.sh` (the fix-it step and its ticket are plain code). It has passed separately: see below.
 - The ticket is a file. Writing it to GitLab and reading it back belongs to the receiver at work.
 
