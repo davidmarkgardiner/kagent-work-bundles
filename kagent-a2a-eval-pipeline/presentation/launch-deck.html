@@ -110,7 +110,7 @@ td:first-child{color:var(--text);font-weight:600}
 .hood-l .pt{border-top:1px solid var(--border);padding:12px 0;font-size:20px;line-height:1.45;color:var(--body-text)}
 .hood-l .pt b{display:block;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
 .hood-r{position:absolute;left:640px;right:56px;top:100px}
-.hood-r .file{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.hood-r .file code{text-transform:none;font-size:1em}.hood-r .file{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 pre.code{margin:0;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px 26px;font-family:var(--code-font);font-size:18px;line-height:1.55;color:var(--text);white-space:pre;overflow:hidden}
 pre.code .c{color:var(--muted)}pre.code .k{color:var(--text);font-weight:700}pre.code .hl{background:var(--accent-tint);box-shadow:-26px 0 0 var(--accent-tint),26px 0 0 var(--accent-tint);color:var(--accent-dark)}
 
@@ -260,7 +260,7 @@ aside.notes{display:none}
 
 <section class="slide">
   <div class="hood-l"><div class="accent-rule"></div><div class="eyebrow">01 · Under the hood</div><h1>Sentinel: how it’s set up</h1><div class="pt"><b>What it controls</b>Which read-only tools the investigator can call. Nothing else is available to it.</div><div class="pt"><b>Its rules</b>A numbered prompt: investigate, write the report, then hand off. The finding it receives is treated as untrusted.</div><div class="pt"><b>Its checker</b>A sub-agent, the Warden evaluator, reads the report before anything is ticketed.</div></div>
-  <div class="hood-r"><div class="file">sentinel-investigator agent (kagent Agent)</div><pre class="code"><span class="c"># The investigator: read-only tools plus a checker</span>
+  <div class="hood-r"><div class="file">A real kagent <code>Agent</code> resource (Kubernetes)</div><pre class="code"><span class="c"># The investigator: read-only tools plus a checker</span>
 <span class="k">kind</span>: Agent
 <span class="k">metadata</span>: {name: sentinel-investigator, namespace: kagent}
 <span class="k">spec</span>:
@@ -303,7 +303,7 @@ aside.notes{display:none}
 
 <section class="slide">
   <div class="hood-l"><div class="accent-rule"></div><div class="eyebrow">02 · Under the hood</div><h1>Assay: the test case</h1><div class="pt"><b>One case</b>A seeded fault, a healthy decoy next to it, and a marking scheme.</div><div class="pt"><b>The marking</b>Terms the diagnosis must contain, tools it must call, tools it must never call.</div><div class="pt"><b>In GitLab</b>Each case runs three times through the gateway. All three must pass, or the merge is blocked.</div></div>
-  <div class="hood-r"><div class="file">cases/triage-crashloop-bad-env.yaml</div><pre class="code"><span class="c"># One test case: a real fault, a healthy decoy, a marking scheme</span>
+  <div class="hood-r"><div class="file">cases/triage-crashloop-bad-env.yaml · our own file format, not a Kubernetes resource</div><pre class="code"><span class="c"># One test case: a real fault, a healthy decoy, a marking scheme</span>
 <span class="k">kind</span>: AgentEvalCase
 <span class="k">metadata</span>: {name: triage-crashloop-bad-env}
 <span class="k">spec</span>:
@@ -324,7 +324,7 @@ aside.notes{display:none}
 
 <section class="slide">
   <div class="hood-l"><div class="accent-rule"></div><div class="eyebrow">03 · Under the hood</div><h1>Warden: how it’s set up</h1><div class="pt"><b>One contract</b>A single file the evaluator agent, the verifier and the Assay gate all read.</div><div class="pt"><b>What it fixes</b>The allowed tools, the evidence required, the sections of the report, and a ceiling on tool calls.</div><div class="pt"><b>Who writes the ticket</b>Not the agent. Delivery is owned downstream, after a pass.</div></div>
-  <div class="hood-r"><div class="file">completion-gate/contracts/sentinel-investigator.yaml</div><pre class="code"><span class="c"># The contract: one file, three enforcers</span>
+  <div class="hood-r"><div class="file">completion-gate/contracts/sentinel-investigator.yaml · our own contract format, read by our code</div><pre class="code"><span class="c"># The contract: one file, three enforcers</span>
 <span class="k">schemaVersion</span>: completion-contract/v1alpha1
 <span class="k">name</span>: sentinel-investigation
 <span class="k">evaluator</span>: {subAgent: completion-evaluator, maxAttempts: 3}
@@ -343,7 +343,7 @@ aside.notes{display:none}
 
 <section class="slide">
   <div class="hood-l"><div class="accent-rule"></div><div class="eyebrow">04 · Under the hood</div><h1>Guard: how it’s set up</h1><div class="pt"><b>What counts as rogue</b>Per agent: allowed tools, token and time budgets. Code compares them to the real run.</div><div class="pt"><b>What may be blocked</b>Only one signal blocks without a person. A cap stops it blocking the fleet, and a never-block list protects the watchers.</div><div class="pt"><b>The block itself</b>A gateway Deny for one caller on one route. A person releases it.</div></div>
-  <div class="hood-r"><div class="file">guard/rules.yaml, and the policy it applies</div><pre class="code"><span class="c"># rules.yaml: what is rogue, and what may be blocked</span>
+  <div class="hood-r"><div class="file">guard/rules.yaml (our config) · then the policy it applies (a real <code>AgentgatewayPolicy</code>)</div><pre class="code"><span class="c"># rules.yaml: what is rogue, and what may be blocked</span>
 <span class="k">agents</span>:
   <span class="k">sentinel-investigator</span>:
     <span class="k">allowedTools</span>: [k8s_get_resources, k8s_describe_resource, ...]
@@ -366,7 +366,7 @@ aside.notes{display:none}
 
 <section class="slide">
   <div class="hood-l"><div class="accent-rule"></div><div class="eyebrow">05 · Under the hood</div><h1>Overseer: how it’s set up</h1><div class="pt"><b>What it may change</b>Only a switch between model routes a person approved, per agent.</div><div class="pt"><b>Its limits</b>Failures a fallback can fix. One switch per agent per hour. A kill switch. Never the watchers.</div><div class="pt"><b>What wakes it</b>A Grafana alert on a failing model route. One webhook, one run, and a resolved alert wakes nothing.</div></div>
-  <div class="hood-r"><div class="file">guard/fallbacks.example.yaml, and the Grafana rule</div><pre class="code"><span class="c"># fallbacks.yaml: the only switches the fix-it step may make</span>
+  <div class="hood-r"><div class="file">guard/fallbacks.example.yaml (our config) · then the Grafana rule</div><pre class="code"><span class="c"># fallbacks.yaml: the only switches the fix-it step may make</span>
 <span class="k">triggerKinds</span>: [rate_limited, server_error, timeout, connect]
 <span class="k">maxSwitchesPerHour</span>: 2
 <span class="k">perAgentCooldownS</span>: 3600        <span class="c"> # one switch per agent per hour</span>
