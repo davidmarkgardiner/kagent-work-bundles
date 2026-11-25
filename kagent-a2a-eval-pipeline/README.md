@@ -108,6 +108,14 @@ Live findings now built in:
 - Receipts contain prompts, tool arguments and answers: keep artifact access at
   developer level and short retention; never commit raw receipts.
 
+## Presenting the demo
+
+- `docs/presenter-card.md` (or `demo/show.sh --card`): one page per scene giving the command, what you should see, the sentence to say and what to point at.
+- `demo/show.sh map`: which folder does what, for the start.
+- `demo/show.sh <scene>`: the YAML or Python behind a scene (`--pause` steps through it). `demo/show.sh <scene> --live`: what that scene just wrote under `$RUN` (finding, block policy, ledger, ticket, note, run record).
+- `docs/walkthrough.md`: the full script. `docs/code-tour.md`: every excerpt.
+- On kagent 0.9 only the `warden` and `lookout` scenes run (`LOOKOUT_KAGENT_API=0.7`); the other scenes need kagent 1.x.
+
 ## Launch deck
 
 `presentation/launch-deck.pdf` is the same deck as a 24-page PDF. `presentation/launch-deck.html`: the five-product launch deck (Sentinel, Assay, Warden, Guard, Overseer) with the two live demos and the evidence. One self-contained file: open it in Chrome, no network needed. Arrow keys or space to move, N for speaker notes, F for full screen, Ctrl+P prints one slide per page.

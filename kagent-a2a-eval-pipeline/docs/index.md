@@ -17,3 +17,5 @@ The agents **diagnose and report; they do not fix**. Assay is the test an agent 
 Start with `FRONT-SHEET.md` in the bundle root, or go straight to [Run it](run-it.md). What is proven and what is not is on [Evidence and limits](evidence.md).
 
 A newer, separate piece, **Lookout**, gives merge requests a first advisory security review: see [Lookout](lookout.md).
+
+Presenting the demo: the [Walkthrough](walkthrough.md) is the script, the one-page [Presenter card](presenter-card.md) sits beside the terminal, and the [Code tour](code-tour.md) lists the code and run output to point at (`demo/show.sh`).
