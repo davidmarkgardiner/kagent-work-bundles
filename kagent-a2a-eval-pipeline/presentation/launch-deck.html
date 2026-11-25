@@ -323,7 +323,7 @@ aside.notes{display:none}
 </section>
 
 <section class="slide">
-  <div class="hood-l"><div class="accent-rule"></div><div class="eyebrow">03 · Under the hood</div><h1>Warden: how it’s set up</h1><div class="pt"><b>One contract</b>A single file the evaluator agent, the verifier and the Assay gate all read.</div><div class="pt"><b>What it fixes</b>The allowed tools, the evidence required, the sections of the report, and a ceiling on tool calls.</div><div class="pt"><b>Who writes the ticket</b>Not the agent. Delivery is owned downstream, after a pass.</div></div>
+  <div class="hood-l"><div class="accent-rule"></div><div class="eyebrow">03 · Under the hood</div><h1>Warden: the contract</h1><div class="pt"><b>One contract</b>A single file the evaluator agent, the verifier and the Assay gate all read.</div><div class="pt"><b>What it fixes</b>The allowed tools, the evidence required, the sections of the report, and a ceiling on tool calls.</div><div class="pt"><b>Who writes the ticket</b>Not the agent. Delivery is owned downstream, after a pass.</div></div>
   <div class="hood-r"><div class="file">completion-gate/contracts/sentinel-investigator.yaml · our own contract format, read by our code</div><pre class="code"><span class="c"># The contract: one file, three enforcers</span>
 <span class="k">schemaVersion</span>: completion-contract/v1alpha1
 <span class="k">name</span>: sentinel-investigation
@@ -339,6 +339,24 @@ aside.notes{display:none}
              Owner and next steps, Confidence]
 <span class="hl"><span class="k">delivery</span>: {owner: downstream}    <span class="c"> # the agent never writes the ticket</span></span></pre></div>
   <aside class="notes">This is a Warden contract. One file defines what a good run looks like: which tools are allowed, which evidence is required, which sections the report must have, and the most tool calls it may make. The evaluator agent&#x27;s instructions are generated from it, the verifier checks the real run against it, and Assay scores against it. And delivery is owned downstream: the agent never writes the ticket.</aside>
+</section>
+
+<section class="slide">
+  <div class="hood-l"><div class="accent-rule"></div><div class="eyebrow">03 · Under the hood</div><h1>Warden: how it’s applied</h1><div class="pt"><b>Where the contract lives</b>In git, next to the agent. Its <code>agent:</code> field says which agent it covers.</div><div class="pt"><b>What reads it</b>The generator for the evaluator agent, the verifier that runs after each run, and the Assay gate.</div><div class="pt"><b>What enforces it</b>The verifier step. The cluster doesn't: nothing blocks an agent that skips the check, which is why the verifier gates the ticket.</div></div>
+  <div class="hood-r" style="top:70px"><div class="file">Commands, from completion-gate/README.md</div><pre class="code" style="font-size:16.5px"><span class="c"># There is no operator. The contract is a file in git; three programs read it.</span>
+
+<span class="c"># 1. Generate the evaluator agent from the contract, and apply it like any Agent</span>
+python render_evaluator.py contracts/*.yaml --model-config &lt;model&gt; &gt; evaluator.yaml
+kubectl apply -f evaluator.yaml
+
+<span class="c"># 2. After EVERY run, the receiver (or a workflow step) checks the run&#x27;s record</span>
+<span class="hl">python verify_completion.py --contract contracts/sentinel-investigator.yaml \</span>
+<span class="hl">                           --receipt run.json</span>
+<span class="c">#    PASS -&gt; route &quot;ticket&quot;      FAIL -&gt; route &quot;reject&quot;: nothing is ticketed</span>
+
+<span class="c"># 3. In GitLab, Assay reads the same files</span>
+python score_and_gate.py --contracts-dir contracts/ --require-contracts ...</pre></div>
+  <aside class="notes">You asked how the contract is actually applied. There&#x27;s no operator and no new Kubernetes resource. The contract is a plain file in git. Three programs read it. A generator turns it into the evaluator agent, which you apply like any other agent. A verifier runs after every run: it&#x27;s given the contract and the run&#x27;s record, and says pass, so the ticket is written, or fail, so nothing is ticketed. And the Assay gate in GitLab reads the same files. The cluster itself doesn&#x27;t enforce the contract. The enforcement point is the verifier step, which at work sits in the receiver or a workflow step.</aside>
 </section>
 
 <section class="slide">
