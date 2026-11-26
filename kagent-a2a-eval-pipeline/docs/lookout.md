@@ -38,6 +38,16 @@ About 1,500 lines of diff fit in one review; a 970-line merge request was review
 | From a real CI runner, through the agentgateway route, on kagent 0.7.x, on a work GitLab, with a least-privilege token | NOT RUN |
 | Independent code review | NOT DONE |
 
+## Config review (kagent, kro and agentgateway YAML)
+
+A second mode tests platform config instead of reading it. For an MR that changes agents, kro definitions around them,
+or agentgateway routes and policies, agent `mr-config-review` asks the sandbox tool to apply the `main` version and the
+MR version side by side in throwaway `lookout-mr-*` namespaces, probes every route as no caller, a stranger and each
+named caller, and posts one note with what changes after rollout. Findings are decided in code; the note must cite every
+high finding. Lab-proven on 26 Nov 2026 with four MRs: a safe new route, a loosened policy plus a delete tool, a kro
+definition that drops a policy, and one kro rejects. Design and limits: `lookout/CONFIG-REVIEW-DESIGN.md`; evidence:
+`evidence/LIVE-CONFIG-REVIEW-LAB-2026-11-26.md`.
+
 ## Where things are
 
 The code and manifests are in the bundle folder `lookout/`; its README has the deploy steps. `lookout/ci/run_local.py` replays the CI job on your own machine with no runner and no exposed endpoint. The evidence, with every defect found and fixed, is `evidence/LIVE-LOOKOUT-LAB-2026-11-25.md`. See also [Variables](variables.md), [Prerequisites and air-gap](prerequisites.md) and [Live demo](demo.md).

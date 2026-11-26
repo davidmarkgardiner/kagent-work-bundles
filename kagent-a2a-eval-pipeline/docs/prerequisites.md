@@ -22,6 +22,7 @@ The controllers and the A2A behaviour are the same at work only if the versions 
 |---|---|---|
 | `python:3.12-slim` | digest at mirror time | the CI runner base (`Dockerfile`) and the `validate` job |
 | `python:3.12-alpine` | digest at mirror time | Lookout's GitLab tool server (and, in the lab only, its mock GitLab). The code is mounted from a ConfigMap; nothing is installed at runtime |
+| `python:3.12-alpine` + `PyYAML==6.0.2` | digest at mirror time | Lookout config review: its tool server (`config-review-sandbox.yaml`), the sandbox echo backend, and the no-op image that replaces kro Job images. The lab installs PyYAML at start from PyPI; air-gapped, bake it into a small image (or point `{{PYPI_INDEX}}` at an internal index) |
 | `python:3.12-slim` (or any python 3 image, `PYTHON_IMAGE`) | digest at mirror time | Demo only: the broken whisky app in the `sentinel` scene and the model stub in the `broken` scene |
 | runner image built from `Dockerfile` | digest of your build, set as `EVAL_IMAGE` | every live CI job |
 | kubectl `v1.31.4` binary | checksum at mirror time | inside the runner image (`Dockerfile`) |

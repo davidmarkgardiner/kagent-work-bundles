@@ -30,6 +30,8 @@ separately approved agent. Warden checks the investigation, not a repair.
 | Warden code and contracts | `verify_completion.py`, `completion-gate/` |
 | Evidence | `evidence/LIVE-PROXMOX-2026-11-23.md`, `tests/fixtures/` (sanitized live receipts) |
 | Guard (rogue-agent detector, block proposals, overseer intake) | `guard/`, `docs/alert-loop.md`, `evidence/GUARD-AND-LOOP-2026-11-24.md` |
+| Helper-crew illustrations (original, AI-generated, not yet used in decks) | `presentation/images/helper-crew/` |
+| Lookout config review (test kagent, kro and agentgateway YAML in a sandbox before merge) | `lookout/CONFIG-REVIEW-DESIGN.md`, `lookout/config_review/`, `lookout/config_review_mcp.py`, `lookout/manifests/config-review-sandbox.yaml`, `evidence/LIVE-CONFIG-REVIEW-LAB-2026-11-26.md` |
 | Lookout (merge-request security review) | [lookout/README.md](lookout/README.md), `lookout/`, `lookout/DESIGN.md`, `docs/lookout.md`, `evidence/LIVE-LOOKOUT-LAB-2026-11-25.md`, `presentation/lookout-flow.html` (open in a browser), `presentation/launch-deck.html` |
 | Independent review: claims, gaps, where to push | [REVIEW-HANDOVER.md](REVIEW-HANDOVER.md) |
 | Check the bundle is intact | `./verify-bundle.sh` |
@@ -50,7 +52,7 @@ separately approved agent. Warden checks the investigation, not a repair.
 | Direct block (`guard/enforce.py`): apply, read back, release on a real cluster; caps and kill switch | PASSED live on the lab again on 25 Nov 2026 after all hardening, through the full Guard path: the caller went **200 → 403 → 200** after `release`, and the same caller on another route stayed 200. Caps and kill switch are tested offline (fake kubectl, mutation-tested) | same |
 | Overseer fix-it step (`guard/remediate.py`): switch a broken agent to an approved fallback ModelConfig | PASSED live on the lab, 25 Nov 2026: 429 failure → probes → switched and read back → the same question completed; ticket written; second apply refused. 15 offline tests, 5 safeguard mutations caught | lab |
 | Live demo (`demo/run-demo.sh all`): lights, healthy, rogue blocked, broken fixed | PASSED end to end on the lab in 6 min 30 s (`docs/demo.md`) | lab |
-| Sentinel scene (`demo/run-demo.sh sentinel`): code finds a broken app, the read-only investigator finds the cause, Warden checks the live run, a ticket only on PASS | PASSED live on the lab, 25 Nov 2026, on kagent 1.0.0-alpha17 with GLM 4.6 (see `evidence/LIVE-SENTINEL-DEMO-2026-11-25.md`) | lab |
+| Sentinel scene (`demo/run-demo.sh sentinel`): code finds a broken app, the read-only investigator finds the cause, Warden checks the live run, a ticket only on PASS | Live on the lab, kagent 1.0.0-alpha17, GLM 4.6: **3 of 4** passed. Run 4 (26 Nov) was rejected by Warden because the agent handed off without writing its report: the gate caught it, so a FAIL is possible on the day (see `evidence/LIVE-SENTINEL-DEMO-2026-11-25.md`) | lab |
 | Presenter aids: `demo/show.sh map`, `demo/show.sh <scene>` (code), `demo/show.sh <scene> --live` (run output), `docs/presenter-card.md` | Checked on the lab against real output, 25 Nov 2026; tests stop the excerpts and card drifting from the code | `docs/code-tour.md` |
 | `assay` scene: capture + score against live agents on kagent 1.x (`a2a_capture.py --protocol 1x`) | PASSED live, 25 Nov 2026: healthy agent passes (1.0); rogue agent fails on `k8s_delete_resource`; exit 1 blocks the merge. 8 new tests incl. a fake-gateway replay of both runs | lab |
 | `warden` scene: the verifier on real saved runs | PASSED: pass, forbidden tool, evaluator FAIL, 14-call wander, overseer pass all give the expected verdicts | offline |
@@ -68,6 +70,9 @@ separately approved agent. Warden checks the investigation, not a repair.
 | Lookout from a real CI runner, through the agentgateway route, on kagent 0.7.x, on a work GitLab, or with a least-privilege token | **NOT RUN** | |
 | Lookout on **kagent 0.9** (the work cluster's version): manifests validated offline against the 0.9.12 CRD schemas (v1alpha2), client 0.x path unit-tested | **NOT RUN** on a 0.9 cluster | `docs/kagent-versions.md` |
 | Live demo on **kagent 0.9**: `KAGENT_API=0.9` switches every scene; `demo/lab/v1alpha2/*.yaml` generated from the 1.x files | Offline only: schema-checked against 0.9.12, 0.x A2A call tested over HTTP, Warden passes a recorded 0.x Sentinel run. **NOT RUN** on a 0.9 cluster | `docs/kagent-versions.md` |
+| Lookout config review: four MRs (safe route; loosened policy + delete tool; kro drops a policy; kro rejects the RGD) through the agent, note posted before merge, every high finding cited | PASSED live in the lab, 26 Nov 2026, kagent 1.0.0-alpha17 + kro 0.9.4 + GLM 4.6, **mock** GitLab, lab cluster as both real and sandbox; re-run after an independent code review (3 high, 10 medium, all fixed) | `evidence/LIVE-CONFIG-REVIEW-LAB-2026-11-26.md` |
+| Config review admission fences (sandbox ServiceAccount and kro children limited to `lookout-mr-*`) | PASSED live, 12 of 12 negative tests (`lookout/lab/negative-config-review.sh`), including kro rendering a real agent (denied) | same |
+| Config review from a real GitLab / CI runner / separate sandbox cluster / kagent 0.9 | **NOT RUN** (the 0.9 agent manifest is validated offline against the 0.9.12 schema; the work agent does this as Phase 7) | |
 | Lookout independent code review | **NOT DONE** (the reviewer was unavailable) | |
 
 A gate with no receipt is NOT RUN, never PASS.

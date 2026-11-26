@@ -14,6 +14,13 @@ Serves just the endpoints gitlab_review_mcp.py uses, with three fixture MRs in p
   8  adds an admin route that looks unauthenticated in the diff, but the repo enforces auth globally in
      server/auth.py (not in the diff). A reviewer that can browse and search the repo should find that.
 GET /_debug/notes returns every note ever written, so a test can prove what was posted.
+
+Second project lab/platform-config (config review): loaded from platform-config-mrs.json next to this file, if present.
+  main holds a guard-demo route + policy, the ClassicSecureAgent kro RGD and the demo-sentinel agent (copied from the lab).
+  21 good: adds a status route with its own auth policy
+  22 bad: loosens the guard-demo policy to any ServiceAccount and gives demo-sentinel k8s_delete_resource
+  23 kro: the RGD stops creating the invoke policy (a valid definition)
+  24 kro: the same edit made carelessly: another resource still references the removed policy, so kro rejects the RGD
 Standard library only; runs from a ConfigMap on a stock python image.
 """
 from __future__ import annotations
@@ -249,6 +256,80 @@ TWO = {
 STATE = {"notes": {}, "next_id": 100, "log": [], "pushed": {}}
 
 
+import os as _os
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+_PC_FILES = [_os.path.join(_HERE, "platform-config-mrs.json"),                                   # in the ConfigMap
+             _os.path.join(_HERE, "..", "config_review", "fixtures", "platform-config-mrs.json")]  # in the repo
+_PC_FILE = next((f for f in _PC_FILES if _os.path.exists(f)), None)
+PC = json.load(open(_PC_FILE)) if _PC_FILE else None
+PC_MAIN = "f0" * 20
+
+
+def pc_head(iid: int) -> str:
+    return f"{iid:02d}" * 20
+
+
+def pc_files(ref: str) -> dict | None:
+    if not PC:
+        return None
+    if PC_MAIN.startswith(ref) and ref:
+        return dict(PC["main"])
+    for n, mr in PC["mrs"].items():
+        if pc_head(int(n)).startswith(ref) and ref:
+            return {**PC["main"], **mr["files"]}
+    return None
+
+
+def pc_route(method: str, rest: str, q: dict, body: dict | None):
+    mr = re.fullmatch(r"merge_requests/(\d+)(/.*)?", rest)
+    if mr:
+        iid, sub = int(mr.group(1)), mr.group(2) or ""
+        fx = PC["mrs"].get(str(iid))
+        if not fx:
+            return 404, {"message": "404 Not found"}
+        if method == "GET" and sub == "":
+            return 200, {"iid": iid, "title": fx["title"], "description": "", "state": "opened", "draft": False,
+                         "sha": pc_head(iid), "diff_refs": {"base_sha": PC_MAIN, "head_sha": pc_head(iid), "start_sha": PC_MAIN},
+                         "source_branch": f"feature-{iid}", "target_branch": "main",
+                         "web_url": f"http://mock.gitlab/{PC['project']}/-/merge_requests/{iid}", "author": {"username": "dev"}}
+        if method == "GET" and sub == "/diffs":
+            out = []
+            for path, text in fx["files"].items():
+                new = path in fx.get("new", [])
+                out.append({"new_path": path, "old_path": path, "new_file": new, "deleted_file": False, "renamed_file": False,
+                            "diff": _udiff(PC["main"].get(path, ""), text, path)[0]["diff"]})
+            return 200, out
+        notes = STATE["notes"].setdefault(f"pc{iid}", [])
+        if sub == "/notes" and method == "GET":
+            return 200, sorted(notes, key=lambda n: -n["id"])
+        if sub == "/notes" and method == "POST":
+            STATE["next_id"] += 1
+            note = {"id": STATE["next_id"], "author": ME, "body": (body or {}).get("body", "")}
+            notes.append(note)
+            return 201, dict(note, web_url=f"http://mock.gitlab/note/{note['id']}")
+        nm = re.fullmatch(r"/notes/(\d+)", sub)
+        if nm and method == "PUT":
+            for n in notes:
+                if n["id"] == int(nm.group(1)):
+                    n["body"] = (body or {}).get("body", "")
+                    return 200, dict(n, web_url=f"http://mock.gitlab/note/{n['id']}")
+        return 404, {"message": "404 Not found"}
+    cm = re.fullmatch(r"repository/commits/([0-9a-f]+)", rest)
+    if cm and method == "GET":
+        for full in [PC_MAIN, *[pc_head(int(n)) for n in PC["mrs"]]]:
+            if full.startswith(cm.group(1)):
+                return 200, {"id": full}
+        return 404, {"message": "404 Commit Not Found"}
+    fm = re.fullmatch(r"repository/files/(.+)", rest)
+    if fm and method == "GET":
+        files = pc_files(q.get("ref", [""])[0]) or {}
+        fpath = urllib.parse.unquote(fm.group(1))
+        if fpath in files:
+            return 200, {"content": base64.b64encode(files[fpath].encode()).decode()}
+        return 404, {"message": "404 File Not Found"}
+    return 404, {"message": "404 Not found"}
+
+
 def head_of(iid: int) -> str:
     if iid in TWO:
         return TWO[iid]["c2"] if STATE["pushed"].get(iid) else TWO[iid]["c1"]
@@ -276,6 +357,8 @@ def route(method: str, path: str, body: dict | None):
         if p == "/api/v4/user":
             return 200, ME
         m = re.fullmatch(r"/api/v4/projects/([^/]+)/(.*)", p)
+        if m and PC and urllib.parse.unquote(m.group(1)) == PC["project"]:
+            return pc_route(method, m.group(2), q, body)
         if not m or urllib.parse.unquote(m.group(1)) != PROJECT:
             return 404, {"message": "404 Project Not Found"}
         rest = m.group(2)

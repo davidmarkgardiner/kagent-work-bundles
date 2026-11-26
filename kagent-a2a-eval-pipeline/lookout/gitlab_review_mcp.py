@@ -88,6 +88,9 @@ def strip_header(body: str) -> str:
 
 
 class ReviewTools:
+    marker = MARKER
+    title = "Security review (automated, advisory)"
+
     def __init__(self, api: Api, allowed: list[str]):
         self.api = api
         self.allowed = [a.strip() for a in allowed if a.strip()]
@@ -184,7 +187,7 @@ class ReviewTools:
     def _review_note(self, p: str, n: int) -> dict[str, Any] | None:
         me = self._user_id()
         for note in self.api("GET", f"/projects/{p}/merge_requests/{n}/notes?per_page=100&sort=desc"):
-            if (note.get("author") or {}).get("id") == me and str(note.get("body", "")).startswith(MARKER):
+            if (note.get("author") or {}).get("id") == me and str(note.get("body", "")).startswith(self.marker):
                 return note
         return None
 
@@ -265,7 +268,7 @@ class ReviewTools:
         if not current or not (current.startswith(sha) or sha.startswith(current)):
             # An out-of-order run must never overwrite a newer review with an older one.
             raise ValueError(f"MR head moved: reviewed {sha}, current {current}; not posting, the existing note is left untouched")
-        header = f"{MARKER}\n**Security review (automated, advisory)** · reviewed commit `{self._full(p, current) if len(current) != 40 else current}`"
+        header = f"{self.marker}\n**{self.title}** · reviewed commit `{self._full(p, current) if len(current) != 40 else current}`"
         text = header + "\n\n" + neutralise(body).strip() + "\n"
         existing = self._review_note(p, n)
         if existing:

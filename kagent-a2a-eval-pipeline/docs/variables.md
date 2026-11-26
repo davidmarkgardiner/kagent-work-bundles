@@ -17,6 +17,9 @@
 | `{{GITLAB_URL}}`, `{{LOOKOUT_ALLOWED_PROJECTS}}` | Lookout: the GitLab base URL and the projects its review tool may touch (exact paths or `group/*`; empty refuses everything) | `https://<host>` and the sandbox project first |
 | `{{PLATFORM_PROJECT}}`, `{{RUNNER_IMAGE}}` | Lookout CI template: the project that holds it, and the runner image that contains `lookout_review.py` and `a2a_capture.py` | internal |
 | `LOOKOUT_MAX_TOOL_CALLS` | Lookout: warn above this many tool calls in one review (default 20) | set from observed reviews |
+| `{{INSTANCE_PLURALS}}` | Config review: CRD plurals of the kro kinds the sandbox may create (comma list) | `classicsecureagents` |
+| `{{PYPI_INDEX}}` | Config review: pip arguments for an internal index (e.g. `--index-url https://<index>/simple`), or empty with a baked image | empty in the lab |
+| `LOOKOUT_DEBUG_EVIDENCE` | Config review tool server: `1` serves `GET /evidence` (lab debugging only) | `0` |
 | `KAGENT_API` | Demo: `1x` (default) or `0.9` (any kagent 0.x). Picks the Agent API (`agents.api.kagent.dev` or `agents.kagent.dev`) and the A2A protocol for every scene; on `0.9` also set `A2A_BASE` to `.../api/a2a/<namespace>` and deploy `demo/lab/v1alpha2/*.yaml` | `demo/demo.env` |
 | `SENTINEL_MODELCONFIG`, `SENTINEL_HARNESS`, `READONLY_MCP_SERVER`, `PYTHON_IMAGE`, `SENTINEL_APP_NS` | Demo `sentinel` scene (kagent 1.x): the investigator's ModelConfig (a model that follows numbered steps and hands off to a sub-agent; GLM 4.6 passed on the lab), its Harness, the read-only tool server, a python image the cluster can pull, and the namespace for the broken whisky app. Empty `SENTINEL_MODELCONFIG` skips the scene | `demo/demo.env` |
 
@@ -33,3 +36,4 @@
 | Scoring weights and hard gates (`docs/scoring.md`) | The scorer is the repo's own and is reused unchanged |
 | Lookout's tool server code: GET calls plus note create and update only; no approve, merge, push or delete | The agent's safety limit lives in this code, and a test fails if it changes |
 | Lookout's agent tool list (seven tools, no `lookout_get_delta_diff`) and its prompt, identical in both kagent manifests | Incremental review is off until findings are structured; a test pins both |
+| Config review's fences: the engine's refusals and rewrites, the two ValidatingAdmissionPolicies, and "cite every high finding" in `lookout_post_note` | They are what keeps MR YAML inside the sandbox and the bad news in the note; `tests/test_config_review.py` pins them |

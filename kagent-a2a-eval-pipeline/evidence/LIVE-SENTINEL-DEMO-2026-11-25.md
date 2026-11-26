@@ -18,10 +18,15 @@
 | 2 | same key | 5 read-only calls, then `transfer_to_agent` | PASS, route `ticket` | yes | 89 s |
 | 3 | same key | 9 read-only calls, then `transfer_to_agent` | PASS, route `ticket` | yes | 95 s |
 
-**3 of 3 passed.**
+**3 of 3 passed** on 25 Nov.
 
-- Every run used only allowlisted read-only tools (get, describe, events, logs, yaml), stayed under the 14-call budget, and had its report approved by the evaluator for `sentinel-investigation@1`.
-- The ticket file was written from the exact `approved_output` the evaluator judged.
+**Run 4, 26 Nov 2026:** part of a full `demo/run-demo.sh all` rehearsal, after VM 201 was moved to 16 GB and restarted.
+- **Detection and investigation:** the code found the app, and the agent made 5 read-only calls, all successful, then handed off. It used about 337,000 tokens.
+- **Warden:** FAIL, route `reject`, so no ticket was written. The reason: "worker text before the handoff must contain exactly one <result> envelope, found 0". The agent handed off without first writing its report in its own reply. That is the failure the worker's numbered prompt exists to prevent, and the gate caught it.
+- **Running total: 3 of 4.** The rest of that rehearsal passed: 8 of 9 checks.
+
+- Every run used only allowlisted read-only tools (get, describe, events, logs, yaml) and stayed under the 14-call budget. Runs 1 to 3 had their report approved by the evaluator for `sentinel-investigation@1`.
+- In runs 1 to 3 the ticket file was written from the exact `approved_output` the evaluator judged.
 - After each run the scene deleted the app (`deployment "whisky-app" deleted`). The agent and evaluator stay for the next run.
 
 ## Changed during the session

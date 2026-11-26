@@ -1,0 +1,256 @@
+# Lookout config review: tool server, its ServiceAccount, RBAC and the admission policies that fence it in.
+# Apply ONLY to the sandbox cluster. The sandbox cluster must hold no real credentials (see CONFIG-REVIEW-DESIGN.md).
+# The code is not inlined: lab/deploy-config-review.sh builds the ConfigMap from config_review_mcp.py, gitlab_review_mcp.py
+# and config_review/*.py. Placeholders: {{GITLAB_URL}}, {{LOOKOUT_ALLOWED_PROJECTS}}, {{INSTANCE_PLURALS}} (kro instance
+# kinds the sandbox may create, e.g. classicsecureagents), {{PYPI_INDEX}} (or bake PyYAML into an image for air-gap).
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lookout-config-review
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: lookout}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: lookout-config-review
+  labels: {app.kubernetes.io/part-of: lookout}
+rules:
+  # Read: what the review compares against (no Secrets anywhere in this role).
+  - apiGroups: [""]
+    resources: [namespaces, serviceaccounts, configmaps, services]
+    verbs: [get, list]
+  - apiGroups: [gateway.networking.k8s.io]
+    resources: [gateways, httproutes]
+    verbs: [get, list]
+  - apiGroups: [agentgateway.dev]
+    resources: [agentgatewaypolicies, agentgatewaybackends]
+    verbs: [get, list]
+  - apiGroups: [kagent.dev, api.kagent.dev]
+    resources: [agents, modelconfigs, remotemcpservers, mcpservers, agenttemplates]
+    verbs: [get, list]
+  - apiGroups: [kro.run]
+    resources: [resourcegraphdefinitions]
+    verbs: [get, list]
+  - apiGroups: [networking.k8s.io]
+    resources: [networkpolicies]
+    verbs: [get, list]
+  # Write: every write below is limited by the ValidatingAdmissionPolicy to lookout-mr-* names.
+  - apiGroups: [""]
+    resources: [namespaces, serviceaccounts, configmaps, services, resourcequotas]
+    verbs: [create, patch, delete]
+  - apiGroups: [""]
+    resources: [serviceaccounts/token]
+    verbs: [create]
+  - apiGroups: [apps]
+    resources: [deployments]
+    verbs: [create, patch, delete]
+  - apiGroups: [networking.k8s.io]
+    resources: [networkpolicies]
+    verbs: [create, patch, delete]
+  - apiGroups: [gateway.networking.k8s.io]
+    resources: [gateways, httproutes]
+    verbs: [create, patch, delete]
+  - apiGroups: [agentgateway.dev]
+    resources: [agentgatewaypolicies, agentgatewaybackends]
+    verbs: [create, patch, delete]
+  - apiGroups: [kagent.dev, api.kagent.dev]          # server-side dry-run only, enforced in code
+    resources: [agents, modelconfigs, remotemcpservers, mcpservers, agenttemplates]
+    verbs: [create, patch]
+  - apiGroups: [kro.run]
+    resources: [resourcegraphdefinitions]
+    verbs: [create, patch, delete]
+  - apiGroups: [apiextensions.k8s.io]                 # read plurals of, and delete, the CRDs kro generates for sandbox RGDs
+    resources: [customresourcedefinitions]
+    verbs: [get, list, delete]
+  - apiGroups: ["*"]                                  # kro instances in the per-side sandbox groups, and live ones (read)
+    resources: [{{INSTANCE_PLURALS}}]
+    verbs: [get, list, create, patch, delete]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: lookout-config-review
+  labels: {app.kubernetes.io/part-of: lookout}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: lookout-config-review}
+subjects: [{kind: ServiceAccount, name: lookout-config-review, namespace: kagent}]
+---
+# Every write by the Lookout ServiceAccount must stay inside lookout-mr-* (RBAC cannot express a name prefix).
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: lookout-config-review-scope
+  labels: {app.kubernetes.io/part-of: lookout}
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - {apiGroups: ["*"], apiVersions: ["*"], resources: ["*/*"], operations: [CREATE, UPDATE, DELETE]}   # */* = all resources AND subresources (serviceaccounts/token)
+  matchConditions:
+    - name: lookout-sa
+      expression: request.userInfo.username == "system:serviceaccount:kagent:lookout-config-review"
+  validations:
+    - expression: >-
+        (has(request.namespace) && request.namespace != "") ? request.namespace.startsWith("lookout-mr-") :
+        ((request.kind.kind == "Namespace" || request.kind.kind == "ResourceGraphDefinition") && request.name.startsWith("lookout-mr-")) ||
+        (request.kind.kind == "CustomResourceDefinition" && request.operation == "DELETE" && request.name.endsWith(".lookout.sandbox"))
+      message: the Lookout sandbox may only write lookout-mr-* namespaces, lookout-mr-* RGDs and delete *.lookout.sandbox CRDs
+    - expression: >-
+        request.kind.kind != "ResourceGraphDefinition" || request.operation == "DELETE" ||
+        object.spec.schema.group.endsWith(".lookout.sandbox")
+      message: sandbox RGDs must generate a *.lookout.sandbox kind
+    - expression: '!(request.kind.group in ["kagent.dev", "api.kagent.dev"]) || request.dryRun == true'
+      message: kagent objects are only ever validated with a server-side dry-run in the sandbox (agents never run)
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: lookout-config-review-scope
+  labels: {app.kubernetes.io/part-of: lookout}
+spec:
+  policyName: lookout-config-review-scope
+  validationActions: [Deny]
+---
+# kro creates children with its OWN (broad) rights. Anything it renders for a sandbox kind must land in lookout-mr-*.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: lookout-kro-children-scope
+  labels: {app.kubernetes.io/part-of: lookout}
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - {apiGroups: ["*"], apiVersions: ["*"], resources: ["*"], operations: [CREATE, UPDATE]}
+  matchConditions:
+    - name: sandbox-kro-child
+      expression: >-
+        has(object.metadata.labels) && "kro.run/instance-group" in object.metadata.labels &&
+        object.metadata.labels["kro.run/instance-group"].endsWith(".lookout.sandbox")
+  validations:
+    - expression: has(request.namespace) && request.namespace.startsWith("lookout-mr-")
+      message: children of a Lookout sandbox kro instance must stay in lookout-mr-* namespaces
+    - expression: '!(request.kind.group in ["kagent.dev", "api.kagent.dev"])'
+      message: a Lookout sandbox kro instance may not create kagent objects (agents are never run; the engine renders a stand-in)
+    - expression: '!(request.kind.kind in ["Pod", "Deployment", "StatefulSet", "DaemonSet", "CronJob", "ReplicaSet"])'
+      message: a Lookout sandbox kro instance may not create workloads (Jobs are neutralised by the engine)
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: lookout-kro-children-scope
+  labels: {app.kubernetes.io/part-of: lookout}
+spec:
+  policyName: lookout-kro-children-scope
+  validationActions: [Deny]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lookout-config-review-mcp
+  namespace: kagent
+  labels: {app.kubernetes.io/name: lookout-config-review-mcp, app.kubernetes.io/part-of: lookout}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app.kubernetes.io/name: lookout-config-review-mcp}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: lookout-config-review-mcp, app.kubernetes.io/part-of: lookout}
+    spec:
+      serviceAccountName: lookout-config-review
+      containers:
+        - name: mcp
+          image: python:3.12-alpine
+          command: ["sh", "-c", "pip install -q --no-cache-dir --target /tmp/py {{PYPI_INDEX}} PyYAML==6.0.2 && PYTHONPATH=/tmp/py:/app exec python /app/config_review_mcp.py"]
+          ports: [{containerPort: 8080}]
+          env:
+            - {name: LOOKOUT_DEBUG_EVIDENCE, value: "0"}       # 1 = serve GET /evidence (lab debugging only)
+            - {name: GITLAB_URL, value: "{{GITLAB_URL}}"}
+            - {name: LOOKOUT_ALLOWED_PROJECTS, value: "{{LOOKOUT_ALLOWED_PROJECTS}}"}
+            - {name: HOME, value: /tmp}
+            - name: GITLAB_TOKEN
+              valueFrom: {secretKeyRef: {name: lookout-gitlab-token, key: token}}
+          resources:
+            requests: {cpu: 20m, memory: 96Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, runAsNonRoot: true, runAsUser: 65532, capabilities: {drop: [ALL]}}
+          volumeMounts:
+            - {name: app, mountPath: /app, readOnly: true}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: tmp
+          emptyDir: {sizeLimit: 64Mi}
+        - name: app
+          configMap:
+            name: lookout-config-review-mcp
+            items:
+              - {key: config_review_mcp.py, path: config_review_mcp.py}
+              - {key: gitlab_review_mcp.py, path: gitlab_review_mcp.py}
+              - {key: init.py, path: config_review/__init__.py}
+              - {key: engine.py, path: config_review/engine.py}
+              - {key: kube.py, path: config_review/kube.py}
+              - {key: sandbox.py, path: config_review/sandbox.py}
+              - {key: janitor.py, path: config_review/janitor.py}
+---
+# Janitor: removes sandbox namespaces, RGDs and generated CRDs a crashed or restarted run left behind (expired or older
+# than an hour). Same ServiceAccount, so the same admission fences apply.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: lookout-config-review-janitor
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: lookout}
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 600
+      template:
+        metadata:
+          labels: {app.kubernetes.io/name: lookout-config-review-janitor, app.kubernetes.io/part-of: lookout}
+        spec:
+          serviceAccountName: lookout-config-review
+          restartPolicy: Never
+          containers:
+            - name: janitor
+              image: python:3.12-alpine
+              command: ["sh", "-c", "cd /app && exec python -m config_review.janitor"]
+              resources:
+                requests: {cpu: 10m, memory: 48Mi}
+                limits: {cpu: 200m, memory: 128Mi}
+              securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, runAsNonRoot: true, runAsUser: 65532, capabilities: {drop: [ALL]}}
+              volumeMounts: [{name: app, mountPath: /app, readOnly: true}]
+          volumes:
+            - name: app
+              configMap:
+                name: lookout-config-review-mcp
+                items:
+                  - {key: init.py, path: config_review/__init__.py}
+                  - {key: kube.py, path: config_review/kube.py}
+                  - {key: janitor.py, path: config_review/janitor.py}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lookout-config-review-mcp
+  namespace: kagent
+  labels: {app.kubernetes.io/name: lookout-config-review-mcp, app.kubernetes.io/part-of: lookout}
+spec:
+  selector: {app.kubernetes.io/name: lookout-config-review-mcp}
+  ports: [{name: http, port: 8080, targetPort: 8080}]
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: lookout-config-review-mcp
+  namespace: kagent
+  labels: {app.kubernetes.io/part-of: lookout}
+spec:
+  description: "Lookout config review: read an MR, test its kagent/kro/agentgateway YAML in a sandbox, upsert one note. No approve or merge."
+  protocol: STREAMABLE_HTTP
+  timeout: 300s
+  sseReadTimeout: 10m0s
+  url: http://lookout-config-review-mcp.kagent.svc.cluster.local:8080/mcp

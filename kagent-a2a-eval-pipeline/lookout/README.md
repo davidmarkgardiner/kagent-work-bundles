@@ -54,6 +54,45 @@ The agent starts every run by reading the previous review note (`lookout_get_rev
 - `up_to_date` is **agent-attested**: the client accepts it only if the agent read the review state and posted nothing, but it can't check GitLab itself. The note's own commit sha makes a wrong claim visible.
 - **Cost of the safe choice:** after a push, a full review of a 1,000-line MR is about 40k input tokens, against about 25k for the (defective) incremental review.
 
+## Config review mode: test agent and gateway YAML in a sandbox before merge
+
+For merge requests that change **kagent** objects (Agent, ModelConfig, RemoteMCPServer, MCPServer, AgentTemplate),
+**kro** ResourceGraphDefinitions that wrap them (and their instances), or **agentgateway** objects (Gateway, HTTPRoute,
+AgentgatewayPolicy, AgentgatewayBackend), reading the diff is not enough: the question is what the change does on the
+cluster, and `main` rolls out to every cluster. A second agent, `mr-config-review`, answers that before merge:
+
+```
+MR job -> A2A pointer {project, mr_iid, head_sha} -> agent mr-config-review
+            lookout_get_mr
+            lookout_config_review   server fetches the YAML (base and head) from GitLab, then in code:
+                                    static checks -> two sandbox namespaces (main vs MR) -> probes -> diff -> findings
+            lookout_post_note       one note; refused unless it cites every high finding (CR-n)
+```
+
+The model never supplies YAML and never decides a finding; it explains them. The sandbox copy forces every object into
+a `lookout-mr-*` namespace, refuses Secrets, RBAC, cluster-scoped kinds, BYO images, `ipBlock` NetworkPolicies and
+references to other namespaces, neutralises kro Jobs, renders kro agents as stand-ins (no agent ever runs), only
+dry-runs kagent objects, and lists every rewrite in the note as "not tested". Two admission policies fence the
+ServiceAccount and kro's children to `lookout-mr-*`; a janitor CronJob removes anything a crashed run leaves.
+
+| File | Role |
+|---|---|
+| `CONFIG-REVIEW-DESIGN.md` | Design, review-gate outcome and as-built notes. Read first |
+| `config_review/engine.py` | Deterministic rules: scope, static checks, sandbox copy (rewrites and refusals), probe diff |
+| `config_review/sandbox.py` | One run: fetch from GitLab, blast radius (read-only), set up both sides, probe, diff, tear down |
+| `config_review/kube.py` | Minimal Kubernetes REST client (stdlib) |
+| `config_review/janitor.py` | Removes expired sandbox namespaces, RGDs and generated CRDs (run by the CronJob) |
+| `config_review_mcp.py` | The three-tool MCP server; enforces "cite every high finding" |
+| `manifests/config-review-sandbox.yaml` | ServiceAccount, ClusterRole (no Secrets), two ValidatingAdmissionPolicies, Deployment, Service, RemoteMCPServer |
+| `manifests/mr-config-review-agent-v1alpha3.yaml` | The agent (kagent 1.x) |
+| `manifests/mr-config-review-agent.yaml` | The same agent for kagent 0.7.x / 0.9 (`kagent.dev/v1alpha2`; offline-validated against the 0.9.12 schema) |
+| `config_review/fixtures/platform-config-mrs.json` | Mock GitLab project `lab/platform-config`: main plus MRs 21-24 (good, bad, kro valid, kro broken) |
+| `lab/deploy-config-review.sh`, `lab/negative-config-review.sh` | Lab deploy, and live negative tests of the admission fences |
+
+CI: the same client with `--review config --agent mr-config-review` (`lookout_review.py`). Status: lab-proven on
+2026-11-26, see `evidence/LIVE-CONFIG-REVIEW-LAB-2026-11-26.md`. Not yet run against a real GitLab, from a real runner,
+or on a separate sandbox cluster.
+
 ## Which kagent version
 
 | kagent | Agent manifest | A2A call | Status |
