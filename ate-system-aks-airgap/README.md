@@ -19,6 +19,18 @@ OCI registry only when moving to Flux (Stage 8).
 
 ### 2. Download files on a connected machine
 
+Click to download:
+
+- [gVisor 20261026.0 `gvisor.tar.zstd`](https://storage.googleapis.com/gvisor/releases/release/20261026.0/x86_64/gvisor.tar.zstd) (about 58 MB): save into `assets/20261026.0/x86_64/`
+- [gVisor 20261102.0 `gvisor.tar.zstd`](https://storage.googleapis.com/gvisor/releases/release/20261102.0/x86_64/gvisor.tar.zstd) (about 59 MB): save into `assets/20261102.0/x86_64/`
+- [`kubectl-ate-linux-amd64` 1.0.1](https://github.com/kagent-dev/substrate/releases/download/v1.0.1/kubectl-ate-linux-amd64)
+- [`kubectl-ate-linux-amd64.sha256`](https://github.com/kagent-dev/substrate/releases/download/v1.0.1/kubectl-ate-linux-amd64.sha256)
+
+Both gVisor files have the same name, and a browser may rename the second one. Each must end up as
+`gvisor.tar.zstd` in its own folder. Do not unpack them.
+
+Or use the commands, then check the checksums either way:
+
 ```sh
 for r in 20261026.0 20261102.0; do
   mkdir -p assets/$r/x86_64
