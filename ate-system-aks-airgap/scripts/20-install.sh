@@ -7,6 +7,8 @@ set -euo pipefail
 : "${ASSETS_DIR:?set ASSETS_DIR}"
 C="$HERE/charts"; V="$HERE/values"; N=ate-system; P=podcertificate-controller-system
 REG=(--set "global.imageRegistry=$REGISTRY")
+# EXTRA_VALUES: optional extra values file for atelet and substrate (e.g. policy/resources.yaml).
+[ -n "${EXTRA_VALUES:-}" ] && REG+=(-f "$EXTRA_VALUES")
 WAIT=(--wait --wait-for-jobs --timeout 10m)
 
 say "1/8 CRDs"
@@ -30,7 +32,7 @@ h upgrade --install substrate-podcert "$C/substrate-podcert-$SUBSTRATE_VERSION.t
 say "5/8 development PostgreSQL"
 sed -e "s#image: postgres:18-alpine@sha256:[0-9a-f]*#image: $REGISTRY/library/postgres:18-alpine#" \
     -e "s#storage: 500Gi#storage: ${PG_STORAGE:-32Gi}#" "$HERE/vendor/postgres.yaml" \
-  | python3 "$HERE/scripts/size-postgres.py" "${STORAGE_CLASS:-}" | k apply -f -
+  | python3 "$HERE/scripts/size-postgres.py" "${STORAGE_CLASS:-}" | ${POLICY_FILTER:-cat} | k apply -f -
 k -n $N rollout status statefulset/postgres --timeout=10m
 k -n $N exec -i postgres-0 -c postgres -- psql --no-psqlrc --set=ON_ERROR_STOP=1 --single-transaction \
   --username=postgres --dbname=atepg \

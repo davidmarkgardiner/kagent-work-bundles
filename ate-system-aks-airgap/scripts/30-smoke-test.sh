@@ -34,6 +34,7 @@ spec:
   workerImage: $REGISTRY/kagent-dev/substrate/ateworker-gvisor:v$SUBSTRATE_VERSION
   sandboxClasses: [{name: gvisor}]
   template:
+    labels: {istio-injection: disabled, sidecar.istio.io/inject: "false"}
     resources:
       limits: {cpu: "1", memory: 1Gi}
       requests: {cpu: 100m, memory: 1Gi}

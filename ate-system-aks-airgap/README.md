@@ -1,5 +1,7 @@
 # ate-system (Agent Substrate 1.0.0, gVisor) on air-gapped AKS
 
+> **Installing Substrate 1.0.1, or CRDs already present?** Start with [NEXT-STEPS-1.0.1.md](NEXT-STEPS-1.0.1.md).
+
 Goal of this phase: **`ate-system` installed and proven working.** kagent comes later.
 Hand [`WORK-AGENT-PROMPT.md`](WORK-AGENT-PROMPT.md) to the work agent.
 
