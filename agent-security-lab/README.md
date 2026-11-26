@@ -41,7 +41,7 @@ The sequence below describes one dedicated Ubuntu VM and a single kind cluster; 
 
 `install-kagent` uses a lab placeholder for its Ollama profile and refuses to rerun if a kagent Helm release already exists. The gateway-setup step generates a seven-day, self-signed lab certificate in the private directory and applies a strict JWT policy before creating the route. It is not a corporate certificate workflow. The controller-only mesh step intentionally does not inject a sidecar into Substrate worker pods.
 
-The scripts call pinned releases, but not all upstream Helm chart references are content-digest pinned. Inspect resolved chart/image digests and mirror them for a controlled or air-gapped environment. Successful installation is not proof of a real agent conversation.
+The scripts call pinned releases, but not all upstream Helm chart references are content-digest pinned. Inspect resolved chart/image digests and mirror them for a controlled or air-gapped environment. For Istio this is done: [airgap/istio/](airgap/istio/README.md) lists every Istio 1.31.4 image by digest and every chart by checksum, with a mirror script, air-gap values (Istio CNI on) and the policy blockers to check at work. Successful installation is not proof of a real agent conversation.
 
 ## Tested scenarios
 

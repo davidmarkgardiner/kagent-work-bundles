@@ -1,0 +1,16 @@
+# Istio 1.31.4 values for an air-gapped cluster pulling from your own registry. Use the same file for every chart
+# (base, istiod, cni, and optionally gateway and ztunnel): each chart reads only the keys it knows.
+# Replace <REGISTRY> with your registry host and path, e.g. myacr.azurecr.io (images then live at <REGISTRY>/istio/...).
+global:
+  hub: <REGISTRY>/istio
+  tag: 1.31.4
+  # "" uses the default images; "distroless" uses the *-distroless tags (smaller, fewer CVEs; no shell for debugging).
+  # Mirror the matching set from images.txt.
+  variant: ""
+  # Not needed on AKS when the kubelet identity can pull from ACR (AcrPull). Otherwise name a docker-registry Secret.
+  imagePullSecrets: []
+# istiod: rely on the Istio CNI node agent instead of the privileged istio-init container in every pod.
+# This is usually what clears the "NET_ADMIN / NET_RAW capability" and "privileged container" policy findings for
+# workloads. The CNI DaemonSet itself needs host access, so it still needs a policy exemption (see README).
+cni:
+  enabled: true

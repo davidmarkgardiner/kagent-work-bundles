@@ -1,0 +1,8 @@
+# Istio 1.31.4 Helm charts from https://blob.istio.io/istio-release/charts (the repo the lab installs from), with the
+# sha256 of each .tgz as pulled on 2026-11-26. mirror.sh refuses a chart whose checksum differs.
+# need: sidecar = base + istiod; cni = Istio CNI node agent; ingress = an Istio ingress gateway; ambient = ztunnel.
+sidecar  base     1.31.4  0d02cd6151cb18cc8f32cef7e460f387e2e1f26badb5e628759749790b35004f
+sidecar  istiod   1.31.4  11897560f1d60f0b2a47660757b7a10f3855f0ce3d89ea4391e0249d5453ac2a
+cni      cni      1.31.4  5fb8196e5eb98983819eef8353b03eab1fac41f17f638db3aa40d65ed9a6e6e7
+ingress  gateway  1.31.4  6a173df7cc1806b4efaff6509d78b2836fd941fe565d156a9380532d2573f607
+ambient  ztunnel  1.31.4  d707632e0598cdd58a4125d88c73bec14c8e654e4d5f8bc61258e23a3377c7e0

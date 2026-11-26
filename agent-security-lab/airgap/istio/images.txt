@@ -1,0 +1,13 @@
+# Istio 1.31.4 images, pinned to their multi-arch (amd64 + arm64) index digests, resolved from Docker Hub on 2026-11-26.
+# Columns: need, source image@digest, target path under <REGISTRY> (keep the tag: the charts build <hub>/<name>:<tag>).
+# need: sidecar = every sidecar install; cni = with the Istio CNI (recommended, see README); ambient = ambient mode only;
+#       grpc = only for proxyless gRPC injection templates; distroless = alternative to the row above it (global.variant).
+sidecar     docker.io/istio/pilot:1.31.4@sha256:4adbb158444f033f11d6814b9c85ff3d13a7f5714cf27cbc64461e4d7d876ddf          istio/pilot:1.31.4
+sidecar     docker.io/istio/proxyv2:1.31.4@sha256:04f0f4a8d494f17ae6c67ee400194f646f90460a220811acaaedafb0c332dd1d        istio/proxyv2:1.31.4
+cni         docker.io/istio/install-cni:1.31.4@sha256:6c5498d0e7a6b7532652f8654ea7cc8ab6b0e397f7b5f1ef246623de6108ddcb    istio/install-cni:1.31.4
+ambient     docker.io/istio/ztunnel:1.31.4@sha256:18c2ef38857675ed6ae430c7c2b7c9977f7d5a3bc31be7000383d532a1be5b4e        istio/ztunnel:1.31.4
+grpc        docker.io/library/busybox:1.28@sha256:141c253bc4c3fd0a201d32dc1f493bcf3fff003b6df416dea4f41046e0f37d47      library/busybox:1.28
+distroless  docker.io/istio/pilot:1.31.4-distroless@sha256:2bc9c4190eec5146c6dacb3e2b81fe2752ecd4f5f5198e51fb27ca67b5930312        istio/pilot:1.31.4-distroless
+distroless  docker.io/istio/proxyv2:1.31.4-distroless@sha256:553f3640686d588531426e4c6b6810390b230374b7f83aae65fe4c68efccf1cc      istio/proxyv2:1.31.4-distroless
+distroless  docker.io/istio/install-cni:1.31.4-distroless@sha256:f80f8bd86001494329d62544da21d75570eef4582f6e95f431296f3bc13b9629  istio/install-cni:1.31.4-distroless
+distroless  docker.io/istio/ztunnel:1.31.4-distroless@sha256:7e62e32aebed2cc220aa7a03818b3a0ab6056af462bf3b6a287ea7c6bd3aeec6      istio/ztunnel:1.31.4-distroless
