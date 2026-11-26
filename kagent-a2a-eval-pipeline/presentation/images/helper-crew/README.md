@@ -2,7 +2,7 @@
 
 Alternative illustrations for the agent workflows: an original "helper crew" (small round sky-blue robots with one lens
 eye and an orange hard hat). They are not any studio's characters. AI-generated on 26 Nov 2026 (Higgsfield, Nano Banana 2,
-1376x768). Not yet used in the decks or docs.
+1376x768). Used in `presentation/helper-crew-deck.html` (12 slides; also as a PDF), embedded as compressed JPEGs.
 
 | File | Workflow | Scene |
 |---|---|---|

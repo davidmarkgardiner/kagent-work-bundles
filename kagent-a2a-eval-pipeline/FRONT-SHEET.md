@@ -24,13 +24,13 @@ separately approved agent. Warden checks the investigation, not a repair.
 | Air-gap image inventory and pinned versions | [PREREQUISITES-AIRGAP.md](PREREQUISITES-AIRGAP.md) |
 | What changes at work and what stays pinned | [VARIABLES.md](VARIABLES.md) |
 | Explainer (open in a browser) | [EVALUATION-EXPLAINED.html](EVALUATION-EXPLAINED.html) |
-| Presentation | [presentation/assay-warden-deck.pdf](presentation/assay-warden-deck.pdf) (Assay and Warden, source: `.html`); the full launch deck with Lookout: [presentation/launch-deck.pdf](presentation/launch-deck.pdf) (24 slides, source: `launch-deck.html`) |
+| Presentation | [presentation/assay-warden-deck.pdf](presentation/assay-warden-deck.pdf) (Assay and Warden, source: `.html`); the full launch deck with Lookout: [presentation/launch-deck.pdf](presentation/launch-deck.pdf) (24 slides, source: `launch-deck.html`); the short image-led deck with config review: [presentation/helper-crew-deck.pdf](presentation/helper-crew-deck.pdf) (12 slides, source: `helper-crew-deck.html`) |
 | Handbook pages | `mkdocs.yml` + `docs/`; build with `requirements-docs.txt` |
 | Assay code and CI | `a2a_capture.py`, `score_and_gate.py`, `judge.py`, `.gitlab-ci.yml`, `cases/`, `fixtures/`, `gateway/` |
 | Warden code and contracts | `verify_completion.py`, `completion-gate/` |
 | Evidence | `evidence/LIVE-PROXMOX-2026-11-23.md`, `tests/fixtures/` (sanitized live receipts) |
 | Guard (rogue-agent detector, block proposals, overseer intake) | `guard/`, `docs/alert-loop.md`, `evidence/GUARD-AND-LOOP-2026-11-24.md` |
-| Helper-crew illustrations (original, AI-generated, not yet used in decks) | `presentation/images/helper-crew/` |
+| Helper-crew illustrations (original, AI-generated) and the deck that uses them | `presentation/images/helper-crew/`, `presentation/helper-crew-deck.html` / `.pdf` |
 | Lookout config review (test kagent, kro and agentgateway YAML in a sandbox before merge) | `lookout/CONFIG-REVIEW-DESIGN.md`, `lookout/config_review/`, `lookout/config_review_mcp.py`, `lookout/manifests/config-review-sandbox.yaml`, `evidence/LIVE-CONFIG-REVIEW-LAB-2026-11-26.md` |
 | Lookout (merge-request security review) | [lookout/README.md](lookout/README.md), `lookout/`, `lookout/DESIGN.md`, `docs/lookout.md`, `evidence/LIVE-LOOKOUT-LAB-2026-11-25.md`, `presentation/lookout-flow.html` (open in a browser), `presentation/launch-deck.html` |
 | Independent review: claims, gaps, where to push | [REVIEW-HANDOVER.md](REVIEW-HANDOVER.md) |
