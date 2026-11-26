@@ -1,0 +1,11 @@
+# The chart has no value for extra volumes; the provider needs the node's azure.json.
+spec:
+  template:
+    spec:
+      containers:
+      - name: atelet
+        volumeMounts:
+        - {name: azure-cloud-config, mountPath: /etc/kubernetes/azure.json, readOnly: true}
+      volumes:
+      - name: azure-cloud-config
+        hostPath: {path: /etc/kubernetes/azure.json, type: File}

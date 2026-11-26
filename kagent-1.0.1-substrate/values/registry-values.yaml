@@ -1,0 +1,3 @@
+# Substrate charts. Swaps only the registry host; repository paths are preserved.
+global:
+  imageRegistry: "{{REGISTRY}}"

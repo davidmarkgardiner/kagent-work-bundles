@@ -1,0 +1,6 @@
+objectStore:
+  backend: s3
+  endpoint: http://rustfs.ate-system.svc:9000
+  region: us-east-1
+  pathStyle: true
+  credentialsSecret: ate-rustfs-credentials

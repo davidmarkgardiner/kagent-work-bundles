@@ -1,0 +1,22 @@
+# kagent 1.0.1
+ghcr.io/kagent-dev/kagent/controller:1.0.1
+ghcr.io/kagent-dev/kagent/ui:1.0.1
+ghcr.io/kagent-dev/kagent/tools:0.3.0
+ghcr.io/kagent-dev/kagent/golang-adk@sha256:d3b1151d39c529a6f921a58a995ff699963012001d2e5075f69bf613abebc24d
+ghcr.io/kagent-dev/kagent/claude-harness@sha256:111d28bc8552469b028d91ecd2352c9d44811aba07be12b1e6868db7948f904e
+ghcr.io/kagent-dev/kagent/codex-harness@sha256:6885f229b4ee70c9babf37f89ef5d93438eab049875e5bc129799fef6e4cfd19
+# Substrate 1.0.0 (kagent-dev build)
+ghcr.io/kagent-dev/substrate/ate-idp-server:v1.0.0
+ghcr.io/kagent-dev/substrate/ateapi:v1.0.0
+ghcr.io/kagent-dev/substrate/atecontroller:v1.0.0
+ghcr.io/kagent-dev/substrate/atelet:v1.0.0
+ghcr.io/kagent-dev/substrate/ateworker-gvisor:v1.0.0
+ghcr.io/kagent-dev/substrate/kubernetes-secrets:v1.0.0
+ghcr.io/kagent-dev/substrate/objectstore-plugin:v1.0.0
+ghcr.io/kagent-dev/substrate/podcertcontroller:v1.0.0
+# Third party
+cr.agentgateway.dev/agentgateway:v1.7.0@sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b
+docker.io/rustfs/rustfs:1.0.3@sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b
+docker.io/amazon/aws-cli:2.38.5@sha256:c8156a0e74e13929a42d7e60f0d4e14e7d28d980cd21822505d4bff80e5460c1
+# Only if you use the development database that `kagent install` deploys
+docker.io/library/postgres:18-alpine

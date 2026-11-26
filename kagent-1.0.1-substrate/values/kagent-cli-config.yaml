@@ -1,0 +1,20 @@
+# `kagent --config kagent-cli-config.yaml install`
+# Replace {{REGISTRY}} with your internal registry host. Paths are relative to this file's use;
+# run from this directory.
+install:
+  defaultModelProvider: OpenAI
+  bundledPostgresImage: "{{REGISTRY}}/library/postgres:18-alpine"
+  kagent:
+    repository: "oci://{{REGISTRY}}/kagent-dev/kagent/helm/"
+    version: "1.0.1"
+    valuesFiles: [kagent-values.yaml]
+  substrate:
+    repository: "oci://{{REGISTRY}}/kagent-dev/substrate/helm/"
+    version: "1.0.0"
+    valuesFiles: [registry-values.yaml]
+  atelet:
+    valuesFiles: [registry-values.yaml]
+  podCertificate:
+    repository: "oci://{{REGISTRY}}/kagent-dev/substrate/helm/"
+    version: "1.0.0"
+    valuesFiles: [registry-values.yaml]

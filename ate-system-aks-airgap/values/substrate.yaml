@@ -1,0 +1,11 @@
+atelet:
+  enabled: false
+postgres:
+  clientCertificates:
+    enabled: true
+atenetRouter:
+  ingressAllowedSPIFFEIDs:
+    - spiffe://cluster.local/ns/ate-system/sa/atenet-client        # kubectl-ate, smoke test
+    # add the kagent controller identity here when kagent is installed
+rustfs:
+  storageSize: 20Gi        # snapshots and gVisor archives; chart default is 1Gi

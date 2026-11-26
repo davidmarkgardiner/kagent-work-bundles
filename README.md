@@ -14,6 +14,13 @@ Before live implementation, fill in
 That sheet lists the common namespaces, MCP server names, datasource UIDs,
 GitLab project values, approval routes, and demo targets needed across bundles.
 
+## Agent Substrate on air-gapped AKS (start here)
+
+| Bundle | What it is |
+| --- | --- |
+| [ate-system-aks-airgap](ate-system-aks-airgap/README.md) | **Current phase.** `ate-system` only (Substrate 1.0.0, gVisor): charts, image list, install and smoke-test scripts. Give the agent [the prompt](ate-system-aks-airgap/WORK-AGENT-PROMPT.md). Lab-tested with egress rejected; not tested on AKS. |
+| [kagent-1.0.1-substrate](kagent-1.0.1-substrate/README.md) | Later phase. Why Substrate is not bundled in the kagent chart, and the CLI install. Lab-tested with public registries. |
+
 ## Sessions and AX home-lab POCs
 
 Start with the [dev-pod, remote-cluster and air-gap guide](agent-runtime-workplace-guide/README.md).

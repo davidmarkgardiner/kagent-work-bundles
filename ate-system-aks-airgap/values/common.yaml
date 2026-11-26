@@ -1,0 +1,4 @@
+# Used by substrate-podcert, substrate-atelet and substrate. REGISTRY is passed with --set.
+preview:
+  - PerTemplateSnapshotLocation   # needed later by kagent
+  - GoldenEgressPolicy            # needed later by kagent

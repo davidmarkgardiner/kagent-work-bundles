@@ -1,0 +1,7 @@
+# chart  version  oci-repository  oci-digest
+kagent-crds        1.0.1  ghcr.io/kagent-dev/kagent/helm     sha256:6fda1c3d10ebc67b7e38dc8361700aebbe5ee73fcc205c5fd2cc2de9e1b85eeb
+kagent             1.0.1  ghcr.io/kagent-dev/kagent/helm     sha256:1c491dde742b91acd8056786177279d3ba8d61fc2c314f6dce66d00ea4bfe9c1
+substrate-crds     1.0.0  ghcr.io/kagent-dev/substrate/helm  sha256:2d1b331c4774dcb88d2d5ebcb017b294a43b4bfb5abeca719534bbc73c14c8d4
+substrate-podcert  1.0.0  ghcr.io/kagent-dev/substrate/helm  sha256:b21ec973ad28c9a417ce7167269bdf403a338ce96ff72cd422b5da987f9247cd
+substrate-atelet   1.0.0  ghcr.io/kagent-dev/substrate/helm  sha256:d1f92b24afe45c34b87f56446fb450f46c3e13869951df475867c7096ddf403f
+substrate          1.0.0  ghcr.io/kagent-dev/substrate/helm  sha256:2098ad8f79e8d00ffe5647286745ed1bf65531ce0b930175d83c8645345ac546

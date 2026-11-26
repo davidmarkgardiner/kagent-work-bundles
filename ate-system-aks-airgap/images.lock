@@ -1,0 +1,14 @@
+# path under {{REGISTRY}}   digest in the lab mirror, 26 Nov 2026 (copied from the public source)
+kagent-dev/substrate/ate-idp-server:v1.0.0 sha256:81c2f4f06eb9aed61b67bb850645bdc9b35a4ef9daba1153add58b81e42a1d1d
+kagent-dev/substrate/ateapi:v1.0.0 sha256:41a6a83530702b6e9b2bb30468d1961cc7c3c2db1bb5ed4095d7d6f49a1edcc6
+kagent-dev/substrate/atecontroller:v1.0.0 sha256:9dbc2618bb3901f54b4b4a6cf6b6f650364f678170faed69e278625142dc04f6
+kagent-dev/substrate/atelet:v1.0.0 sha256:c4deb4a264d5bfd2e7221ae057ba59b7845ed33a5c82806991f9d6341f78e3a6
+kagent-dev/substrate/ateworker-gvisor:v1.0.0 sha256:ba3b63e1d307f7dc5e5191d586811c8736bd3f69ec6209f5f4ea061fed5ffeee
+kagent-dev/substrate/kubernetes-secrets:v1.0.0 sha256:7722a1733aa83efd79e665654bc580b34d18539f1160d992dfb1dd89f7d89abe
+kagent-dev/substrate/objectstore-plugin:v1.0.0 sha256:c079030bb7b66b8d46e9a4489180375c59b93c9047ecb5687c92831eab5a9c11
+kagent-dev/substrate/podcertcontroller:v1.0.0 sha256:9fe4100674d200aa83af3b994b0ca3dcfc814f922ceb49ff4edafc1bdb1648c1
+agentgateway:v1.7.0 sha256:60216aafb03d37f94e952ff3d51d2f630a65b10ecaebdc0a864882f92610c45b
+rustfs/rustfs:1.0.3 sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b
+amazon/aws-cli:2.38.5 sha256:c8156a0e74e13929a42d7e60f0d4e14e7d28d980cd21822505d4bff80e5460c1
+library/postgres:18-alpine sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15
+library/python:3.13-alpine sha256:9ef1a599f863231c3d91e941389bfdc4a2d6070557243d54df1a4e57015b960e

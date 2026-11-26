@@ -1,0 +1,6 @@
+global:
+  imageRegistry: "{{REGISTRY}}"
+substrateWorkerPool:
+  create: true
+  sandboxClass: gvisor
+  workerImage: ghcr.io/kagent-dev/substrate/ateworker-gvisor:v1.0.0
