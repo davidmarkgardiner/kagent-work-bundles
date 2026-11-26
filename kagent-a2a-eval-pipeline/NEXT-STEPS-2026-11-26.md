@@ -1,89 +1,103 @@
 # Next steps after the 26 Nov 2026 work status report
 
-This sheet answers the work agent's status report from 26 Nov 2026. It covers three things: where the work stands, what the agent does next, and what only a person can do. It ends with the target: the same state the home lab reached.
+This sheet answers the work agent's status report from 26 Nov 2026. It says what to do next, what only a person can do, and what "same as the home lab" means.
 
-## 1. Where the work stands
+## Scope for now: everything outside Grafana
 
-| Helper | Home lab (proven) | Work (reported 26 Nov) | Gap |
-|---|---|---|---|
-| **Warden** (in-place A2A eval) | Worker corrected by the evaluator; ticket written only after PASS; negative tests pass | Worker and evaluator Ready; an earlier smoke gave `PASS/no_action` but was not rerun | Phase 1 gate not yet evidenced: rerun with receipts |
-| **Assay** (pipeline eval) | Healthy case passes, rogue case fails (exit 1) | 28 offline tests pass | Runner, identity, image and CI variables missing (rows 5–7, 12) |
-| **Guard** (detect, propose) | `detect.py` clean / `forbidden_tool` / `degraded`; proposal accepted by server dry-run | Offline tests pass | Waiting for observability (Phase 0) and rows 13–14 |
-| **Overseer** (LGTM, alert intake) | Broken agent fixed by switching to the approved fallback model; Grafana alert loop end to end | Offline tests pass; 2 observability agents not Ready | Telemetry and alert path absent (Phase 0); rows 11, 15, 19, 20 |
-| **Guard direct blocking** | Gateway 200 → 403 → 200 on a throwaway route | Not started (correct) | Rows 16–18; written owner approval |
-| **Lookout** (MR security review) | Advisory note posted; rerun of the same commit gives `up_to_date` | 131 offline tests pass | Rows 21–25 (token, sandbox project, approved model, runner or local replay, owners) |
-| **Lookout config review** | 4 MRs reviewed in a sandbox, notes posted, 12/12 fence tests, nothing left behind | Correctly not started | Rows 26–32 (dedicated sanitised sandbox cluster) |
+**This sheet overrides the Grafana part of Phase 0 in `WORK-AGENT-PROMPT.md`.** Grafana is out of scope for now. Do not install, repair or wait for Grafana, Loki, Tempo, Mimir or Alertmanager.
 
-**Read this first:** the report treats observability as blocking everything. It does not. Per `docs/rollout.md`:
+What the platform already gives you:
 
-- **Phase 1 (Warden)** needs no monitoring and no CI.
-- **Phase 6 (Lookout)** and **Phase 7 (config review)** are independent of Phases 1–5.
+- a GitLab project and a token the agent may use;
+- a model and ModelConfig that reach the model through agentgateway;
+- a cluster with kagent and agentgateway running and connected.
 
-Only Guard (Phase 3), the Overseer (Phase 4) and direct blocking (Phase 5) wait on observability. Three tracks can move now.
+That is enough for everything except Phase 4 (the Overseer's alert intake), which is deferred.
 
-**Check the bundle version.** The report's test counts (28 + 131 + 111) do not add up to the current bundle's 443. Pull `kagent-work-bundles` main (`202665b` or later) and run `./verify-bundle.sh`. It must print `BUNDLE_OK: yes` with 443 tests. The config review mode (Phase 7, 45 tests) was added on 26 Nov and may be missing from the copy at work.
+| Phase | Needs Grafana? | Status for now |
+|---|---|---|
+| 0. Readiness | No (Grafana rows skipped) | **Do**, reduced: see step 2 |
+| 1. Warden | No | **Do** |
+| 2. Assay | No (needs a CI runner) | **Do** when rows 5–7 are filled; skip until then |
+| 3. Guard: detect and propose | No | **Do**, on receipts (see below) |
+| 4. Overseer alert intake | **Yes**: something must fire an alert webhook | **Deferred** |
+| 5. Direct blocking | No | **Do** only with written owner approval (rows 16–18) |
+| 6. Lookout | No | **Do** |
+| 7. Config review | No (needs its own sandbox cluster) | **Do** when rows 26–32 are filled; skip until then |
 
-## 2. What the work agent does next (in order)
+### Why Guard does not need Grafana
+
+`guard/detect.py` reads files, not Grafana. It accepts:
+
+- `a2a_capture` `*.run.json` and raw A2A receipts: Warden and Assay already write these;
+- `warden.jsonl`;
+- generic JSONL access logs;
+- OTLP-JSON trace files (optional).
+
+Feed it the receipts from Phase 1. Without a list of started tasks (`--inventory`, row 14) it cannot see a run that never finishes, so it reports `degraded`, never `clean`. That list can come from kagent's own task list or the gateway; it does not need Grafana.
+
+### OpenTelemetry without Grafana (optional)
+
+OTel does not need Grafana. Grafana and Tempo only store and show the traces. To feed traces to Guard without them:
+
+1. Point kagent's OTLP trace exporter at an OpenTelemetry Collector (check the kagent Helm chart's `otel` tracing values for your version).
+2. Give the Collector a `file` exporter in JSON format. It writes one OTLP-JSON document per line.
+3. **Split that file before giving it to `detect.py`.** The detector reads a `.jsonl` file as access-log lines and would misread trace lines. Put each line in its own `.json` file:
+
+   ```sh
+   mkdir -p otel-split && i=0; while IFS= read -r l; do [ -n "$l" ] && i=$((i+1)) && printf '%s' "$l" > "otel-split/trace-$i.json"; done < traces.jsonl
+   python guard/detect.py --events otel-split/*.json <receipts...> --inventory started.json
+   ```
+
+This step is optional. Receipts plus an inventory are enough for the Phase 3 gate. Add OTel only if a Collector is already allowed at work.
+
+## What the work agent does next (in order)
 
 | # | Action | Gate (stop and report) |
 |---|---|---|
-| 1 | Pull the latest bundle and run `./verify-bundle.sh` | `BUNDLE_OK: yes`, 443 tests |
-| 2 | **Phase 1, Warden:** rerun the smoke now (do not rely on the old result), then the negative tests | Worker corrected by the evaluator; ticket only after PASS; negative tests pass; receipts saved |
-| 3 | **Phase 6, Lookout:** once rows 21–25 are filled, one run on the sandbox MR (or `lookout/ci/run_local.py` if there is no runner) | One advisory note; rerun of the same commit gives `up_to_date` |
-| 4 | **Phase 0, again:** once the platform owner names the telemetry and alert path, redo the readiness table | Recent trace and log per application; a controlled test alert reaches the webhook; both observability agents Ready |
-| 5 | **Phase 2, Assay:** once rows 5–7 and 12 are filled | Smoke, then pass^3 per case through the gateway; an unprotected-branch MR fails closed |
-| 6 | **Phase 3, Guard (no enforcement):** after step 4 is green and rows 13–14 are filled | Clean / `forbidden_tool` / `degraded` as expected; proposal accepted by dry-run, nothing applied |
-| 7 | **Phase 4, Overseer:** after Phase 3 and rows 11, 15, 19, 20 | One bounded overseer run, then one real alert end to end |
-| 8 | **Phase 5, direct blocking:** only with rows 16–18 signed off | Applied, read back and released on a throwaway route; a real request proves the Deny |
-| 9 | **Phase 7, config review:** only on the dedicated sandbox cluster (rows 26–32) | `deploy-config-review.sh` Ready; `negative-config-review.sh` 12/12; one note on a sandbox MR; no `lookout-mr-*` namespaces left |
-| 10 | Browser and PDF visual checks of `presentation/` (any machine with Chrome; no cluster needed) | Screenshots look right; the PDFs open |
+| 1 | Pull the latest `kagent-work-bundles` main and run `./verify-bundle.sh` | `BUNDLE_OK: yes`, 443 tests. The report's counts (28 + 131 + 111) suggest an older copy without config review |
+| 2 | **Phase 0, reduced:** pinned versions; the model route answers; the agentgateway route answers with caller authentication; GitLab token reaches the project. Mark the Grafana rows "out of scope (26 Nov sheet)" | Readiness table, Grafana rows marked out of scope, everything else green |
+| 3 | **Phase 1, Warden:** rerun the smoke now (do not rely on the old `PASS/no_action`), then the negative tests | Worker corrected by the evaluator; ticket only after PASS; negative tests pass; receipts saved |
+| 4 | **Phase 6, Lookout:** one run on a sandbox MR (or `lookout/ci/run_local.py` if no runner) | One advisory note; rerun of the same commit gives `up_to_date` |
+| 5 | **Phase 3, Guard (no enforcement):** run `detect.py` on the Phase 1 receipts, then `propose.py --dry-run-server` | `clean` on good runs, `forbidden_tool` on a bad one, `degraded` when the inventory is missing; proposal accepted by server dry-run, nothing applied |
+| 6 | **Phase 2, Assay:** only once rows 5–7 and 12 are filled | Smoke, then pass^3 per case through the gateway; an unprotected-branch MR fails closed |
+| 7 | **Phase 5, direct blocking:** only with rows 16–18 signed off | Applied, read back and released on a throwaway route; a real request proves the Deny |
+| 8 | **Phase 7, config review:** only on the dedicated sandbox cluster (rows 26–32) | `deploy-config-review.sh` Ready; `negative-config-review.sh` 12/12; one note on a sandbox MR; no `lookout-mr-*` namespaces left |
+| 9 | Browser and PDF checks of `presentation/` (any machine with Chrome) | Screenshots look right; the PDFs open |
 
 Rules unchanged: one phase per "go"; stop at the first failure and read the receipt; never loop a failing agent; no secrets in email or git.
 
-## 3. What only a person can do
+## What only a person can do
 
-Grouped by who to ask. Row numbers refer to `HUMAN-PREREQUISITES.md`.
-
-**Unblocks the most:**
+Row numbers refer to `HUMAN-PREREQUISITES.md`. Already covered: GitLab project and token, model and ModelConfig, cluster with kagent and agentgateway.
 
 | Owner | Ask | Rows | Unblocks |
 |---|---|---|---|
-| Platform / Observability | Name the approved telemetry and alert path (Grafana or an approved alternative that meets the Phase 0 gate). Confirm applications send traces and logs. Send one controlled test alert | 0, 15 | Phases 3, 4, 5 |
-| Platform / Security | Least-privilege GitLab token into Secret `lookout-gitlab-token`; `LOOKOUT_ALLOWED_PROJECTS` list | 21 | Phases 6, 7 |
-| DevEx | Sandbox GitLab project with a throwaway MR | 22 | Phases 6, 7 |
-| Data classification owner | Approve a model that may read source code; ModelConfig (and Harness on 1.x) | 23 | Phases 6, 7 |
-
-**Then:**
-
-| Owner | Ask | Rows | Unblocks |
-|---|---|---|---|
-| Platform / DevEx | Protected runner tagged `kagent-eval`; masked CI variables; restricted `eval-*` service account; runner image pinned by digest and mirrored | 5, 6, 7, 24 | Phase 2 (and Lookout CI) |
-| Agent owner | Review the first full run of each Assay case | 12 | Phase 2 |
-| Platform / Security | Dry-run RBAC identity; start inventory source | 13, 14 | Phase 3 |
-| Platform | Separate model route for the overseer and Guard; overseer read RBAC; approved fallbacks | 11, 19, 20 | Phase 4 |
-| Product owner | Written approval of which signals may auto-block and the never-block list | 16 | Phase 5 |
+| Platform / Security | Confirm the GitLab token is least-privilege, sits in Secret `lookout-gitlab-token`, and set `LOOKOUT_ALLOWED_PROJECTS` | 21 | Phase 6 |
+| Data classification owner | Confirm the model may read source code (and an approved Harness on kagent 1.x) | 23 | Phase 6 |
+| Platform | Gateway caller authentication and a scoped test token; the read-only tool names | 2, 3 | Phases 1, 6 |
+| Platform | Where to get started tasks (kagent task list or gateway) | 14 | Phase 3 `clean` instead of `degraded` |
+| Platform / Security | A dedicated identity for `propose.py --dry-run-server` | 13 | Phase 3 |
+| Platform / DevEx | Protected runner tagged `kagent-eval`, CI variables, restricted `eval-*` account, mirrored runner image | 5, 6, 7, 24 | Phase 2 |
+| Product owner | Written approval of auto-block signals and the never-block list | 16 | Phase 5 |
 | Platform / Security | Narrow identity for `enforce.py`; JWT test caller and throwaway route | 17, 18 | Phase 5 |
-| Platform | Dedicated sanitised sandbox cluster, same versions, internal-only load balancers, Kubernetes 1.30+, admin to install the fences once, kro plurals, PyYAML mirrored | 26–31 | Phase 7 |
-| Product owner | Who reads Lookout and config-review notes; how long advisory-only; where a first FAIL routes; who owns a failing agent | 9, 10, 25, 32 | Turning the helpers into a gate people read |
+| Platform | Dedicated sanitised sandbox cluster with the same versions, internal-only load balancers, Kubernetes 1.30+, an admin to install the fences once, kro plurals, mirrored PyYAML | 26–31 | Phase 7 |
+| Product owner | Who reads the notes; how long advisory-only; where a first FAIL routes; who owns a failing agent | 9, 10, 25, 32 | People acting on the results |
+| *Later* | Grafana 9+ (or an existing Alertmanager) with a webhook contact point to `guard/alert_receiver.py` | 11, 15, 19, 20 | Phase 4, deferred |
 
-## 4. Desired state: same as the home lab
+## Desired state: same as the home lab (minus Grafana)
 
-Work is "at lab parity" when every line below has a saved receipt.
+Work is at lab parity, for now, when every line below has a saved receipt.
 
 - [ ] `./verify-bundle.sh`: `BUNDLE_OK: yes`, 443 tests
 - [ ] **Warden:** worker corrected by the evaluator; ticket written only after PASS; negative tests pass
-- [ ] **Assay:** healthy case passes, rogue case fails (exit 1), through the gateway, in CI; unprotected-branch MR fails closed
-- [ ] **Telemetry:** recent trace and log per application; test alert reaches the receiver; observability agents Ready
-- [ ] **Guard:** `detect.py` gives clean, `forbidden_tool` and `degraded` correctly; proposal accepted by server dry-run, nothing applied
-- [ ] **Overseer:** a broken agent fixed by switching to an approved fallback; one real alert handled end to end
-- [ ] **Direct blocking:** gateway 200 → 403 → 200 on a throwaway route, with the ledger entry
 - [ ] **Lookout:** advisory note on a sandbox MR; rerun gives `up_to_date`
-- [ ] **Config review:** notes on sandbox MRs (clean, write-tool risk, kro breakage); 12/12 fence tests; no `lookout-mr-*` namespaces left
-- [ ] **Demo:** `demo/run-demo.sh` scenes run in order (`docs/walkthrough.md`), ending with `reset` then `lights`: `guard blocks active: 0`
-- [ ] Presentation decks checked in a browser and as PDF
+- [ ] **Guard:** `detect.py` gives `clean`, `forbidden_tool` and `degraded` correctly on receipts; proposal accepted by server dry-run, nothing applied
+- [ ] **Assay** (once a runner exists): healthy passes, rogue fails (exit 1), through the gateway in CI; unprotected-branch MR fails closed
+- [ ] **Direct blocking** (once approved): gateway 200 → 403 → 200 on a throwaway route, with the ledger entry
+- [ ] **Config review** (once the sandbox cluster exists): notes on sandbox MRs; 12/12 fence tests; no `lookout-mr-*` namespaces left
+- [ ] **Demo:** `demo/run-demo.sh` scenes except the Grafana loop, ending with `reset` then `lights`: `guard blocks active: 0`
+- [ ] Decks checked in a browser and as PDF
+- [ ] *Deferred:* Overseer alert intake via Grafana or an Alertmanager webhook
 
-Parity does **not** mean copying the lab's shortcuts. At work, keep these differences:
-
-- config review gets its own cluster;
-- direct blocking needs written approval;
-- secrets live only in approved stores.
+Lab shortcuts not to copy at work: config review gets its own cluster; direct blocking needs written approval; secrets stay in approved stores.
