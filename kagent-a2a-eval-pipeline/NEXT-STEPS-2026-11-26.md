@@ -2,6 +2,32 @@
 
 This sheet answers the work agent's status report from 26 Nov 2026. It says what to do next, what only a person can do, and what "same as the home lab" means.
 
+## Update: answer to the second status report (26 Nov 2026)
+
+Stopping at Lookout and refusing to reuse the shared GitLab MCP was correct. Three corrections:
+
+1. **Phase 1 (Warden) is not finished.** A healthy `PASS/no_action` proves only the happy path. Still to do:
+   - a case where the evaluator **corrects** a bad worker answer;
+   - the ticket step written **only after PASS**;
+   - the negative tests;
+   - receipts saved for each.
+2. **Phase 3 (Guard detection) does not wait for Assay.** Run `guard/detect.py` now on the Phase 1 receipts.
+   - Without `--inventory` the result is `degraded`. That is an accepted result for this gate.
+   - Skip `propose.py --dry-run-server` until the dedicated dry-run identity (row 13) exists.
+3. **Report your local edits.** List the local Warden and presentation changes behind the 4 refreshed checksums (453 tests here vs 443 in the bundle). Do this before the next `git pull`, so they can be merged into the bundle or dropped on purpose.
+
+**Secrets:** never read Secrets with `kubectl get secret -o yaml` or `-o json`. To check that a Secret exists, use `kubectl get secret <name>` or `kubectl describe secret <name>`, which show key names only. Ask a person to clear any session logs that still hold the earlier base64 output.
+
+**Lookout resumes** when a person confirms all of these:
+
+- the Secret `lookout-gitlab-token` holds a project access token for the test project only (role Reporter, scope `api`, short expiry);
+- `LOOKOUT_ALLOWED_PROJECTS` is set to that one project;
+- the reviewer, advisory-only status and trial period are recorded.
+
+Then run step 4 below.
+
+**Order from here:** finish Phase 1, then Phase 3 detection, then Phase 6 (when the token is confirmed).
+
 ## Scope for now: everything outside Grafana
 
 **This sheet overrides the Grafana part of Phase 0 in `WORK-AGENT-PROMPT.md`.** Grafana is out of scope for now. Do not install, repair or wait for Grafana, Loki, Tempo, Mimir or Alertmanager.
