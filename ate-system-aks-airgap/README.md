@@ -2,6 +2,66 @@
 
 > **Installing Substrate 1.0.1, or CRDs already present?** Start with [NEXT-STEPS-1.0.1.md](NEXT-STEPS-1.0.1.md).
 
+## What you (the human) need to do for 1.0.1
+
+The work agent cannot fetch from the internet. These are yours. The agent's own steps are in
+[NEXT-STEPS-1.0.1.md](NEXT-STEPS-1.0.1.md).
+
+### 1. Import images into the internal registry
+
+- [ ] All images in the Stage 2 table of [NEXT-STEPS-1.0.1.md](NEXT-STEPS-1.0.1.md), keeping paths and digests.
+- [ ] In particular the worker. Do **not** fall back to a 1.0.0 worker with a 1.0.1 control plane (untested):
+      `ghcr.io/kagent-dev/substrate/ateworker-gvisor:v1.0.1` = `sha256:97ca74cd2cabc3fd28ac67790ed3b1f25b7b4247709a316ff374a428822c420e`
+- [ ] The smoke test image: `docker.io/library/python:3.13-alpine` = `sha256:9ef1a599f863231c3d91e941389bfdc4a2d6070557243d54df1a4e57015b960e`
+
+Charts need no import for a direct Helm install: they are in `charts/`. Push them to the internal
+OCI registry only when moving to Flux (Stage 8).
+
+### 2. Download files on a connected machine
+
+```sh
+for r in 20261026.0 20261102.0; do
+  mkdir -p assets/$r/x86_64
+  curl -fL -o assets/$r/x86_64/gvisor.tar.zstd \
+    https://storage.googleapis.com/gvisor/releases/release/$r/x86_64/gvisor.tar.zstd
+done
+curl -fLO https://github.com/kagent-dev/substrate/releases/download/v1.0.1/kubectl-ate-linux-amd64
+curl -fLO https://github.com/kagent-dev/substrate/releases/download/v1.0.1/kubectl-ate-linux-amd64.sha256
+shasum -a 256 assets/*/x86_64/gvisor.tar.zstd kubectl-ate-linux-amd64
+```
+
+| File | SHA256 |
+| --- | --- |
+| `assets/20261026.0/x86_64/gvisor.tar.zstd` | `708afc62f2ee82d19930c703e85f9dab4f27a78c0aec40c0f55eb1040107f1a7` |
+| `assets/20261102.0/x86_64/gvisor.tar.zstd` | `a1439ffbba7d212e0fde32ea79fa9bb51cbc4c5f6c16af1f047260290b861d42` |
+| `kubectl-ate-linux-amd64` | `455a3c465e9473575083cb54d5646eac0ba6f299f8e1b7e42077a3997c17afaa` |
+
+### 3. Transfer them by the approved internal route
+
+- [ ] `assets/` to the jumpbox, keeping the folder layout; tell the agent the path (`ASSETS_DIR`).
+- [ ] `kubectl-ate-linux-amd64` and its `.sha256`. On the jumpbox: verify, rename to `kubectl-ate`,
+      `chmod +x`, put on `PATH`.
+
+### 4. Get approvals
+
+- [ ] Privileged + `hostPath` exemption for **`ate-system`** and `ate-smoke`. A namespace label is not an exemption.
+- [ ] Direct Helm install while Flux stays suspended.
+- [ ] atelet reading the node's ACR credential provider and `/etc/kubernetes/azure.json` (see `aks/`).
+- [ ] If `ate-api` must reach a public OIDC issuer: egress on 443 from `ate-system`.
+- [ ] Proof-of-concept choices: single in-cluster PostgreSQL, in-cluster RustFS, generated Secrets,
+      signing CAs that expire after one year with no auto-renewal.
+
+### 5. Send the work agent this
+
+> Pull the latest bundle and follow `NEXT-STEPS-1.0.1.md`. Files and images are coming by internal
+> transfer. Do not use the 1.0.0 worker; pin the 1.0.1 worker digest `sha256:97ca74cd2cabc3fd28ac67790ed3b1f25b7b4247709a316ff374a428822c420e`.
+> Before installing, report: (1) every Stage 2 image is in the registry with a matching digest;
+> (2) Stage 3 admission probe results; (3) the privileged and hostPath exemption for `ate-system`
+> and `ate-smoke`; (4) Stage 4 results; (5) anything you changed in the bundle scripts.
+
+Then paste its report back for the next step. Note that 1.0.1 has been checked offline only; the
+lab install was 1.0.0.
+
 Goal of this phase: **`ate-system` installed and proven working.** kagent comes later.
 Hand [`WORK-AGENT-PROMPT.md`](WORK-AGENT-PROMPT.md) to the work agent.
 
