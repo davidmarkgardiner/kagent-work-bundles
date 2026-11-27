@@ -1,6 +1,8 @@
 # ate-system (Agent Substrate 1.0.0, gVisor) on air-gapped AKS
 
 > **Installing Substrate 1.0.1, or CRDs already present?** Start with [NEXT-STEPS-1.0.1.md](NEXT-STEPS-1.0.1.md).
+>
+> **kagent and Substrate already installed?** Verify them with [VERIFY-KAGENT-ON-ATE-SYSTEM.md](VERIFY-KAGENT-ON-ATE-SYSTEM.md) (no `kubectl-ate` needed).
 
 ## What you (the human) need to do for 1.0.1
 
